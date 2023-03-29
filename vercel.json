@@ -4,8 +4,5 @@
           "source": "/(.*)",
           "destination": "/src/app.ts"
       }
-  ],
-  "functions": {
-    "src/app.ts": {}
-  }
+  ]
 }
