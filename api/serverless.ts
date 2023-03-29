@@ -1,3 +1,11 @@
+import fastify from "fastify";
 import App from "../src/app";
 
-export default App;
+const app = fastify({ logger: true });
+
+app.register(App);
+
+export default async (req, res) => {
+  await app.ready();
+  app.server.emit("request", req, res);
+};
