@@ -3,9 +3,7 @@ import App from "../src/app";
 
 const app = fastify({ logger: true });
 
-app.register(App, {
-  prefix: "/api/serverless",
-});
+app.register(App);
 
 export default async (req: any, res: any) => {
   await app.ready();
