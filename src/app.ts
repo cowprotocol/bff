@@ -14,7 +14,10 @@ const app: FastifyPluginAsync<AppOptions> = async (
   opts
 ): Promise<void> => {
   // Place here your custom code!
-
+  const appOpts = {
+    ...opts,
+    prefix: "/api/serverless",
+  };
   // Do not touch the following lines
 
   // This loads all plugins defined in plugins
@@ -22,14 +25,14 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // through your application
   void fastify.register(AutoLoad, {
     dir: join(__dirname, "plugins"),
-    options: opts,
+    options: appOpts,
   });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   void fastify.register(AutoLoad, {
     dir: join(__dirname, "routes"),
-    options: opts,
+    options: appOpts,
   });
 };
 
