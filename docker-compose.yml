@@ -1,0 +1,55 @@
+version: '3'
+services:
+  bff:
+    container_name: bff
+    build: .
+    image: bff:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PROXY_UPSTREAM: ${PROXY_UPSTREAM}
+      PROXY_ORIGIN: ${PROXY_ORIGIN}
+      JWT_CERT_PASSPHRASE: ${JWT_CERT_PASSPHRASE}
+      INFURA_KEY: ${INFURA_KEY}
+      INFURA_JWT_ID: ${INFURA_JWT_ID}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+
+      - ./.env:/app/.env
+    ports:
+      - '1337:1337'
+    networks:
+      - bff-network
+    depends_on:
+      - bff-db
+      
+  bff-db:
+    container_name: bff-db
+    restart: unless-stopped
+    env_file: .env
+    image: postgres:14.5-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - bff-data:/var/lib/postgresql/data/ # using a volume
+
+    ports:
+      - '5432:5432'
+    networks:
+      - bff-network
+
+volumes:
+  bff-data:
+
+networks:
+  bff-network:
+    name: bff-network
+    driver: bridge

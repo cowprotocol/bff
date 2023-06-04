@@ -9,6 +9,8 @@
   "scripts": {
     "test": "jest --coverage",
     "start": "npm run build:ts && fastify start -l info dist/app.js",
+    "start:production": "fastify start -l info dist/app.js",
+    "build": "tsc -p .",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
