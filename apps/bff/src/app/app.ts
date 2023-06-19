@@ -1,6 +1,6 @@
-import { join } from "path";
-import AutoLoad, { AutoloadPluginOptions } from "@fastify/autoload";
-import { FastifyPluginAsync } from "fastify";
+import { join } from 'path';
+import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload';
+import { FastifyPluginAsync } from 'fastify';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -16,7 +16,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // Place here your custom code!
   const appOpts = {
     ...opts,
-    prefix: "/api/serverless",
+    prefix: '/api/serverless',
   };
   // Do not touch the following lines
 
@@ -24,14 +24,14 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // those should be support plugins that are reused
   // through your application
   void fastify.register(AutoLoad, {
-    dir: join(__dirname, "plugins"),
+    dir: join(__dirname, 'plugins'),
     options: appOpts,
   });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   void fastify.register(AutoLoad, {
-    dir: join(__dirname, "routes"),
+    dir: join(__dirname, 'routes'),
     options: appOpts,
   });
 };
