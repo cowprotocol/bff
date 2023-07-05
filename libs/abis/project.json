@@ -7,9 +7,7 @@
     "abis": {
       "executor": "nx:noop",
       "dependsOn": [
-        "abi:ethflow",
-        "abi:custom",
-        "abis-legacy"
+        "abi:custom"
       ]
     },
     "abi:ethflow": {
@@ -22,12 +20,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "typechain --target ethers-v5 --out-dir ./libs/abis/src/generated/custom './libs/abis/src/abis/**/*.json'"
-      }
-    },
-    "abis-legacy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "typechain --target ethers-v5 --out-dir ./libs/abis/src/generated/legacy './libs/abis/src/abis-legacy/**/*.json'"
       }
     },
     "build": {
