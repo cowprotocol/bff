@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "paths": {
+      "@cow-web-services/abis": ["libs/abis/src/index.ts"],
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
