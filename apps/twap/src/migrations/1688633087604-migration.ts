@@ -8,7 +8,7 @@ export class Migration1688633087604 implements MigrationInterface {
             ALTER TABLE "order" DROP COLUMN "chainId"
         `);
     await queryRunner.query(`
-        TRUNCATE TABLE "order"
+            TRUNCATE TABLE "order"
         `);
     await queryRunner.query(`
             ALTER TABLE "order"
