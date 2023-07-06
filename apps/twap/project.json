@@ -91,23 +91,33 @@
       ],
       "command": "docker buildx build --platform=linux/amd64 -f apps/twap/Dockerfile . -t twap"
     },
-    "typeorm-generate-migrations": {
+    "typeorm": {
       "executor": "nx:run-commands",
       "outputs": [
         "{options.outputPath}"
       ],
       "options": {
-        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm migration:generate --pretty -d datasource.config.ts src/migrations/migration",
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm",
         "cwd": "apps/twap"
       }
     },
-    "typeorm-run-migrations": {
+    "generate-migrations": {
       "executor": "nx:run-commands",
       "outputs": [
         "{options.outputPath}"
       ],
       "options": {
-        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm migration:run -d datasource.config.ts",
+        "command": "nx run typeorm migration:generate --pretty -d datasource.config.ts src/migrations/migration",
+        "cwd": "apps/twap"
+      }
+    },
+    "run-migrations": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "command": "nx run typeorm migration:run -d datasource.config.ts",
         "cwd": "apps/twap"
       }
     }

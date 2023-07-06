@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "twap:run-migrations": "nx run twap:typeorm-run-migrations",
-    "twap:generate-migrations": "nx run twap:typeorm-generate-migrations",
+    "twap:run-migrations": "nx run twap:run-migrations",
+    "twap:generate-migrations": "nx run twap:generate-migrations",
     "serve": "nx serve",
     "build": "nx build",
     "create-app": "nx g app --framework=fastify --docker",

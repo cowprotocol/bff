@@ -52,7 +52,7 @@ export class Order {
   @Column('varchar')
   receiver: string;
 
-  @Column('varchar')
+  @Column('int')
   chainId: number;
 
   @Column('varchar')
