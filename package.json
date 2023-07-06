@@ -13,7 +13,6 @@
   },
   "private": true,
   "dependencies": {
-    "@cowprotocol/ethflowcontract": "cowprotocol/ethflowcontract.git#v1.0.0-artifacts",
     "@cowprotocol/cow-sdk": "^2.1.0",
     "@fastify/autoload": "~5.7.1",
     "@fastify/cors": "^8.2.1",
