@@ -8,6 +8,7 @@ const ADDRESS_LENGTH = 42;
 const routeSchema = {
   type: 'object',
   required: ['chainId', 'walletAddress'],
+  additionalProperties: false,
   properties: {
     chainId: {
       enum: ['1', '5', '100'],
@@ -129,21 +130,6 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async function (request, reply) {
-      const {
-        order: {
-          sellToken,
-          buyToken,
-          receiver,
-          partSellAmount,
-          minPartLimit,
-          t0,
-          n,
-          t,
-          span,
-          appData,
-        },
-        safeTxHash,
-      } = request.body;
       const { chainId, walletAddress } = request.params;
       const walletRepository = fastify.orm.getRepository(Wallet);
       const orderRepository = fastify.orm.getRepository(Order);
@@ -163,18 +149,9 @@ export default async function (fastify: FastifyInstance) {
       }
 
       const order = orderRepository.create({
+        ...request.body.order,
         wallet,
-        sellToken,
-        buyToken,
-        appData,
-        receiver,
         chainId: Number(chainId),
-        partSellAmount,
-        minPartLimit,
-        t0,
-        n,
-        t,
-        span,
       });
 
       await orderRepository.save(order);
