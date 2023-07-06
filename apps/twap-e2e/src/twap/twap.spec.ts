@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 describe('GET /', () => {
-  it('should return a message', async () => {
+  it('should be healthy', async () => {
     const res = await axios.get(`/health-check`);
 
     expect(res.status).toBe(200);
