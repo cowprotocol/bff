@@ -20,6 +20,6 @@ RUN chown -R bff:bff .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN npm --prefix bff --omit=dev -f install
+RUN yarn --cwd bff --omit=dev -f install
 
 CMD [ "node", "bff" ]

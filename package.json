@@ -9,7 +9,7 @@
     "build": "nx build",
     "create-app": "nx g app --framework=fastify --docker",
     "docker-build:affected": "nx affected -t docker-build --prod --parallel --maxParallel=3 --skip-nx-cache --skip-nx-cache",
-    "compose:up": "npm run docker-build:affected && docker-compose up"
+    "compose:up": "yarn run docker-build:affected && docker-compose up"
   },
   "private": true,
   "dependencies": {
