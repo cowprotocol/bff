@@ -18,18 +18,6 @@ export class Order {
 
   @BeforeInsert()
   createOrderId() {
-    console.log({
-      sellToken: this.sellToken,
-      buyToken: this.buyToken,
-      receiver: this.receiver,
-      partSellAmount: this.partSellAmount,
-      minPartLimit: this.minPartLimit,
-      t0: this.t0,
-      n: this.n,
-      t: this.t,
-      span: this.span,
-      appData: this.appData,
-    });
     this.id = getConditionalOrderId(
       buildTwapOrderParamsStruct(this.chainId, {
         sellToken: this.sellToken,
