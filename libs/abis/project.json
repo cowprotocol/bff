@@ -10,12 +10,6 @@
         "abi:custom"
       ]
     },
-    "abi:ethflow": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "typechain --target ethers-v5 --out-dir ./libs/abis/src/generated/ethflow \"./node_modules/@cowprotocol/ethflowcontract/artifacts/CoWSwapEthFlow.sol/*.json\""
-      }
-    },
     "abi:custom": {
       "executor": "nx:run-commands",
       "options": {
@@ -30,12 +24,6 @@
       "options": {
         "outputPath": "dist/libs/abis"
       }
-    },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs abis {args.ver} {args.tag}",
-      "dependsOn": [
-        "build"
-      ]
     },
     "lint": {
       "executor": "@nx/linter:eslint",
