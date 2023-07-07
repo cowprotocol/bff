@@ -60,6 +60,12 @@ You want to edit;
     - all variables here are defined as `name:variable` format (i.e. `twap:dbHost`). You want to update the `twap` part to your service name.
   - add or remove variables as your service needs
 
+This will also show you some variables which are defined with `secure` fields. These are secrets, and they are defined per stack. You can use the following command to update them;
+
+```bash
+  pulumi config set --secret {name}:{value}
+```
+
 Once you have a decent version, you want to open a PR to infrastructure to start the review process. You should also add your service to `docker-compose.yml` with corresponding changes, to ensure we can still run it on a local environment.
 
 Every service must talk to the outside world through BFF. So you want to go to the BFF project here and add _at least_ a pass through proxy (examples can be found under `apps/bff/src/app/routes/twap`). Because of this, your Pulumi definition does not need an ingress. However, you will need to add a new environment variable to reference your service from BFF (i.e. `http://{service-name}.{namespace}.svc.cluster.local`).
