@@ -43,4 +43,4 @@ To have more control over this process and/or to create a non-fastify service, y
 
 A generated service, will have a Dockerfile that you must adjust accordingly. You can refer to the [NX documentation regarding docker generators](https://nx.dev/packages/docker/generators/docker).
 
-For deployments, you will need a Pulumi definition created for your service as well. This needs to be created in the https://github.com/cowprotocol/infrastructure repository. For more information on how to do this, please refer to INFRASTRUCTURE.md.
+For deployments, you will need a Pulumi definition created for your service as well. This needs to be created in the https://github.com/cowprotocol/infrastructure repository. For more information on how to do this, please refer to [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
