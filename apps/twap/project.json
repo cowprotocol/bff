@@ -1,0 +1,126 @@
+{
+  "name": "twap",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/twap/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/twap",
+        "format": [
+          "cjs"
+        ],
+        "bundle": false,
+        "main": "apps/twap/src/main.ts",
+        "tsConfig": "apps/twap/tsconfig.app.json",
+        "assets": [
+          "apps/twap/src/assets"
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "twap:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "twap:build:development"
+        },
+        "production": {
+          "buildTarget": "twap:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "apps/twap/**/*.ts"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "apps/twap/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "docker-build": {
+      "dependsOn": [
+        "build"
+      ],
+      "command": "docker buildx build --platform=linux/amd64 -f apps/twap/Dockerfile . -t twap"
+    },
+    "typeorm": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "command": "ts-node --project tsconfig.app.json ../../node_modules/.bin/typeorm",
+        "cwd": "apps/twap"
+      }
+    },
+    "generate-migrations": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "command": "nx run typeorm migration:generate --pretty -d datasource.config.ts src/migrations/migration",
+        "cwd": "apps/twap"
+      }
+    },
+    "run-migrations": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "command": "nx run typeorm migration:run -d datasource.config.ts",
+        "cwd": "apps/twap"
+      }
+    }
+  },
+  "tags": []
+}

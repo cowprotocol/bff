@@ -16,7 +16,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // Place here your custom code!
   const appOpts = {
     ...opts,
-    prefix: '/api/serverless',
+    prefix: '/',
   };
   // Do not touch the following lines
 

@@ -3,11 +3,11 @@ FROM node:18-alpine as build
 
 WORKDIR /app/
 COPY . .
-RUN npm install
+RUN yarn install
 ENV PATH /app/node_modules/.bin:$PATH
-RUN npm run build
+RUN yarn run build
 RUN rm -rf ./node_modules
-RUN npm install --production
+RUN yarn install --production
 
 # Creating final production image
 FROM node:18-alpine
@@ -22,4 +22,4 @@ ENV PATH /app/node_modules/.bin:$PATH
 RUN chown -R node:node /app
 USER node
 EXPOSE 1337
-CMD ["npm", "run", "start:production"]
+CMD ["yarn", "run", "start:production"]

@@ -1,5 +1,30 @@
 version: '3'
 services:
+  twap:
+    container_name: twap
+    image: twap:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_HOST: bff-db
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+    volumes:
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+      - ./package.json:/app/package.json
+      - ./yarn.lock:/app/yarn.lock
+
+      - ./.env:/app/.env
+    ports:
+      - '3000:3000'
+    networks:
+      - bff-network
+    depends_on:
+      - bff-db
+
   bff:
     container_name: bff
     image: bff:latest
@@ -14,11 +39,12 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
+      TWAP_BASE_URL: http://twap:3000/
     volumes:
       - ./src:/app/src
       - ./node_modules:/app/node_modules
       - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
+      - ./yarn.lock:/app/yarn.lock
 
       - ./.env:/app/.env
     ports:
@@ -30,7 +56,6 @@ services:
       
   bff-db:
     container_name: bff-db
-    restart: unless-stopped
     env_file: .env
     image: postgres:14.5-alpine
     environment:
@@ -41,7 +66,7 @@ services:
       - bff-data:/var/lib/postgresql/data/ # using a volume
 
     ports:
-      - '5432:5432'
+      - '5432:${DATABASE_PORT}'
     networks:
       - bff-network
 

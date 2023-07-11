@@ -11,6 +11,9 @@ const schema = {
     PROXY_UPSTREAM: {
       type: "string",
     },
+    TWAP_BASE_URL: {
+      type: "string",
+    }
   },
 };
 
