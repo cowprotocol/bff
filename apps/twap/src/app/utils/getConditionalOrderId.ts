@@ -1,8 +1,8 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { CurrencyAmount, Token } from '@uniswap/sdk-core';
-import { hexZeroPad } from '@ethersproject/bytes';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { keccak256 } from '@ethersproject/keccak256';
+import { OrderStruct } from '../types/order';
 
 interface ConditionalOrderParams {
   staticInput: string;
@@ -21,22 +21,6 @@ export interface TWAPOrder {
   appData: string;
 }
 
-export interface TWAPOrderStruct {
-  sellToken: string;
-  buyToken: string;
-  receiver: string;
-  partSellAmount: string;
-  minPartLimit: string;
-  // timeStart
-  t0: number;
-  // numOfParts
-  n: number;
-  // timeInterval
-  t: number;
-  span: number;
-  appData: string;
-}
-
 export const TWAP_ORDER_STRUCT =
   'tuple(address sellToken,address buyToken,address receiver,uint256 partSellAmount,uint256 minPartLimit,uint256 t0,uint256 n,uint256 t,uint256 span,bytes32 appData)';
 
@@ -47,7 +31,7 @@ export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
   5: twapHandlerAddress,
 };
 
-export function twapOrderToStruct(order: TWAPOrder): TWAPOrderStruct {
+export function twapOrderToStruct(order: TWAPOrder): OrderStruct {
   return {
     sellToken: order.sellAmount.currency.address,
     buyToken: order.buyAmount.currency.address,
@@ -66,11 +50,11 @@ export function twapOrderToStruct(order: TWAPOrder): TWAPOrderStruct {
 
 export function buildTwapOrderParamsStruct(
   chainId: SupportedChainId,
-  twapOrderData: TWAPOrderStruct
+  twapOrderData: OrderStruct
 ): ConditionalOrderParams {
   return {
     handler: TWAP_HANDLER_ADDRESS[chainId],
-    salt: '0x00000000000000000000000000000000000000000000000000000018920d8ce7', // hexZeroPad(Buffer.from(Date.now().toString(16), 'hex'), 32),
+    salt: '0x00000000000000000000000000000000000000000000000000000018920d8ce7',
     staticInput: defaultAbiCoder.encode([TWAP_ORDER_STRUCT], [twapOrderData]),
   };
 }
