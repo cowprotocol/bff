@@ -3,6 +3,7 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
 } from 'typeorm';
 import { Wallet } from './wallet';
@@ -10,6 +11,9 @@ import {
   buildTwapOrderParamsStruct,
   getConditionalOrderId,
 } from '../utils/getConditionalOrderId';
+import { OrderPart } from './orderPart';
+import { OrderStatus } from '../types/order';
+import { bigIntToString, stringToBigInt } from '../utils/transformers';
 
 @Entity({ name: 'order' })
 export class Order {
@@ -35,6 +39,7 @@ export class Order {
   }
 
   @ManyToOne(() => Wallet, (wallet) => wallet.orders, {
+    cascade: true,
     createForeignKeyConstraints: true,
     eager: true,
   })
@@ -72,4 +77,41 @@ export class Order {
 
   @Column('int')
   span: number;
+
+  @Column('enum', {
+    enum: [
+      'WaitSigning',
+      'Pending',
+      'Scheduled',
+      'Cancelled',
+      'Cancelling',
+      'Expired',
+      'Fulfilled',
+    ],
+  })
+  status: OrderStatus;
+
+  @OneToMany(() => OrderPart, (orderPart) => orderPart.order, {
+    cascade: true,
+    eager: true,
+  })
+  parts: OrderPart[];
+
+  @Column('bigint', {
+    transformer: { from: stringToBigInt, to: bigIntToString },
+    nullable: true,
+  })
+  executedBuyAmount: bigint;
+
+  @Column('bigint', {
+    transformer: { from: stringToBigInt, to: bigIntToString },
+    nullable: true,
+  })
+  executedSellAmount: bigint;
+
+  @Column('bigint', {
+    transformer: { from: stringToBigInt, to: bigIntToString },
+    nullable: true,
+  })
+  executedFeeAmount: bigint;
 }

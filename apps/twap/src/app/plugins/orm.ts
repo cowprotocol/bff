@@ -8,6 +8,8 @@ import { SafeTx } from '../data/safeTx';
 import { Order as OrderbookOrder } from '../orderbook/order';
 import { Settlement } from '../orderbook/settlement';
 import { Trade } from '../orderbook/trade';
+import { OrderPart } from '../data/orderPart';
+import { Block } from '../data/block';
 
 export default fp(async function (fastify: FastifyInstance) {
   fastify.register(typeORMPlugin, {
@@ -17,7 +19,7 @@ export default fp(async function (fastify: FastifyInstance) {
     database: fastify.config.DATABASE_NAME,
     username: fastify.config.DATABASE_USERNAME,
     password: fastify.config.DATABASE_PASSWORD,
-    entities: [Wallet, Order, SafeTx],
+    entities: [Wallet, Order, SafeTx, OrderPart, Block],
     migrations: ['twap/apps/twap/src/migrations/*.js'],
   });
 
