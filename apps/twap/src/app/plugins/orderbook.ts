@@ -32,7 +32,7 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
             .then((res) => res.json())
             .then((json) => ({
               executedBuyAmount: BigInt(json.executedBuyAmount),
-              executedSellAmount: BigInt(json.executedSellAmount),
+              executedSellAmount: BigInt(json.executedSellAmountBeforeFees),
               executedFeeAmount: BigInt(json.executedFeeAmount),
             }))
             .catch(() => DEFAULT_TWAP_EXECUTION_INFO)
