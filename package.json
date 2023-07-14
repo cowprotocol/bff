@@ -28,6 +28,7 @@
     "fastify": "~4.13.0",
     "fastify-cli": "^5.7.1",
     "fastify-plugin": "~4.5.0",
+    "graphql": "^16.7.1",
     "json-schema-to-ts": "^2.9.1",
     "pg": "^8.11.1",
     "reflect-metadata": "^0.1.13",
