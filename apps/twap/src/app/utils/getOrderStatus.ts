@@ -1,6 +1,9 @@
 import { OrderStatus, OrderStruct } from '../types/order';
 
-function isOrderFulfilled(executedSellAmount: bigint, orderInfo: OrderStruct) {
+function isOrderFulfilled(
+  executedSellAmount: bigint,
+  orderInfo: OrderStruct
+): boolean {
   return (
     executedSellAmount ===
     BigInt(orderInfo.partSellAmount) * BigInt(orderInfo.n)
