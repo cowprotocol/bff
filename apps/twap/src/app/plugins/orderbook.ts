@@ -12,7 +12,6 @@ import { ExecutionInfo } from '../types/order';
 const DEFAULT_TWAP_EXECUTION_INFO = {
   executedSellAmount: BigInt(0),
   executedBuyAmount: BigInt(0),
-  executedFeeAmount: BigInt(0),
 };
 
 function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
@@ -32,8 +31,7 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
             .then((res) => res.json())
             .then((json) => ({
               executedBuyAmount: BigInt(json.executedBuyAmount),
-              executedSellAmount: BigInt(json.executedSellAmount),
-              executedFeeAmount: BigInt(json.executedFeeAmount),
+              executedSellAmount: BigInt(json.executedSellAmountBeforeFees),
             }))
             .catch(() => DEFAULT_TWAP_EXECUTION_INFO)
         )
@@ -46,14 +44,10 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
               accumulator.executedBuyAmount + BigInt(order.executedBuyAmount),
             executedSellAmount:
               accumulator.executedSellAmount + BigInt(order.executedSellAmount),
-            executedFeeAmount:
-              accumulator.executedFeeAmount + BigInt(order.executedFeeAmount),
           };
         },
         {
-          executedBuyAmount: BigInt(0),
-          executedSellAmount: BigInt(0),
-          executedFeeAmount: BigInt(0),
+          ...DEFAULT_TWAP_EXECUTION_INFO,
         }
       );
     } catch (err) {
@@ -62,26 +56,28 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
   };
 }
 
+function orderbookFactory(
+  dataSource: DataSource,
+  apiBaseUrl: string
+): Orderbook {
+  return {
+    settlement: dataSource.getRepository(Settlement),
+    trade: dataSource.getRepository(Trade),
+    order: dataSource.getRepository(Order),
+    getExecutionInfo: getExecutionInfoFactory(dataSource, apiBaseUrl),
+  };
+}
+
 export default fp(async function (fastify: FastifyInstance) {
   fastify.ready(() => {
-    const goerli = {
-      settlement: fastify.orm['goerli'].getRepository(Settlement),
-      trade: fastify.orm['goerli'].getRepository(Trade),
-      order: fastify.orm['goerli'].getRepository(Order),
-      getExecutionInfo: getExecutionInfoFactory(
-        fastify.orm['goerli'],
-        getApiBaseUrl(SupportedChainId.GOERLI)
-      ),
-    };
-    const mainnet = {
-      settlement: fastify.orm['mainnet'].getRepository(Settlement),
-      trade: fastify.orm['mainnet'].getRepository(Trade),
-      order: fastify.orm['mainnet'].getRepository(Order),
-      getExecutionInfo: getExecutionInfoFactory(
-        fastify.orm['mainnet'],
-        getApiBaseUrl(SupportedChainId.MAINNET)
-      ),
-    };
+    const goerli = orderbookFactory(
+      fastify.orm['goerli'],
+      getApiBaseUrl(SupportedChainId.GOERLI)
+    );
+    const mainnet = orderbookFactory(
+      fastify.orm['mainnet'],
+      getApiBaseUrl(SupportedChainId.MAINNET)
+    );
     fastify.decorate('orderbook', {
       goerli,
       mainnet,

@@ -27,5 +27,11 @@ export class Trade {
   orderUid: string;
 
   @Column('numeric', { name: 'sell_amount' })
-  sellAmount: string;
+  sellAmount: number;
+
+  @Column('numeric', { name: 'buy_amount' })
+  buyAmount: number;
+
+  @Column('numeric', { name: 'fee_amount' })
+  feeAmount: number;
 }

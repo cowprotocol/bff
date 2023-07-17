@@ -38,7 +38,6 @@ export interface OrderPart {
 export interface ExecutionInfo {
   executedSellAmount: bigint;
   executedBuyAmount: bigint;
-  executedFeeAmount: bigint;
 }
 
 export function returnNever(): never {

@@ -30,7 +30,7 @@ export default fp(async function (fastify: FastifyInstance) {
     type: 'postgres',
     database: 'goerli',
     username: fastify.config.ORDERBOOK_DATABASE_USERNAME,
-    password: fastify.config.DATABASE_PASSWORD,
+    password: fastify.config.ORDERBOOK_DATABASE_PASSWORD,
     entities: [Settlement, Trade, OrderbookOrder],
   });
 
@@ -41,7 +41,7 @@ export default fp(async function (fastify: FastifyInstance) {
     type: 'postgres',
     database: 'mainnet',
     username: fastify.config.ORDERBOOK_DATABASE_USERNAME,
-    password: fastify.config.DATABASE_PASSWORD,
+    password: fastify.config.ORDERBOOK_DATABASE_PASSWORD,
     entities: [Settlement, Trade, OrderbookOrder],
   });
 
