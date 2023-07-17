@@ -69,10 +69,8 @@ export async function processConditionalOrders(
       const partIds = orderParts.map((part) => part.uid);
 
       // Current execution info (how much is filled etc.) for the TWAP order.
-      const { executedSellAmount } = await orderbook.getExecutionInfo(
-        orderId,
-        partIds
-      );
+      const { executedBuyAmount, executedSellAmount } =
+        await orderbook.getExecutionInfo(orderId, partIds);
 
       const status = getOrderStatus(
         executedSellAmount,
@@ -108,15 +106,6 @@ export async function processConditionalOrders(
 
         const order = new Order();
 
-        // Order parts are the individual orders that make up the TWAP order.
-        const parts = partIds.map((partId) => {
-          const orderPart = new OrderPart();
-          orderPart.id = partId;
-          orderPart.order = order;
-
-          return orderPart;
-        });
-
         order.id = orderId;
         order.sellToken = orderStruct.sellToken;
         order.buyToken = orderStruct.buyToken;
@@ -131,6 +120,18 @@ export async function processConditionalOrders(
         order.span = orderStruct.span;
         order.status = status;
         order.wallet = wallet;
+        order.executedBuyAmount = executedBuyAmount;
+        order.executedSellAmount = executedSellAmount;
+
+        // Order parts are the individual orders that make up the TWAP order.
+        const parts = partIds.map((partId) => {
+          const orderPart = new OrderPart();
+          orderPart.id = partId;
+          orderPart.order = order;
+
+          return orderPart;
+        });
+
         order.parts = parts;
 
         // Save order and parts (update if it exists)

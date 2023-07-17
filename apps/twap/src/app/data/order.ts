@@ -89,21 +89,15 @@ export class Order {
   })
   parts: OrderPart[];
 
-  @Column('bigint', {
+  @Column('numeric', {
     transformer: { from: stringToBigInt, to: bigIntToString },
     nullable: true,
   })
   executedBuyAmount: bigint;
 
-  @Column('bigint', {
+  @Column('numeric', {
     transformer: { from: stringToBigInt, to: bigIntToString },
     nullable: true,
   })
   executedSellAmount: bigint;
-
-  @Column('bigint', {
-    transformer: { from: stringToBigInt, to: bigIntToString },
-    nullable: true,
-  })
-  executedFeeAmount: bigint;
 }
