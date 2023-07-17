@@ -51,9 +51,7 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
           };
         },
         {
-          executedBuyAmount: BigInt(0),
-          executedSellAmount: BigInt(0),
-          executedFeeAmount: BigInt(0),
+          ...DEFAULT_TWAP_EXECUTION_INFO,
         }
       );
     } catch (err) {
