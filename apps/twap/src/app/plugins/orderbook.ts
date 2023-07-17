@@ -12,7 +12,6 @@ import { ExecutionInfo } from '../types/order';
 const DEFAULT_TWAP_EXECUTION_INFO = {
   executedSellAmount: BigInt(0),
   executedBuyAmount: BigInt(0),
-  executedFeeAmount: BigInt(0),
 };
 
 function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
@@ -33,7 +32,6 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
             .then((json) => ({
               executedBuyAmount: BigInt(json.executedBuyAmount),
               executedSellAmount: BigInt(json.executedSellAmountBeforeFees),
-              executedFeeAmount: BigInt(json.executedFeeAmount),
             }))
             .catch(() => DEFAULT_TWAP_EXECUTION_INFO)
         )
@@ -46,8 +44,6 @@ function getExecutionInfoFactory(dataSource: DataSource, apiBaseUrl: string) {
               accumulator.executedBuyAmount + BigInt(order.executedBuyAmount),
             executedSellAmount:
               accumulator.executedSellAmount + BigInt(order.executedSellAmount),
-            executedFeeAmount:
-              accumulator.executedFeeAmount + BigInt(order.executedFeeAmount),
           };
         },
         {
