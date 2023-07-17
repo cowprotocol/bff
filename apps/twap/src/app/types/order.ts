@@ -9,6 +9,15 @@ export enum OrderStatus {
   Expired = 'Expired',
   Fulfilled = 'Fulfilled',
 }
+export const AllOrderStatuses = [
+  OrderStatus.WaitSigning,
+  OrderStatus.Pending,
+  OrderStatus.Scheduled,
+  OrderStatus.Cancelled,
+  OrderStatus.Cancelling,
+  OrderStatus.Expired,
+  OrderStatus.Fulfilled,
+] as const; // Important, to force inlining.
 
 export interface OrderStruct {
   sellToken: string;

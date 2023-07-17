@@ -12,7 +12,7 @@ import {
   getConditionalOrderId,
 } from '../utils/getConditionalOrderId';
 import { OrderPart } from './orderPart';
-import { OrderStatus } from '../types/order';
+import { AllOrderStatuses, OrderStatus } from '../types/order';
 import { bigIntToString, stringToBigInt } from '../utils/transformers';
 
 @Entity({ name: 'order' })
@@ -79,15 +79,7 @@ export class Order {
   span: number;
 
   @Column('enum', {
-    enum: [
-      'WaitSigning',
-      'Pending',
-      'Scheduled',
-      'Cancelled',
-      'Cancelling',
-      'Expired',
-      'Fulfilled',
-    ],
+    enum: AllOrderStatuses,
   })
   status: OrderStatus;
 
