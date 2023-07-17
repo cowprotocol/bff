@@ -18,16 +18,13 @@ import { Block } from '../data/block';
 // Add lag per network (in confirmations)
 const NETWORKS = ['mainnet', 'goerli'];
 const CONFIRMATIONS: Record<SupportedChainId, number> = {
-  '1': 5,
-  '5': 3,
-  '100': 3,
+  [SupportedChainId.MAINNET]: 5,
+  [SupportedChainId.GOERLI]: 3,
+  [SupportedChainId.GNOSIS_CHAIN]: 3,
 };
 
-export const COMPOSABLE_COW_ADDRESS: Record<SupportedChainId, string> = {
-  1: '0xF487887DA5a4b4e3eC114FDAd97dc0F785d72738',
-  100: '0xF487887DA5a4b4e3eC114FDAd97dc0F785d72738',
-  5: '0xF487887DA5a4b4e3eC114FDAd97dc0F785d72738',
-};
+export const COMPOSABLE_COW_ADDRESS =
+  '0xF487887DA5a4b4e3eC114FDAd97dc0F785d72738';
 
 export interface TwapPartOrderItem {
   uid: string;
@@ -77,7 +74,7 @@ function infuraPlugin(
       let isColdStart = true;
       const network = await provider.getNetwork();
       const contract = ComposableCoW__factory.connect(
-        COMPOSABLE_COW_ADDRESS[provider.network.chainId],
+        COMPOSABLE_COW_ADDRESS,
         provider
       );
       async function getSingleOrder(event: ConditionalOrderCreatedEvent) {
