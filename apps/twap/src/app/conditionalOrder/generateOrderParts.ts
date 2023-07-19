@@ -9,6 +9,16 @@ import { OrderPart, OrderStruct } from '../types/order';
 import { calculateValidTo } from './calculateValidTo';
 import { computeOrderUid } from './computeOrderUid';
 
+/**
+ * A function that generates order parts for a TWAP order.
+ *
+ * @param orderId ID of the order
+ * @param orderStruct OrderStruct of the order
+ * @param blockTimestamp Current block timestamp
+ * @param chainId ID of the chain the order is on, must be a SupportedChainId
+ * @param safeAddress Safe address that owns the order
+ * @returns Promise that returns an array of OrderParts for the given order
+ */
 export async function generateOrderParts(
   orderId: string,
   {

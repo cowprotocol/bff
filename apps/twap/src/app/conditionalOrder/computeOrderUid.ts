@@ -24,6 +24,15 @@ async function getDomain(chainId: SupportedChainId): Promise<TypedDataDomain> {
   return domain;
 }
 
+// TODO: This should be pulled from the SDK, in the future.
+/**
+ * Computes the order UID for a given order.
+ *
+ * @param chainId Which chain the order is at. Must be a SupportedChainId.
+ * @param owner Address of the Safe Wallet that owns the order.
+ * @param order Order or OrderParameters to compute the UID for.
+ * @returns A Promise that returns the order UID.
+ */
 export async function computeOrderUid(
   chainId: SupportedChainId,
   owner: string,

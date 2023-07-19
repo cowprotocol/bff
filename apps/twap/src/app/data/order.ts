@@ -10,7 +10,7 @@ import { Wallet } from './wallet';
 import {
   buildTwapOrderParamsStruct,
   getConditionalOrderId,
-} from '../utils/getConditionalOrderId';
+} from '../conditionalOrder/getConditionalOrderId';
 import { OrderPart } from './orderPart';
 import { AllOrderStatuses, OrderStatus } from '../types/order';
 import { bigIntToString, stringToBigInt } from '../utils/transformers';

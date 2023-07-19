@@ -1,16 +1,17 @@
 import { providers } from 'ethers';
-import { getConditionalOrderId } from '../utils/getConditionalOrderId';
-import { getOrderStatus } from '../utils/getOrderStatus';
-import { parseOrderStruct } from '../utils/parseOrderStruct';
-import { generateOrderParts } from '../utils/generateOrderParts';
+import fp from 'fastify-plugin';
+import { getConditionalOrderId } from '../conditionalOrder/getConditionalOrderId';
+import { getOrderStatus } from '../conditionalOrder/getOrderStatus';
+import { parseOrderStruct } from '../conditionalOrder/parseOrderStruct';
+import { generateOrderParts } from '../conditionalOrder/generateOrderParts';
 import { Wallet } from '../data/wallet';
 import { Order } from '../data/order';
 import { OrderPart } from '../data/orderPart';
 import { Block } from '../data/block';
-import { getSingleOrder } from './getSingleOrder';
+import { getSingleOrder } from '../conditionalOrder/getSingleOrder';
 import { FastifyInstance } from 'fastify';
 import { ComposableCoW__factory } from '@cow-web-services/abis';
-import { getBlockInfo } from './getBlockInfo';
+import { getConditionalOrderCreatedEvents } from '../conditionalOrder/getConditionalOrderCreatedEvents';
 export const COMPOSABLE_COW_ADDRESS =
   '0xF487887DA5a4b4e3eC114FDAd97dc0F785d72738';
 
@@ -23,28 +24,12 @@ export async function processConditionalOrders(
     COMPOSABLE_COW_ADDRESS,
     provider
   );
-  // We are only interested in ConditionalOrderCreated events,
-  // Since we are trying to determine TWAP order creation.
-  const filter = contract.filters.ConditionalOrderCreated();
-
-  const { fromBlockNumber, toBlockNumber } = await getBlockInfo(
-    fastify,
-    provider,
-    network.chainId
+  const blockInfo = await fastify.blockInfo(provider, network.chainId);
+  const events = await getConditionalOrderCreatedEvents(
+    blockInfo,
+    contract,
+    network.name
   );
-
-  console.log(
-    `[${network.name}] fetching ConditionalOrderCreated from ${fromBlockNumber} to ${toBlockNumber}`
-  );
-
-  // ConditionalOrderCreated between fromBlockNumber and toBlockNumber
-  const events = await contract.queryFilter(
-    filter,
-    fromBlockNumber,
-    toBlockNumber
-  );
-  console.log(`[${network.name}] has ${events.length} events`);
-
   const orderbook = fastify.orderbook[network.chainId];
   const walletRepository = fastify.orm.getRepository(Wallet);
 
@@ -142,13 +127,31 @@ export async function processConditionalOrders(
       });
     } catch (err) {
       // An error has happened, skip event and log it.
-      console.log(
-        `Skipping:\n\tOwner: ${
-          event.args.owner
-        }\n\tOrder ID: ${getConditionalOrderId(
-          event.args.params
-        )}\n\tTx Hash: ${event.transactionHash}\n\tError: ${err.message}`
-      );
+      const orderId = getConditionalOrderId(event.args.params);
+      console.log(`Skipped: ${orderId}`);
+      console.log(`\tTx Hash: ${event.transactionHash}`);
+      console.log(`\tError: ${err.message}`);
     }
+  }
+}
+
+export default fp(async function (fastify: FastifyInstance) {
+  fastify.decorate(
+    'processConditionalOrders',
+    async function (
+      provider: providers.InfuraProvider,
+      network: providers.Network
+    ) {
+      return processConditionalOrders(fastify, provider, network);
+    }
+  );
+});
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    processConditionalOrders: (
+      provider: providers.InfuraProvider,
+      network: providers.Network
+    ) => Promise<void>;
   }
 }

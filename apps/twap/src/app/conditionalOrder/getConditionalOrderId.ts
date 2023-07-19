@@ -31,29 +31,21 @@ export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
   5: twapHandlerAddress,
 };
 
-export function twapOrderToStruct(order: TWAPOrder): OrderStruct {
-  return {
-    sellToken: order.sellAmount.currency.address,
-    buyToken: order.buyAmount.currency.address,
-    receiver: order.receiver,
-    partSellAmount: order.sellAmount
-      .divide(order.numOfParts)
-      .quotient.toString(),
-    minPartLimit: order.buyAmount.divide(order.numOfParts).quotient.toString(),
-    t0: order.startTime,
-    n: order.numOfParts,
-    t: order.timeInterval,
-    span: order.span,
-    appData: order.appData,
-  };
-}
-
+/**
+ * Returns the conditional order params struct for a TWAP order.
+ *
+ * @param chainId Chain ID of the order. Must be a SupportedChainId.
+ * @param twapOrderData OrderStruct instance of the order.
+ * @returns ConditionalOrderParams instance of the order.
+ */
 export function buildTwapOrderParamsStruct(
   chainId: SupportedChainId,
   twapOrderData: OrderStruct
 ): ConditionalOrderParams {
   return {
     handler: TWAP_HANDLER_ADDRESS[chainId],
+    // This salt must match between FE and BE to produce the same id, so we need to sync it.
+    // If we use time here, because time on server vs local differ, we end up with mismatching ids.
     salt: '0x00000000000000000000000000000000000000000000000000000018920d8ce7',
     staticInput: defaultAbiCoder.encode([TWAP_ORDER_STRUCT], [twapOrderData]),
   };
@@ -62,6 +54,12 @@ export function buildTwapOrderParamsStruct(
 const CONDITIONAL_ORDER_PARAMS_STRUCT =
   'tuple(address handler, bytes32 salt, bytes staticInput)';
 
+/**
+ * Generates the conditional order id from the params.
+ *
+ * @param params ConditionalOrderParams for the order.
+ * @returns Deterministically generated conditional order id.
+ */
 export function getConditionalOrderId(params: ConditionalOrderParams): string {
   return keccak256(
     defaultAbiCoder.encode([CONDITIONAL_ORDER_PARAMS_STRUCT], [params])

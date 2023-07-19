@@ -52,3 +52,8 @@ export interface ExecutionInfo {
 export function returnNever(): never {
   throw new Error('This should never happen.');
 }
+
+export interface BlockInfo {
+  fromBlockNumber?: number;
+  toBlockNumber: number;
+}

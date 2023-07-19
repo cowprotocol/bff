@@ -15,6 +15,12 @@ const ABI = [
   { name: 'appData', type: 'bytes32' },
 ] as ParamType[];
 
+/**
+ * Parses order struct from staticInput.
+ *
+ * @param staticInput staticInput field of the params, from ConditionalOrderCreated event.
+ * @returns OrderStruct of the order.
+ */
 export function parseOrderStruct(staticInput: string): OrderStruct {
   const rawData = defaultAbiCoder.decode(ABI, staticInput);
 

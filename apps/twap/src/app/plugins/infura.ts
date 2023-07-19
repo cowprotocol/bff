@@ -2,7 +2,6 @@ import { OrderParameters, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { ethers } from 'ethers';
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { processConditionalOrders } from '../utils/processConditionalOrders';
 
 const NETWORKS = ['mainnet', 'goerli'];
 
@@ -38,7 +37,7 @@ export interface TwapOrdersSafeData {
 
 function infuraPlugin(
   fastify: FastifyInstance,
-  options: Record<string, unknown>,
+  _: Record<string, unknown>,
   done: () => void
 ) {
   const providers = NETWORKS.map(
@@ -52,7 +51,7 @@ function infuraPlugin(
 
     providers.forEach(async (provider) => {
       const network = await provider.getNetwork();
-      processConditionalOrders(fastify, provider, network);
+      fastify.processConditionalOrders(provider, network);
     });
   });
 
