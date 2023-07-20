@@ -10,10 +10,10 @@ export class MigrationRemoveOrderStatusTable1689325892801
         TRUNCATE TABLE "order" CASCADE
     `);
     await queryRunner.query(`
-        DROP TABLE "order_status"
+        ALTER TABLE "order" DROP CONSTRAINT "FK_9496f9d1ea4f40147049da67e54"
     `);
     await queryRunner.query(`
-        ALTER TABLE "order" DROP CONSTRAINT "FK_9496f9d1ea4f40147049da67e54"
+        DROP TABLE "order_status"
     `);
     await queryRunner.query(`
         ALTER TABLE "order"

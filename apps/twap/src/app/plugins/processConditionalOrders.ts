@@ -124,6 +124,8 @@ export async function processConditionalOrders(
           conflictPaths: ['id'],
           upsertType: 'on-duplicate-key-update',
         });
+
+        await manager.save(parts);
       });
     } catch (err) {
       // An error has happened, skip event and log it.
