@@ -11,6 +11,21 @@ const schema = {
     PROXY_UPSTREAM: {
       type: "string",
     },
+    NFA_DB_HOST: {
+      type: "string",
+    },
+    NFA_DB_PORT: {
+      type: "string",
+    },
+    NFA_DB_LOGIN: {
+      type: "string",
+    },
+    NFA_DB_PASS: {
+      type: "string",
+    },
+    NFA_DB_NAME: {
+      type: "string",
+    },
   },
 };
 
