@@ -10,12 +10,9 @@ const nfa: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     })
 
     fastify.get('/', async function (request, reply) {
-        console.log('START')
         const client = await fastify.pg.connect()
-        console.log('CONNECTED')
         try {
             const { rows } = await client.query(NFA_QUERY, [])
-            console.log('ROWS', rows)
             return rows
         } finally {
             client.release()
