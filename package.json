@@ -22,10 +22,12 @@
     "@fastify/cors": "^8.2.1",
     "@fastify/env": "^4.2.0",
     "@fastify/http-proxy": "^9.0.0",
+    "@fastify/postgres": "^5.2.2",
     "@fastify/sensible": "^5.0.0",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.7.1",
-    "fastify-plugin": "^4.0.0"
+    "fastify-plugin": "^4.0.0",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
