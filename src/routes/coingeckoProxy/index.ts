@@ -52,7 +52,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
       // Header set when there's a cache hit, remove it
       reply.removeHeader("cache-hit");
       fastify.log.info("cache hit, not storing it");
-    } else {
+    } else if (reply.statusCode >= 200 && reply.statusCode < 300) {
       // No cache hit, consume the payload stream to be able to cache it
       fastify.log.info("not cached, storing it");
       let contents = "";
