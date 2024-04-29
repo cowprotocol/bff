@@ -72,6 +72,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
       }
 
       const headers = reply.getHeaders();
+      // Do not cache `set-cookie` header
+      delete headers["set-cookie"];
+
       // Cache contents and headers
       fastify.cache.set(
         req.url.toLowerCase(),
