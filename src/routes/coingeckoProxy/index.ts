@@ -43,10 +43,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
       if (isCachedResponse(result)) {
         fastify.log.info(`onRequest: cache hit for ${req.url}`);
         reply
-          .headers({
-            ...result.item.headers,
-            "x-proxy-cache": "HIT",
-          })
+          .headers({ "cache-hit": true, ...result.item.headers })
           .send(result.item.contents);
       }
     });
@@ -62,15 +59,11 @@ const coingeckoProxy: FastifyPluginAsync = async (
       );
     }
 
-    if (
-      reply.getHeader("x-proxy-cache") !== "HIT" &&
-      reply.statusCode >= 200 &&
-      reply.statusCode < 300
-    ) {
+    if (reply.getHeader("cache-hit")) {
+      // Header set when there's a cache hit, remove it
+      reply.removeHeader("cache-hit");
+    } else if (reply.statusCode >= 200 && reply.statusCode < 300) {
       fastify.log.info(`onSend: caching response for ${req.url}`);
-
-      // Set header indicating the internal cache miss
-      reply.header("x-proxy-cache", "MISS");
 
       // No cache hit, consume the payload stream to be able to cache it
       let contents = "";
