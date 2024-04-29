@@ -31,14 +31,13 @@ const coingeckoProxy: FastifyPluginAsync = async (
 
   // Intercepts request and uses cache if found
   fastify.addHook("onRequest", async function (req, reply) {
-    fastify.log.info("onRequest handler triggered");
     fastify.cache.get(req.url.toLowerCase(), (err, result) => {
       if (err) {
         fastify.log.warn(`Error fetching cache for '${req.url}'`, err);
         return err;
       }
       if (isCachedResponse(result)) {
-        fastify.log.info("cache hit!!");
+        fastify.log.info(`onRequest: cache hit for ${req.url}`);
         reply
           .headers({ "cache-hit": true, ...result.item.headers })
           .send(result.item.contents);
@@ -51,10 +50,10 @@ const coingeckoProxy: FastifyPluginAsync = async (
     if (reply.getHeader("cache-hit")) {
       // Header set when there's a cache hit, remove it
       reply.removeHeader("cache-hit");
-      fastify.log.info("cache hit, not storing it");
     } else if (reply.statusCode >= 200 && reply.statusCode < 300) {
+      fastify.log.info(`onSend: caching response for ${req.url}`);
+
       // No cache hit, consume the payload stream to be able to cache it
-      fastify.log.info("not cached, storing it");
       let contents = "";
       for await (const chunk of payload as ReadableStream) {
         contents += chunk.toString(); // Process each chunk of data
