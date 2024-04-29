@@ -3,7 +3,8 @@ import httpProxy from "@fastify/http-proxy";
 import { FastifyPluginAsync } from "fastify";
 import { ReadableStream } from "stream/web";
 
-const CACHE_TTL = 5 * 60 * 1000; // 5 min in ms
+const CACHE_TTL = 1 * 60; // 1 min in s
+const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
 
 type CachedData = {
   item: {
@@ -27,7 +28,10 @@ const coingeckoProxy: FastifyPluginAsync = async (
   opts
 ): Promise<void> => {
   // Set up caching
-  fastify.register(fastifyCaching, { expiresIn: 300, serverExpiresIn: 300 });
+  fastify.register(fastifyCaching, {
+    expiresIn: CACHE_TTL,
+    serverExpiresIn: SERVER_CACHE_TTL,
+  });
 
   // Intercepts request and uses cache if found
   fastify.addHook("onRequest", async function (req, reply) {
@@ -47,6 +51,14 @@ const coingeckoProxy: FastifyPluginAsync = async (
 
   // Intercepts response to store result on cache
   fastify.addHook("onSend", async function (req, reply, payload) {
+    // Apply our own cache control header, but only if set in the response already
+    if (reply.getHeader("cache-control")) {
+      reply.header(
+        "cache-control",
+        `max-age=${CACHE_TTL}, public, s-maxage=${SERVER_CACHE_TTL}`
+      );
+    }
+
     if (reply.getHeader("cache-hit")) {
       // Header set when there's a cache hit, remove it
       reply.removeHeader("cache-hit");
@@ -59,11 +71,12 @@ const coingeckoProxy: FastifyPluginAsync = async (
         contents += chunk.toString(); // Process each chunk of data
       }
 
+      const headers = reply.getHeaders();
       // Cache contents and headers
       fastify.cache.set(
         req.url.toLowerCase(),
-        { contents, headers: reply.getHeaders() },
-        CACHE_TTL,
+        { contents, headers },
+        CACHE_TTL * 1000, // in milliseconds
         (error) => {
           if (error)
             fastify.log.error(`Failed to cache result for ${req.url}`, error);
