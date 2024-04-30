@@ -2,7 +2,6 @@ import fastifyCaching from "@fastify/caching";
 import httpProxy from "@fastify/http-proxy";
 import { FastifyPluginAsync } from "fastify";
 import { ReadableStream } from "stream/web";
-import payloadDataReply from "./payloadDataReply";
 
 const CACHE_TTL = 1 * 60; // 1 min in s
 const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
@@ -54,7 +53,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
     });
   });
 
-  fastify.register(payloadDataReply);
+  fastify.decorateReply("payloadData", null);
 
   fastify.addHook("onSend", async function (req, reply, payload) {
     // Apply our own cache control header, but only if set in the response already
@@ -68,6 +67,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
     if (!reply.getHeader("x-proxy-cache")) {
       reply.header("x-proxy-cache", "MISS");
     }
+
+    // @ts-ignore
+    reply.payloadData = payload;
   });
 
   // After the response is sent, cache it if needed
