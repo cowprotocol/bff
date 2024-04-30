@@ -35,6 +35,10 @@ const coingeckoProxy: FastifyPluginAsync = async (
 
   // Intercepts request and uses cache if found
   fastify.addHook("onRequest", async function (req, reply) {
+    // First, get rid of the `accept-encoding` header as we cannot deal with it here
+    req.headers["accept-encoding"] = undefined;
+
+    // Then, get the cached request, if any
     fastify.cache.get(req.url.toLowerCase(), (err, result) => {
       if (err) {
         fastify.log.warn(`Error fetching cache for '${req.url}'`, err);
