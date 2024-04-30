@@ -2,6 +2,7 @@ import fastifyCaching from "@fastify/caching";
 import httpProxy from "@fastify/http-proxy";
 import { FastifyPluginAsync } from "fastify";
 import { ReadableStream } from "stream/web";
+import payloadDataReply from "./payloadDataReply";
 
 const CACHE_TTL = 1 * 60; // 1 min in s
 const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
@@ -47,13 +48,14 @@ const coingeckoProxy: FastifyPluginAsync = async (
       if (isCachedResponse(result)) {
         fastify.log.info(`onRequest: cache hit for ${req.url}`);
         reply
-          .headers({ "cache-hit": true, ...result.item.headers })
+          .headers({ ...result.item.headers, "x-proxy-cache": "HIT" })
           .send(result.item.contents);
       }
     });
   });
 
-  // Intercepts response to store result on cache
+  fastify.register(payloadDataReply);
+
   fastify.addHook("onSend", async function (req, reply, payload) {
     // Apply our own cache control header, but only if set in the response already
     if (reply.getHeader("cache-control")) {
@@ -63,11 +65,22 @@ const coingeckoProxy: FastifyPluginAsync = async (
       );
     }
 
-    if (reply.getHeader("cache-hit")) {
-      // Header set when there's a cache hit, remove it
-      reply.removeHeader("cache-hit");
-    } else if (reply.statusCode >= 200 && reply.statusCode < 300) {
-      fastify.log.info(`onSend: caching response for ${req.url}`);
+    if (!reply.getHeader("x-proxy-cache")) {
+      reply.header("x-proxy-cache", "MISS");
+    }
+  });
+
+  // After the response is sent, cache it if needed
+  fastify.addHook("onRequest", async function (req, reply) {
+    const payload = "payloadData" in reply && reply.payloadData;
+
+    if (
+      reply.getHeader("x-proxy-cache") === "MISS" &&
+      reply.statusCode >= 200 &&
+      reply.statusCode < 300 &&
+      payload
+    ) {
+      fastify.log.info(`onRequest: caching response for ${req.url}`);
 
       // No cache hit, consume the payload stream to be able to cache it
       let contents = "";
