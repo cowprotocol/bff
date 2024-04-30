@@ -1,23 +1,23 @@
-// import { FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync } from "fastify";
 
-// const plugin: FastifyPluginAsync = async (fastify): Promise<void> => {
-//   fastify.decorateReply("payloadData", null);
+const plugin: FastifyPluginAsync = async (fastify): Promise<void> => {
+  fastify.decorateReply("payloadData", null);
 
-//   fastify.addHook("onSend", function (req, reply, payload) {
-//     fastify.log.info("onSend:payloadData");
-//     fastify.payloadData = payload;
-//     fastify.log.info("onSend:payloadData");
-//   });
-// };
+  fastify.addHook("onSend", function (req, reply, payload) {
+    console.log("onSend:payloadData");
+    fastify.payloadData = payload;
+    console.log("onSend:payloadData");
+  });
+};
 
-// declare module "fastify" {
-//   export interface FastifyInstance {
-//     /**
-//      * `payload` is only populated after `onSend` hook
-//      * To be consumed inside `onRequest` hook
-//      */
-//     payloadData?: unknown;
-//   }
-// }
+declare module "fastify" {
+  export interface FastifyInstance {
+    /**
+     * `payload` is only populated after `onSend` hook
+     * To be consumed inside `onRequest` hook
+     */
+    payloadData?: unknown;
+  }
+}
 
-// export default plugin;
+export default plugin;
