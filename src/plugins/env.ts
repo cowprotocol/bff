@@ -14,6 +14,9 @@ const schema = {
     COINGECKO_API_KEY: {
       type: "string",
     },
+    COINGECKO_PROXY_UPSTREAM: {
+      type: "string",
+    },
   },
 };
 
