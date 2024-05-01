@@ -3,15 +3,22 @@ import { FastifyPluginAsync } from "fastify";
 
 const CACHE_TTL = 1 * 60; // 1 min in s
 const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
+const DEFAULT_COINGECKO_PROXY_UPSTREAM = "https://api.coingecko.com";
 
 const coingeckoProxy: FastifyPluginAsync = async (
   fastify,
   opts
 ): Promise<void> => {
   fastify.register(httpProxy, {
-    upstream: "https://api.coingecko.com",
-    rewritePrefix: "/api/v3/simple/",
+    upstream:
+      fastify.config.COINGECKO_PROXY_UPSTREAM ||
+      DEFAULT_COINGECKO_PROXY_UPSTREAM,
+    rewritePrefix: "/api/v3/",
     replyOptions: {
+      rewriteRequestHeaders: (request, headers) => ({
+        ...headers,
+        "x-cg-pro-api-key": fastify.config.COINGECKO_API_KEY,
+      }),
       // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
       rewriteHeaders: (originalHeaders, request) => {
         const {
