@@ -12,6 +12,10 @@ const coingeckoProxy: FastifyPluginAsync = async (
     upstream: "https://api.coingecko.com",
     rewritePrefix: "/api/v3/simple/",
     replyOptions: {
+      rewriteRequestHeaders: (request, headers) => ({
+        ...headers,
+        "x-cg-pro-api-key": fastify.config.COINGECKO_API_KEY,
+      }),
       // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
       rewriteHeaders: (originalHeaders, request) => {
         const {
