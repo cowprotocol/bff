@@ -1,114 +1,38 @@
-import fastifyCaching from "@fastify/caching";
 import httpProxy from "@fastify/http-proxy";
 import { FastifyPluginAsync } from "fastify";
-import { ReadableStream } from "stream/web";
 
 const CACHE_TTL = 1 * 60; // 1 min in s
 const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
-
-type CachedData = {
-  item: {
-    contents: string;
-    headers: Headers;
-  };
-};
-
-function isCachedResponse(cached: any): cached is CachedData {
-  return (
-    cached &&
-    typeof cached === "object" &&
-    "item" in cached &&
-    typeof cached.item === "object" &&
-    "contents" in cached.item
-  );
-}
 
 const coingeckoProxy: FastifyPluginAsync = async (
   fastify,
   opts
 ): Promise<void> => {
-  // Set up caching
-  fastify.register(fastifyCaching, {
-    expiresIn: CACHE_TTL,
-    serverExpiresIn: SERVER_CACHE_TTL,
-  });
-
-  // Intercepts request and uses cache if found
-  fastify.addHook("onRequest", async function (req, reply) {
-    // First, get rid of the `accept-encoding` header as we cannot deal with it here
-    req.headers["accept-encoding"] = undefined;
-
-    // Then, get the cached request, if any
-    fastify.cache.get(req.url.toLowerCase(), (err, result) => {
-      if (err) {
-        fastify.log.warn(`Error fetching cache for '${req.url}'`, err);
-        return err;
-      }
-      if (isCachedResponse(result)) {
-        fastify.log.info(`onRequest: cache hit for ${req.url}`);
-        reply
-          .headers({ "cache-hit": true, ...result.item.headers })
-          .send(result.item.contents);
-      }
-    });
-  });
-
-  // Intercepts response to store result on cache
-  fastify.addHook("onSend", async function (req, reply, payload) {
-    // Apply our own cache control header, but only if set in the response already
-    if (reply.getHeader("cache-control")) {
-      reply.header(
-        "cache-control",
-        `max-age=${CACHE_TTL}, public, s-maxage=${SERVER_CACHE_TTL}`
-      );
-    }
-
-    if (reply.getHeader("cache-hit")) {
-      // Header set when there's a cache hit, remove it
-      reply.removeHeader("cache-hit");
-    } else if (reply.statusCode >= 200 && reply.statusCode < 300) {
-      fastify.log.info(`onSend: caching response for ${req.url}`);
-
-      // No cache hit, consume the payload stream to be able to cache it
-      let contents = "";
-      for await (const chunk of payload as ReadableStream) {
-        contents += chunk.toString(); // Process each chunk of data
-      }
-
-      const headers = reply.getHeaders();
-      // Do not cache `set-cookie` header
-      delete headers["set-cookie"];
-
-      // Cache contents and headers
-      fastify.cache.set(
-        req.url.toLowerCase(),
-        { contents, headers },
-        CACHE_TTL * 1000, // in milliseconds
-        (error) => {
-          if (error)
-            fastify.log.error(`Failed to cache result for ${req.url}`, error);
-        }
-      );
-
-      // Return consumed payload
-      // This is important!!! Without this, the response will be empty
-      return contents;
-    }
-  });
-
   fastify.register(httpProxy, {
     upstream: "https://api.coingecko.com",
     rewritePrefix: "/api/v3/simple/",
     replyOptions: {
-      rewriteRequestHeaders: (originalRequest: any, headers: any) => {
+      // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
+      rewriteHeaders: (originalHeaders, request) => {
+        const {
+          // Drop set-cookie header to allow Vercel CDN caching https://vercel.com/docs/edge-network/caching#cacheable-response-criteria
+          "set-cookie": _,
+          "cache-control": cacheControl,
+          ...headers
+        } = originalHeaders;
+
         return {
           ...headers,
-          Origin: "https://swap.cow.fi",
+          // Only replace `cache-control` if it was set in the response
+          ...(cacheControl
+            ? {
+                "cache-control": `max-age=${CACHE_TTL}, public, s-maxage=${SERVER_CACHE_TTL}`,
+                // Add `cdn-cache-control` otherwise Vercel strips `s-maxage` from `cache-control`
+                "cdn-cache-control": `max-age${SERVER_CACHE_TTL}`,
+              }
+            : undefined),
         };
       },
-    },
-    undici: {
-      strictContentLength: false, // Prevent errors when content-length header mismatches
     },
   });
 };
