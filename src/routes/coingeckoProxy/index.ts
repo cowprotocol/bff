@@ -9,7 +9,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
   opts
 ): Promise<void> => {
   fastify.register(httpProxy, {
-    upstream: "https://api.coingecko.com",
+    upstream: "https://pro-api.coingecko.com",
     rewritePrefix: "/api/v3/",
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
