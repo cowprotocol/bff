@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^18.19.31",
     "@types/tap": "^15.0.5",
     "concurrently": "^7.0.0",
     "fastify-tsconfig": "^1.0.1",
