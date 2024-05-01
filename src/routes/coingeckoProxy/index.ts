@@ -28,7 +28,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
             ? {
                 "cache-control": `max-age=${CACHE_TTL}, public, s-maxage=${SERVER_CACHE_TTL}`,
                 // Add `cdn-cache-control` otherwise Vercel strips `s-maxage` from `cache-control`
-                "cdn-cache-control": `max-age${SERVER_CACHE_TTL}`,
+                "cdn-cache-control": `max-age=${SERVER_CACHE_TTL}`,
               }
             : undefined),
         };
