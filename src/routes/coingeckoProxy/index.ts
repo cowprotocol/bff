@@ -34,6 +34,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
         };
       },
     },
+    undici: {
+      strictContentLength: false, // Prevent errors when content-length header mismatches
+    },
   });
 };
 
