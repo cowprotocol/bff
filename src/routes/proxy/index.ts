@@ -1,10 +1,5 @@
-import { FastifyPluginAsync } from "fastify";
+import tokensProxy from "../proxies/tokens";
 
-// This path moved from /proxy to /proxies/tokens
-const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  fastify.all("/", (_request, response) => {
-    response.redirect(301, "/proxies/tokens");
-  });
-};
-
-export default proxy;
+// TODO: temporarily re-export old path while we migrate deployed services
+// TODO: remove this path after 2 months: by 2024-07-01
+export default tokensProxy;
