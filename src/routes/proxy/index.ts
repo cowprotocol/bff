@@ -1,18 +1,5 @@
-import { FastifyPluginAsync } from "fastify";
-import httpProxy from "@fastify/http-proxy";
+import tokensProxy from "../proxies/tokens";
 
-const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  fastify.register(httpProxy, {
-    upstream: fastify.config.PROXY_UPSTREAM,
-    replyOptions: {
-      rewriteRequestHeaders: (originalRequest: any, headers: any) => {
-        return {
-          ...headers,
-          Origin: fastify.config.PROXY_ORIGIN,
-        };
-      },
-    },
-  });
-};
-
-export default proxy;
+// TODO: temporarily re-export old path while we migrate deployed services
+// TODO: remove this path after 2 months: by 2024-07-01
+export default tokensProxy;
