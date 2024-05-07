@@ -1,9 +1,11 @@
 name: Publish Docker image
 
 on:
-  push:
-    branches: [main]
-    tags: [v*]
+  [push]
+
+  # push:
+  #   branches: [main]
+  #   tags: [v*]
 
 jobs:
   docker:
