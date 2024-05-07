@@ -44,6 +44,7 @@ jobs:
           tags: ${{ steps.image_meta_bff-core.outputs.tags }}
           labels: ${{ steps.image_meta_bff-core.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
+          platforms: linux/amd64
 
       - name: Image metadata
         id: image_meta_bff-twap
@@ -60,3 +61,4 @@ jobs:
           tags: ${{ steps.image_meta_bff-twap.outputs.tags }}
           labels: ${{ steps.image_meta_bff-twap.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
+          platforms: linux/amd64
