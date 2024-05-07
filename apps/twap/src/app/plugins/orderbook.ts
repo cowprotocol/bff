@@ -70,19 +70,25 @@ function orderbookFactory(
 
 export default fp(async function (fastify: FastifyInstance) {
   fastify.ready(() => {
-    const goerli = orderbookFactory(
-      fastify.orm['goerli'],
-      getApiBaseUrl(SupportedChainId.GOERLI)
-    );
+    // const gnosis = orderbookFactory(
+    //   fastify.orm['gnosis'],
+    //   getApiBaseUrl(SupportedChainId.GNOSIS_CHAIN)
+    // );
     const mainnet = orderbookFactory(
       fastify.orm['mainnet'],
       getApiBaseUrl(SupportedChainId.MAINNET)
     );
+    // const sepolia = orderbookFactory(
+    //   fastify.orm['sepolia'],
+    //   getApiBaseUrl(SupportedChainId.SEPOLIA)
+    // );
     fastify.decorate('orderbook', {
-      goerli,
+      // gnosis,
       mainnet,
-      [SupportedChainId.GOERLI]: goerli,
+      // sepolia,
       [SupportedChainId.MAINNET]: mainnet,
+      // [SupportedChainId.SEPOLIA]: sepolia,
+      // [SupportedChainId.GNOSIS_CHAIN]: gnosis,
     });
   });
 });
@@ -97,9 +103,11 @@ interface Orderbook {
 declare module 'fastify' {
   interface FastifyInstance {
     orderbook: {
-      goerli: Orderbook;
+      gnosis: Orderbook;
       mainnet: Orderbook;
-      [SupportedChainId.GOERLI]: Orderbook;
+      sepolia: Orderbook;
+      [SupportedChainId.SEPOLIA]: Orderbook;
+      [SupportedChainId.GNOSIS_CHAIN]: Orderbook;
       [SupportedChainId.MAINNET]: Orderbook;
     };
   }

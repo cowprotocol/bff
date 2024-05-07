@@ -44,7 +44,7 @@ const twapHandlerAddress = '0x910d00a310f7Dc5B29FE73458F47f519be547D3d';
 export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
   1: twapHandlerAddress,
   100: twapHandlerAddress,
-  5: twapHandlerAddress,
+  '11155111': twapHandlerAddress,
 };
 
 export function twapOrderToStruct(order: TWAPOrder): TWAPOrderStruct {
