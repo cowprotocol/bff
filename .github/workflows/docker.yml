@@ -35,7 +35,7 @@ jobs:
         id: image_meta_bff-core
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}/bff-core
+          images: ghcr.io/${{ github.repository }}/core
 
       - name: 'BFF: Build and push'
         uses: docker/build-push-action@v4
@@ -51,7 +51,7 @@ jobs:
         id: image_meta_bff-twap
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}/bff-twap
+          images: ghcr.io/${{ github.repository }}/twap
 
       - name: 'TWAP: Build and push'
         uses: docker/build-push-action@v4
