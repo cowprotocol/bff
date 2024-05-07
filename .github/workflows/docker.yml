@@ -1,0 +1,44 @@
+name: Publish Docker image
+
+on:
+  push:
+    branches: [main]
+    tags: [v*]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: image_meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: 'TWAP: Build and push'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: apps/twap/Dockerfile
+          push: true
+          tags: ${{ steps.image_meta.outputs.tags }}
+          labels: ${{ steps.image_meta.outputs.labels }}
+
+      - name: 'BFF: Build and push'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: apps/bff/Dockerfile
+          push: true
+          tags: ${{ steps.image_meta.outputs.tags }}
+          labels: ${{ steps.image_meta.outputs.labels }}
