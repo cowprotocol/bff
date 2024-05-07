@@ -32,20 +32,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Image metadata
-        id: image_meta
+        id: image_meta_bff-core
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}
-
-      - name: 'TWAP: Build and push'
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: apps/twap/Dockerfile
-          push: true
-          tags: ${{ steps.image_meta.outputs.tags }}
-          labels: ${{ steps.image_meta.outputs.labels }}
-          builder: ${{ steps.setup-buildx.outputs.name }}
+          images: ghcr.io/${{ github.repository }}/bff-core
 
       - name: 'BFF: Build and push'
         uses: docker/build-push-action@v4
@@ -53,6 +43,22 @@ jobs:
           context: .
           file: apps/bff/Dockerfile
           push: true
-          tags: ${{ steps.image_meta.outputs.tags }}
-          labels: ${{ steps.image_meta.outputs.labels }}
+          tags: ${{ steps.image_meta_bff-core.outputs.tags }}
+          labels: ${{ steps.image_meta_bff-core.outputs.labels }}
+          builder: ${{ steps.setup-buildx.outputs.name }}
+
+      - name: Image metadata
+        id: image_meta_bff-twap
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/bff-twap
+
+      - name: 'TWAP: Build and push'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: apps/twap/Dockerfile
+          push: true
+          tags: ${{ steps.image_meta_bff-twap.outputs.tags }}
+          labels: ${{ steps.image_meta_bff-twap.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
