@@ -13,7 +13,7 @@
   },
   "private": true,
   "dependencies": {
-    "@cowprotocol/cow-sdk": "^2.1.0",
+    "@cowprotocol/cow-sdk": "5.2.0",
     "@fastify/autoload": "~5.7.1",
     "@fastify/cors": "^8.2.1",
     "@fastify/env": "^4.2.0",
@@ -46,7 +46,7 @@
     "@nx/workspace": "16.3.2",
     "@typechain/ethers-v5": "^11.0.0",
     "@types/jest": "^29.5.0",
-    "@types/node": "~18.7.1",
+    "@types/node": "^18.19.31",
     "@types/tap": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",

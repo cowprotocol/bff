@@ -1,9 +1,9 @@
-import fp from "fastify-plugin";
 import fastifyEnv from "@fastify/env";
+import fp from "fastify-plugin";
 
 const schema = {
   type: "object",
-  required: ["PROXY_ORIGIN", "PROXY_UPSTREAM"],
+  required: ["PROXY_ORIGIN", "PROXY_UPSTREAM", "COINGECKO_API_KEY"],
   properties: {
     PROXY_ORIGIN: {
       type: "string",
@@ -13,7 +13,13 @@ const schema = {
     },
     TWAP_BASE_URL: {
       type: "string",
-    }
+    },
+    COINGECKO_API_KEY: {
+      type: "string",
+    },
+    COINGECKO_PROXY_UPSTREAM: {
+      type: "string",
+    },
   },
 };
 
@@ -21,6 +27,7 @@ export default fp(async (fastify, opts) => {
   const options = {
     ...opts,
     schema,
+    dotenv: true,
   };
 
   fastify.register(fastifyEnv, options);
