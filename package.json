@@ -6,7 +6,7 @@
     "twap:run-migrations": "nx run twap:run-migrations",
     "twap:generate-migrations": "nx run twap:generate-migrations",
     "serve": "nx serve",
-    "build": "nx build",
+    "build": "nx run-many --all --target=build",
     "create-app": "nx g app --framework=fastify --docker",
     "docker-build:affected": "nx affected -t docker-build --prod --parallel --maxParallel=3 --skip-nx-cache --skip-nx-cache",
     "compose:up": "yarn run docker-build:affected && docker-compose up"
