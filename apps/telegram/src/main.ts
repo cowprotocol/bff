@@ -17,7 +17,7 @@ interface TelegramSubscription {
   code: string;
 }
 
-const subscriptions = new Map<string, TelegramSubscription[]>();
+const SUBSCRIPTION_CACHE = new Map<string, TelegramSubscription[]>();
 
 // Create telegram bot
 const token = process.env.TELEGRAM_SECRET;
@@ -77,9 +77,9 @@ amqp.connect(
           const subscriptionForAccount = cmsClient.GET(
             `/tg-subscriptions/${account}`
           ) as TelegramSubscription[];
-          subscriptions.set(account, subscriptionForAccount);
+          SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
 
-          const telegramSubscriptions = subscriptions.get(account);
+          const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
           if (telegramSubscriptions.length > 0) {
             // Send the message to all subscribers
             for (const { chatId } of telegramSubscriptions) {
