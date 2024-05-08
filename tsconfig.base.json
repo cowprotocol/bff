@@ -18,7 +18,8 @@
     "esModuleInterop": true,
     "allowJs": true,
     "paths": {
-      "@cow-web-services/abis": ["libs/abis/src/index.ts"],
+      "@cowprotocol/abis": ["libs/abis/src/index.ts"],
+      "@cowprotocol/notifications": ["libs/notifications/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

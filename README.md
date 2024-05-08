@@ -28,10 +28,17 @@ This will only build the affected docker containers. After that, you'll need to 
 
 ## How to create a new service?
 
-To add a new service, you can run the following command;
+To add a new app or library, you can run the following command;
 
 ```bash
-yarn create-app
+# New API
+yarn new:fastify
+
+# New Library
+yarn new:lib
+
+# New Node app
+yarn new:node
 ```
 
 After which, you'll be prompted to enter a name for the service, and will have two apps with fastify created for you;
