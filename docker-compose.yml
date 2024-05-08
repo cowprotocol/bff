@@ -50,7 +50,7 @@ services:
 
       - ./.env:/app/.env
     ports:
-      - '1337:1337'
+      - '1500:1500'
     networks:
       - bff-network
     depends_on:

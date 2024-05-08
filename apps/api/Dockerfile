@@ -7,7 +7,7 @@
 FROM docker.io/node:lts-alpine
 
 ENV HOST=0.0.0.0
-ENV PORT=1337
+ENV PORT=1500
 
 WORKDIR /app
 

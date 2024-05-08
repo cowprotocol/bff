@@ -7,7 +7,7 @@ import amqp from 'amqplib/callback_api';
 import fetch from 'node-fetch';
 
 // URL of the Strapi API endpoint
-const API_URL = 'http://localhost:1337/notifications';
+const API_URL = 'http://localhost:1500/notifications';
 
 // Connect to RabbitMQ server
 amqp.connect('amqp://localhost', function (error0, connection) {
