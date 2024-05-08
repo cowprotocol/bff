@@ -1,21 +1,27 @@
 {
-  "name": "bff",
+  "name": "api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/bff/src",
+  "sourceRoot": "apps/api/src",
   "projectType": "application",
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/bff",
-        "format": ["cjs"],
+        "outputPath": "dist/apps/api",
+        "format": [
+          "cjs"
+        ],
         "bundle": false,
-        "main": "apps/bff/src/main.ts",
-        "tsConfig": "apps/bff/tsconfig.app.json",
-        "assets": ["apps/bff/src/assets"],
+        "main": "apps/api/src/main.ts",
+        "tsConfig": "apps/api/tsconfig.app.json",
+        "assets": [
+          "apps/api/src/assets"
+        ],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -41,29 +47,35 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "bff:build"
+        "buildTarget": "api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "bff:build:development"
+          "buildTarget": "api:build:development"
         },
         "production": {
-          "buildTarget": "bff:build:production"
+          "buildTarget": "api:build:production"
         }
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/bff/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/api/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
-        "jestConfig": "apps/bff/jest.config.ts",
+        "jestConfig": "apps/api/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -74,8 +86,10 @@
       }
     },
     "docker-build": {
-      "dependsOn": ["build"],
-      "command": "docker buildx build --platform=linux/amd64 -f apps/bff/Dockerfile . -t bff"
+      "dependsOn": [
+        "build"
+      ],
+      "command": "docker buildx build --platform=linux/amd64 -f apps/api/Dockerfile . -t api"
     }
   },
   "tags": []

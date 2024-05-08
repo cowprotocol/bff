@@ -68,7 +68,7 @@ This will also show you some variables which are defined with `secure` fields. T
 
 Once you have a decent version, you want to open a PR to infrastructure to start the review process. You should also add your service to `docker-compose.yml` with corresponding changes, to ensure we can still run it on a local environment.
 
-Every service must talk to the outside world through BFF. So you want to go to the BFF project here and add _at least_ a pass through proxy (examples can be found under `apps/bff/src/app/routes/twap`). Because of this, your Pulumi definition does not need an ingress. However, you will need to add a new environment variable to reference your service from BFF (i.e. `http://{service-name}.{namespace}.svc.cluster.local`).
+Every service must talk to the outside world through BFF. So you want to go to the BFF project here and add _at least_ a pass through proxy (examples can be found under `apps/api/src/app/routes/twap`). Because of this, your Pulumi definition does not need an ingress. However, you will need to add a new environment variable to reference your service from BFF (i.e. `http://{service-name}.{namespace}.svc.cluster.local`).
 
 ## How to read logs?
 

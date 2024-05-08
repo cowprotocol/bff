@@ -25,9 +25,9 @@ services:
     depends_on:
       - db
 
-  bff:
-    container_name: bff
-    image: bff:latest
+  api:
+    container_name: api
+    image: api:latest
     restart: unless-stopped
     env_file: .env
     environment:
