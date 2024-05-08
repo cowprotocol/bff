@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-  displayName: 'bff',
+  displayName: 'api',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/packages/bff',
+  coverageDirectory: '../../coverage/packages/api',
 };
