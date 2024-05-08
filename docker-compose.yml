@@ -82,8 +82,8 @@ services:
       - '15672:15672'
       - '5672:5672'
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${QUEUE_USER}
+      RABBITMQ_DEFAULT_PASS: ${QUEUE_PASSWORD}
     volumes:
       - data-rabbitmq:/var/lib/rabbitmq
     networks:
