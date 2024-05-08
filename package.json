@@ -15,6 +15,7 @@
   },
   "private": true,
   "dependencies": {
+    "@cowprotocol/cms": "^0.3.0-RC.2",
     "@cowprotocol/cow-sdk": "5.2.0",
     "@fastify/autoload": "~5.7.1",
     "@fastify/cors": "^8.2.1",
@@ -50,6 +51,7 @@
     "@nx/vite": "^16.4.3",
     "@nx/workspace": "16.3.2",
     "@typechain/ethers-v5": "^11.0.0",
+    "@types/amqplib": "^0.10.5",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.19.31",
     "@types/node-fetch": "^2.6.11",
@@ -69,7 +71,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "typechain": "^8.2.0",
-    "typescript": "~5.0.2",
+    "typescript": "^5.1.6",
     "vite-plugin-dts": "^3.0.3",
     "vite-tsconfig-paths": "^4.2.0"
   }

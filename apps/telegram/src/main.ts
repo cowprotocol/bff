@@ -1,33 +1,59 @@
 // console.log('Hello World');
 
 import TelegramBot from 'node-telegram-bot-api';
+
+import { CmsClient, components } from '@cowprotocol/cms';
 import amqp from 'amqplib/callback_api';
 import {
   NOTIFICATIONS_QUEUE,
   parseNotification,
+  Notification,
 } from '@cowprotocol/notifications';
+import assert from 'assert';
 
-// replace the value below with the Telegram token you receive from BotFather
-const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+type Schemas = components['schemas'];
+export type Article = Schemas['ArticleListResponseDataItem'];
+export type SharedMediaComponent = Schemas['SharedMediaComponent'];
+export type SharedQuoteComponent = Schemas['SharedQuoteComponent'];
+export type SharedRichTextComponent = Schemas['SharedRichTextComponent'];
+export type SharedSliderComponent = Schemas['SharedSliderComponent'];
+export type SharedVideoEmbedComponent = Schemas['SharedVideoEmbedComponent'];
+export type Category = Schemas['CategoryListResponseDataItem'];
 
-// Create a bot that uses 'polling' to fetch new updates
+// TODO: Fix me. Types from CMS are not being imported correctly! declaring this should not be necesary
+interface TelegramSubscription {
+  chatId: number;
+  code: string;
+}
+
+const subscriptions = new Map<string, TelegramSubscription[]>();
+const WATCHED_ACCOUNTS = [
+  '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
+  '0x79063d9173C09887d536924E2F6eADbaBAc099f5',
+];
+
+// Create telegram bot
+const token = process.env.TELEGRAM_SECRET;
+assert(token, 'TELEGRAM_SECRET is required');
 const bot = new TelegramBot(token, { polling: true });
 
-// This object will hold the chat ids for all subscribed users
-const subscribers: Record<number, string> = {}; // TODO: Load from CMS
+// Create CMS client
+const cmsBaseUrl = process.env.CMS_BASE_URL;
+assert(cmsBaseUrl, 'CMS_BASE_URL is required');
+const cmsApiKey = process.env.STRAPI_API_KEY;
+assert(cmsApiKey, 'CMS_API_KEY is required');
+const cmsClient = CmsClient({
+  url: cmsBaseUrl,
+  apiKey: cmsApiKey,
+});
 
-// // Matches "/subscribe [whatever]"
-// bot.onText(/\/subscribe (.+)/, (msg, match) => {
-//   const chatId = msg.chat.id;
-//   const code = match[1]; // the captured "whatever"
-
-//   // Here you should validate the code and check if it's a valid code
-
-//   // If the code is valid, add the chatId to the subscribers list
-//   subscribers[chatId] = code;
-
-//   bot.sendMessage(chatId, 'You have successfully subscribed to notifications.');
-// });
+// TODO: The endpoint should return all subscriptions, not an specific one. Using WATCHED_ACCOUNTS to cut corners for the hackathon
+for (const account of WATCHED_ACCOUNTS) {
+  const subscriptionForAccount = cmsClient.GET(
+    `/tg-subscriptions/${account}`
+  ) as TelegramSubscription[];
+  subscriptions.set(account, subscriptionForAccount);
+}
 
 // Connect to RabbitMQ server
 amqp.connect('amqp://localhost', function (error0, connection) {
@@ -46,24 +72,29 @@ amqp.connect('amqp://localhost', function (error0, connection) {
       durable: false,
     });
 
-    console.log(' [*] Waiting for messages in %s', NOTIFICATIONS_QUEUE);
+    console.log(
+      '[telegram-consumer] Waiting for messages in %s',
+      NOTIFICATIONS_QUEUE
+    );
 
     // Consume messages from RabbitMQ
     channel.consume(
       NOTIFICATIONS_QUEUE,
       function (msg) {
-        const message = msg.content.toString();
-        const notification = parseNotification(message);
-
-        // Send the message to all subscribers
-        for (const chatId in subscribers) {
-          bot.sendMessage(
-            Number(chatId),
-            `\
-TITLE: ${notification.title}
-MESSAGE: ${notification.message}
-URL: ${notification.url ? notification.url : 'No URL provided'}`
-          );
+        const notification = parseNotification(msg.content.toString());
+        const { id, message, account, title, url } = notification;
+        console.log(
+          `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+        );
+        const telegramSubscriptions = subscriptions.get(account);
+        if (telegramSubscriptions.length > 0) {
+          // Send the message to all subscribers
+          for (const { chatId } of telegramSubscriptions) {
+            console.log(
+              `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
+            );
+            bot.sendMessage(chatId, formatMessage(notification));
+          }
         }
       },
       {
@@ -72,3 +103,17 @@ URL: ${notification.url ? notification.url : 'No URL provided'}`
     );
   });
 });
+
+function formatMessage({ title, message, url }: Notification) {
+  return `\
+${title}
+
+${message}
+
+${
+  url &&
+  `
+
+More info in ${url}`
+}`;
+}
