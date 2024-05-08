@@ -27,10 +27,6 @@ interface TelegramSubscription {
 }
 
 const subscriptions = new Map<string, TelegramSubscription[]>();
-const WATCHED_ACCOUNTS = [
-  '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
-  '0x79063d9173C09887d536924E2F6eADbaBAc099f5',
-];
 
 // Create telegram bot
 const token = process.env.TELEGRAM_SECRET;
@@ -46,14 +42,6 @@ const cmsClient = CmsClient({
   url: cmsBaseUrl,
   apiKey: cmsApiKey,
 });
-
-// TODO: The endpoint should return all subscriptions, not an specific one. Using WATCHED_ACCOUNTS to cut corners for the hackathon
-for (const account of WATCHED_ACCOUNTS) {
-  const subscriptionForAccount = cmsClient.GET(
-    `/tg-subscriptions/${account}`
-  ) as TelegramSubscription[];
-  subscriptions.set(account, subscriptionForAccount);
-}
 
 // Connect to RabbitMQ server
 amqp.connect('amqp://localhost', function (error0, connection) {
@@ -86,6 +74,14 @@ amqp.connect('amqp://localhost', function (error0, connection) {
         console.log(
           `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
         );
+
+        // TODO: Don't check every time!!
+        // Check in CMS if there's one
+        const subscriptionForAccount = cmsClient.GET(
+          `/tg-subscriptions/${account}`
+        ) as TelegramSubscription[];
+        subscriptions.set(account, subscriptionForAccount);
+
         const telegramSubscriptions = subscriptions.get(account);
         if (telegramSubscriptions.length > 0) {
           // Send the message to all subscribers
@@ -95,6 +91,10 @@ amqp.connect('amqp://localhost', function (error0, connection) {
             );
             bot.sendMessage(chatId, formatMessage(notification));
           }
+        } else {
+          console.log(
+            `[telegram-consumer] No subscriptions found for account ${account}`
+          );
         }
       },
       {
