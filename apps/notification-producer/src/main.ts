@@ -1,6 +1,10 @@
-import fetch from 'node-fetch';
+import {
+  NOTIFICATIONS_QUEUE,
+  Notification,
+  stringifyNotification,
+} from '@cowprotocol/notifications';
 import amqp from 'amqplib/callback_api';
-import { NOTIFICATIONS_QUEUE, Notification, stringifyNotification } from '@cowprotocol/notifications';
+import fetch from 'node-fetch';
 
 // URL of the Strapi API endpoint
 const API_URL = 'http://localhost:1337/notifications';
@@ -28,10 +32,10 @@ amqp.connect('amqp://localhost', function (error0, connection) {
     const fetchNotifications = async () => {
       try {
         const response = await fetch(API_URL);
-        const cmsNotifications = await response.json() as unknown[];
+        const cmsNotifications = (await response.json()) as unknown[];
 
         // TODO: Convert from CMS to notifications
-        const notifications = cmsNotifications.map(fromCmsToNotifications)
+        const notifications = cmsNotifications.map(fromCmsToNotifications);
 
         for (const notification of notifications) {
           const message = stringifyNotification(notification);
@@ -53,7 +57,4 @@ function fromCmsToNotifications(_notifications: unknown): Notification {
     title: 'Hello',
     message: 'World',
   };
-  }
 }
-
-
