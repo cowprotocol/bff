@@ -86,6 +86,8 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - data-rabbitmq:/var/lib/rabbitmq
+    networks:
+      - bff-network
 
 volumes:
   data-postgres:
