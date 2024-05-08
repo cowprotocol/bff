@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_HOST: bff-db
+      DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -23,7 +23,7 @@ services:
     networks:
       - bff-network
     depends_on:
-      - bff-db
+      - db
 
   bff:
     container_name: bff
@@ -52,10 +52,10 @@ services:
     networks:
       - bff-network
     depends_on:
-      - bff-db
-      
-  bff-db:
-    container_name: bff-db
+      - db
+
+  db:
+    container_name: db
     env_file: .env
     image: postgres:14.5-alpine
     environment:
@@ -63,15 +63,29 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - bff-data:/var/lib/postgresql/data/ # using a volume
+      - data-postgres:/var/lib/postgresql/data/ # using a volume
 
     ports:
       - '5432:${DATABASE_PORT}'
     networks:
       - bff-network
 
+  queue:
+    container_name: queue
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - data-rabbitmq:/var/lib/rabbitmq
+
 volumes:
-  bff-data:
+  data-postgres:
+  data-rabbitmq:
 
 networks:
   bff-network:
