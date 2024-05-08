@@ -2,6 +2,7 @@ export const NOTIFICATIONS_QUEUE = 'notifications';
 
 export interface Notification {
   id: string;
+  account: string;
   title: string;
   message: string;
   url?: string;

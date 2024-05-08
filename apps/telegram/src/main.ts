@@ -1,74 +1,117 @@
 // console.log('Hello World');
 
 import TelegramBot from 'node-telegram-bot-api';
+
+import { CmsClient } from '@cowprotocol/cms';
 import amqp from 'amqplib/callback_api';
 import {
   NOTIFICATIONS_QUEUE,
   parseNotification,
+  Notification,
 } from '@cowprotocol/notifications';
+import assert from 'assert';
 
-// replace the value below with the Telegram token you receive from BotFather
-const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+// TODO: Fix me. Types from CMS are not being imported correctly! declaring this should not be necesary
+interface TelegramSubscription {
+  chatId: number;
+  code: string;
+}
 
-// Create a bot that uses 'polling' to fetch new updates
+const SUBSCRIPTION_CACHE = new Map<string, TelegramSubscription[]>();
+
+// Create telegram bot
+const token = process.env.TELEGRAM_SECRET;
+assert(token, 'TELEGRAM_SECRET is required');
 const bot = new TelegramBot(token, { polling: true });
 
-// This object will hold the chat ids for all subscribed users
-const subscribers: Record<number, string> = {}; // TODO: Load from CMS
-
-// // Matches "/subscribe [whatever]"
-// bot.onText(/\/subscribe (.+)/, (msg, match) => {
-//   const chatId = msg.chat.id;
-//   const code = match[1]; // the captured "whatever"
-
-//   // Here you should validate the code and check if it's a valid code
-
-//   // If the code is valid, add the chatId to the subscribers list
-//   subscribers[chatId] = code;
-
-//   bot.sendMessage(chatId, 'You have successfully subscribed to notifications.');
-// });
+// Create CMS client
+const cmsBaseUrl = process.env.CMS_BASE_URL;
+assert(cmsBaseUrl, 'CMS_BASE_URL is required');
+const cmsApiKey = process.env.STRAPI_API_KEY;
+assert(cmsApiKey, 'CMS_API_KEY is required');
+const cmsClient = CmsClient({
+  url: cmsBaseUrl,
+  apiKey: cmsApiKey,
+});
 
 // Connect to RabbitMQ server
-amqp.connect('amqp://localhost', function (error0, connection) {
-  if (error0) {
-    throw error0;
-  }
+const queueHost = process.env.QUEUE_HOST;
+assert(queueHost, 'QUEUE_HOST is required');
+const queuePort = process.env.QUEUE_PORT || 5672;
 
-  // Create a channel
-  connection.createChannel(function (error1, channel) {
-    if (error1) {
-      throw error1;
+amqp.connect(
+  'amqp://' + queueHost + ':' + queuePort,
+  function (error0, connection) {
+    if (error0) {
+      throw error0;
     }
 
-    // This makes sure the queue is declared
-    channel.assertQueue(NOTIFICATIONS_QUEUE, {
-      durable: false,
-    });
-
-    console.log(' [*] Waiting for messages in %s', NOTIFICATIONS_QUEUE);
-
-    // Consume messages from RabbitMQ
-    channel.consume(
-      NOTIFICATIONS_QUEUE,
-      function (msg) {
-        const message = msg.content.toString();
-        const notification = parseNotification(message);
-
-        // Send the message to all subscribers
-        for (const chatId in subscribers) {
-          bot.sendMessage(
-            Number(chatId),
-            `\
-TITLE: ${notification.title}
-MESSAGE: ${notification.message}
-URL: ${notification.url ? notification.url : 'No URL provided'}`
-          );
-        }
-      },
-      {
-        noAck: true,
+    // Create a channel
+    connection.createChannel(function (error1, channel) {
+      if (error1) {
+        throw error1;
       }
-    );
-  });
-});
+
+      // This makes sure the queue is declared
+      channel.assertQueue(NOTIFICATIONS_QUEUE, {
+        durable: false,
+      });
+
+      console.log(
+        '[telegram-consumer] Waiting for messages in %s',
+        NOTIFICATIONS_QUEUE
+      );
+
+      // Consume messages from RabbitMQ
+      channel.consume(
+        NOTIFICATIONS_QUEUE,
+        function (msg) {
+          const notification = parseNotification(msg.content.toString());
+          const { id, message, account, title, url } = notification;
+          console.log(
+            `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+          );
+
+          // TODO: Don't check every time!!
+          // Check in CMS if there's one
+          const subscriptionForAccount = cmsClient.GET(
+            `/tg-subscriptions/${account}`
+          ) as TelegramSubscription[];
+          SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
+
+          const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
+          if (telegramSubscriptions.length > 0) {
+            // Send the message to all subscribers
+            for (const { chatId } of telegramSubscriptions) {
+              console.log(
+                `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
+              );
+              bot.sendMessage(chatId, formatMessage(notification));
+            }
+          } else {
+            console.log(
+              `[telegram-consumer] No subscriptions found for account ${account}`
+            );
+          }
+        },
+        {
+          noAck: true,
+        }
+      );
+    });
+  }
+);
+
+function formatMessage({ title, message, url }: Notification) {
+  return `\
+${title}
+
+${message}
+
+${
+  url &&
+  `
+
+More info in ${url}`
+}`;
+}
