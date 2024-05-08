@@ -2,6 +2,7 @@ version: '3'
 services:
   twap:
     container_name: twap
+    platform: linux/amd64
     image: twap:latest
     restart: unless-stopped
     env_file: .env
@@ -27,6 +28,7 @@ services:
 
   api:
     container_name: api
+    platform: linux/amd64
     image: api:latest
     restart: unless-stopped
     env_file: .env
@@ -56,6 +58,7 @@ services:
 
   db:
     container_name: db
+    platform: linux/amd64
     env_file: .env
     image: postgres:14.5-alpine
     environment:
@@ -72,6 +75,7 @@ services:
 
   queue:
     container_name: queue
+    platform: linux/amd64
     image: rabbitmq:3.13-management
     restart: unless-stopped
     ports:
