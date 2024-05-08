@@ -2,7 +2,7 @@
 
 import TelegramBot from 'node-telegram-bot-api';
 
-import { CmsClient, components } from '@cowprotocol/cms';
+import { CmsClient } from '@cowprotocol/cms';
 import amqp from 'amqplib/callback_api';
 import {
   NOTIFICATIONS_QUEUE,
@@ -10,15 +10,6 @@ import {
   Notification,
 } from '@cowprotocol/notifications';
 import assert from 'assert';
-
-type Schemas = components['schemas'];
-export type Article = Schemas['ArticleListResponseDataItem'];
-export type SharedMediaComponent = Schemas['SharedMediaComponent'];
-export type SharedQuoteComponent = Schemas['SharedQuoteComponent'];
-export type SharedRichTextComponent = Schemas['SharedRichTextComponent'];
-export type SharedSliderComponent = Schemas['SharedSliderComponent'];
-export type SharedVideoEmbedComponent = Schemas['SharedVideoEmbedComponent'];
-export type Category = Schemas['CategoryListResponseDataItem'];
 
 // TODO: Fix me. Types from CMS are not being imported correctly! declaring this should not be necesary
 interface TelegramSubscription {
