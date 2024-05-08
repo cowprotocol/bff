@@ -21,5 +21,5 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 RUN chown -R node:node /app
 USER node
-EXPOSE 1337
+EXPOSE 1500
 CMD ["yarn", "run", "start:production"]
