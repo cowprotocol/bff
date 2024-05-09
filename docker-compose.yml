@@ -1,4 +1,3 @@
-version: '3'
 services:
   twap:
     container_name: twap
@@ -88,6 +87,53 @@ services:
       - data-rabbitmq:/var/lib/rabbitmq
     networks:
       - bff-network
+    healthcheck:
+    # TODO: figure out why this check doesn't succeed so telegram and notification-producer can depend on it
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  notification-producer:
+    container_name: notification-producer
+    build:
+      context: .
+      dockerfile: ./apps/notification-producer/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      QUEUE_HOST: ${QUEUE_HOST}
+      QUEUE_PORT: ${QUEUE_PORT}
+      QUEUE_USER: ${QUEUE_USER}
+      QUEUE_PASSWORD: ${QUEUE_PASSWORD}
+      CMS_BASE_URL: ${CMS_BASE_URL}
+      CMS_API_KEY: ${CMS_API_KEY}
+    networks:
+      - bff-network
+    depends_on:
+      - queue
+        # condition: service_healthy
+
+  telegram:
+    container_name: telegram
+    build: 
+      context: .
+      dockerfile: ./apps/telegram/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      QUEUE_HOST: ${QUEUE_HOST}
+      QUEUE_PORT: ${QUEUE_PORT}
+      QUEUE_USER: ${QUEUE_USER}
+      QUEUE_PASSWORD: ${QUEUE_PASSWORD}
+      CMS_BASE_URL: ${CMS_BASE_URL}
+      CMS_API_KEY: ${CMS_API_KEY}
+      TELEGRAM_SECRET: ${TELEGRAM_SECRET}
+    networks:
+      - bff-network
+    depends_on:
+      - queue
+        # condition: service_healthy
 
 volumes:
   data-postgres:
