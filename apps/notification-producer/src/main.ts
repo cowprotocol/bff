@@ -39,8 +39,6 @@ amqp.connect(
         throw error1;
       }
 
-      // Name of the queue
-
       // This makes sure the queue is declared
       channel.assertQueue(NOTIFICATIONS_QUEUE, {
         durable: false,
@@ -48,6 +46,8 @@ amqp.connect(
 
       // Function to fetch notifications and send them to RabbitMQ
       const fetchNotifications = async () => {
+        console.log('[notification-producer] Fetching notifications');
+
         try {
           const cmsPushNotifications = await getPushNotifications();
 
@@ -64,8 +64,9 @@ amqp.connect(
         }
       };
 
-      // Fetch notifications every 5 minutes
-      setInterval(fetchNotifications, 5 * 60 * 1000);
+      console.log(
+        '[notification-producer] Ready to start fetching notifications'
+      );
     });
   }
 );
