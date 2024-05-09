@@ -1,38 +1,22 @@
-// console.log('Hello World');
-
-import TelegramBot from 'node-telegram-bot-api';
-
-import { CmsClient } from '@cowprotocol/cms';
-import amqp from 'amqplib/callback_api';
+import {
+  CmsTelegramSubscription,
+  getAllTelegramSubscriptionsForAccounts,
+} from '@cowprotocol/cms-api';
 import {
   NOTIFICATIONS_QUEUE,
-  parseNotification,
   Notification,
+  parseNotification,
 } from '@cowprotocol/notifications';
+import amqp from 'amqplib/callback_api';
 import assert from 'assert';
+import TelegramBot from 'node-telegram-bot-api';
 
-// TODO: Fix me. Types from CMS are not being imported correctly! declaring this should not be necesary
-interface TelegramSubscription {
-  chatId: number;
-  code: string;
-}
-
-const SUBSCRIPTION_CACHE = new Map<string, TelegramSubscription[]>();
+const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 
 // Create telegram bot
 const token = process.env.TELEGRAM_SECRET;
 assert(token, 'TELEGRAM_SECRET is required');
-const bot = new TelegramBot(token, { polling: true });
-
-// Create CMS client
-const cmsBaseUrl = process.env.CMS_BASE_URL;
-assert(cmsBaseUrl, 'CMS_BASE_URL is required');
-const cmsApiKey = process.env.STRAPI_API_KEY;
-assert(cmsApiKey, 'CMS_API_KEY is required');
-const cmsClient = CmsClient({
-  url: cmsBaseUrl,
-  apiKey: cmsApiKey,
-});
+const telegramBot = new TelegramBot(token, { polling: true });
 
 // Connect to RabbitMQ server
 const queueHost = process.env.QUEUE_HOST;
@@ -65,7 +49,7 @@ amqp.connect(
       // Consume messages from RabbitMQ
       channel.consume(
         NOTIFICATIONS_QUEUE,
-        function (msg) {
+        async function (msg) {
           const notification = parseNotification(msg.content.toString());
           const { id, message, account, title, url } = notification;
           console.log(
@@ -74,19 +58,20 @@ amqp.connect(
 
           // TODO: Don't check every time!!
           // Check in CMS if there's one
-          const subscriptionForAccount = cmsClient.GET(
-            `/tg-subscriptions/${account}`
-          ) as TelegramSubscription[];
+          const subscriptionForAccount =
+            await getAllTelegramSubscriptionsForAccounts([account]);
+
           SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
 
           const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
           if (telegramSubscriptions.length > 0) {
             // Send the message to all subscribers
-            for (const { chatId } of telegramSubscriptions) {
+            for (const { attributes } of telegramSubscriptions) {
+              const { chat_id: chatId } = attributes;
               console.log(
                 `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
               );
-              bot.sendMessage(chatId, formatMessage(notification));
+              telegramBot.sendMessage(chatId, formatMessage(notification));
             }
           } else {
             console.log(

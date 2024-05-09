@@ -15,7 +15,7 @@
   },
   "private": true,
   "dependencies": {
-    "@cowprotocol/cms": "^0.3.0-RC.2",
+    "@cowprotocol/cms": "^0.3.0-RC.4",
     "@cowprotocol/cow-sdk": "5.2.0",
     "@fastify/autoload": "~5.7.1",
     "@fastify/cors": "^8.2.1",
@@ -55,6 +55,7 @@
     "@types/jest": "^29.5.0",
     "@types/node": "^18.19.31",
     "@types/node-fetch": "^2.6.11",
+    "@types/node-telegram-bot-api": "^0.64.6",
     "@types/tap": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
