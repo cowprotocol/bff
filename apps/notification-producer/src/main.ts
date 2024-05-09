@@ -14,11 +14,20 @@ import Mustache from 'mustache';
 // Connect to RabbitMQ server
 const queueHost = process.env.QUEUE_HOST;
 assert(queueHost, 'QUEUE_HOST is required');
-const queuePort = process.env.QUEUE_PORT || 5672;
+const queuePort = +process.env.QUEUE_PORT || 5672;
+const queueUser = process.env.QUEUE_USER;
+assert(queueUser, 'QUEUE_USER is required');
+const queuePassword = process.env.QUEUE_PASSWORD;
+assert(queuePassword, 'QUEUE_PASSWORD is required');
 
 // Connect to RabbitMQ server
 amqp.connect(
-  'amqp://' + queueHost + ':' + queuePort,
+  {
+    hostname: queueHost,
+    port: queuePort,
+    username: queueUser,
+    password: queuePassword,
+  },
   function (error0, connection) {
     if (error0) {
       throw error0;
