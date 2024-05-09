@@ -5,9 +5,9 @@ import {
 import {
   NOTIFICATIONS_QUEUE,
   Notification,
+  connectToQueue,
   parseNotification,
 } from '@cowprotocol/notifications';
-import amqp from 'amqplib/callback_api';
 import assert from 'assert';
 import TelegramBot from 'node-telegram-bot-api';
 
@@ -19,84 +19,56 @@ const token = process.env.TELEGRAM_SECRET;
 assert(token, 'TELEGRAM_SECRET is required');
 const telegramBot = new TelegramBot(token, { polling: true });
 
-// Connect to RabbitMQ server
-
-const queueHost = process.env.QUEUE_HOST;
-assert(queueHost, 'QUEUE_HOST is required');
-const queuePort = +process.env.QUEUE_PORT || 5672;
-const queueUser = process.env.QUEUE_USER;
-assert(queueUser, 'QUEUE_USER is required');
-const queuePassword = process.env.QUEUE_PASSWORD;
-assert(queuePassword, 'QUEUE_PASSWORD is required');
-
 async function main() {
-  // Connect to RabbitMQ server
-  amqp.connect(
-    {
-      hostname: queueHost,
-      port: queuePort,
-      username: queueUser,
-      password: queuePassword,
-    },
-    function (error0, connection) {
-      if (error0) {
-        throw error0;
-      }
+  const channel = await connectToQueue({
+    channel: NOTIFICATIONS_QUEUE,
+  });
 
-      // Create a channel
-      connection.createChannel(function (error1, channel) {
-        if (error1) {
-          throw error1;
+  // This makes sure the queue is declared
+  channel.assertQueue(NOTIFICATIONS_QUEUE, {
+    durable: false,
+  });
+
+  console.log(
+    '[telegram-consumer] Waiting for messages in %s',
+    NOTIFICATIONS_QUEUE
+  );
+
+  // Consume messages from RabbitMQ
+  channel.consume(
+    NOTIFICATIONS_QUEUE,
+    async function (msg) {
+      const notification = parseNotification(msg.content.toString());
+      const { id, message, account, title, url } = notification;
+      console.log(
+        `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+      );
+
+      // TODO: Don't check every time!!
+      // Check in CMS if there's one
+      const subscriptionForAccount =
+        await getAllTelegramSubscriptionsForAccounts([account]);
+
+      SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
+
+      const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
+      if (telegramSubscriptions.length > 0) {
+        // Send the message to all subscribers
+        for (const { attributes } of telegramSubscriptions) {
+          const { chat_id: chatId } = attributes;
+          console.log(
+            `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
+          );
+          telegramBot.sendMessage(chatId, formatMessage(notification));
         }
-
-        // This makes sure the queue is declared
-        channel.assertQueue(NOTIFICATIONS_QUEUE, {
-          durable: false,
-        });
-
+      } else {
         console.log(
-          '[telegram-consumer] Waiting for messages in %s',
-          NOTIFICATIONS_QUEUE
+          `[telegram-consumer] No subscriptions found for account ${account}`
         );
-
-        // Consume messages from RabbitMQ
-        channel.consume(
-          NOTIFICATIONS_QUEUE,
-          async function (msg) {
-            const notification = parseNotification(msg.content.toString());
-            const { id, message, account, title, url } = notification;
-            console.log(
-              `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
-            );
-
-            // TODO: Don't check every time!!
-            // Check in CMS if there's one
-            const subscriptionForAccount =
-              await getAllTelegramSubscriptionsForAccounts([account]);
-
-            SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
-
-            const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
-            if (telegramSubscriptions.length > 0) {
-              // Send the message to all subscribers
-              for (const { attributes } of telegramSubscriptions) {
-                const { chat_id: chatId } = attributes;
-                console.log(
-                  `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
-                );
-                telegramBot.sendMessage(chatId, formatMessage(notification));
-              }
-            } else {
-              console.log(
-                `[telegram-consumer] No subscriptions found for account ${account}`
-              );
-            }
-          },
-          {
-            noAck: true,
-          }
-        );
-      });
+      }
+    },
+    {
+      noAck: true,
     }
   );
 }
