@@ -43,7 +43,7 @@ jobs:
         id: image_meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }} (${{ matrix.package }})
+          images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
         uses: docker/build-push-action@v4
