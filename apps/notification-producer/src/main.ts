@@ -67,6 +67,9 @@ amqp.connect(
       console.log(
         '[notification-producer] Ready to start fetching notifications'
       );
+
+      // Fetch notifications every 30s
+      setInterval(fetchNotifications, 30 * 1000);
     });
   }
 );
