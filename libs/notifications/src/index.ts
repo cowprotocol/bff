@@ -15,3 +15,8 @@ export function parseNotification(notificationString: string): Notification {
 export function stringifyNotification(notification: Notification): string {
   return JSON.stringify(notification);
 }
+
+// TODO: Move to commons lib
+export function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

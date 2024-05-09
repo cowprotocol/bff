@@ -11,6 +11,7 @@ import amqp from 'amqplib/callback_api';
 import assert from 'assert';
 import TelegramBot from 'node-telegram-bot-api';
 
+const SLEEP_TIME = 5000;
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 
 // Create telegram bot
@@ -114,8 +115,11 @@ More info in ${url}`
 }`;
 }
 
-function logErrorAndReconnect(error): Promise<void> {
+async function logErrorAndReconnect(error): Promise<void> {
   console.error('[telegram] Error ', error);
+  console.log(
+    `[notification-producer] Reconnecting in ${SLEEP_TIME / 1000}s...`
+  );
   return main().catch(logErrorAndReconnect);
 }
 

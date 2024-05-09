@@ -6,10 +6,13 @@ import {
   NOTIFICATIONS_QUEUE,
   Notification,
   stringifyNotification,
+  sleep,
 } from '@cowprotocol/notifications';
 import amqp from 'amqplib/callback_api';
 import assert from 'assert';
 import Mustache from 'mustache';
+
+const SLEEP_TIME = 5000;
 
 // Connect to RabbitMQ server
 const queueHost = process.env.QUEUE_HOST;
@@ -93,8 +96,13 @@ function fromCmsToNotifications({
   };
 }
 
-function logErrorAndReconnect(error): Promise<void> {
+async function logErrorAndReconnect(error): Promise<void> {
   console.error('[notification-producer] Error ', error);
+
+  console.log(
+    `[notification-producer] Reconnecting in ${SLEEP_TIME / 1000}s...`
+  );
+  await sleep(SLEEP_TIME);
   return main().catch(logErrorAndReconnect);
 }
 
