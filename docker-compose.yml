@@ -76,7 +76,7 @@ services:
   queue:
     container_name: queue
     # platform: linux/amd64 -- no platform as it breaks on my mac m1
-    image: rabbitmq:3.13-management
+    image: rabbitmq:3.13.2
     restart: unless-stopped
     ports:
       - '15672:15672'
