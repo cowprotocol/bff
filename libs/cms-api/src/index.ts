@@ -182,5 +182,5 @@ async function _getPushNotifications(): Promise<CmsPushNotification[]> {
     throw error;
   }
 
-  return data.data;
+  return data;
 }
