@@ -4,8 +4,11 @@ import assert from 'assert';
 type Schemas = components['schemas'];
 export type CmsNotification = Schemas['NotificationListResponseDataItem'];
 export type CmsNotificationResponse = Schemas['NotificationListResponse'];
-export type CmsTelegramSubscription =
-  Schemas['TelegramSubscriptionResponseDataObject'];
+export type CmsTelegramSubscription = {
+  id: number;
+  account: string;
+  chat_id: string;
+};
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
 export type CmsPushNotification = {
@@ -148,13 +151,16 @@ async function getTelegramSubscriptionsForAccounts({
   CmsTelegramSubscription[]
 > {
   const { data, error, response } = await cmsClient.GET(
-    `/telegram-subscriptions/?accounts=${accounts.join(',')}`,
+    `/tg-subscriptions?accounts=${accounts.join(',')}`,
     {
       // Pagination
       'pagination[page]': page,
       'pagination[pageSize]': pageSize,
     }
   );
+
+  console.debug(`[getTelegramSubscriptionsForAccounts] accounts`, accounts);
+  console.debug(`[getTelegramSubscriptionsForAccounts] data`, data);
 
   if (error) {
     console.error(
@@ -164,7 +170,7 @@ async function getTelegramSubscriptionsForAccounts({
     throw error;
   }
 
-  return data.data;
+  return data;
 }
 
 export async function getPushNotifications(): Promise<CmsPushNotification[]> {
@@ -173,6 +179,8 @@ export async function getPushNotifications(): Promise<CmsPushNotification[]> {
 
 async function _getPushNotifications(): Promise<CmsPushNotification[]> {
   const { data, error, response } = await cmsClient.GET('/push-notifications');
+
+  console.debug(`[_getPushNotifications] data`, data);
 
   if (error) {
     console.error(

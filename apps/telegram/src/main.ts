@@ -54,8 +54,7 @@ async function main() {
       const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
       if (telegramSubscriptions.length > 0) {
         // Send the message to all subscribers
-        for (const { attributes } of telegramSubscriptions) {
-          const { chat_id: chatId } = attributes;
+        for (const { chat_id: chatId } of telegramSubscriptions) {
           console.log(
             `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
           );
