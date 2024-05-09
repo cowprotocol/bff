@@ -5,7 +5,7 @@ import {
 import {
   NOTIFICATIONS_QUEUE,
   Notification,
-  connectToQueue,
+  connectToChannel,
   parseNotification,
 } from '@cowprotocol/notifications';
 import assert from 'assert';
@@ -20,7 +20,7 @@ assert(token, 'TELEGRAM_SECRET is required');
 const telegramBot = new TelegramBot(token, { polling: true });
 
 async function main() {
-  const channel = await connectToQueue({
+  const channel = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
   });
 
