@@ -79,10 +79,11 @@ ${title}
 ${message}
 
 ${
-  url &&
-  `
+  url
+    ? `
 
 More info in ${url}`
+    : ''
 }`;
 }
 
