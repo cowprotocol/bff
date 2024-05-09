@@ -8,6 +8,21 @@ export type CmsTelegramSubscription =
   Schemas['TelegramSubscriptionResponseDataObject'];
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
+export type CmsPushNotification = {
+  id: number;
+  account: string;
+  data: object;
+  createdAt: string;
+  updatedAt: string;
+  notification_template: {
+    id: null | number;
+    title: string;
+    description: string;
+    url: null | string;
+    push: boolean;
+    thumbnail: null | string;
+  };
+};
 
 const cmsBaseUrl = process.env.CMS_BASE_URL;
 assert(cmsBaseUrl, 'CMS_BASE_URL is required');
@@ -144,6 +159,24 @@ async function getTelegramSubscriptionsForAccounts({
   if (error) {
     console.error(
       `Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`,
+      error
+    );
+    throw error;
+  }
+
+  return data.data;
+}
+
+export async function getPushNotifications(): Promise<CmsPushNotification[]> {
+  return _getPushNotifications();
+}
+
+async function _getPushNotifications(): Promise<CmsPushNotification[]> {
+  const { data, error, response } = await cmsClient.GET('/push-notifications');
+
+  if (error) {
+    console.error(
+      `Error ${response.status} getting push-notifications: ${response.url}`,
       error
     );
     throw error;

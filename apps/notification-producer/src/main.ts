@@ -1,4 +1,7 @@
-import { CmsNotification, getAllNotifications } from '@cowprotocol/cms-api';
+import {
+  CmsPushNotification,
+  getPushNotifications,
+} from '@cowprotocol/cms-api';
 import {
   NOTIFICATIONS_QUEUE,
   Notification,
@@ -6,6 +9,7 @@ import {
 } from '@cowprotocol/notifications';
 import amqp from 'amqplib/callback_api';
 import assert from 'assert';
+import Mustache from 'mustache';
 
 // Connect to RabbitMQ server
 const queueHost = process.env.QUEUE_HOST;
@@ -36,11 +40,13 @@ amqp.connect(
       // Function to fetch notifications and send them to RabbitMQ
       const fetchNotifications = async () => {
         try {
-          const cmsNotifications = await getAllNotifications();
+          const cmsPushNotifications = await getPushNotifications();
 
-          const notifications = cmsNotifications.map(fromCmsToNotifications);
+          const pushNotifications = cmsPushNotifications.map(
+            fromCmsToNotifications
+          );
 
-          for (const notification of notifications) {
+          for (const notification of pushNotifications) {
             const message = stringifyNotification(notification);
             channel.sendToQueue(NOTIFICATIONS_QUEUE, Buffer.from(message));
           }
@@ -55,14 +61,19 @@ amqp.connect(
   }
 );
 
-function fromCmsToNotifications(notification: CmsNotification): Notification {
-  // TODO: format has changed, need to update once we get the newest CMS version
+function fromCmsToNotifications({
+  id,
+  account,
+  data,
+  notification_template: { title, description, url },
+}: CmsPushNotification): Notification {
+  const message = Mustache.render(description, data);
+
   return {
-    id: notification.id?.toString(),
-    title: notification.attributes.notification_template.data.attributes.title,
-    message:
-      notification.attributes.notification_template.data.attributes.description,
-    account: notification.attributes.account,
-    url: notification.attributes.notification_template.data.attributes.url,
+    id: id.toString(),
+    title,
+    message,
+    account,
+    url,
   };
 }
