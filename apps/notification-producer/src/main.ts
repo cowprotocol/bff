@@ -20,59 +20,61 @@ assert(queueUser, 'QUEUE_USER is required');
 const queuePassword = process.env.QUEUE_PASSWORD;
 assert(queuePassword, 'QUEUE_PASSWORD is required');
 
-// Connect to RabbitMQ server
-amqp.connect(
-  {
-    hostname: queueHost,
-    port: queuePort,
-    username: queueUser,
-    password: queuePassword,
-  },
-  function (error0, connection) {
-    if (error0) {
-      throw error0;
-    }
-
-    // Create a channel
-    connection.createChannel(function (error1, channel) {
-      if (error1) {
-        throw error1;
+async function main() {
+  // Connect to RabbitMQ server
+  amqp.connect(
+    {
+      hostname: queueHost,
+      port: queuePort,
+      username: queueUser,
+      password: queuePassword,
+    },
+    function (error0, connection) {
+      if (error0) {
+        throw error0;
       }
 
-      // This makes sure the queue is declared
-      channel.assertQueue(NOTIFICATIONS_QUEUE, {
-        durable: false,
-      });
-
-      // Function to fetch notifications and send them to RabbitMQ
-      const fetchNotifications = async () => {
-        console.log('[notification-producer] Fetching notifications');
-
-        try {
-          const cmsPushNotifications = await getPushNotifications();
-
-          const pushNotifications = cmsPushNotifications.map(
-            fromCmsToNotifications
-          );
-
-          for (const notification of pushNotifications) {
-            const message = stringifyNotification(notification);
-            channel.sendToQueue(NOTIFICATIONS_QUEUE, Buffer.from(message));
-          }
-        } catch (error) {
-          console.error(error);
+      // Create a channel
+      connection.createChannel(function (error1, channel) {
+        if (error1) {
+          throw error1;
         }
-      };
 
-      console.log(
-        '[notification-producer] Ready to start fetching notifications'
-      );
+        // This makes sure the queue is declared
+        channel.assertQueue(NOTIFICATIONS_QUEUE, {
+          durable: false,
+        });
 
-      // Fetch notifications every 30s
-      setInterval(fetchNotifications, 30 * 1000);
-    });
-  }
-);
+        // Function to fetch notifications and send them to RabbitMQ
+        const fetchNotifications = async () => {
+          console.log('[notification-producer] Fetching notifications');
+
+          try {
+            const cmsPushNotifications = await getPushNotifications();
+
+            const pushNotifications = cmsPushNotifications.map(
+              fromCmsToNotifications
+            );
+
+            for (const notification of pushNotifications) {
+              const message = stringifyNotification(notification);
+              channel.sendToQueue(NOTIFICATIONS_QUEUE, Buffer.from(message));
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        };
+
+        console.log(
+          '[notification-producer] Ready to start fetching notifications'
+        );
+
+        // Fetch notifications every 30s
+        setInterval(fetchNotifications, 30 * 1000);
+      });
+    }
+  );
+}
 
 function fromCmsToNotifications({
   id,
@@ -90,3 +92,11 @@ function fromCmsToNotifications({
     url,
   };
 }
+
+function logErrorAndReconnect(error): Promise<void> {
+  console.error('[notification-producer] Error ', error);
+  return main().catch(logErrorAndReconnect);
+}
+
+// Start the main function
+main().catch(logErrorAndReconnect);

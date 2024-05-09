@@ -28,75 +28,77 @@ assert(queueUser, 'QUEUE_USER is required');
 const queuePassword = process.env.QUEUE_PASSWORD;
 assert(queuePassword, 'QUEUE_PASSWORD is required');
 
-// Connect to RabbitMQ server
-amqp.connect(
-  {
-    hostname: queueHost,
-    port: queuePort,
-    username: queueUser,
-    password: queuePassword,
-  },
-  function (error0, connection) {
-    if (error0) {
-      throw error0;
-    }
-
-    // Create a channel
-    connection.createChannel(function (error1, channel) {
-      if (error1) {
-        throw error1;
+async function main() {
+  // Connect to RabbitMQ server
+  amqp.connect(
+    {
+      hostname: queueHost,
+      port: queuePort,
+      username: queueUser,
+      password: queuePassword,
+    },
+    function (error0, connection) {
+      if (error0) {
+        throw error0;
       }
 
-      // This makes sure the queue is declared
-      channel.assertQueue(NOTIFICATIONS_QUEUE, {
-        durable: false,
-      });
-
-      console.log(
-        '[telegram-consumer] Waiting for messages in %s',
-        NOTIFICATIONS_QUEUE
-      );
-
-      // Consume messages from RabbitMQ
-      channel.consume(
-        NOTIFICATIONS_QUEUE,
-        async function (msg) {
-          const notification = parseNotification(msg.content.toString());
-          const { id, message, account, title, url } = notification;
-          console.log(
-            `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
-          );
-
-          // TODO: Don't check every time!!
-          // Check in CMS if there's one
-          const subscriptionForAccount =
-            await getAllTelegramSubscriptionsForAccounts([account]);
-
-          SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
-
-          const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
-          if (telegramSubscriptions.length > 0) {
-            // Send the message to all subscribers
-            for (const { attributes } of telegramSubscriptions) {
-              const { chat_id: chatId } = attributes;
-              console.log(
-                `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
-              );
-              telegramBot.sendMessage(chatId, formatMessage(notification));
-            }
-          } else {
-            console.log(
-              `[telegram-consumer] No subscriptions found for account ${account}`
-            );
-          }
-        },
-        {
-          noAck: true,
+      // Create a channel
+      connection.createChannel(function (error1, channel) {
+        if (error1) {
+          throw error1;
         }
-      );
-    });
-  }
-);
+
+        // This makes sure the queue is declared
+        channel.assertQueue(NOTIFICATIONS_QUEUE, {
+          durable: false,
+        });
+
+        console.log(
+          '[telegram-consumer] Waiting for messages in %s',
+          NOTIFICATIONS_QUEUE
+        );
+
+        // Consume messages from RabbitMQ
+        channel.consume(
+          NOTIFICATIONS_QUEUE,
+          async function (msg) {
+            const notification = parseNotification(msg.content.toString());
+            const { id, message, account, title, url } = notification;
+            console.log(
+              `[telegram-consumer] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+            );
+
+            // TODO: Don't check every time!!
+            // Check in CMS if there's one
+            const subscriptionForAccount =
+              await getAllTelegramSubscriptionsForAccounts([account]);
+
+            SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
+
+            const telegramSubscriptions = SUBSCRIPTION_CACHE.get(account);
+            if (telegramSubscriptions.length > 0) {
+              // Send the message to all subscribers
+              for (const { attributes } of telegramSubscriptions) {
+                const { chat_id: chatId } = attributes;
+                console.log(
+                  `[telegram-consumer] Sending message ${id} to chatId ${chatId}`
+                );
+                telegramBot.sendMessage(chatId, formatMessage(notification));
+              }
+            } else {
+              console.log(
+                `[telegram-consumer] No subscriptions found for account ${account}`
+              );
+            }
+          },
+          {
+            noAck: true,
+          }
+        );
+      });
+    }
+  );
+}
 
 function formatMessage({ title, message, url }: Notification) {
   return `\
@@ -111,3 +113,11 @@ ${
 More info in ${url}`
 }`;
 }
+
+function logErrorAndReconnect(error): Promise<void> {
+  console.error('[telegram] Error ', error);
+  return main().catch(logErrorAndReconnect);
+}
+
+// Start the main function
+main().catch(logErrorAndReconnect);
