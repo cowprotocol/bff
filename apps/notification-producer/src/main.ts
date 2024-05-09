@@ -7,14 +7,15 @@ import {
   Notification,
   stringifyNotification,
   sleep,
-  connectToQueue,
+  connectToChannel,
+  sendNotificationToQueue,
 } from '@cowprotocol/notifications';
 import Mustache from 'mustache';
 
 const SLEEP_TIME = 5000;
 
 async function main() {
-  const channel = await connectToQueue({
+  const channel = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
   });
 
@@ -32,8 +33,11 @@ async function main() {
       );
 
       for (const notification of pushNotifications) {
-        const message = stringifyNotification(notification);
-        channel.sendToQueue(NOTIFICATIONS_QUEUE, Buffer.from(message));
+        sendNotificationToQueue({
+          channel,
+          queue: NOTIFICATIONS_QUEUE,
+          notification,
+        });
       }
     } catch (error) {
       console.log(

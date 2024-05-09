@@ -1,4 +1,4 @@
-import amqp from 'amqplib';
+import amqp, { Channel } from 'amqplib';
 import assert from 'assert';
 
 export const NOTIFICATIONS_QUEUE = 'notifications';
@@ -34,10 +34,12 @@ export function sleep(ms) {
 }
 
 interface ConnectToQueueParams {
-  channel: string;
+  channel?: string;
 }
 
-export async function connectToQueue(params: ConnectToQueueParams) {
+export async function connectToChannel(
+  params: ConnectToQueueParams
+): Promise<Channel> {
   // Connect to RabbitMQ server
   const { channel: channelName } = params;
   console.log('[notifications] Fetching notifications');
@@ -51,10 +53,24 @@ export async function connectToQueue(params: ConnectToQueueParams) {
 
   const channel = await connection.createChannel();
 
-  // This makes sure the queue is declared
-  channel.assertQueue(channelName, {
-    durable: false,
-  });
+  if (channelName) {
+    // This makes sure the queue is declared
+    channel.assertQueue(channelName, {
+      durable: false,
+    });
+  }
 
   return channel;
+}
+
+export interface SendToQueueParams {
+  channel: Channel;
+  queue: string;
+  notification: Notification;
+}
+
+export function sendNotificationToQueue(params: SendToQueueParams) {
+  const { channel, queue, notification } = params;
+  const message = stringifyNotification(notification);
+  channel.sendToQueue(queue, Buffer.from(message));
 }
