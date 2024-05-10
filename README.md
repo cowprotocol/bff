@@ -55,11 +55,16 @@ For APIs and apps, it will create a Dockerfile. Please, remember to update:
 - The `docker-compose.yml` file to include the new service.
 - The github actions to include the new service (`.github/workflows/ci.yml`)
 
-For more info, see:
+For more information relevant generators, see:
 - [@nx/node:application](https://nx.dev/packages/node/generators/application): Generator for Applications
 - [@nx/node:application (Fastify)](https://nx.dev/showcase/example-repos/add-fastify): Generator for API Applications using Fastify 
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/library): Generator for NodeJS Libraries
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/setup-docker): Docker Generator
+
+For more information on relevant executors, see:
+- [@nx/esbuild:esbuild](https://nx.dev/nx-api/esbuild/executors/esbuild): Build a package
+- [@nx/js:node](https://nx.dev/nx-api/js/executors/node): Execute Nodejs applications
+- [@nx/node:build](https://nx.dev/nx-api/node/executors/build): Build Nodejs applications
 
 
 # Build

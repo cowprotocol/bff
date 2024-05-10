@@ -42,7 +42,7 @@ export async function connectToChannel(
 ): Promise<Channel> {
   // Connect to RabbitMQ server
   const { channel: channelName } = params;
-  console.log('[notifications] Fetching notifications');
+  console.log('[notifications] Connect to queue ' + channelName);
 
   const connection = await amqp.connect({
     hostname: queueHost,
