@@ -5,50 +5,41 @@ import {
 import {
   NOTIFICATIONS_QUEUE,
   Notification,
-  stringifyNotification,
   sleep,
   connectToChannel,
   sendNotificationToQueue,
 } from '@cowprotocol/notifications';
+import { Channel } from 'amqplib';
 import Mustache from 'mustache';
 
 const SLEEP_TIME = 5000;
+const CHECK_TIME = 30 * 1000; // 30s
+
+async function fetchNotifications(channel: Channel) {
+  console.log('[notification-producer] Fetch and post notifications');
+  const cmsPushNotifications = await getPushNotifications();
+
+  const pushNotifications = cmsPushNotifications.map(fromCmsToNotifications);
+
+  for (const notification of pushNotifications) {
+    console.log(
+      '[notification-producer] Post notification to queue',
+      notification
+    );
+    sendNotificationToQueue({
+      channel,
+      queue: NOTIFICATIONS_QUEUE,
+      notification,
+    });
+  }
+}
 
 async function main() {
   const channel = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
   });
 
-  console.log('[notification-producer] Ready to start fetching notifications');
-
-  // Function to fetch notifications and send them to RabbitMQ
-  const fetchNotifications = async () => {
-    console.log('[notification-producer] Fetching notifications');
-
-    try {
-      const cmsPushNotifications = await getPushNotifications();
-
-      const pushNotifications = cmsPushNotifications.map(
-        fromCmsToNotifications
-      );
-
-      for (const notification of pushNotifications) {
-        sendNotificationToQueue({
-          channel,
-          queue: NOTIFICATIONS_QUEUE,
-          notification,
-        });
-      }
-    } catch (error) {
-      console.log(
-        '[notification-producer] Error fetching notifications',
-        error
-      );
-    }
-  };
-
-  // Fetch notifications every 30s
-  setInterval(fetchNotifications, 30 * 1000);
+  return fetchNotifications(channel);
 }
 
 function fromCmsToNotifications({
@@ -68,15 +59,24 @@ function fromCmsToNotifications({
   };
 }
 
-async function logErrorAndReconnect(error): Promise<void> {
+async function logAndReconnect(error): Promise<void> {
   console.error('[notification-producer] Error ', error);
 
   console.log(
     `[notification-producer] Reconnecting in ${SLEEP_TIME / 1000}s...`
   );
   await sleep(SLEEP_TIME);
-  return main().catch(logErrorAndReconnect);
+  return mainLoop();
 }
 
-// Start the main function
-main().catch(logErrorAndReconnect);
+async function waitAndFetch() {
+  await sleep(CHECK_TIME);
+  return mainLoop();
+}
+
+function mainLoop() {
+  return main().then(waitAndFetch).catch(logAndReconnect);
+}
+
+// Start the main loop
+mainLoop();

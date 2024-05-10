@@ -159,9 +159,6 @@ async function getTelegramSubscriptionsForAccounts({
     }
   );
 
-  console.debug(`[getTelegramSubscriptionsForAccounts] accounts`, accounts);
-  console.debug(`[getTelegramSubscriptionsForAccounts] data`, data);
-
   if (error) {
     console.error(
       `Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`,
@@ -174,13 +171,7 @@ async function getTelegramSubscriptionsForAccounts({
 }
 
 export async function getPushNotifications(): Promise<CmsPushNotification[]> {
-  return _getPushNotifications();
-}
-
-async function _getPushNotifications(): Promise<CmsPushNotification[]> {
   const { data, error, response } = await cmsClient.GET('/push-notifications');
-
-  console.debug(`[_getPushNotifications] data`, data);
 
   if (error) {
     console.error(
