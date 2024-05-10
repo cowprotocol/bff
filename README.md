@@ -56,8 +56,10 @@ For APIs and apps, it will create a Dockerfile. Please, remember to update:
 - The github actions to include the new service (`.github/workflows/ci.yml`)
 
 For more info, see:
-- [NX Generators](https://nx.dev/packages/node/generators/application).
-- [Docker Generators](https://nx.dev/packages/docker/generators/docker).
+- [@nx/node:application](https://nx.dev/packages/node/generators/application): Generator for Applications
+- [@nx/node:application (Fastify)](https://nx.dev/showcase/example-repos/add-fastify): Generator for API Applications using Fastify 
+- [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/library): Generator for NodeJS Libraries
+- [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/setup-docker): Docker Generator
 
 
 # Build

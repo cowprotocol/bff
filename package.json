@@ -9,8 +9,8 @@
     "telegram": "nx run telegram:serve",
     "serve": "nx serve",
     "build": "nx run-many --all --target=build",
-    "new:fastify": "nx g app --framework=fastify --docker --directory=apps",
-    "new:node": "nx generate @nx/node:app --directory=apps --docker",
+    "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
+    "new:node": "nx generate @nx/node:application --directory=apps --docker",
     "new:lib": "nx g @nx/node:library --directory=libs",
     "docker-build:affected": "nx affected -t docker-build --prod --parallel --maxParallel=3 --skip-nx-cache --skip-nx-cache",
     "compose:up": "yarn run docker-build:affected && docker-compose up"
