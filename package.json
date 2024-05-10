@@ -5,6 +5,8 @@
   "scripts": {
     "twap:run-migrations": "nx run twap:run-migrations",
     "twap:generate-migrations": "nx run twap:generate-migrations",
+    "producer": "nx run notification-producer:serve",
+    "telegram": "nx run telegram:serve",
     "serve": "nx serve",
     "build": "nx run-many --all --target=build",
     "new:fastify": "nx g app --framework=fastify --docker --directory=apps",
