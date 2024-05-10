@@ -1,32 +1,42 @@
-# Cow Web Services
+# BFF (Backend For Frontend)
 
-This repository contains Cow Web Services. These are a collection of web services, in a mono repo, created and used by the Cow Swap frontend.
+Backend for frontend is a series of backend services and libraries that enhance user experience for the frontend. 
 
 ## Getting Started
 
-This monorepo is managed by NX. To get started, you must first install your dependencies via;
+Install dependencies:
 
 ```bash
 yarn
 ```
 
-If you'd like to test out how the containers are functioning, you'll also need a Docker daemon running. You can then run the following command to start the containers;
+Create the `.env` file:
 
+```bash
+# If you are not using docker
+cp .env.example .env
+
+# If you are using docker (handy to launch a service directly using NX)
+cp .env.example .env.docker
+```
+
+Start docker:
 ```bash
 yarn compose:up
 ```
 
-## How to build docker containers?
-
-To build docker containers, simply run the following;
+# Develop
+## Notification Producer
+Make sure your `.env` file is defined, if not create one using `.env.example` as a template.
 
 ```bash
-yarn docker-build:affected
+# Start RabbitMQ
+docker-compose up -d queue
+
+# Start the notification producer
+yarn producer
 ```
-
-This will only build the affected docker containers. After that, you'll need to publish these to your container registry.
-
-## How to create a new service?
+## Create a new service or library
 
 To add a new app or library, you can run the following command;
 
@@ -41,13 +51,21 @@ yarn new:lib
 yarn new:node
 ```
 
-After which, you'll be prompted to enter a name for the service, and will have two apps with fastify created for you;
+For APIs and apps, it will create a Dockerfile. Please, remember to update:
+- The `docker-compose.yml` file to include the new service.
+- The github actions to include the new service (`.github/workflows/ci.yml`)
 
-- /apps/{name}
-- /apps/{name}-e2e
+For more info, see:
+- [NX Generators](https://nx.dev/packages/node/generators/application).
+- [Docker Generators](https://nx.dev/packages/docker/generators/docker).
 
-To have more control over this process and/or to create a non-fastify service, you can refer to the [NX documentation regarding node generators](https://nx.dev/packages/node/generators/application).
 
-A generated service, will have a Dockerfile that you must adjust accordingly. You can refer to the [NX documentation regarding docker generators](https://nx.dev/packages/docker/generators/docker).
+# Build
+## Docker
 
-For deployments, you will need a Pulumi definition created for your service as well. This needs to be created in the https://github.com/cowprotocol/infrastructure repository. For more information on how to do this, please refer to [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+Build docker containers and publish to a local registry:
+
+```bash
+yarn docker-build:affected
+```
+
