@@ -4,7 +4,7 @@ services:
     platform: linux/amd64
     image: twap:latest
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
@@ -17,7 +17,7 @@ services:
       - ./package.json:/app/package.json
       - ./yarn.lock:/app/yarn.lock
 
-      - ./.env:/app/.env
+      - ./.env.docker:/app/.env
     ports:
       - '3000:3000'
     networks:
@@ -30,7 +30,7 @@ services:
     platform: linux/amd64
     image: api:latest
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
       PROXY_UPSTREAM: ${PROXY_UPSTREAM}
       PROXY_ORIGIN: ${PROXY_ORIGIN}
@@ -47,7 +47,7 @@ services:
       - ./package.json:/app/package.json
       - ./yarn.lock:/app/yarn.lock
 
-      - ./.env:/app/.env
+      - ./.env.docker:/app/.env
     ports:
       - '1500:1500'
     networks:
@@ -58,7 +58,7 @@ services:
   db:
     container_name: db
     platform: linux/amd64
-    env_file: .env
+    env_file: .env.docker
     image: postgres:14.5-alpine
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
@@ -88,8 +88,8 @@ services:
     networks:
       - bff-network
     healthcheck:
-    # TODO: figure out why this check doesn't succeed so telegram and notification-producer can depend on it
-      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      # TODO: figure out why this check doesn't succeed so telegram and notification-producer can depend on it
+      test: ['CMD', 'curl', '-f', 'http://localhost:15672']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -100,7 +100,7 @@ services:
       context: .
       dockerfile: ./apps/notification-producer/Dockerfile
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
       QUEUE_HOST: ${QUEUE_HOST}
       QUEUE_PORT: ${QUEUE_PORT}
@@ -116,11 +116,11 @@ services:
 
   telegram:
     container_name: telegram
-    build: 
+    build:
       context: .
       dockerfile: ./apps/telegram/Dockerfile
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
       QUEUE_HOST: ${QUEUE_HOST}
       QUEUE_PORT: ${QUEUE_PORT}

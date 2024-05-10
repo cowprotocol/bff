@@ -67,4 +67,5 @@ test/types/index.js
 dist
 
 # env file
-.env
+.env*
+!.env.examples
