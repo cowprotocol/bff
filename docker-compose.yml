@@ -1,12 +1,12 @@
-version: '3'
 services:
   twap:
     container_name: twap
+    platform: linux/amd64
     image: twap:latest
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
-      DATABASE_HOST: bff-db
+      DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -17,19 +17,20 @@ services:
       - ./package.json:/app/package.json
       - ./yarn.lock:/app/yarn.lock
 
-      - ./.env:/app/.env
+      - ./.env.docker:/app/.env
     ports:
       - '3000:3000'
     networks:
       - bff-network
     depends_on:
-      - bff-db
+      - db
 
-  bff:
-    container_name: bff
-    image: bff:latest
+  api:
+    container_name: api
+    platform: linux/amd64
+    image: api:latest
     restart: unless-stopped
-    env_file: .env
+    env_file: .env.docker
     environment:
       PROXY_UPSTREAM: ${PROXY_UPSTREAM}
       PROXY_ORIGIN: ${PROXY_ORIGIN}
@@ -46,32 +47,97 @@ services:
       - ./package.json:/app/package.json
       - ./yarn.lock:/app/yarn.lock
 
-      - ./.env:/app/.env
+      - ./.env.docker:/app/.env
     ports:
-      - '1337:1337'
+      - '1500:1500'
     networks:
       - bff-network
     depends_on:
-      - bff-db
-      
-  bff-db:
-    container_name: bff-db
-    env_file: .env
+      - db
+
+  db:
+    container_name: db
+    platform: linux/amd64
+    env_file: .env.docker
     image: postgres:14.5-alpine
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - bff-data:/var/lib/postgresql/data/ # using a volume
+      - data-postgres:/var/lib/postgresql/data/ # using a volume
 
     ports:
       - '5432:${DATABASE_PORT}'
     networks:
       - bff-network
 
+  queue:
+    container_name: queue
+    # platform: linux/amd64 -- no platform as it breaks on my mac m1
+    image: rabbitmq:3.13.2
+    restart: unless-stopped
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${QUEUE_USER}
+      RABBITMQ_DEFAULT_PASS: ${QUEUE_PASSWORD}
+    volumes:
+      - data-rabbitmq:/var/lib/rabbitmq
+    networks:
+      - bff-network
+    healthcheck:
+      # TODO: figure out why this check doesn't succeed so telegram and notification-producer can depend on it
+      test: ['CMD', 'curl', '-f', 'http://localhost:15672']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  notification-producer:
+    container_name: notification-producer
+    build:
+      context: .
+      dockerfile: ./apps/notification-producer/Dockerfile
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      QUEUE_HOST: ${QUEUE_HOST}
+      QUEUE_PORT: ${QUEUE_PORT}
+      QUEUE_USER: ${QUEUE_USER}
+      QUEUE_PASSWORD: ${QUEUE_PASSWORD}
+      CMS_BASE_URL: ${CMS_BASE_URL}
+      CMS_API_KEY: ${CMS_API_KEY}
+    networks:
+      - bff-network
+    depends_on:
+      - queue
+        # condition: service_healthy
+
+  telegram:
+    container_name: telegram
+    build:
+      context: .
+      dockerfile: ./apps/telegram/Dockerfile
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      QUEUE_HOST: ${QUEUE_HOST}
+      QUEUE_PORT: ${QUEUE_PORT}
+      QUEUE_USER: ${QUEUE_USER}
+      QUEUE_PASSWORD: ${QUEUE_PASSWORD}
+      CMS_BASE_URL: ${CMS_BASE_URL}
+      CMS_API_KEY: ${CMS_API_KEY}
+      TELEGRAM_SECRET: ${TELEGRAM_SECRET}
+    networks:
+      - bff-network
+    depends_on:
+      - queue
+        # condition: service_healthy
+
 volumes:
-  bff-data:
+  data-postgres:
+  data-rabbitmq:
 
 networks:
   bff-network:

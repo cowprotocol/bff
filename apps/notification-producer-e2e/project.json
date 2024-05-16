@@ -1,13 +1,13 @@
 {
-  "name": "bff-e2e",
+  "name": "notification-producer-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["bff"],
+  "implicitDependencies": ["notification-producer"],
   "targets": {
     "e2e": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
-        "jestConfig": "packages/bff-e2e/jest.config.ts",
+        "jestConfig": "apps/notification-producer-e2e/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -15,7 +15,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/bff-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/notification-producer-e2e/**/*.{js,ts}"]
       }
     }
   }

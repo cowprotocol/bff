@@ -1,7 +1,7 @@
 {
-  "name": "bff",
+  "name": "telegram",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/bff/src",
+  "sourceRoot": "apps/telegram/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -10,12 +10,12 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/bff",
+        "outputPath": "dist/apps/telegram",
         "format": ["cjs"],
         "bundle": false,
-        "main": "apps/bff/src/main.ts",
-        "tsConfig": "apps/bff/tsconfig.app.json",
-        "assets": ["apps/bff/src/assets"],
+        "main": "apps/telegram/src/main.ts",
+        "tsConfig": "apps/telegram/tsconfig.app.json",
+        "assets": ["apps/telegram/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -41,14 +41,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "bff:build"
+        "buildTarget": "telegram:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "bff:build:development"
+          "buildTarget": "telegram:build:development"
         },
         "production": {
-          "buildTarget": "bff:build:production"
+          "buildTarget": "telegram:build:production"
         }
       }
     },
@@ -56,14 +56,14 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/bff/**/*.ts"]
+        "lintFilePatterns": ["apps/telegram/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/bff/jest.config.ts",
+        "jestConfig": "apps/telegram/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -75,7 +75,7 @@
     },
     "docker-build": {
       "dependsOn": ["build"],
-      "command": "docker buildx build --platform=linux/amd64 -f apps/bff/Dockerfile . -t bff"
+      "command": "docker build -f apps/telegram/Dockerfile . -t telegram"
     }
   },
   "tags": []
