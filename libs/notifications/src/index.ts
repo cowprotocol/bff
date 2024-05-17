@@ -1,4 +1,4 @@
-import amqp, { Channel } from 'amqplib';
+import amqp, { Channel, Connection } from 'amqplib';
 import assert from 'assert';
 
 export const NOTIFICATIONS_QUEUE = 'notifications';
@@ -33,16 +33,20 @@ export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-interface ConnectToQueueParams {
+export interface ConnectToQueueParams {
   channel?: string;
+}
+
+export interface ConnectToChannelResponse {
+  connection: Connection;
+  channel: Channel;
 }
 
 export async function connectToChannel(
   params: ConnectToQueueParams
-): Promise<Channel> {
+): Promise<ConnectToChannelResponse> {
   // Connect to RabbitMQ server
   const { channel: channelName } = params;
-  console.log('[notifications] Fetching notifications');
 
   const connection = await amqp.connect({
     hostname: queueHost,
@@ -60,7 +64,7 @@ export async function connectToChannel(
     });
   }
 
-  return channel;
+  return { connection, channel };
 }
 
 export interface SendToQueueParams {

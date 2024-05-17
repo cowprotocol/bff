@@ -27,6 +27,17 @@ export type CmsPushNotification = {
   };
 };
 
+// TODO: For now the CMS don't generate this type. Adding it manually for now.
+export interface NotificationModel {
+  id: number;
+  account: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  url: string | null;
+  thumbnail: string | null;
+}
+
 const cmsBaseUrl = process.env.CMS_BASE_URL;
 assert(cmsBaseUrl, 'CMS_BASE_URL is required');
 const cmsApiKey = process.env.CMS_API_KEY;
@@ -38,6 +49,26 @@ const cmsClient = CmsClient({
 });
 
 const PAGE_SIZE = 50;
+
+export async function getNotificationsByAccount({
+  account,
+}: {
+  account: string;
+}): Promise<NotificationModel[]> {
+  const { data, error, response } = await cmsClient.GET(
+    '/notification-list/' + account
+  );
+
+  if (error) {
+    console.error(
+      `Error ${response.status} getting notifications: ${response.url}`,
+      error
+    );
+    throw error;
+  }
+
+  return data.data;
+}
 
 export async function getAllNotifications(): Promise<CmsNotification[]> {
   const allNotifications = [];
