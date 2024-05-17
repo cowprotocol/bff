@@ -5,7 +5,7 @@ import {
 } from '@cowprotocol/notifications';
 
 export async function main() {
-  const channel = await connectToChannel({
+  const { channel } = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
   });
 
