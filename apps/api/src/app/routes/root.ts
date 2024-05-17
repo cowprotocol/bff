@@ -1,8 +1,8 @@
-import { FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync } from 'fastify';
 
-const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  fastify.get("/", async function (request, reply) {
-    return { root: true };
+const root: FastifyPluginAsync = async (fastify): Promise<void> => {
+  fastify.get('/', async function (request, reply) {
+    reply.redirect(301, '/docs/static/index.html');
   });
 };
 
