@@ -12,7 +12,7 @@ import {
 } from '@cowprotocol/notifications';
 import Mustache from 'mustache';
 
-const WAIT_TIME = 3000;
+const WAIT_TIME = 30000;
 
 /**
  * This in-memory state just adds some resilience in case there's an error posting the message.

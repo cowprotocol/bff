@@ -13,10 +13,11 @@ import { Channel, ConsumeMessage } from 'amqplib';
 import assert from 'assert';
 import TelegramBot from 'node-telegram-bot-api';
 
-const WAIT_TIME = 10000;
+const WAIT_TIME = 10000; // 10s
+const SUBSCRIPTION_CACHE_TiME = 5 * 60 * 1000; // 5 minute
+
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
-const SUBSCRIPTION_CHECK_FREQUENCY = 5 * 60 * 1000; // 5 minute
 
 let telegramBot: TelegramBot;
 
@@ -38,7 +39,7 @@ async function getSubscriptions(
   const lastCheck = LAST_SUBSCRIPTION_CHECK.get(account);
   if (
     !lastCheck ||
-    lastCheck.getTime() + SUBSCRIPTION_CHECK_FREQUENCY < Date.now()
+    lastCheck.getTime() + SUBSCRIPTION_CACHE_TiME < Date.now()
   ) {
     // Get the subscriptions for this account (if we haven't checked in a while)
     const subscriptionForAccount = await getAllTelegramSubscriptionsForAccounts(
