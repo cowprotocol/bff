@@ -8,38 +8,74 @@ import {
   sleep,
   connectToChannel,
   sendNotificationToQueue,
+  ConnectToChannelResponse,
 } from '@cowprotocol/notifications';
-import { Channel } from 'amqplib';
 import Mustache from 'mustache';
 
-const SLEEP_TIME = 5000;
-const CHECK_TIME = 30 * 1000; // 30s
+const WAIT_TIME = 3000;
 
-async function fetchNotifications(channel: Channel) {
-  console.log('[notification-producer] Fetch and post notifications');
+/**
+ * This in-memory state just adds some resilience in case there's an error posting the message.
+ * Because the PUSH notifications are currently consumed just by reading, in case of a failure the notification is lost
+ *
+ * This solution is a patch until we properly implement a more reliable consumption
+ */
+const PENDING_NOTIFICATIONS = new Map<string, Notification>();
+
+async function main(
+  connectionParam: ConnectToChannelResponse | null,
+  onCloseConnection: () => void
+): Promise<ConnectToChannelResponse | null> {
+  // Get PUSH notifications
   const cmsPushNotifications = await getPushNotifications();
+  const pendingNotifications = Array.from(PENDING_NOTIFICATIONS.values());
+  const pushNotifications = cmsPushNotifications
+    .map(fromCmsToNotifications)
+    .concat(pendingNotifications);
 
-  const pushNotifications = cmsPushNotifications.map(fromCmsToNotifications);
+  if (pushNotifications.length === 0) {
+    return connectionParam;
+  }
 
+  console.debug(
+    `[notification-producer:main] ${pushNotifications.length} new PUSH notifications`
+  );
+
+  // Save notifications in-memory, so they are not lost if there's an issue with the queue
+  pushNotifications.forEach((notification) =>
+    PENDING_NOTIFICATIONS.set(notification.id, notification)
+  );
+
+  // Connect
+  if (!connectionParam) {
+    console.debug(
+      `[notification-producer:main] Connect to the queue: ${NOTIFICATIONS_QUEUE}`
+    );
+    connectionParam = await connectToChannel({
+      channel: NOTIFICATIONS_QUEUE,
+    });
+
+    // Watch for connection close
+    connectionParam.connection.on('close', onCloseConnection);
+  }
+  const { channel } = connectionParam;
+
+  // Post notifications to queue
   for (const notification of pushNotifications) {
     console.log(
-      '[notification-producer] Post notification to queue',
+      '[notification-producer:main] Post notification to queue',
       notification
     );
+
     sendNotificationToQueue({
       channel,
       queue: NOTIFICATIONS_QUEUE,
       notification,
     });
+    PENDING_NOTIFICATIONS.delete(notification.id);
   }
-}
 
-async function main() {
-  const channel = await connectToChannel({
-    channel: NOTIFICATIONS_QUEUE,
-  });
-
-  return fetchNotifications(channel);
+  return connectionParam;
 }
 
 function fromCmsToNotifications({
@@ -59,23 +95,29 @@ function fromCmsToNotifications({
   };
 }
 
-async function logAndReconnect(error): Promise<void> {
-  console.error('[notification-producer] Error ', error);
+/**
+ * Main loop: Run and re-attempt on error
+ */
+async function mainLoop() {
+  console.info('[notification-producer:main] Start notification producer');
 
-  console.log(
-    `[notification-producer] Reconnecting in ${SLEEP_TIME / 1000}s...`
-  );
-  await sleep(SLEEP_TIME);
-  return mainLoop();
-}
+  // Keep an open connection. Reset it if the connection is closed
+  let connectionParam: ConnectToChannelResponse | null = null;
+  const onCloseConnection = () => (connectionParam = null);
 
-async function waitAndFetch() {
-  await sleep(CHECK_TIME);
-  return mainLoop();
-}
-
-function mainLoop() {
-  return main().then(waitAndFetch).catch(logAndReconnect);
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      connectionParam = await main(connectionParam, onCloseConnection);
+    } catch (error) {
+      console.error('[notification-producer:main] Error ', error);
+      console.log(
+        `[notification-producer:main] Reconnecting in ${WAIT_TIME / 1000}s...`
+      );
+    } finally {
+      await sleep(WAIT_TIME);
+    }
+  }
 }
 
 // Start the main loop

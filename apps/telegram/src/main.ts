@@ -93,7 +93,6 @@ async function connect() {
   const { connection, channel } = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
   });
-  channel.assertQueue(NOTIFICATIONS_QUEUE, { durable: false });
 
   console.info(
     `[telegram:main] Waiting for messages in "${NOTIFICATIONS_QUEUE}" queue`
@@ -150,8 +149,11 @@ More info in ${url}`
 }`;
 }
 
+/**
+ * Main loop: Run and re-attempt on error
+ */
 async function mainLoop() {
-  // Main loop: Run and re-attempt on error
+  console.info('[telegram:main] Start telegram consumer');
   // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
