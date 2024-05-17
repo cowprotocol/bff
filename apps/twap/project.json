@@ -43,7 +43,7 @@
         }
       }
     },
-    "serve": {
+    "start": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {

@@ -3,17 +3,18 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "start": "yarn start:api",
+    "start:api": "nx start",
     "twap:run-migrations": "nx run twap:run-migrations",
     "twap:generate-migrations": "nx run twap:generate-migrations",
-    "producer": "nx run notification-producer:serve",
-    "telegram": "nx run telegram:serve",
-    "serve": "nx serve",
+    "producer": "nx run notification-producer:start",
+    "telegram": "nx run telegram:start",
     "build": "nx run-many --all --target=build",
     "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
     "new:node": "nx generate @nx/node:application --directory=apps --docker",
     "new:lib": "nx g @nx/node:library --directory=libs",
     "docker-build:affected": "nx affected -t docker-build --prod --parallel --maxParallel=3 --skip-nx-cache --skip-nx-cache",
-    "compose:up": "yarn run docker-build:affected && docker-compose up"
+    "compose:up": "yarn docker-build:affected && docker-compose up"
   },
   "private": true,
   "dependencies": {
