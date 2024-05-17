@@ -32,6 +32,9 @@
       },
       "configurations": {
         "development": {},
+        "postToQueueTest": {
+          "main": "apps/notification-producer/src/postToQueueTest.ts"
+        },
         "production": {
           "generateLockfile": true,
           "esbuildOptions": {
@@ -43,7 +46,7 @@
         }
       }
     },
-    "serve": {
+    "start": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
@@ -53,9 +56,22 @@
         "development": {
           "buildTarget": "notification-producer:build:development"
         },
+        "postToQueueTest": {
+          "buildTarget": "notification-producer:build:postToQueueTest",
+          "main": "apps/notification-producer/src/postToQueueTest.js"
+        },
         "production": {
           "buildTarget": "notification-producer:build:production"
         }
+      }
+    },
+    "tsc": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/apps/notification-producer",
+        "main": "apps/notification-producer/src/postToQueueTest.ts",
+        "tsConfig": "apps/notification-producer/tsconfig.app.json",
+        "rootDir": "../.."
       }
     },
     "lint": {
@@ -83,12 +99,6 @@
           "ci": true,
           "codeCoverage": true
         }
-      }
-    },
-    "postToQueueTest": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx ts-node apps/notification-producer/src/postToQueueTest"
       }
     },
     "docker-build": {
