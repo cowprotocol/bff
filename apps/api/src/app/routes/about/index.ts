@@ -29,7 +29,7 @@ const example: FastifyPluginAsync = async (fastify): Promise<void> => {
  * Read a file with the git commit hash (generated for example using github actions)
  */
 function getCommitHash(): string | undefined {
-  const filePath = join(__dirname, '../../../../../../../../', GIT_COMMIT_HASH_FILE)
+  const filePath = join(__dirname, '../../..', GIT_COMMIT_HASH_FILE)
   try {    
     return readFileSync(filePath, 'utf-8')
   } catch (error) {

@@ -20,7 +20,16 @@
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
         "assets": [
-          "apps/api/src/assets"
+          {
+            "input": "apps/api/src/assets",
+            "output": "apps/api/src",
+            "glob": "**/*"
+          },
+          {
+            "input": "assets",
+            "output": "apps/api/src",
+            "glob": "**/*"
+          }
         ],
         "generatePackageJson": true,
         "esbuildOptions": {
