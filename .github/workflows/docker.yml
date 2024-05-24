@@ -24,6 +24,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install
+      
+      - name: Write commit hash
+        run: echo "${{ github.sha }}" > git-commit-hash.env
+        
       - run: yarn build
 
       - name: Set up Docker Buildx
