@@ -24,11 +24,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install
+
+      - name: Write commit hash in the assets directory
+        run: echo "${{ github.sha }}" > assets/git-commit-hash.txt
         
       - run: yarn build
-            
-      - name: Write commit hash
-        run: echo "${{ github.sha }}" > dist/git-commit-hash.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
