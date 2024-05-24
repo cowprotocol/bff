@@ -26,7 +26,7 @@ jobs:
       - run: yarn install
       
       - name: Write commit hash
-        run: echo "${{ github.sha }}" > git-commit-hash.env
+        run: echo "${{ github.sha }}" > dist/git-commit-hash.txt
         
       - run: yarn build
 
