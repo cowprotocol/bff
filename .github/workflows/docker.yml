@@ -26,7 +26,7 @@ jobs:
       - run: yarn install
 
       - name: Write commit hash in the assets directory
-        run: echo "${{ github.sha }}" > assets/git-commit-hash.txt
+        run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
         
       - run: yarn build
 
