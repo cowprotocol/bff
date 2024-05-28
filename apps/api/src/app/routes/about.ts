@@ -16,7 +16,7 @@ interface AboutResponse {
 }
 
 const example: FastifyPluginAsync = async (fastify): Promise<void> => {
-  fastify.get<{ Reply: AboutResponse }>('/', async function (_request, reply) {
+  fastify.get<{ Reply: AboutResponse }>('/about', async function (_request, reply) {
     return reply.send({
       name: 'BFF API',
       version: VERSION,
@@ -29,12 +29,12 @@ const example: FastifyPluginAsync = async (fastify): Promise<void> => {
  * Read a file with the git commit hash (generated for example using github actions)
  */
 function getCommitHash(): string | undefined {
-  const filePath = join(__dirname, '../../..', GIT_COMMIT_HASH_FILE)
-  try {    
+  const filePath = join(__dirname, '../..', GIT_COMMIT_HASH_FILE)
+  try {
     return readFileSync(filePath, 'utf-8')
   } catch (error) {
     // Not a big deal, if the file is not present, the about won't 
-    console.warn(`Unable to read the commit hash file ${filePath}, therefore won't be exported in the about endpoint`);  
+    console.warn(`Unable to read the file with the git commit hash: ${filePath}. /about endpoint won't export the 'gitCommitHash'`);
     return undefined
   }
 }
