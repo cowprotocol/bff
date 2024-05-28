@@ -59,3 +59,12 @@ jobs:
           labels: ${{ steps.image_meta.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
           platforms: linux/amd64
+
+
+      - uses: cowprotocol/autodeploy-action@v2
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          images: ghcr.io/cowprotocol/bff/${{ env.PACKAGE_NAME }}:main
+          url: ${{ secrets.AUTODEPLOY_URL }}
+          token: ${{ secrets.AUTODEPLOY_TOKEN }}
+          timeout: 600000 # 10 minutes
