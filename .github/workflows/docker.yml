@@ -65,7 +65,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           images: ghcr.io/cowprotocol/bff/${{ env.PACKAGE_NAME }}:main
-          tag: ${{ secrets.AUTODEPLOY_TAG }}
           url: ${{ secrets.AUTODEPLOY_URL }}
           token: ${{ secrets.AUTODEPLOY_TOKEN }}
           timeout: 600000 # 10 minutes
