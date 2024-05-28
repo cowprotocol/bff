@@ -1,5 +1,6 @@
 {
   "name": "@cowprotocol/root",
+  "description": "Backend for frontend is a series of backend services and libraries that enhance user experience for the frontend",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
