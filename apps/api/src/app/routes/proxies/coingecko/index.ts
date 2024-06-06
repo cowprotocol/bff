@@ -40,6 +40,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
 
       },
     },
+    preHandler: async (request) => {
+      fastify.log.info({ url: request.url, method: request.method }, `Request coingecko proxy`);
+    },
     undici: {
       strictContentLength: false, // Prevent errors when content-length header mismatches
     },
