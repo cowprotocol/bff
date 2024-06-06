@@ -5,6 +5,9 @@ const schema = {
   type: "object",
   required: ["PROXY_ORIGIN", "PROXY_UPSTREAM", "COINGECKO_API_KEY"],
   properties: {
+    LOG_LEVEL: {
+      type: "string",
+    },
     PROXY_ORIGIN: {
       type: "string",
     },
