@@ -36,12 +36,16 @@ const coingeckoProxy: FastifyPluginAsync = async (
             : undefined)
         });
 
+        const logOptions = { url: request.url, method: request.method }
+        fastify.log.trace(logOptions, `Old Headers`);
+        fastify.log.trace(logOptions, `New Headers`);
+
         return newHeaders
 
       },
     },
     preHandler: async (request) => {
-      fastify.log.info({ url: request.url, method: request.method }, `Request coingecko proxy`);
+      fastify.log.debug({ url: request.url, method: request.method }, `Request coingecko proxy`);
     },
     undici: {
       strictContentLength: false, // Prevent errors when content-length header mismatches
