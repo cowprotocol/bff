@@ -5,6 +5,9 @@ on:
     branches: [main]
     tags: [v*]
 
+  pull_request:
+    types: [opened, synchronize]
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -27,7 +30,7 @@ jobs:
 
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
-        
+
       - run: yarn build
 
       - name: Set up Docker Buildx
@@ -59,7 +62,6 @@ jobs:
           labels: ${{ steps.image_meta.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
           platforms: linux/amd64
-
 
       - uses: cowprotocol/autodeploy-action@v2
         if: ${{ github.ref == 'refs/heads/main' }}
