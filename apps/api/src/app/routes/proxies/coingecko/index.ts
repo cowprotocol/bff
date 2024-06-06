@@ -37,8 +37,8 @@ const coingeckoProxy: FastifyPluginAsync = async (
         });
 
         const logOptions = { url: request.url, method: request.method }
-        fastify.log.trace(logOptions, `Old Headers`);
-        fastify.log.trace(logOptions, `New Headers`);
+        fastify.log.trace(logOptions, `Old Headers: ${JSON.stringify(headers)}`);
+        fastify.log.trace(logOptions, `New Headers: ${JSON.stringify(newHeaders)}`);
 
         return newHeaders
 
