@@ -8,7 +8,6 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const server = Fastify({
   logger: {
     level: process.env.LOG_LEVEL ?? 'info',
-    msgPrefix: '[BFF] '
   },
 });
 
