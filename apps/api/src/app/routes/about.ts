@@ -15,7 +15,7 @@ interface AboutResponse {
   gitCommitHash?: string | undefined;
 }
 
-const example: FastifyPluginAsync = async (fastify): Promise<void> => {
+const about: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{ Reply: AboutResponse }>('/about', async function (_request, reply) {
     return reply.send({
       name: 'BFF API',
@@ -39,4 +39,4 @@ function getCommitHash(): string | undefined {
   }
 }
 
-export default example;
+export default about;
