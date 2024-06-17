@@ -45,7 +45,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
     const isStatus200 = reply.statusCode >= 200 && reply.statusCode < 300
 
     // If the cache is a hit, or is non-cacheable, we just proceed with the request
-    if (isCacheHit || cacheTtl === undefined || isStatus200) {
+    if (isCacheHit || cacheTtl === undefined || !isStatus200) {
       next();
       return;
     }
