@@ -1,6 +1,6 @@
-import { FastifyBaseLogger, FastifyInstance, FastifyReply } from "fastify";
+import { FastifyInstance } from "fastify";
 
-export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export const CACHE_CONTROL_HEADER = 'cache-control'
 
 export interface CachedItem {
   stored: number,
@@ -45,4 +45,29 @@ export async function setCache(key: string, value: unknown, timeToLive: number, 
 
 function isCachedItem(value: unknown): value is CachedItem {
   return typeof value === 'object' && value !== null && 'stored' in value && 'ttl' in value && 'item' in value
+}
+
+export function getCacheControlHeaderValue(ttl: number, ttlSharedCache?: number) {
+  return `max-age=${ttl}, public, s-maxage=${ttlSharedCache || ttl}`
+}
+
+export function parseCacheControlHeaderValue(headerValue?: string | number | string[]) {
+  if (!headerValue || typeof headerValue !== 'string') {
+    return {};
+  }
+
+  const directives = {};
+  const parts = headerValue.split(',');
+
+  parts.forEach(part => {
+    const trimmedPart = part.trim();
+    if (trimmedPart.includes('=')) {
+      const [key, value] = trimmedPart.split('=');
+      directives[key] = value;
+    } else {
+      directives[trimmedPart] = true;
+    }
+  });
+
+  return directives;
 }

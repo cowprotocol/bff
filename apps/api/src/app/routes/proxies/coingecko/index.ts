@@ -1,4 +1,5 @@
 import httpProxy from "@fastify/http-proxy";
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from "../../../../utils/cache";
 import { FastifyPluginAsync } from "fastify";
 
 const DROP_HEADERS = ['cf-ray', 'cf-cache-status', 'set-cookie', 'server']
@@ -31,7 +32,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
           ...headers,
           ...(headers.cacheControl
             ? {
-              "cache-control": `max-age=${CACHE_TTL}, public, s-maxage=${SERVER_CACHE_TTL}`,
+              [CACHE_CONTROL_HEADER]: getCacheControlHeaderValue(CACHE_TTL, SERVER_CACHE_TTL),
             }
             : undefined)
         });
