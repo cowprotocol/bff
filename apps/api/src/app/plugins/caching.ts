@@ -4,7 +4,7 @@ import abstractCache from 'abstract-cache'
 import { redis } from '../connections/redis';
 
 
-const isRedisEnabled = process.env.REDIS_ENABLED === 'true';
+const isRedisEnabled = !!process.env.REDIS_HOST;
 
 export default fp(async (fastify, opts) => {
   const options: FastifyCachingPluginOptions = {
