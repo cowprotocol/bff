@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import { sleep } from '@cowprotocol/notifications';
-import { CACHE_CONTROL_HEADER as CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../utils/cache';
+import { CACHE_CONTROL_HEADER as CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../utils/cache';
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get('/hello', async function (request, reply) {

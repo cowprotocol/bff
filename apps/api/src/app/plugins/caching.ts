@@ -9,15 +9,12 @@ const isRedisEnabled = process.env.REDIS_ENABLED === 'true';
 export default fp(async (fastify, opts) => {
   const options: FastifyCachingPluginOptions = {
     ...opts,
-    // privacy: fastifyCaching.privacy.NOCACHE,
-    // privacy: fastifyCaching.privacy.PUBLIC,
-    // expiresIn: 3600,     // Time in seconds
 
     ...(isRedisEnabled ? {
       cache: abstractCache({
         useAwait: false,
         driver: {
-          name: 'abstract-cache-redis', // must be installed via `npm i`
+          name: 'abstract-cache-redis',
           options: {
             client: redis
           }
