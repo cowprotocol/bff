@@ -100,7 +100,6 @@ services:
 
   redis:
     container_name: redis
-    # platform: linux/amd64 -- no platform as it breaks on my mac m1
     image: redis:7.2.5
     restart: unless-stopped
     ports:
