@@ -42,7 +42,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
   fastify.addHook('onSend', function (req, reply, payload, next) {
     const isCacheHit = reply.getHeader(HEADER_NAME) === 'HIT'
     const cacheTtl: number | undefined = getTtlFromResponse(reply, ttl)
-    const isStatus200 = reply.statusCode < 200 || reply.statusCode >= 300
+    const isStatus200 = reply.statusCode >= 200 && reply.statusCode < 300
 
     // If the cache is a hit, or is non-cacheable, we just proceed with the request
     if (isCacheHit || cacheTtl === undefined || isStatus200) {
