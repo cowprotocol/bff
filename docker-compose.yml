@@ -94,6 +94,24 @@ services:
       timeout: 10s
       retries: 5
 
+  redis:
+    container_name: redis
+    # platform: linux/amd64 -- no platform as it breaks on my mac m1
+    image: redis:7.2.5
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - data-redis:/data
+      #- ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - bff-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:6379']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   notification-producer:
     container_name: notification-producer
     build:
@@ -138,6 +156,7 @@ services:
 volumes:
   data-postgres:
   data-rabbitmq:
+  data-redis:
 
 networks:
   bff-network:
