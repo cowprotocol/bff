@@ -50,7 +50,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
       return;
     }
 
-    // If there is no cached data, then we just proceed with the request
+    // If there is no cached data, then its a cache-miss
     reply.header(HEADER_NAME, 'MISS')
 
     let key = getKey(req)
