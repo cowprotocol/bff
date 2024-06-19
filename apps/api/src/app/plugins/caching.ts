@@ -5,13 +5,12 @@ import { redis } from '../connections/redis';
 import 'abstract-cache-redis';
 
 
-const isRedisEnabled = !!process.env.REDIS_HOST;
 
 export default fp(async (fastify, opts) => {
   const options: FastifyCachingPluginOptions = {
     ...opts,
 
-    ...(isRedisEnabled ? {
+    ...(redis ? {
       cache: abstractCache({
         useAwait: false,
         driver: {
