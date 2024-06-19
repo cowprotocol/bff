@@ -1,6 +1,5 @@
 import fp from "fastify-plugin";
-import { CACHE_CONTROL_HEADER, getCache, getCacheControlHeaderValue, parseCacheControlHeaderValue, setCache } from "../../utils/cache";
-import { FastifyPluginCallback, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyPluginCallback } from "fastify";
 
 const PROTECTED_PATHS = ['/proxies']
 
@@ -13,27 +12,19 @@ const AUTHORIZED_DOMAINS = (() => {
   return domains.split(',').map(domain => domain.trim())
 })()
 
-interface BffCacheOptions {
-  ttl?: number
-}
 
-export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, next) => {
-  const { ttl } = opts
+export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.addHook('onRequest', async (request, reply) => {
-    // Cache only GET requests
-    if (!AUTHORIZED_DOMAINS) {
+    // Return early if its an unprotected path
+    if (AUTHORIZED_DOMAINS.length == 0 || !PROTECTED_PATHS.some(path => request.url.startsWith(path))) {
       return
     }
 
-    // Check the path is withing the protected paths
-    if (!PROTECTED_PATHS.some(path => request.url.startsWith(path))) {
-
-      // Verify the origin is authorized
-      const origin = request.headers.origin
-      if (!origin || !AUTHORIZED_DOMAINS.includes(origin)) {
-        reply.status(403).send('Unauthorized')
-        return
-      }
+    const origin = request.headers.origin
+    // Check the path is withing the protected paths (or its localhost)
+    if ((!origin || !AUTHORIZED_DOMAINS.includes(origin)) && !isLocalhost(origin)) {
+      reply.status(403).send('Unauthorized')
+      return
     }
 
     return
@@ -42,6 +33,11 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
   next()
 }
 
+function isLocalhost(origin: string): boolean {
+  if (!origin) {
+    return false
+  }
+  return /^http:\/\/localhost:\d+\/?$/.test(origin)
+}
 
-
-export default fp<BffCacheOptions>(bffCache, { fastify: '4.x', name: 'bffAuth' })
+export default fp(bffAuth, { fastify: '4.x', name: 'bffAuth' })
