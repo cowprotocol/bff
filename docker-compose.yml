@@ -40,6 +40,10 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USER: ${REDIS_USER}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
       TWAP_BASE_URL: http://twap:3000/
     volumes:
       - ./src:/app/src
@@ -94,6 +98,24 @@ services:
       timeout: 10s
       retries: 5
 
+  redis:
+    container_name: redis
+    image: redis:7.2.5
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - data-redis:/data
+      - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - bff-network
+    entrypoint: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:6379']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   notification-producer:
     container_name: notification-producer
     build:
@@ -138,6 +160,7 @@ services:
 volumes:
   data-postgres:
   data-rabbitmq:
+  data-redis:
 
 networks:
   bff-network:
