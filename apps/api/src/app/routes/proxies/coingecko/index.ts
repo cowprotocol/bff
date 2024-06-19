@@ -4,7 +4,7 @@ import { FastifyPluginAsync } from "fastify";
 
 const DROP_HEADERS = ['cf-ray', 'cf-cache-status', 'set-cookie', 'server']
 
-const CACHE_TTL = 2.5 * 60; // 1 min in s
+const CACHE_TTL = parseInt(process.env.COINGECKO_CACHING_TIME || '150') // Defaults to 2.5 minutes (150 seconds)
 const DEFAULT_COINGECKO_PROXY_UPSTREAM = "https://api.coingecko.com";
 
 const coingeckoProxy: FastifyPluginAsync = async (
