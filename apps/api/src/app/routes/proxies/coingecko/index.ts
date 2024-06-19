@@ -4,8 +4,7 @@ import { FastifyPluginAsync } from "fastify";
 
 const DROP_HEADERS = ['cf-ray', 'cf-cache-status', 'set-cookie', 'server']
 
-const CACHE_TTL = 1 * 60; // 1 min in s
-const SERVER_CACHE_TTL = 1.5 * 60; // 1.5 min in s
+const CACHE_TTL = 2.5 * 60; // 1 min in s
 const DEFAULT_COINGECKO_PROXY_UPSTREAM = "https://api.coingecko.com";
 
 const coingeckoProxy: FastifyPluginAsync = async (
@@ -32,7 +31,7 @@ const coingeckoProxy: FastifyPluginAsync = async (
           ...headers,
           ...(headers.cacheControl
             ? {
-              [CACHE_CONTROL_HEADER]: getCacheControlHeaderValue(CACHE_TTL, SERVER_CACHE_TTL),
+              [CACHE_CONTROL_HEADER]: getCacheControlHeaderValue(CACHE_TTL),
             }
             : undefined)
         });
