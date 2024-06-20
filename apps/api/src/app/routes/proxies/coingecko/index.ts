@@ -23,13 +23,14 @@ const coingeckoProxy: FastifyPluginAsync = async (
       }),
       // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
       rewriteHeaders: (headers, request) => {
+
         // Drop some headers
         const newHeaders = DROP_HEADERS.reduce((acc, header) => {
           delete acc[header];
           return acc;
         }, {
           ...headers,
-          ...(headers.cacheControl
+          ...(headers[CACHE_CONTROL_HEADER]
             ? {
               [CACHE_CONTROL_HEADER]: getCacheControlHeaderValue(CACHE_TTL),
             }
