@@ -16,7 +16,7 @@ const AUTHORIZED_ORIGINS = (() => {
 export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.addHook('onRequest', async (request, reply) => {
     // Return early if its an unprotected path
-    if (AUTHORIZED_ORIGINS.length == 0 || !PROTECTED_PATHS.some(path => request.url.startsWith(path))) {
+    if (AUTHORIZED_ORIGINS.length === 0 || !PROTECTED_PATHS.some(path => request.url.startsWith(path))) {
       return
     }
 
