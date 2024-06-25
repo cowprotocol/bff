@@ -55,7 +55,6 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
 
     let key = getKey(req)
     setCache(key, payload, cacheTtl, fastify).catch(e => {
-      console.error('Error getting key', key, e)
       fastify.log.error(`Error setting key ${key} from cache`, e)
       return null
     })

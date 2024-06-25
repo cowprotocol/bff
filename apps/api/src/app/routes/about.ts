@@ -6,6 +6,7 @@ const GIT_COMMIT_HASH_FILE = 'git-commit-hash.txt';
 const VERSION = process.env.VERSION || 'UNKNOWN, please set the environment variable';
 const COMMIT_HASH = getCommitHash();
 import { join } from 'path';
+import { server } from '../../main';
 
 
 
@@ -34,7 +35,7 @@ function getCommitHash(): string | undefined {
     return readFileSync(filePath, 'utf-8')
   } catch (error) {
     // Not a big deal, if the file is not present, the about won't 
-    console.warn(`Unable to read the file with the git commit hash: ${filePath}. /about endpoint won't export the 'gitCommitHash'`);
+    server.log.warn(`Unable to read the file with the git commit hash: ${filePath}. /about endpoint won't export the 'gitCommitHash'`);
     return undefined
   }
 }

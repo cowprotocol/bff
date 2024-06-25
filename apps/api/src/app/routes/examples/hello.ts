@@ -10,7 +10,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
   fastify.get('/hello-cached', async function (request, reply) {
     await delay(2000)
-    console.log('Setting cache header')
     reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(10))
     reply.send({ hello: 'world' })
   });
