@@ -5,7 +5,7 @@ const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 // Instantiate Fastify with some config
-const server = Fastify({
+export const server = Fastify({
   logger: {
     level: process.env.LOG_LEVEL ?? 'info',
   },
@@ -20,6 +20,6 @@ server.listen({ port, host }, (err) => {
     server.log.error(err);
     process.exit(1);
   } else {
-    console.log(`[ ready ] http://${host}:${port}`);
+    server.log.info(`[ ready ] http://${host}:${port}`);
   }
 });
