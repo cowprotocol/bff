@@ -36,6 +36,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{
     Params: RouteSchema;
     Reply: Result;
+<<<<<<< HEAD
   }>(
     '/defaultSlippageTolerance',
     {
@@ -49,6 +50,15 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       reply.send({ slippageBps: 50 });
     }
   );
+=======
+  }>('/defaultSlippageTolerance', {
+    schema: { params: routeSchema }
+  }, async function (request, reply) {
+    const { chainId, sellTokenAddress, buyTokenAddress } = request.params;
+    fastify.log.info(`Get default slippage for market ${sellTokenAddress}-${buyTokenAddress} on chain ${chainId}`);
+    reply.send({ slippageBps: 50 })
+  });
+>>>>>>> ec8f7c4 (Use BPS)
 };
 
 export default root;
