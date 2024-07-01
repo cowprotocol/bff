@@ -3,7 +3,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 interface Result {
-  slippagePercent: number;
+  slippageBps: number;
 }
 
 const routeSchema = {
@@ -40,7 +40,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   }, async function (request, reply) {
     const { chainId, sellTokenAddress, buyTokenAddress } = request.params;
     fastify.log.info(`Get default slippage for market ${sellTokenAddress}-${buyTokenAddress} on chain ${chainId}`);
-    reply.send({ slippagePercent: 0.5 })
+    reply.send({ slippageBps: 50 })
   });
 };
 
