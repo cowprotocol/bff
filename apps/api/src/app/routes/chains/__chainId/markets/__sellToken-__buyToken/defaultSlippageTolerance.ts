@@ -14,17 +14,33 @@ const routeSchema = {
   required: ['chainId', 'sellToken', 'buyToken'],
   properties: {
     chainId: ChainIdSchema,
-    sellToken: {
-      title: 'Sell token address',
-      description: 'Sell token address',
+    baseTokenAddress: {
+      title: 'Base token address',
+      description: 'Currency that is being bought or sold.',
       type: 'string',
       pattern: ETHEREUM_ADDRESS_PATTERN,
     },
-    buyToken: {
-      title: 'Buy token address',
-      description: 'Buy token address',
+    quoteTokenAddress: {
+      title: 'Quote token address',
+      description: ' Currency in which the price of the base token is quoted.',
       type: 'string',
       pattern: ETHEREUM_ADDRESS_PATTERN,
+    },
+  },
+} as const satisfies JSONSchema;
+
+const responseSchema = {
+  type: 'object',
+  required: ['slippageBps'],
+  properties: {
+    slippageBps: {
+      title: 'Slippage tolerance in basis points',
+      description:
+        'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
+      type: 'number',
+      examples: [50, 100, 200],
+      minimum: 0,
+      maximum: 10000,
     },
   },
 } as const satisfies JSONSchema;
@@ -36,29 +52,24 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{
     Params: RouteSchema;
     Reply: Result;
-<<<<<<< HEAD
   }>(
     '/defaultSlippageTolerance',
     {
-      schema: { params: routeSchema },
+      schema: {
+        params: routeSchema,
+        response: {
+          '2XX': responseSchema,
+        },
+      },
     },
     async function (request, reply) {
-      const { chainId, sellTokenAddress, buyTokenAddress } = request.params;
+      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
       fastify.log.info(
-        `Get default slippage for market ${sellTokenAddress}-${buyTokenAddress} on chain ${chainId}`
+        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}`
       );
       reply.send({ slippageBps: 50 });
     }
   );
-=======
-  }>('/defaultSlippageTolerance', {
-    schema: { params: routeSchema }
-  }, async function (request, reply) {
-    const { chainId, sellTokenAddress, buyTokenAddress } = request.params;
-    fastify.log.info(`Get default slippage for market ${sellTokenAddress}-${buyTokenAddress} on chain ${chainId}`);
-    reply.send({ slippageBps: 50 })
-  });
->>>>>>> ec8f7c4 (Use BPS)
 };
 
 export default root;
