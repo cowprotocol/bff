@@ -11,7 +11,7 @@ interface Result {
 
 const routeSchema = {
   type: 'object',
-  required: ['chainId', 'sellToken', 'buyToken'],
+  required: ['chainId', 'baseTokenAddress', 'quoteTokenAddress'],
   properties: {
     chainId: ChainIdSchema,
     baseTokenAddress: {
@@ -48,12 +48,12 @@ const responseSchema = {
 type RouteSchema = FromSchema<typeof routeSchema>;
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  // example: http://localhost:3010/chains/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/defaultSlippageTolerance
+  // example: http://localhost:3010/chains/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
   fastify.get<{
     Params: RouteSchema;
     Reply: Result;
   }>(
-    '/defaultSlippageTolerance',
+    '/slippageTolerance',
     {
       schema: {
         params: routeSchema,
