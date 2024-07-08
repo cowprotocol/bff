@@ -24,22 +24,10 @@ export class SlippageServiceImpl implements SlippageService {
     quoteTokenAddress: string,
     baseTokenAddress: string
   ): Promise<Bps> {
-    console.log(
-      'getSlippageBps',
-      quoteTokenAddress,
-      baseTokenAddress,
-      this.usdRepository
-    );
     const [slippageQuoteToken, slippageBaseToken] = await Promise.all([
       this.getSlippageForToken(quoteTokenAddress),
       this.getSlippageForToken(quoteTokenAddress),
     ]);
-
-    console.log(
-      'slippageQuoteToken, slippageBaseToken',
-      slippageQuoteToken,
-      slippageBaseToken
-    );
 
     return Math.max(slippageQuoteToken, slippageBaseToken);
   }
@@ -56,11 +44,9 @@ export class SlippageServiceImpl implements SlippageService {
       tokenAddress,
       yesterday
     );
-    console.log('Today price, yesterday', todayPrice, yesterdayPrice);
     const bps = Math.abs(
       ((todayPrice - yesterdayPrice) / yesterdayPrice) * 10000
     );
-    console.log('bps', bps);
 
     return Math.ceil(bps);
   }
