@@ -1,20 +1,67 @@
+import { UsdRepository, usdRepositorySymbol } from '@cowprotocol/repositories';
+import { injectable, inject } from 'inversify';
+
 /**
  * BPS (Basis Points)
  */
 export type Bps = number;
 
 export interface SlippageService {
-  getSlippageBps(quoteTokenAddress: string, baseTokenAddress: string): Bps;
+  getSlippageBps(
+    quoteTokenAddress: string,
+    baseTokenAddress: string
+  ): Promise<Bps>;
 }
 
-// TODO: Find good name for the implementation, as Leandro don't like "Impl" suffix, just don't want to couple it to add Coingecko in its name (as that would couple it to the data-source, and the adding a name to specify the algorithm might complicate the name, as this will use some custom logic based on standard deviation, so for now as we plan to have just one implementation, I want to keep it simple. But happy to get ideas here)
+export const slippageServiceSymbol = Symbol.for('SlippageService');
+
+@injectable()
 export class SlippageServiceImpl implements SlippageService {
-  getSlippageBps(_quoteTokenAddress: string, _baseTokenAddress: string): Bps {
-    return 50;
-  }
-}
+  @inject(usdRepositorySymbol)
+  private usdRepository: UsdRepository;
 
-// TODO: This is just temporal! I will introduce a IoC framework in a follow up
-export function getSlippageService(): SlippageService {
-  return new SlippageServiceImpl();
+  async getSlippageBps(
+    quoteTokenAddress: string,
+    baseTokenAddress: string
+  ): Promise<Bps> {
+    console.log(
+      'getSlippageBps',
+      quoteTokenAddress,
+      baseTokenAddress,
+      this.usdRepository
+    );
+    const [slippageQuoteToken, slippageBaseToken] = await Promise.all([
+      this.getSlippageForToken(quoteTokenAddress),
+      this.getSlippageForToken(quoteTokenAddress),
+    ]);
+
+    console.log(
+      'slippageQuoteToken, slippageBaseToken',
+      slippageQuoteToken,
+      slippageBaseToken
+    );
+
+    return Math.max(slippageQuoteToken, slippageBaseToken);
+  }
+
+  private async getSlippageForToken(tokenAddress: string) {
+    const today = new Date();
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+    const todayPrice = await this.usdRepository.getDailyUsdPrice(
+      tokenAddress,
+      today
+    );
+    const yesterdayPrice = await this.usdRepository.getDailyUsdPrice(
+      tokenAddress,
+      yesterday
+    );
+    console.log('Today price, yesterday', todayPrice, yesterdayPrice);
+    const bps = Math.abs(
+      ((todayPrice - yesterdayPrice) / yesterdayPrice) * 10000
+    );
+    console.log('bps', bps);
+
+    return Math.ceil(bps);
+  }
 }

@@ -1,10 +1,11 @@
+import { SlippageService, slippageServiceSymbol } from '@cowprotocol/services';
 import {
   ChainIdSchema,
   ETHEREUM_ADDRESS_PATTERN,
 } from '../../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { getSlippageService } from '@cowprotocol/services';
+import { apiContainer } from '../../../../../inversify.config';
 
 // TODO:  Add this in a follow up PR
 // import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
@@ -51,7 +52,9 @@ const responseSchema = {
 
 type RouteSchema = FromSchema<typeof routeSchema>;
 
-const slippageService = getSlippageService();
+const slippageService: SlippageService = apiContainer.get(
+  slippageServiceSymbol
+);
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/chains/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
@@ -73,7 +76,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       fastify.log.info(
         `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}`
       );
-      const slippageBps = slippageService.getSlippageBps(
+      const slippageBps = await slippageService.getSlippageBps(
         baseTokenAddress,
         quoteTokenAddress
       );
