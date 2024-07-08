@@ -4,6 +4,10 @@ import {
 } from '../../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
+import { getSlippageService } from '@cowprotocol/services';
+
+// TODO:  Add this in a follow up PR
+// import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 
 interface Result {
   slippageBps: number;
@@ -38,7 +42,7 @@ const responseSchema = {
       description:
         'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
       type: 'number',
-      examples: [50, 100, 200],
+      examples: [50, 100, 200], // [ALL_SUPPORTED_CHAIN_IDS],
       minimum: 0,
       maximum: 10000,
     },
@@ -46,6 +50,8 @@ const responseSchema = {
 } as const satisfies JSONSchema;
 
 type RouteSchema = FromSchema<typeof routeSchema>;
+
+const slippageService = getSlippageService();
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/chains/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
@@ -67,7 +73,11 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       fastify.log.info(
         `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}`
       );
-      reply.send({ slippageBps: 50 });
+      const slippageBps = slippageService.getSlippageBps(
+        baseTokenAddress,
+        quoteTokenAddress
+      );
+      reply.send({ slippageBps });
     }
   );
 };
