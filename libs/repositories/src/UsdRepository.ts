@@ -1,11 +1,11 @@
 import { get } from 'http';
 
 export interface UsdRepository {
-  getPriceDayUsd(tokenAddress: string, date: Date): Promise<number>;
+  getDailyUsdPrice(tokenAddress: string, date: Date): Promise<number>;
 }
 
-export class UsdRepositoryMock {
-  async getPriceDayUsd(tokenAddress: string, date: Date): Promise<number> {
+export class UsdRepositoryMock implements UsdRepository {
+  async getDailyUsdPrice(tokenAddress: string, date: Date): Promise<number> {
     return 1234;
   }
 }
