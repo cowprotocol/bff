@@ -28,7 +28,7 @@ describe('SlippageService', () => {
     slippageService = container.get(slippageServiceSymbol);
   });
 
-  it('should return always 1234', async () => {
+  it('should return always 0', async () => {
     expect(await slippageService.getSlippageBps('0x0', '0x0')).toEqual(0);
   });
 });
