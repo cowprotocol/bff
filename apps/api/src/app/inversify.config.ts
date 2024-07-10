@@ -1,6 +1,6 @@
 import {
   UsdRepository,
-  UsdRepositoryMock,
+  UsdRepositoryCoingecko,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
 import { Container } from 'inversify';
@@ -13,7 +13,9 @@ import {
 export const apiContainer = new Container();
 
 // Repositories
-apiContainer.bind<UsdRepository>(usdRepositorySymbol).to(UsdRepositoryMock);
+apiContainer
+  .bind<UsdRepository>(usdRepositorySymbol)
+  .to(UsdRepositoryCoingecko);
 
 // Services
 apiContainer
