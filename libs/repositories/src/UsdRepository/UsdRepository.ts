@@ -1,15 +1,30 @@
-import { injectable } from 'inversify';
-
 export const usdRepositorySymbol = Symbol.for('UsdRepository');
 
-export interface UsdRepository {
-  getDailyUsdPrice(tokenAddress: string, date: Date): Promise<number>;
+export type PriceStrategy = '5m' | 'hourly' | 'daily';
+
+export interface PricePoint {
+  /**
+   * Date and time of the price point
+   */
+  date: Date;
+
+  /**
+   * Price
+   */
+  price: number;
+
+  /**
+   * Volume traded at that price
+   */
+  volume: number;
 }
 
-@injectable()
-export class UsdRepositoryMock implements UsdRepository {
-  async getDailyUsdPrice(_tokenAddress: string, _date: Date): Promise<number> {
-    // Return a random number between 1 and 1000
-    return Math.floor(Math.random() * 1000) + 1;
-  }
+export interface UsdRepository {
+  getUsdPrice(chainId: number, tokenAddress: string): Promise<number | null>;
+
+  getUsdPrices(
+    chainId: number,
+    tokenAddress: string,
+    priceStrategy: PriceStrategy
+  ): Promise<PricePoint[] | null>;
 }
