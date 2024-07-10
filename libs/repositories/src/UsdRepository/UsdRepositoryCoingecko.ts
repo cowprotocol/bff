@@ -86,6 +86,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
           query: {
             vs_currency: 'usd',
             days: days.toString(),
+            interval: priceStrategy === 'daily' ? 'daily' : undefined, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
           },
         },
       }
