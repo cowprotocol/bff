@@ -71,3 +71,9 @@ Build docker containers and publish to a local registry:
 yarn docker-build:affected
 ```
 
+# Generate Types
+There's some API types that are generated automatically from their swagger definitions. To generate them, run:
+
+```bash
+yarn gen:types
+```
