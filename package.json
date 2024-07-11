@@ -17,7 +17,8 @@
     "docker-build:affected": "nx affected -t docker-build --prod --parallel --maxParallel=3 --skip-nx-cache --skip-nx-cache",
     "compose:up": "yarn docker-build:affected && docker-compose up",
     "swagger": "ts-node scripts/fetchCoingeckoSwagger",
-    "gen:types": "npx openapi-typescript"
+    "gen:types": "npx openapi-typescript",
+    "postinstall": "yarn gen:types"
   },
   "private": true,
   "dependencies": {
