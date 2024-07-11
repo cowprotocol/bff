@@ -1,5 +1,11 @@
 # https://docs.coingecko.com/docs/clients-unofficial
 apis:
+  # CoW core API
+  cow-api@v0.1:
+    root: https://raw.githubusercontent.com/cowprotocol/services/main/crates/orderbook/openapi.yml
+    x-openapi-ts:
+      output: ./libs/repositories/src/gen/cow/cow-api-types.ts
+
   # Public API Swagger JSON
   coingecko-public@v3:
     root: https://docs.coingecko.com/openapi/65bf9cabb0951b0072e2cade

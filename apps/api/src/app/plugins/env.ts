@@ -8,6 +8,9 @@ const schema = {
     LOG_LEVEL: {
       type: 'string',
     },
+    COW_API_BASE_URL: {
+      type: 'string',
+    },
     PROXY_ORIGIN: {
       type: 'string',
     },
