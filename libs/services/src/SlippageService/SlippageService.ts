@@ -1,4 +1,8 @@
-import { UsdRepository, usdRepositorySymbol } from '@cowprotocol/repositories';
+import {
+  UsdRepository,
+  usdRepositorySymbol,
+  SupportedChainId,
+} from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 
 /**
@@ -26,24 +30,20 @@ export class SlippageServiceImpl implements SlippageService {
   ): Promise<Bps> {
     const [slippageQuoteToken, slippageBaseToken] = await Promise.all([
       this.getSlippageForToken(quoteTokenAddress),
-      this.getSlippageForToken(quoteTokenAddress),
+      this.getSlippageForToken(baseTokenAddress),
     ]);
 
     return Math.max(slippageQuoteToken, slippageBaseToken);
   }
 
   private async getSlippageForToken(tokenAddress: string) {
-    const today = new Date();
-    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-
-    const todayPrice = await this.usdRepository.getDailyUsdPrice(
+    const prices = await this.usdRepository.getUsdPrices(
+      SupportedChainId.MAINNET,
       tokenAddress,
-      today
+      'daily'
     );
-    const yesterdayPrice = await this.usdRepository.getDailyUsdPrice(
-      tokenAddress,
-      yesterday
-    );
+    const todayPrice = prices[prices.length - 1].price;
+    const yesterdayPrice = prices[prices.length - 2].price;
     const bps = Math.abs(
       ((todayPrice - yesterdayPrice) / yesterdayPrice) * 10000
     );
