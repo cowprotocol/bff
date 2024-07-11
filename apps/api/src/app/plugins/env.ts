@@ -1,27 +1,24 @@
-import fastifyEnv from "@fastify/env";
-import fp from "fastify-plugin";
+import fastifyEnv from '@fastify/env';
+import fp from 'fastify-plugin';
 
 const schema = {
-  type: "object",
-  required: ["PROXY_ORIGIN", "PROXY_UPSTREAM", "COINGECKO_API_KEY"],
+  type: 'object',
+  required: ['PROXY_ORIGIN', 'PROXY_UPSTREAM', 'COINGECKO_API_KEY'],
   properties: {
     LOG_LEVEL: {
-      type: "string",
+      type: 'string',
     },
     PROXY_ORIGIN: {
-      type: "string",
+      type: 'string',
     },
     PROXY_UPSTREAM: {
-      type: "string",
+      type: 'string',
     },
     TWAP_BASE_URL: {
-      type: "string",
+      type: 'string',
     },
     COINGECKO_API_KEY: {
-      type: "string",
-    },
-    COINGECKO_PROXY_UPSTREAM: {
-      type: "string",
+      type: 'string',
     },
   },
 };
@@ -36,7 +33,7 @@ export default fp(async (fastify, opts) => {
   fastify.register(fastifyEnv, options);
 });
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
     config: {
       // Currently only supports string type like this.
