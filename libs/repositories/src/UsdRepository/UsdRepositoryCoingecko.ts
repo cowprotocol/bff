@@ -96,19 +96,17 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null;
     }
 
-    const volumesMap = fetchResponses.data.total_volumes.reduce(
-      (acc, [timestamp, volume]) => {
+    const volumesMap =
+      fetchResponses.data.total_volumes?.reduce((acc, [timestamp, volume]) => {
         acc.set(timestamp, volume);
         return acc;
-      },
-      new Map<number, number>()
-    );
+      }, new Map<number, number>()) || undefined;
 
     const prices = fetchResponses.data.prices;
     const pricePoints = prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,
-      volume: volumesMap.get(timestamp) ?? 0,
+      volume: volumesMap?.get(timestamp) ?? 0,
     }));
 
     return pricePoints;
