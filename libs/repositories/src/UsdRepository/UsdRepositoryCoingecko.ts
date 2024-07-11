@@ -22,7 +22,7 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<number | null> {
     const platform = COINGECKO_PLATFORMS[chainId];
@@ -32,9 +32,8 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const tokenAddressLower = tokenAddress.toLowerCase();
 
-    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    // Get prices. See https://docs.coingecko.com/reference/coins-id-market-chart
-    const fetchResponse = await coingeckoProClient.GET(
+    // Get USD price: https://docs.coingecko.com/reference/simple-token-price
+    const { data: priceData } = await coingeckoProClient.GET(
       `/simple/token_price/{id}`,
       {
         params: {
@@ -49,11 +48,6 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (fetchResponse.error) {
-      throw fetchResponse.error;
-    }
-    const priceData = fetchResponse.data;
-
     if (!priceData[tokenAddressLower] || !priceData[tokenAddressLower].usd) {
       return null;
     }
@@ -62,7 +56,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   }
 
   async getUsdPrices(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {

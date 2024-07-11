@@ -6,7 +6,7 @@ export class UsdRepositoryFallback implements UsdRepository {
   constructor(private usdRepositories: UsdRepository[]) {}
 
   async getUsdPrice(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<number | null> {
     for (const usdRepository of this.usdRepositories) {
@@ -19,7 +19,7 @@ export class UsdRepositoryFallback implements UsdRepository {
   }
 
   async getUsdPrices(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
