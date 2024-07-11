@@ -1,11 +1,11 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '../types';
-import { assert } from 'console';
+import ms from 'ms';
 
-const FIVE_MINUTES = 5 * 60 * 1000;
-const ONE_HOUR = 60 * 60 * 1000;
-const ONE_DAY = 24 * 60 * 60 * 1000;
+const FIVE_MINUTES = ms`5m`;
+const ONE_HOUR = ms`1h`;
+const ONE_DAY = ms`1d`;
 const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const DEFINITELY_NOT_A_TOKEN = '0x0000000000000000000000000000000000000000';
 
