@@ -6,6 +6,10 @@ import {
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../../inversify.config';
+import {
+  CACHE_CONTROL_HEADER,
+  getCacheControlHeaderValue,
+} from '../../../../../../utils/cache';
 
 // TODO:  Add this in a follow up PR
 // import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
@@ -80,6 +84,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         baseTokenAddress,
         quoteTokenAddress
       );
+      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(120));
       reply.send({ slippageBps });
     }
   );

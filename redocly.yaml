@@ -1,0 +1,19 @@
+# https://docs.coingecko.com/docs/clients-unofficial
+apis:
+  # Public API Swagger JSON
+  coingecko-public@v3:
+    root: https://docs.coingecko.com/openapi/65bf9cabb0951b0072e2cade
+    x-openapi-ts:
+      output: ./libs/repositories/src/gen/coingecko/coingecko-public-types.ts
+
+  # CoinGecko API Endpoints (PRO)
+  coingecko-pro@v3:
+    root: https://docs.coingecko.com/openapi/6584ea6ce07e130056b1af99
+    x-openapi-ts:
+      output: ./libs/repositories/src/gen/coingecko/coingecko-pro-types.ts
+
+  # Onchain DEX API (GeckoTerminal) Endpoints
+  coingecko-dex@v3:
+    root: https://docs.coingecko.com/openapi/6585013ec2907b0031346aa4
+    x-openapi-ts:
+      output: ./libs/repositories/src/gen/coingecko/coingecko-dex-types.ts
