@@ -27,7 +27,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   ): Promise<number | null> {
     const platform = COINGECKO_PLATFORMS[chainId];
     if (!platform) {
-      return undefined;
+      return null;
     }
 
     const tokenAddressLower = tokenAddress.toLowerCase();
@@ -68,11 +68,11 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   ): Promise<PricePoint[] | null> {
     const platform = COINGECKO_PLATFORMS[chainId];
     if (!platform) {
-      return undefined;
+      return null;
     }
 
     const tokenAddressLower = tokenAddress.toLowerCase();
-    const days = DAYS_PER_PRICE_STRATEGY[priceStrategy];
+    const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
 
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
     const fetchResponses = await coingeckoProClient.GET(
@@ -85,7 +85,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
           },
           query: {
             vs_currency: 'usd',
-            days: days.toString(),
+            days,
             interval: priceStrategy === 'daily' ? 'daily' : undefined, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
           },
         },
