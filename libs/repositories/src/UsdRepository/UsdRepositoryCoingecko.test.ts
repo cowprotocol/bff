@@ -1,13 +1,12 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '../types';
+import { WETH, DEFINITELY_NOT_A_TOKEN } from '../../test/mock';
 import ms from 'ms';
 
-const FIVE_MINUTES = ms`5m`;
-const ONE_HOUR = ms`1h`;
-const ONE_DAY = ms`1d`;
-const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-const DEFINITELY_NOT_A_TOKEN = '0x0000000000000000000000000000000000000000';
+const FIVE_MINUTES = ms('5m');
+const ONE_HOUR = ms('1h');
+const ONE_DAY = ms('1d');
 
 describe('UsdRepositoryCoingecko', () => {
   let usdRepositoryCoingecko: UsdRepositoryCoingecko;
