@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
 import { SupportedChainId } from '../types';
+import { throwIfUnsuccessful } from '../utils/fetch';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -32,7 +33,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const tokenAddressLower = tokenAddress.toLowerCase();
 
     // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    const { data: priceData } = await coingeckoProClient.GET(
+    const { data: priceData, response } = await coingeckoProClient.GET(
       `/simple/token_price/{id}`,
       {
         params: {
@@ -47,9 +48,14 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (!priceData[tokenAddressLower] || !priceData[tokenAddressLower].usd) {
+    if (
+      response.status === 404 ||
+      !priceData[tokenAddressLower] ||
+      !priceData[tokenAddressLower].usd
+    ) {
       return null;
     }
+    throwIfUnsuccessful('Error getting USD price from Coingecko', response);
 
     return priceData[tokenAddressLower].usd;
   }
@@ -68,7 +74,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
 
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    const fetchResponses = await coingeckoProClient.GET(
+    const { data: priceData, response } = await coingeckoProClient.GET(
       `/coins/{id}/contract/{contract_address}/market_chart`,
       {
         params: {
@@ -85,17 +91,18 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (!fetchResponses.data) {
+    if (response.status === 404 || !priceData) {
       return null;
     }
+    throwIfUnsuccessful('Error getting USD prices from Coingecko', response);
 
     const volumesMap =
-      fetchResponses.data.total_volumes?.reduce((acc, [timestamp, volume]) => {
+      priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {
         acc.set(timestamp, volume);
         return acc;
       }, new Map<number, number>()) || undefined;
 
-    const prices = fetchResponses.data.prices;
+    const prices = priceData.prices;
     const pricePoints = prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,

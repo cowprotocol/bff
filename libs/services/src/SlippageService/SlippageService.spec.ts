@@ -1,17 +1,31 @@
-import 'reflect-metadata';
-
 import { Container, injectable } from 'inversify';
 import {
   SlippageService,
   SlippageServiceImpl,
   slippageServiceSymbol,
 } from './SlippageService';
-import { UsdRepository, usdRepositorySymbol } from '@cowprotocol/repositories';
+import {
+  PricePoint,
+  PriceStrategy,
+  SupportedChainId,
+  UsdRepository,
+  usdRepositorySymbol,
+} from '@cowprotocol/repositories';
 
 @injectable()
 class UsdRepositoryMock implements UsdRepository {
-  async getDailyUsdPrice(_tokenAddress: string, _date: Date): Promise<number> {
-    return 1234;
+  getUsdPrice(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<number | null> {
+    throw null;
+  }
+  getUsdPrices(
+    chainId: SupportedChainId,
+    tokenAddress: string,
+    priceStrategy: PriceStrategy
+  ): Promise<PricePoint[] | null> {
+    throw null;
   }
 }
 
