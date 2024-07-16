@@ -41,13 +41,6 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       tokenDecimals
     );
 
-    console.log('Prices', {
-      usdcPrice: usdcPrice.toString(),
-      tokenPrice: tokenPrice.toString(),
-      usdcNativePrice: usdcNativePrice,
-      tokenNativePrice: tokenNativePrice,
-    });
-
     if (tokenPrice.eq(ZeroBigNumber)) {
       return null;
     }
@@ -71,8 +64,6 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     );
 
     throwIfUnsuccessful('Error getting prices', response);
-
-    console.log('Price', response); // response.url, priceResult.price
 
     return priceResult.price || null;
   }

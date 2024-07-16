@@ -3,8 +3,6 @@ import { UsdRepositoryCow } from './UsdRepositoryCow';
 import { cowApiClientMainnet } from '../cowApi';
 
 import { WETH, okResponse } from '../../test/mock';
-
-import assert from 'assert';
 import { USDC } from '../const';
 
 function getTokenDecimalsMock(tokenAddress: string) {
@@ -12,8 +10,8 @@ function getTokenDecimalsMock(tokenAddress: string) {
 }
 
 const NATIVE_PRICE_ENDPOINT = '/api/v1/token/{token}/native_price';
-const WETH_NATIVE_PRICE = 289801403.348473; // 289801403.348473;  3,450.6389149453
-const USDC_PRICE = 1;
+const WETH_NATIVE_PRICE = 1; // See https://api.cow.fi/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
+const USDC_PRICE = 288778763.042292; // USD price: 3,462.8585200136 (calculated 1e12 / 288778763.042292). See https://api.cow.fi/mainnet/api/v1/token/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/native_price
 
 const usdRepositoryCow = new UsdRepositoryCow(getTokenDecimalsMock);
 
@@ -37,7 +35,6 @@ describe('UsdRepositoryCow', () => {
         }
       });
 
-      console.log('cowApiClientMainnet', cowApiClientMainnet);
       let price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
@@ -56,7 +53,7 @@ describe('UsdRepositoryCow', () => {
       ]);
 
       // USD calculation based on native price is correct
-      expect(price).toEqual(3_450.6389149453);
+      expect(price).toEqual(3_462.8585200136367);
     });
   });
 
