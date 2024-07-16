@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
+import { SupportedChainId } from '../types';
 
 /**
  * Number of days of data to fetch for each price strategy
