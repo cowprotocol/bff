@@ -26,5 +26,5 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
 };
 
 export const ZeroBigNumber = new BigNumber(0);
-export const OneBigNumber = new BigNumber(0);
+export const OneBigNumber = new BigNumber(1);
 export const TenBigNumber = new BigNumber(10);

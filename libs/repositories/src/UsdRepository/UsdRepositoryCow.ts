@@ -4,6 +4,7 @@ import { cowApiClient } from '../cowApi';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';
+import { throwIfUnsuccessful } from '../utils/fetch';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
@@ -40,6 +41,13 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       tokenDecimals
     );
 
+    console.log('Prices', {
+      usdcPrice: usdcPrice.toString(),
+      tokenPrice: tokenPrice.toString(),
+      usdcNativePrice: usdcNativePrice,
+      tokenNativePrice: tokenNativePrice,
+    });
+
     if (tokenPrice.eq(ZeroBigNumber)) {
       return null;
     }
@@ -51,8 +59,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     _chainId: SupportedChainId,
     tokenAddress: string
   ) {
-    // TODO: Support other networks!!!!
-    const { data: priceResult } = await cowApiClient.GET(
+    const { data: priceResult, response } = await cowApiClient.GET(
       '/api/v1/token/{token}/native_price',
       {
         params: {
@@ -62,6 +69,10 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
         },
       }
     );
+
+    throwIfUnsuccessful('Error getting prices', response);
+
+    console.log('Price', response.url, priceResult.price);
 
     return priceResult.price || null;
   }
@@ -75,6 +86,5 @@ function invertNativeToTokenPrice(
   value: BigNumber,
   decimals: number
 ): BigNumber {
-  const inverted = OneBigNumber.div(value);
-  return inverted.times(TenBigNumber.pow(18 - decimals));
+  return OneBigNumber.times(TenBigNumber.pow(18 - decimals)).div(value);
 }
