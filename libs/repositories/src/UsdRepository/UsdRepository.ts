@@ -45,7 +45,7 @@ export class UsdRepositoryNoop implements UsdRepository {
     chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
-  ): Promise<PricePoint[]> {
+  ): Promise<PricePoint[] | null> {
     return null;
   }
 }

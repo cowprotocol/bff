@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
