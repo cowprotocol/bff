@@ -3,7 +3,7 @@ export async function throwIfUnsuccessful(
   response: Response,
   context?: string
 ) {
-  if (!response.ok) {
+  if (!response.ok || response.status !== 200) {
     const text = await response.text().catch(() => undefined);
     throw new Error(
       `${errorMessage}. ${response.status} (${response.statusText})${

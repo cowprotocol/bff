@@ -55,7 +55,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     ) {
       return null;
     }
-    throwIfUnsuccessful('Error getting USD price from Coingecko', response);
+    await throwIfUnsuccessful(
+      'Error getting USD price from Coingecko',
+      response
+    );
 
     return priceData[tokenAddressLower].usd;
   }
@@ -94,7 +97,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     if (response.status === 404 || !priceData) {
       return null;
     }
-    throwIfUnsuccessful('Error getting USD prices from Coingecko', response);
+    await throwIfUnsuccessful(
+      'Error getting USD prices from Coingecko',
+      response
+    );
 
     const volumesMap =
       priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {

@@ -53,7 +53,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     tokenAddress: string
   ) {
     const {
-      data: priceResult,
+      data: priceResult = {},
       response,
       error,
     } = await cowApiClientMainnet.GET('/api/v1/token/{token}/native_price', {
@@ -64,6 +64,11 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       },
     });
 
+    // If tokens is not found, return null. See See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
+    if (response.status === 404) {
+      return null;
+    }
+
     // Unsupported tokens return undefined. See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
     if (response.status === 400) {
       const errorType = (error as any)?.errorType;
@@ -71,15 +76,15 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       if (errorType === 'UnsupportedToken') {
         return null;
       } else {
-        throwIfUnsuccessful(
+        await throwIfUnsuccessful(
           `Error getting native prices`,
           response,
-          `${errorType}: ${description}`
+          errorType && description ? `${errorType}: ${description}` : undefined
         );
       }
     }
 
-    throwIfUnsuccessful('Error getting native prices', response);
+    await throwIfUnsuccessful('Error getting native prices', response);
 
     return priceResult.price || null;
   }
