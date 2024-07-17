@@ -54,9 +54,11 @@ export function okResponse(
 
 export function errorResponse(
   status: number,
+  data?: unknown,
   overrides?: Partial<Response>
 ): {
   response: Response;
+  data?: unknown;
 } {
   return {
     response: {
@@ -65,5 +67,6 @@ export function errorResponse(
       ok: false,
       ...overrides,
     },
+    data,
   };
 }
