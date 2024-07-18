@@ -1,6 +1,6 @@
 import { SupportedChainId } from '../types';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
-import { cowApiClientMainnet } from '../cowApi';
+import { cowApiClientMainnet } from '../datasources/cowApi';
 
 import {
   DEFINITELY_NOT_A_TOKEN,

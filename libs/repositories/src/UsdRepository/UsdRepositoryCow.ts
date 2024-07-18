@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { UsdRepositoryNoop } from './UsdRepository';
-import { cowApiClientMainnet } from '../cowApi';
+import { cowApiClientMainnet } from '../datasources/cowApi';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';

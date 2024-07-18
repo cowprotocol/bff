@@ -1,6 +1,9 @@
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
-import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
+import {
+  COINGECKO_PLATFORMS,
+  coingeckoProClient,
+} from '../datasources/coingecko';
 import { SupportedChainId } from '../types';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 

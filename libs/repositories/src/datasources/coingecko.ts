@@ -1,8 +1,8 @@
-import { SupportedChainId } from './types';
+import { SupportedChainId } from '../types';
 
 import createClient from 'openapi-fetch';
 
-import type { paths } from './gen/coingecko/coingecko-pro-types';
+import type { paths } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
