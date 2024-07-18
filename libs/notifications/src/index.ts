@@ -6,7 +6,7 @@ export const NOTIFICATIONS_QUEUE = 'notifications';
 // Connect to RabbitMQ server
 const queueHost = process.env.QUEUE_HOST;
 assert(queueHost, 'QUEUE_HOST is required');
-const queuePort = +process.env.QUEUE_PORT || 5672;
+const queuePort = +(process.env.QUEUE_PORT || '5672');
 const queueUser = process.env.QUEUE_USER;
 assert(queueUser, 'QUEUE_USER is required');
 const queuePassword = process.env.QUEUE_PASSWORD;
@@ -29,7 +29,7 @@ export function stringifyNotification(notification: Notification): string {
 }
 
 // TODO: Move to commons lib
-export function sleep(ms) {
+export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
