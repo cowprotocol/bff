@@ -68,7 +68,7 @@ describe('UsdRepositoryRedis', () => {
     });
 
     it('should do a delegate code if no cache, then cache for the specified number of seconds', async () => {
-      // GIVEN: Cached value null
+      // GIVEN: The value is not cached
       // GIVEN: proxy returns 200
       redisMock.get.mockResolvedValue(null);
       proxyMock.getUsdPrice.mockResolvedValue(200);
@@ -95,6 +95,44 @@ describe('UsdRepositoryRedis', () => {
         'EX',
         CACHE_TIME_SECONDS
       );
+    });
+
+    it('should return the cached value, even if the proxy throws', async () => {
+      // GIVEN: Cached value '100'
+      // GIVEN: proxy returns 200
+      redisMock.get.mockResolvedValue('100');
+      proxyMock.getUsdPrice.mockImplementation(() => {
+        throw new Error('💥 Booom!');
+      });
+
+      // When: Get USD price
+      const price = await usdRepositoryRedis.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // THEN: The price matches the result from the proxy
+      expect(price).toEqual(100);
+      expect(proxyMock.getUsdPrice).not.toHaveBeenCalled();
+    });
+
+    it('should throw if the proxy throws and there is no cache available', async () => {
+      // GIVEN: The value is not cached
+      redisMock.get.mockResolvedValue(null);
+
+      // GIVEN: The proxy throws an awful error
+      proxyMock.getUsdPrice.mockImplementation(async () => {
+        throw new Error('💥 Booom!');
+      });
+
+      // When: Get USD price
+      const pricePromise = usdRepositoryRedis.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // THEN: The call throws an awful error
+      expect(pricePromise).rejects.toThrow('💥 Booom!');
     });
   });
 });
