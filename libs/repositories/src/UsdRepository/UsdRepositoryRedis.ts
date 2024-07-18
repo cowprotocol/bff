@@ -10,8 +10,8 @@ import { SupportedChainId } from '../types';
 import IORedis from 'ioredis';
 import ms from 'ms';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('2min'); // 2min cache time by default for values
-const DEFAULT_CACHE_NULL_SECONDS = ms('30min'); // 2min cache time by default for NULL values (when the repository don't know)
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 2min cache time by default for NULL values (when the repository don't know)
 const NULL_VALUE = 'null';
 
 @injectable()
