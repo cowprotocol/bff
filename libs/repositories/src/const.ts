@@ -12,7 +12,7 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
     decimals: 6,
   },
   [SupportedChainId.GNOSIS_CHAIN]: {
-    address: '0x2a22f9c3b484c3629090feed35f17ff8f88f76f0', // '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83',
+    address: '0x2a22f9c3b484c3629090feed35f17ff8f88f76f0',
     decimals: 6,
   },
   [SupportedChainId.ARBITRUM_ONE]: {
