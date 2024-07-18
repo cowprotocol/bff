@@ -29,7 +29,7 @@ function getUsdRepositoryCow(): UsdRepository {
     return usdRepositoryCow;
   }
 
-  return new UsdRepositoryRedis(usdRepositoryCow, redisClient, 'usd');
+  return new UsdRepositoryRedis(usdRepositoryCow, redisClient, 'usdCow');
 }
 
 function getUsdRepositoryCoingecko(): UsdRepository {
@@ -39,7 +39,11 @@ function getUsdRepositoryCoingecko(): UsdRepository {
     return usdRepositoryCoingecko;
   }
 
-  return new UsdRepositoryRedis(usdRepositoryCoingecko, redisClient, 'usd');
+  return new UsdRepositoryRedis(
+    usdRepositoryCoingecko,
+    redisClient,
+    'usdCoingecko'
+  );
 }
 
 function getUsdRepository(): UsdRepository {
