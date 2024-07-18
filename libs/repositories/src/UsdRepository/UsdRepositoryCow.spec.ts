@@ -27,7 +27,7 @@ describe('UsdRepositoryCow', () => {
     it('USD price calculation is correct', async () => {
       // Mock native price
       cowApiMock.mockImplementation(async (url, params) => {
-        const token = (params.params.path as any).token || undefined;
+        const token = (params as any).params.path.token || undefined;
         switch (token) {
           case WETH:
             // Return WETH native price
@@ -66,76 +66,103 @@ describe('UsdRepositoryCow', () => {
       // USD calculation based on native price is correct
       expect(price).toEqual(3_462.8585200136367);
     });
-  });
+    it('Handles UnsupportedToken(400) errors', async () => {
+      // Mock native price
+      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
+      cowApiGet.mockReturnValue(
+        errorResponse({
+          status: 400,
+          statusText: 'Bad Request',
+          error: {
+            errorType: 'UnsupportedToken',
+            description: 'Token not supported',
+          },
+        })
+      );
 
-  it('Handles UnsupportedToken(400) errors', async () => {
-    // Mock native price
-    const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-    cowApiGet.mockReturnValue(
-      errorResponse({
-        status: 400,
-        statusText: 'Bad Request',
-        error: {
-          errorType: 'UnsupportedToken',
-          description: 'Token not supported',
-        },
-      })
-    );
+      // Get USD price for a not supported token
+      let price = await usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        DEFINITELY_NOT_A_TOKEN // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
+      );
 
-    // Get USD price for a not supported token
-    let price = await usdRepositoryCow.getUsdPrice(
-      SupportedChainId.MAINNET,
-      DEFINITELY_NOT_A_TOKEN // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
-    );
+      // USD calculation based on native price is correct
+      expect(price).toEqual(null);
+    });
 
-    // USD calculation based on native price is correct
-    expect(price).toEqual(null);
-  });
+    it('Handles NewErrorTypeWeDontHandleYet(400) errors', async () => {
+      // Mock native price
+      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
+      cowApiGet.mockReturnValue(
+        errorResponse({
+          status: 400,
+          statusText: 'Bad Request',
+          error: {
+            errorType: 'NewErrorTypeWeDontHandleYet',
+            description:
+              "This is a new error type we don't, so we expect the repository to throw",
+          },
+        })
+      );
 
-  it('Handles NotFound(404) errors', async () => {
-    // Mock native price
-    const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-    cowApiGet.mockReturnValue(
-      errorResponse({
-        status: 404,
-        statusText: 'Not Found',
-        error: undefined,
-      })
-    );
+      // Get USD price for a not supported token
+      let pricePromise = usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
 
-    // Get USD price for something is not even an address
-    let price = await usdRepositoryCow.getUsdPrice(
-      SupportedChainId.MAINNET,
-      'this-is-not-a-token' // See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
-    );
+      // USD calculation based on native price is correct
+      expect(pricePromise).rejects.toThrow(
+        "Error getting native prices. 400 (Bad Request): Mock response text. NewErrorTypeWeDontHandleYet: This is a new error type we don't, so we expect the repository to throw URL: http://mocked-url.mock"
+      );
+    });
 
-    // USD calculation based on native price is correct
-    expect(price).toEqual(null);
-  });
+    it('Handles NotFound(404) errors', async () => {
+      // Mock native price
+      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
+      cowApiGet.mockReturnValue(
+        errorResponse({
+          status: 404,
+          statusText: 'Not Found',
+          error: undefined,
+        })
+      );
 
-  it('Handles un-expected errors (I_AM_A_TEA_POT)', async () => {
-    // Mock native price
-    const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-    cowApiGet.mockReturnValue(
-      errorResponse({
-        status: 418,
-        statusText: "I'm a teapot",
-        url: 'http://calling-a-teapot.com',
-        text: async () => 'This server is a teapot, and it cannot brew coffee',
-        error: undefined,
-      })
-    );
+      // Get USD price for something is not even an address
+      let price = await usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        'this-is-not-a-token' // See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
+      );
 
-    // Get USD price for something is not even an address
-    let priceResult = usdRepositoryCow.getUsdPrice(
-      SupportedChainId.MAINNET,
-      'this-is-not-a-token'
-    );
+      // USD calculation based on native price is correct
+      expect(price).toEqual(null);
+    });
 
-    // USD calculation based on native price is correct
-    expect(priceResult).rejects.toThrow(
-      "Error getting native prices. 418 (I'm a teapot): This server is a teapot, and it cannot brew coffee. URL: http://calling-a-teapot.com"
-    );
+    it('Handles un-expected errors (I_AM_A_TEA_POT)', async () => {
+      // Mock native price
+      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
+      cowApiGet.mockReturnValue(
+        errorResponse({
+          status: 418,
+          statusText: "I'm a teapot",
+          url: 'http://calling-a-teapot.com',
+          text: async () =>
+            'This server is a teapot, and it cannot brew coffee',
+          error: undefined,
+        })
+      );
+
+      // Get USD price for something is not even an address
+      let priceResult = usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        'this-is-not-a-token'
+      );
+
+      // USD calculation based on native price is correct
+      expect(priceResult).rejects.toThrow(
+        "Error getting native prices. 418 (I'm a teapot): This server is a teapot, and it cannot brew coffee. URL: http://calling-a-teapot.com"
+      );
+    });
   });
 
   describe('getUsdPrices', () => {
