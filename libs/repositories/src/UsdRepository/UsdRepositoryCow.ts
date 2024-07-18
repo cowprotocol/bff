@@ -4,7 +4,7 @@ import { cowApiClientMainnet } from '../cowApi';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';
-import { throwIfUnsuccessful } from '../utils/fetch';
+import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
