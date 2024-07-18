@@ -51,6 +51,7 @@ export class UsdRepositoryNoop implements UsdRepository {
 }
 
 export const serializePricePoints = (pricePoints: PricePoint[]): string => {
+  console.log('pricePoints', pricePoints);
   const serialized = pricePoints.map((point) => ({
     ...point,
     date: point.date.toISOString(),

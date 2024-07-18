@@ -22,14 +22,14 @@ export class UsdRepositoryRedis implements UsdRepository {
     private cacheName: string,
     private cacheTimeSeconds: number = DEFAULT_CACHE_TIME_SECONDS
   ) {
-    this.baseCacheKey = `repos:usdPrice:${this.cacheName}`;
+    this.baseCacheKey = `repos:${this.cacheName}`;
   }
 
   async getUsdPrice(
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<number | null> {
-    const key = `${chainId}:${tokenAddress}`;
+    const key = `usdPrice:${chainId}:${tokenAddress}`;
 
     // Get price from cache
     const usdPriceCached = await this.getValueFromCache({
@@ -58,8 +58,7 @@ export class UsdRepositoryRedis implements UsdRepository {
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const key = `${chainId}:${tokenAddress}:${priceStrategy}`;
-    const usdPriceString = await this.redisClient.get(key);
+    const key = `usdPrices:${chainId}:${tokenAddress}:${priceStrategy}`;
 
     // Get price from cache
     const usdPriceCached = await this.getValueFromCache({
