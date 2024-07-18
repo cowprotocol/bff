@@ -61,6 +61,19 @@ For more info, see:
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/library): Generator for NodeJS Libraries
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/setup-docker): Docker Generator
 
+## Test
+
+ ```
+ # Run all tests
+ yarn test
+
+ # Run test for repositories
+ nx run repositories:test --watch
+
+ # Run test on specific file
+ nx run repositories:test --watch --testFile=libs/repositories/src/UsdRepository/UsdRepositoryRedis.spec.ts
+ ```
+
 
 # Build
 ## Docker

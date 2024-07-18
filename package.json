@@ -11,6 +11,7 @@
     "producer": "nx run notification-producer:start",
     "telegram": "nx run telegram:start",
     "build": "nx run-many --all --target=build",
+    "test": "nx run-many --all --target=test",
     "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
     "new:node": "nx generate @nx/node:application --directory=apps --docker",
     "new:lib": "nx g @nx/node:library --directory=libs",
