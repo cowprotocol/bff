@@ -5,8 +5,15 @@ import {
 } from '../../../../utils/cache';
 import { FastifyPluginAsync } from 'fastify';
 import { COINGECKO_PRO_BASE_URL } from '@cowprotocol/repositories';
+import { KeysOf } from 'fastify/types/type-provider';
+import { IncomingHttpHeaders } from 'http2';
 
-const DROP_HEADERS = ['cf-ray', 'cf-cache-status', 'set-cookie', 'server'];
+const DROP_HEADERS: KeysOf<IncomingHttpHeaders>[] = [
+  'cf-ray',
+  'cf-cache-status',
+  'set-cookie',
+  'server',
+];
 
 const CACHE_TTL = parseInt(process.env.COINGECKO_CACHING_TIME || '150'); // Defaults to 2.5 minutes (150 seconds)
 
@@ -25,7 +32,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
       // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
       rewriteHeaders: (headers, request) => {
         // Drop some headers
-        const newHeaders = DROP_HEADERS.reduce(
+        const newHeaders = DROP_HEADERS.reduce<
+          IncomingHttpHeaders | IncomingHttpHeaders
+        >(
           (acc, header) => {
             delete acc[header];
             return acc;

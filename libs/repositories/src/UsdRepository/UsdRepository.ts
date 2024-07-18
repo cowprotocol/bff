@@ -35,13 +35,13 @@ export interface UsdRepository {
 }
 
 export class UsdRepositoryNoop implements UsdRepository {
-  getUsdPrice(
+  async getUsdPrice(
     chainId: SupportedChainId,
     tokenAddress: string
-  ): Promise<number> {
+  ): Promise<number | null> {
     return null;
   }
-  getUsdPrices(
+  async getUsdPrices(
     chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
@@ -49,3 +49,25 @@ export class UsdRepositoryNoop implements UsdRepository {
     return null;
   }
 }
+
+export const serializePricePoints = (pricePoints: PricePoint[]): string => {
+  const serialized = pricePoints.map((point) => ({
+    ...point,
+    date: point.date.toISOString(),
+  }));
+  return JSON.stringify(serialized);
+};
+
+export type PricePointSerializable = Omit<PricePoint, 'date'> & {
+  date: string;
+};
+
+export const deserializePricePoints = (
+  serializedPricePoints: string
+): PricePoint[] => {
+  const parsed: PricePointSerializable[] = JSON.parse(serializedPricePoints);
+  return parsed.map((point) => ({
+    ...point,
+    date: new Date(point.date),
+  }));
+};

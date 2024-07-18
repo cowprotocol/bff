@@ -1297,6 +1297,9 @@ export interface components {
              *      */
             orders?: components["schemas"]["AuctionOrder"][];
             prices?: components["schemas"]["AuctionPrices"];
+            /** @description List of addresses on whose surplus will count towards the objective value of their solution (unlike other orders that were created by the solver).
+             *      */
+            surplusCapturingJitOrderOwners?: components["schemas"]["Address"][];
         };
         /** @description The components that describe a batch auction for the solver competition.
          *      */
@@ -1354,6 +1357,9 @@ export interface components {
             buyAmount: components["schemas"]["TokenAmount"];
             /** @description Transaction hash of the corresponding settlement transaction containing the trade (if available). */
             txHash: components["schemas"]["TransactionHash"] | null;
+            /** @description The fee policies that were used to compute the fees for this trade. Listed in the order they got applied.
+             *      */
+            feePolicies?: components["schemas"]["FeePolicy"][];
         };
         /**
          * @description Unique identifier for the order: 56 bytes encoded as hex with `0x` prefix.

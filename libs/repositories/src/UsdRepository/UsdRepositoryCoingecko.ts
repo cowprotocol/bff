@@ -53,6 +53,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     if (
       response.status === 404 ||
+      !priceData ||
       !priceData[tokenAddressLower] ||
       !priceData[tokenAddressLower].usd
     ) {
@@ -63,7 +64,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       response
     );
 
-    return priceData[tokenAddressLower].usd;
+    return priceData[tokenAddressLower].usd || null;
   }
 
   async getUsdPrices(
@@ -112,6 +113,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }, new Map<number, number>()) || undefined;
 
     const prices = priceData.prices;
+    if (!prices) {
+      return null;
+    }
+
     const pricePoints = prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,

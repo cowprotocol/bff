@@ -1,7 +1,8 @@
 import fastifyCaching, { FastifyCachingPluginOptions } from '@fastify/caching';
 import fp from 'fastify-plugin';
 import abstractCache from 'abstract-cache';
-import { redisClient } from '../../../../../libs/repositories/src/datasources/redis';
+import { redisClient } from '@cowprotocol/repositories';
+
 import 'abstract-cache-redis';
 
 export default fp(async (fastify, opts) => {
