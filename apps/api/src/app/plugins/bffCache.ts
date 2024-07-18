@@ -67,7 +67,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
 
 
 function getKey(req: FastifyRequest) {
-  return `GET:${req.routerPath}`;
+  return `requests:${req.routerPath}`;
 }
 
 function getTtlFromResponse(reply: FastifyReply, defaultTtl: number | undefined): number | undefined {
