@@ -111,7 +111,7 @@ export class UsdRepositoryRedis implements UsdRepository {
     const { key, value } = props;
 
     await this.redisClient.set(
-      key,
+      this.baseCacheKey + ':' + key,
       value === null ? NULL_VALUE : value,
       'EX',
       this.cacheTimeSeconds
