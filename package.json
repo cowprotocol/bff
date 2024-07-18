@@ -72,6 +72,7 @@
     "@types/amqplib": "^0.10.5",
     "@types/bignumber.js": "^5.0.0",
     "@types/jest": "^29.5.0",
+    "@types/ms": "^0.7.34",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.14.11",
     "@types/node-telegram-bot-api": "^0.64.6",

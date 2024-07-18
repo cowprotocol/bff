@@ -4,6107 +4,5869 @@
  */
 
 export interface paths {
-  '/ping': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/ping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check API server status
+         * @description This endpoint allows you to **check the API server status**.
+         */
+        get: operations["ping-server"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Check API server status
-     * @description This endpoint allows you to **check the API server status**.
-     */
-    get: operations['ping-server'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/key': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 API Usage
+         * @description This endpoint allows you to **monitor your account's API usage, including rate limits, monthly total credits, remaining credits, and more**.
+         */
+        get: operations["api-usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 API Usage
-     * @description This endpoint allows you to **monitor your account's API usage, including rate limits, monthly total credits, remaining credits, and more**.
-     */
-    get: operations['api-usage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/simple/price': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/simple/price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Price by IDs
+         * @description This endpoint allows you to **query the prices of one or more coins by using their unique Coin API IDs**.
+         */
+        get: operations["simple-price"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Price by IDs
-     * @description This endpoint allows you to **query the prices of one or more coins by using their unique Coin API IDs**.
-     */
-    get: operations['simple-price'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/simple/token_price/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/simple/token_price/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Price by Token Addresses
+         * @description This endpoint allows you to **query a token price by using token contract address**.
+         */
+        get: operations["simple-token-price"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Price by Token Addresses
-     * @description This endpoint allows you to **query a token price by using token contract address**.
-     */
-    get: operations['simple-token-price'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/simple/supported_vs_currencies': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/simple/supported_vs_currencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Supported Currencies List
+         * @description This endpoint allows you to **query all the supported currencies on CoinGecko**.
+         */
+        get: operations["simple-supported-currencies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Supported Currencies List
-     * @description This endpoint allows you to **query all the supported currencies on CoinGecko**.
-     */
-    get: operations['simple-supported-currencies'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coins List (ID Map)
+         * @description This endpoint allows you to **query all the supported coins on CoinGecko with coins id, name and symbol**.
+         */
+        get: operations["coins-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coins List (ID Map)
-     * @description This endpoint allows you to **query all the supported coins on CoinGecko with coins id, name and symbol**.
-     */
-    get: operations['coins-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/top_gainers_losers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/top_gainers_losers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 Top Gainers & Losers
+         * @description This endpoint allows you to **query the top 30 coins with largest price gain and loss by a specific time duration**
+         */
+        get: operations["coins-top-gainers-losers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 Top Gainers & Losers
-     * @description This endpoint allows you to **query the top 30 coins with largest price gain and loss by a specific time duration**
-     */
-    get: operations['coins-top-gainers-losers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/list/new': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/list/new": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 Recently Added Coins
+         * @description This endpoint allows you to **query the latest 200 coins that recently listed on CoinGecko**
+         */
+        get: operations["coins-list-new"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 Recently Added Coins
-     * @description This endpoint allows you to **query the latest 200 coins that recently listed on CoinGecko**
-     */
-    get: operations['coins-list-new'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/markets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/markets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coins List with Market Data
+         * @description This endpoint allows you to **query all the supported coins with price, market cap, volume and market related data**.
+         */
+        get: operations["coins-markets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coins List with Market Data
-     * @description This endpoint allows you to **query all the supported coins with price, market cap, volume and market related data**.
-     */
-    get: operations['coins-markets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Data by ID
+         * @description This endpoint allows you to **query all the coin data of a coin (name, price, market .... including exchange tickers) on CoinGecko coin page based on a particular coin id**.
+         */
+        get: operations["coins-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Data by ID
-     * @description This endpoint allows you to **query all the coin data of a coin (name, price, market .... including exchange tickers) on CoinGecko coin page based on a particular coin id**.
-     */
-    get: operations['coins-id'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/tickers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/tickers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Tickers by ID
+         * @description This endpoint allows you to **query the coin tickers on both centralized exchange (cex) and decentralized exchange (dex) based on a particular coin id**.
+         */
+        get: operations["coins-id-tickers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Tickers by ID
-     * @description This endpoint allows you to **query the coin tickers on both centralized exchange (cex) and decentralized exchange (dex) based on a particular coin id**.
-     */
-    get: operations['coins-id-tickers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/history': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Historical Data by ID
+         * @description This endpoint allows you to **query the historical data (price, market cap, 24hrs volume, etc) at a given date for a coin based on a particular coin id**.
+         */
+        get: operations["coins-id-history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Historical Data by ID
-     * @description This endpoint allows you to **query the historical data (price, market cap, 24hrs volume, etc) at a given date for a coin based on a particular coin id**.
-     */
-    get: operations['coins-id-history'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/market_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/market_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Historical Chart Data by ID
+         * @description This endpoint allows you to **get the historical chart data of a coin including time in UNIX, price, market cap and 24hrs volume based on particular coin id**.
+         */
+        get: operations["coins-id-market-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Historical Chart Data by ID
-     * @description This endpoint allows you to **get the historical chart data of a coin including time in UNIX, price, market cap and 24hrs volume based on particular coin id**.
-     */
-    get: operations['coins-id-market-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/market_chart/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/market_chart/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Historical Chart Data within Time Range by ID
+         * @description This endpoint allows you to **get the historical chart data of a coin within certain time range in UNIX along with price, market cap and 24hrs volume based on particular coin id**.
+         */
+        get: operations["coins-id-market-chart-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Historical Chart Data within Time Range by ID
-     * @description This endpoint allows you to **get the historical chart data of a coin within certain time range in UNIX along with price, market cap and 24hrs volume based on particular coin id**.
-     */
-    get: operations['coins-id-market-chart-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/ohlc': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/ohlc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin OHLC Chart by ID
+         * @description This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin based on particular coin id**.
+         */
+        get: operations["coins-id-ohlc"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin OHLC Chart by ID
-     * @description This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin based on particular coin id**.
-     */
-    get: operations['coins-id-ohlc'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/ohlc/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/ohlc/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 Coin OHLC Chart within Time Range by ID
+         * @description This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin within a range of timestamp based on particular coin id**.
+         */
+        get: operations["coins-id-ohlc-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 Coin OHLC Chart within Time Range by ID
-     * @description This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin within a range of timestamp based on particular coin id**.
-     */
-    get: operations['coins-id-ohlc-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/contract/{contract_address}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/contract/{contract_address}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Data by Token Address
+         * @description This endpoint allows you to **query all the coin data (name, price, market .... including exchange tickers) on CoinGecko coin page based on asset platform and particular token contract address**.
+         */
+        get: operations["coins-contract-address"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Data by Token Address
-     * @description This endpoint allows you to **query all the coin data (name, price, market .... including exchange tickers) on CoinGecko coin page based on asset platform and particular token contract address**.
-     */
-    get: operations['coins-contract-address'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/contract/{contract_address}/market_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/contract/{contract_address}/market_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Historical Chart Data by Token Address
+         * @description This endpoint allows you to **get the historical chart data including time in UNIX, price, market cap and 24hrs volume based on asset platform and particular token contract address**.
+         */
+        get: operations["contract-address-market-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Historical Chart Data by Token Address
-     * @description This endpoint allows you to **get the historical chart data including time in UNIX, price, market cap and 24hrs volume based on asset platform and particular token contract address**.
-     */
-    get: operations['contract-address-market-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/contract/{contract_address}/market_chart/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/contract/{contract_address}/market_chart/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coin Historical Chart Data within Time Range by Token Address
+         * @description This endpoint allows you to **get the historical chart data within certain time range in UNIX along with price, market cap and 24hrs volume  based on asset platform and particular token contract address**.
+         */
+        get: operations["contract-address-market-chart-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coin Historical Chart Data within Time Range by Token Address
-     * @description This endpoint allows you to **get the historical chart data within certain time range in UNIX along with price, market cap and 24hrs volume  based on asset platform and particular token contract address**.
-     */
-    get: operations['contract-address-market-chart-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/circulating_supply_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/circulating_supply_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 👑 Circulating Supply Chart by ID
+         * @description This endpoint allows you to **query historical circulating supply of a coin by number of days away from now based on provided coin id**
+         */
+        get: operations["coins-id-circulating-supply-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 👑 Circulating Supply Chart by ID
-     * @description This endpoint allows you to **query historical circulating supply of a coin by number of days away from now based on provided coin id**
-     */
-    get: operations['coins-id-circulating-supply-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/circulating_supply_chart/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/circulating_supply_chart/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 👑 Circulating Supply chart within Time Range by ID
+         * @description This endpoint allows you to **query historical circulating supply of a coin, within a range of timestamp based on the provided coin id**
+         */
+        get: operations["coins-id-circulating-supply-chart-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 👑 Circulating Supply chart within Time Range by ID
-     * @description This endpoint allows you to **query historical circulating supply of a coin, within a range of timestamp based on the provided coin id**
-     */
-    get: operations['coins-id-circulating-supply-chart-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/total_supply_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/total_supply_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 👑 Total Supply Chart by ID
+         * @description This endpoint allows you to **query historical total supply of a coin by number of days away from now based on provided coin id**
+         */
+        get: operations["coins-id-total-supply-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 👑 Total Supply Chart by ID
-     * @description This endpoint allows you to **query historical total supply of a coin by number of days away from now based on provided coin id**
-     */
-    get: operations['coins-id-total-supply-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/{id}/total_supply_chart/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/{id}/total_supply_chart/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 👑 Total Supply chart within time range by ID
+         * @description This endpoint allows you to **query historical total supply of a coin, within a range of timestamp based on the provided coin id**
+         */
+        get: operations["coins-id-total-supply-chart-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 👑 Total Supply chart within time range by ID
-     * @description This endpoint allows you to **query historical total supply of a coin, within a range of timestamp based on the provided coin id**
-     */
-    get: operations['coins-id-total-supply-chart-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/asset_platforms': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/asset_platforms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Asset Platforms List (ID Map)
+         * @description This endpoint allows you to **query all the asset platforms on CoinGecko**.
+         */
+        get: operations["asset-platforms-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Asset Platforms List (ID Map)
-     * @description This endpoint allows you to **query all the asset platforms on CoinGecko**.
-     */
-    get: operations['asset-platforms-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/token_lists/{asset_platform_id}/all.json': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/token_lists/{asset_platform_id}/all.json": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 👑 Token Lists by Asset Platform ID
+         * @description This endpoint allows you to **get full list of tokens of a blockchain network (asset platform) that is supported by [Ethereum token list standard](https://tokenlists.org/)**
+         */
+        get: operations["token-lists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 👑 Token Lists by Asset Platform ID
-     * @description This endpoint allows you to **get full list of tokens of a blockchain network (asset platform) that is supported by [Ethereum token list standard](https://tokenlists.org/)**
-     */
-    get: operations['token-lists'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/categories/list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/categories/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coins Categories List (ID Map)
+         * @description This endpoint allows you to **query all the coins categories on CoinGecko**.
+         */
+        get: operations["coins-categories-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coins Categories List (ID Map)
-     * @description This endpoint allows you to **query all the coins categories on CoinGecko**.
-     */
-    get: operations['coins-categories-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/coins/categories': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/coins/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coins Categories List with Market Data
+         * @description This endpoint allows you to **query all the coins categories with market data (market cap, volume, etc.) on CoinGecko**.
+         */
+        get: operations["coins-categories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Coins Categories List with Market Data
-     * @description This endpoint allows you to **query all the coins categories with market data (market cap, volume, etc.) on CoinGecko**.
-     */
-    get: operations['coins-categories'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exchanges List with data
+         * @description This endpoint allows you to **query all the supported exchanges with exchanges’ data (id, name, country, .... etc) that have active trading volumes on CoinGecko**.
+         */
+        get: operations["exchanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Exchanges List with data
-     * @description This endpoint allows you to **query all the supported exchanges with exchanges’ data (id, name, country, .... etc) that have active trading volumes on CoinGecko**.
-     */
-    get: operations['exchanges'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges/list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exchanges List (ID Map)
+         * @description This endpoint allows you to **query all the exchanges with id and name**.
+         */
+        get: operations["exchanges-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Exchanges List (ID Map)
-     * @description This endpoint allows you to **query all the exchanges with id and name**.
-     */
-    get: operations['exchanges-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exchange Data by ID
+         * @description This endpoint allows you to **query exchange’s data (name, year established, country, .... etc), exchange volume in BTC and top 100 tickers based on exchange’s id**.
+         */
+        get: operations["exchanges-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Exchange Data by ID
-     * @description This endpoint allows you to **query exchange’s data (name, year established, country, .... etc), exchange volume in BTC and top 100 tickers based on exchange’s id**.
-     */
-    get: operations['exchanges-id'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges/{id}/tickers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges/{id}/tickers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exchange Tickers by ID
+         * @description This endpoint allows you to **query exchange's tickers based on exchange’s id**.
+         */
+        get: operations["exchanges-id-tickers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Exchange Tickers by ID
-     * @description This endpoint allows you to **query exchange's tickers based on exchange’s id**.
-     */
-    get: operations['exchanges-id-tickers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges/{id}/volume_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges/{id}/volume_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exchange Volume Chart by ID
+         * @description This endpoint allows you to **query the historical volume chart data with time in UNIX and trading volume data in BTC based on exchange’s id**.
+         */
+        get: operations["exchanges-id-volume-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Exchange Volume Chart by ID
-     * @description This endpoint allows you to **query the historical volume chart data with time in UNIX and trading volume data in BTC based on exchange’s id**.
-     */
-    get: operations['exchanges-id-volume-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchanges/{id}/volume_chart/range': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchanges/{id}/volume_chart/range": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 Exchange Volume Chart within Time Range by ID
+         * @description This endpoint allows you to **query the historical volume chart data in BTC by specifying date range in UNIX based on exchange’s id**
+         */
+        get: operations["exchanges-id-volume-chart-range"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 Exchange Volume Chart within Time Range by ID
-     * @description This endpoint allows you to **query the historical volume chart data in BTC by specifying date range in UNIX based on exchange’s id**
-     */
-    get: operations['exchanges-id-volume-chart-range'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/derivatives': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/derivatives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Derivatives Tickers List
+         * @description This endpoint allows you to **query all the tickers from derivatives exchanges on CoinGecko**.
+         */
+        get: operations["derivatives-tickers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Derivatives Tickers List
-     * @description This endpoint allows you to **query all the tickers from derivatives exchanges on CoinGecko**.
-     */
-    get: operations['derivatives-tickers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/derivatives/exchanges': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/derivatives/exchanges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Derivatives Exchanges List with Data
+         * @description This endpoint allows you to **query all the derivatives exchanges with related data (id, name, open interest, .... etc) on CoinGecko**.
+         */
+        get: operations["derivatives-exchanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Derivatives Exchanges List with Data
-     * @description This endpoint allows you to **query all the derivatives exchanges with related data (id, name, open interest, .... etc) on CoinGecko**.
-     */
-    get: operations['derivatives-exchanges'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/derivatives/exchanges/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/derivatives/exchanges/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Derivatives Exchange Data by ID
+         * @description This endpoint allows you to **query the derivatives exchange’s related data (id, name, open interest, .... etc) based on the exchanges’ id**.
+         */
+        get: operations["derivatives-exchanges-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Derivatives Exchange Data by ID
-     * @description This endpoint allows you to **query the derivatives exchange’s related data (id, name, open interest, .... etc) based on the exchanges’ id**.
-     */
-    get: operations['derivatives-exchanges-id'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/derivatives/exchanges/list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/derivatives/exchanges/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Derivatives Exchanges List (ID Map)
+         * @description This endpoint allows you to **query all the derivatives exchanges with id and name on CoinGecko**.
+         */
+        get: operations["derivatives-exchanges-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Derivatives Exchanges List (ID Map)
-     * @description This endpoint allows you to **query all the derivatives exchanges with id and name on CoinGecko**.
-     */
-    get: operations['derivatives-exchanges-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * NFTs List (ID Map)
+         * @description This endpoint allows you to **query all supported NFTs with id, contract address, name, asset platform id and symbol on CoinGecko**.
+         */
+        get: operations["nfts-list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * NFTs List (ID Map)
-     * @description This endpoint allows you to **query all supported NFTs with id, contract address, name, asset platform id and symbol on CoinGecko**.
-     */
-    get: operations['nfts-list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * NFTs Collection Data by ID
+         * @description This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection id**.
+         */
+        get: operations["nfts-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * NFTs Collection Data by ID
-     * @description This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection id**.
-     */
-    get: operations['nfts-id'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/{asset_platform_id}/contract/{contract_address}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/{asset_platform_id}/contract/{contract_address}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * NFTs Collection Data by Contract Address
+         * @description This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection contract address and respective asset platform**.
+         */
+        get: operations["nfts-contract-address"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * NFTs Collection Data by Contract Address
-     * @description This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection contract address and respective asset platform**.
-     */
-    get: operations['nfts-contract-address'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/markets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/markets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 NFTs List with Market Data
+         * @description This endpoint allows you to **query all the supported NFT collections with floor price, market cap, volume and market related data on CoinGecko**
+         */
+        get: operations["nfts-markets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 NFTs List with Market Data
-     * @description This endpoint allows you to **query all the supported NFT collections with floor price, market cap, volume and market related data on CoinGecko**
-     */
-    get: operations['nfts-markets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/{id}/market_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/{id}/market_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 NFTs Collection Historical Chart Data by ID
+         * @description This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now**
+         */
+        get: operations["nfts-id-market-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 NFTs Collection Historical Chart Data by ID
-     * @description This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now**
-     */
-    get: operations['nfts-id-market-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/{asset_platform_id}/contract/{contract_address}/market_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/{asset_platform_id}/contract/{contract_address}/market_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 NFTs Collection Historical Chart Data by Contract Address
+         * @description This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now based on the provided contract address**
+         */
+        get: operations["nfts-contract-address-market-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 NFTs Collection Historical Chart Data by Contract Address
-     * @description This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now based on the provided contract address**
-     */
-    get: operations['nfts-contract-address-market-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/nfts/{id}/tickers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/nfts/{id}/tickers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 NFTs Collection Tickers by ID
+         * @description This endpoint allows you to **query the latest floor price and 24h volume of a NFT collection, on each NFT marketplace, e.g. OpenSea and LooksRare**
+         */
+        get: operations["nfts-id-tickers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 NFTs Collection Tickers by ID
-     * @description This endpoint allows you to **query the latest floor price and 24h volume of a NFT collection, on each NFT marketplace, e.g. OpenSea and LooksRare**
-     */
-    get: operations['nfts-id-tickers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/exchange_rates': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/exchange_rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * BTC-to-Currency Exchange Rates
+         * @description This endpoint allows you to **query BTC exchange rates with other currencies**.
+         */
+        get: operations["exchange-rates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * BTC-to-Currency Exchange Rates
-     * @description This endpoint allows you to **query BTC exchange rates with other currencies**.
-     */
-    get: operations['exchange-rates'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Queries
+         * @description This endpoint allows you to **search for coins, categories and markets listed on CoinGecko**.
+         */
+        get: operations["search-data"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Search Queries
-     * @description This endpoint allows you to **search for coins, categories and markets listed on CoinGecko**.
-     */
-    get: operations['search-data'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/search/trending': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/search/trending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trending Search List
+         * @description This endpoint allows you **query trending search coins, nfts and categories on CoinGecko in the last 24 hours**.
+         */
+        get: operations["trending-search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Trending Search List
-     * @description This endpoint allows you **query trending search coins, nfts and categories on CoinGecko in the last 24 hours**.
-     */
-    get: operations['trending-search'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/global': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/global": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Crypto Global Market Data
+         * @description This endpoint allows you **query cryptocurrency global data including active cryptocurrencies, markets, total crypto market cap and etc**.
+         */
+        get: operations["crypto-global"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Crypto Global Market Data
-     * @description This endpoint allows you **query cryptocurrency global data including active cryptocurrencies, markets, total crypto market cap and etc**.
-     */
-    get: operations['crypto-global'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/global/decentralized_finance_defi': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/global/decentralized_finance_defi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Global De-Fi Market Data
+         * @description This endpoint allows you **query top 100 cryptocurrency global decentralized finance (defi) data including defi market cap, trading volume**.
+         */
+        get: operations["global-DeFi"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Global De-Fi Market Data
-     * @description This endpoint allows you **query top 100 cryptocurrency global decentralized finance (defi) data including defi market cap, trading volume**.
-     */
-    get: operations['global-DeFi'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/global/market_cap_chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/global/market_cap_chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 💼 Global Market Cap Chart Data
+         * @description This endpoint allows you to **query historical global market cap and volume data by number of days away from now**
+         */
+        get: operations["global-market-cap-chart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * 💼 Global Market Cap Chart Data
-     * @description This endpoint allows you to **query historical global market cap and volume data by number of days away from now**
-     */
-    get: operations['global-market-cap-chart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/companies/public_treasury/{coin_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/companies/public_treasury/{coin_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public Companies Holdings
+         * @description This endpoint allows you **query public companies’ bitcoin or ethereum holdings**.
+         */
+        get: operations["companies-public-treasury"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Public Companies Holdings
-     * @description This endpoint allows you **query public companies’ bitcoin or ethereum holdings**.
-     */
-    get: operations['companies-public-treasury'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    Ping: {
-      /** @example (V3) To the Moon! */
-      gecko_says?: string;
-    };
-    /** @example {
-     *       "plan": "Other",
-     *       "rate_limit_request_per_minute": 1000,
-     *       "monthly_call_credit": 1000000,
-     *       "current_total_monthly_calls": 104,
-     *       "current_remaining_monthly_calls": 999896
-     *     } */
-    Key: {
-      plan?: string;
-      rate_limit_request_per_minute?: number;
-      monthly_call_credit?: number;
-      current_total_monthly_calls?: number;
-      current_remaining_monthly_calls?: number;
-    };
-    /** @example {
-     *       "usd": 67187.33589365664,
-     *       "usd_market_cap": 1317802988326.2493,
-     *       "usd_24h_vol": 31260929299.52484,
-     *       "usd_24h_change": 3.637278946773539,
-     *       "last_updated_at": 1711356300
-     *     } */
-    SimplePrice: {
-      /** @description price in USD */
-      usd?: number;
-      /** @description market cap in USD */
-      usd_market_cap?: number;
-      /** @description 24h volume in USD */
-      usd_24h_vol?: number;
-      /** @description 24h change in USD */
-      usd_24h_change?: number;
-      /** @description last updated timestamp */
-      last_updated_at?: number;
-    };
-    /** @example [
-     *       "btc",
-     *       "eth",
-     *       "ltc",
-     *       "bch",
-     *       "bnb",
-     *       "eos",
-     *       "xrp",
-     *       "xlm",
-     *       "link",
-     *       "dot",
-     *       "yfi",
-     *       "usd",
-     *       "aed",
-     *       "ars",
-     *       "aud",
-     *       "bdt",
-     *       "bhd",
-     *       "bmd",
-     *       "brl",
-     *       "cad",
-     *       "chf",
-     *       "clp",
-     *       "cny",
-     *       "czk",
-     *       "dkk",
-     *       "eur",
-     *       "gbp",
-     *       "gel",
-     *       "hkd",
-     *       "huf",
-     *       "idr",
-     *       "ils",
-     *       "inr",
-     *       "jpy",
-     *       "krw",
-     *       "kwd",
-     *       "lkr",
-     *       "mmk",
-     *       "mxn",
-     *       "myr",
-     *       "ngn",
-     *       "nok",
-     *       "nzd",
-     *       "php",
-     *       "pkr",
-     *       "pln",
-     *       "rub",
-     *       "sar",
-     *       "sek",
-     *       "sgd",
-     *       "thb",
-     *       "try",
-     *       "twd",
-     *       "uah",
-     *       "vef",
-     *       "vnd",
-     *       "zar",
-     *       "xdr",
-     *       "xag",
-     *       "xau",
-     *       "bits",
-     *       "sats"
-     *     ] */
-    CurrencyList: string[];
-    /** @example [
-     *       {
-     *         "id": "0chain",
-     *         "symbol": "zcn",
-     *         "name": "Zus",
-     *         "platforms": {
-     *           "ethereum": "0xb9ef770b6a5e12e45983c5d80545258aa38f3b78",
-     *           "polygon-pos": "0x8bb30e0e67b11b978a5040144c410e1ccddcba30"
-     *         }
-     *       },
-     *       {
-     *         "id": "01coin",
-     *         "symbol": "zoc",
-     *         "name": "01coin",
-     *         "platforms": {}
-     *       }
-     *     ] */
-    CoinsList: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description coin asset platform and contract address */
-      platforms?: {
-        [key: string]: string | undefined;
-      };
-    }[];
-    TopGainersLosers: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description coin image url */
-      image?: string;
-      /** @description coin rank by market cap */
-      market_cap_rank?: number;
-      /** @description coin price in USD */
-      usd?: number;
-      /** @description coin 24h volume in USD */
-      usd_24h_vol?: number;
-      /** @description coin 1 year change in USD */
-      usd_1y_change?: number;
-    }[];
-    /** @example [
-     *       {
-     *         "id": "long-johnson",
-     *         "symbol": "olong",
-     *         "name": "Long Johnson",
-     *         "activated_at": 1712562430
-     *       },
-     *       {
-     *         "id": "dogita",
-     *         "symbol": "doga",
-     *         "name": "DOGITA",
-     *         "activated_at": 1712562282
-     *       },
-     *       {
-     *         "id": "bebe-on-base",
-     *         "symbol": "bebe",
-     *         "name": "Bebe on Base",
-     *         "activated_at": 1712561709
-     *       }
-     *     ] */
-    CoinsListNew: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description timestamp when coin was activated on CoinGecko */
-      activated_at?: number;
-    }[];
-    /** @example [
-     *       {
-     *         "id": "bitcoin",
-     *         "symbol": "btc",
-     *         "name": "Bitcoin",
-     *         "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-     *         "current_price": 70187,
-     *         "market_cap": 1381651251183,
-     *         "market_cap_rank": 1,
-     *         "fully_diluted_valuation": 1474623675796,
-     *         "total_volume": 20154184933,
-     *         "high_24h": 70215,
-     *         "low_24h": 68060,
-     *         "price_change_24h": 2126.88,
-     *         "price_change_percentage_24h": 3.12502,
-     *         "market_cap_change_24h": 44287678051,
-     *         "market_cap_change_percentage_24h": 3.31157,
-     *         "circulating_supply": 19675987,
-     *         "total_supply": 21000000,
-     *         "max_supply": 21000000,
-     *         "ath": 73738,
-     *         "ath_change_percentage": -4.77063,
-     *         "ath_date": "2024-03-14T07:10:36.635Z",
-     *         "atl": 67.81,
-     *         "atl_change_percentage": 103455.83335,
-     *         "atl_date": "2013-07-06T00:00:00.000Z",
-     *         "roi": null,
-     *         "last_updated": "2024-04-07T16:49:31.736Z"
-     *       }
-     *     ] */
-    CoinsMarkets: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description coin image url */
-      image?: string;
-      /** @description coin current price in currency */
-      current_price?: number;
-      /** @description coin market cap in currency */
-      market_cap?: number;
-      /** @description coin rank by market cap */
-      market_cap_rank?: number;
-      /** @description coin fully diluted valuation (fdv) in currency */
-      fully_diluted_valuation?: number;
-      /** @description coin total trading volume in currency */
-      total_volume?: number;
-      /** @description coin 24h price high in currency */
-      high_24h?: number;
-      /** @description coin 24h price low in currency */
-      low_24h?: number;
-      /** @description coin 24h price change in currency */
-      price_change_24h?: number;
-      /** @description coin 24h price change in percentage */
-      price_change_percentage_24h?: number;
-      /** @description coin 24h market cap change in currency */
-      market_cap_change_24h?: number;
-      /** @description coin 24h market cap change in percentage */
-      market_cap_change_percentage_24h?: number;
-      /** @description coin circulating supply */
-      circulating_supply?: number;
-      /** @description coin total supply */
-      total_supply?: number;
-      /** @description coin max supply */
-      max_supply?: number;
-      /** @description coin all time high (ath) in currency */
-      ath?: number;
-      /** @description coin all time high (ath) change in percentage */
-      ath_change_percentage?: number;
-      /**
-       * Format: date-time
-       * @description coin all time high (ath) date
-       */
-      ath_date?: string;
-      /** @description coin all time low (atl) in currency */
-      atl?: number;
-      /** @description coin all time low (atl) change in percentage */
-      atl_change_percentage?: number;
-      /**
-       * Format: date-time
-       * @description coin all time low (atl) date
-       */
-      atl_date?: string;
-      /** @example null */
-      roi?: string;
-      /**
-       * Format: date-time
-       * @description coin last updated timestamp
-       */
-      last_updated?: string;
-      /** @description coin 1h price change in percentage */
-      price_change_percentage_1h?: number;
-      /** @description coin price sparkline in 7 days */
-      sparkline_in_7d?: {
-        price?: number[];
-      };
-    };
-    CoinsDataBase: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description coin web slug */
-      web_slug?: string;
-      /** @description coin asset platform id */
-      asset_platform_id?: string;
-      /** @description coin asset platform and contract address */
-      platforms?: {
-        [key: string]: string | undefined;
-      };
-      /** @description detailed coin asset platform and contract address */
-      detail_platforms?: {
-        [key: string]: string | undefined;
-      };
-      /** @description blockchain block time in minutes */
-      block_time_in_minutes?: number;
-      /** @description blockchain hashing algorithm */
-      hashing_algorithm?: string;
-      /** @description coin categories */
-      categories?: string[];
-      /** @description preview listing coin */
-      preview_listing?: boolean;
-      /** @description public notice */
-      public_notice?: string;
-      /** @description additional notices */
-      additional_notices?: string[];
-      /** @description coin name localization */
-      localization?: {
-        [key: string]: string | undefined;
-      };
-      /** @description coin description */
-      description?: {
-        [key: string]: string | undefined;
-      };
-      /** @description links */
-      links?: {
-        /** @description coin website url */
-        homepage?: string[];
-        /** @description coin whitepaper url */
-        whitepaper?: string[];
-        /** @description coin block explorer url */
-        blockchain_site?: string[];
-        /** @description coin official forum url */
-        official_forum_url?: string[];
-        /** @description coin chat url */
-        chat_url?: string[];
-        /** @description coin announcement url */
-        announcement_url?: string[];
-        /** @description coin twitter handle */
-        twitter_screen_name?: string;
-        /** @description coin facebook username */
-        facebook_username?: string;
-        /** @description coin bitcointalk thread identifier */
-        bitcointalk_thread_identifier?: string;
-        /** @description coin telegram channel identifier */
-        telegram_channel_identifier?: string;
-        /** @description coin subreddit url */
-        subreddit_url?: string;
-        /** @description coin repository url */
-        repos_url?: {
-          /** @description coin github repository url */
-          github?: string[];
-          /** @description coin bitbucket repository url */
-          bitbucket?: string[];
+    schemas: {
+        Ping: {
+            /** @example (V3) To the Moon! */
+            gecko_says?: string;
         };
-      };
-      /** @description coin image url */
-      image?: {
-        thumb?: string;
-        small?: string;
-        large?: string;
-      };
-      /** @description coin country of origin */
-      country_origin?: string;
-      /**
-       * Format: date-time
-       * @description coin genesis date
-       */
-      genesis_date?: string;
-      /** @description coin sentiment votes up percentage */
-      sentiment_votes_up_percentage?: number;
-      /** @description coin sentiment votes down percentage */
-      sentiment_votes_down_percentage?: number;
-      /** @description coin rank by market cap */
-      market_cap_rank?: number;
-      /** @description coin market data */
-      market_data?: {
-        /** @description coin current price in currency */
-        current_price?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
+        /** @example {
+         *       "plan": "Other",
+         *       "rate_limit_request_per_minute": 1000,
+         *       "monthly_call_credit": 1000000,
+         *       "current_total_monthly_calls": 104,
+         *       "current_remaining_monthly_calls": 999896
+         *     } */
+        Key: {
+            plan?: string;
+            rate_limit_request_per_minute?: number;
+            monthly_call_credit?: number;
+            current_total_monthly_calls?: number;
+            current_remaining_monthly_calls?: number;
         };
-        /** @description total value locked */
-        total_value_locked?: number;
-        /** @description market cap to total value locked ratio */
-        mcap_to_tvl_ratio?: number;
-        /** @description fully diluted valuation to total value locked ratio */
-        fdv_to_tvl_ratio?: number;
-        /** @description coin return on investment */
-        roi?: number;
-        /** @description coin all time high (ath) in currency */
-        ath?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin all time high (ath) change in percentage */
-        ath_change_percentage?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin all time high (ath) date */
-        ath_date?: {
-          btc?: string;
-          eur?: string;
-          usd?: string;
-        };
-        /** @description coin all time low (atl) in currency */
-        atl?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin all time low (atl) change in percentage */
-        atl_change_percentage?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin all time low (atl) date */
-        atl_date?: {
-          btc?: string;
-          eur?: string;
-          usd?: string;
-        };
-        /** @description coin market cap in currency */
-        market_cap?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin rank by market cap */
-        market_cap_rank?: number;
-        /** @description coin fully diluted valuation (fdv) in currency */
-        fully_diluted_valuation?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description market cap to fully diluted valuation ratio */
-        market_cap_fdv_ratio?: number;
-        /** @description coin total trading volume in currency */
-        total_volume?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h price high in currency */
-        high_24h?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h price low in currency */
-        low_24h?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h price change in currency */
-        price_change_24h?: number;
-        /** @description coin 24h price change in percentage */
-        price_change_percentage_24h?: number;
-        /** @description coin 7d price change in percentage */
-        price_change_percentage_7d?: number;
-        /** @description coin 14d price change in percentage */
-        price_change_percentage_14d?: number;
-        /** @description coin 30d price change in percentage */
-        price_change_percentage_30d?: number;
-        /** @description coin 60d price change in percentage */
-        price_change_percentage_60d?: number;
-        /** @description coin 200d price change in percentage */
-        price_change_percentage_200d?: number;
-        /** @description coin 1y price change in percentage */
-        price_change_percentage_1y?: number;
-        /** @description coin 24h market cap change in currency */
-        market_cap_change_24h?: number;
-        /** @description coin 24h market cap change in percentage */
-        market_cap_change_percentage_24h?: number;
-        /** @description coin 1h price change in currency */
-        price_change_percentage_1h_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h price change in currency */
-        price_change_percentage_24h_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 7d price change in currency */
-        price_change_percentage_7d_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 14d price change in currency */
-        price_change_percentage_14d_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 30d price change in currency */
-        price_change_percentage_30d_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 60d price change in currency */
-        price_change_percentage_60d_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 200d price change in currency */
-        price_change_percentage_200d_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 1y price change in currency */
-        price_change_percentage_1y_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h market cap change in currency */
-        market_cap_change_24h_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin 24h market cap change in percentage */
-        market_cap_change_percentage_24h_in_currency?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin total supply */
-        total_supply?: number;
-        /** @description coin max supply */
-        max_supply?: number;
-        /** @description coin circulating supply */
-        circulating_supply?: number;
-        /**
-         * Format: date-time
-         * @description coin market data last updated timestamp
-         */
-        last_updated?: string;
-      };
-      /** @description coin community data */
-      community_data?: {
-        /** @description coin facebook likes */
-        facebook_likes?: number;
-        /** @description coin twitter followers */
-        twitter_followers?: number;
-        /** @description coin reddit average posts in 48 hours */
-        reddit_average_posts_48h?: number;
-        /** @description coin reddit average comments in 48 hours */
-        reddit_average_comments_48h?: number;
-        /** @description coin reddit subscribers */
-        reddit_subscribers?: number;
-        /** @description coin reddit active accounts in 48 hours */
-        reddit_accounts_active_48h?: number;
-        /** @description coin telegram channel user count */
-        telegram_channel_user_count?: number;
-      };
-      /** @description coin developer data */
-      developer_data?: {
-        /** @description coin repository forks */
-        forks?: number;
-        /** @description coin repository stars */
-        stars?: number;
-        /** @description coin repository subscribers */
-        subscribers?: number;
-        /** @description coin repository total issues */
-        total_issues?: number;
-        /** @description coin repository closed issues */
-        closed_issues?: number;
-        /** @description coin repository pull requests merged */
-        pull_requests_merged?: number;
-        /** @description coin repository pull request contributors */
-        pull_request_contributors?: number;
-        /** @description coin code additions and deletions in 4 weeks */
-        code_additions_deletions_4_weeks?: {
-          additions?: number;
-          deletions?: number;
-        };
-        /** @description coin repository commit count in 4 weeks */
-        commit_count_4_weeks?: number;
-        /**
-         * @description coin repository last 4 weeks commit activity series
-         * @example []
-         */
-        last_4_weeks_commit_activity_series?: number[];
-      };
-      /**
-       * @description coin status updates
-       * @example []
-       */
-      status_updates?: Record<string, never>[];
-      /**
-       * Format: date-time
-       * @description coin last updated timestamp
-       */
-      last_updated?: string;
-      /** @description coin tickers */
-      tickers?: {
-        /** @description coin ticker base currency */
-        base?: string;
-        /** @description coin ticker target currency */
-        target?: string;
-        /** @description coin ticker exchange */
-        market?: {
-          /** @description coin ticker exchange name */
-          name?: string;
-          /** @description coin ticker exchange identifier */
-          identifier?: string;
-          /** @description coin ticker exchange trading incentive */
-          has_trading_incentive?: boolean;
-        };
-        /** @description coin ticker last price */
-        last?: number;
-        /** @description coin ticker volume */
-        volume?: number;
-        /** @description coin ticker converted last price */
-        converted_last?: {
-          btc?: number;
-          eth?: number;
-          usd?: number;
-        };
-        /** @description coin ticker converted volume */
-        converted_volume?: {
-          btc?: number;
-          eth?: number;
-          usd?: number;
-        };
-        /** @description coin ticker trust score */
-        trust_score?: string;
-        /** @description coin ticker bid ask spread percentage */
-        bid_ask_spread_percentage?: number;
-        /**
-         * Format: date-time
-         * @description coin ticker timestamp
-         */
-        timestamp?: string;
-        /**
-         * Format: date-time
-         * @description coin ticker last traded timestamp
-         */
-        last_traded_at?: string;
-        /**
-         * Format: date-time
-         * @description coin ticker last fetch timestamp
-         */
-        last_fetch_at?: string;
-        /** @description coin ticker anomaly */
-        is_anomaly?: boolean;
-        /** @description coin ticker stale */
-        is_stale?: boolean;
-        /** @description coin ticker trade url */
-        trade_url?: string;
-        /** @description coin ticker token info url */
-        token_info_url?: string;
-        /** @description coin ticker base currency coin id */
-        coin_id?: string;
-        /** @description coin ticker target currency coin id */
-        target_coin_id?: string;
-      }[];
-    };
-    CoinsID: components['schemas']['CoinsDataBase'] & unknown;
-    /** @example {
-     *       "name": "Bitcoin",
-     *       "tickers": [
-     *         {
-     *           "base": "BTC",
-     *           "target": "USDT",
-     *           "market": {
-     *             "name": "Binance",
-     *             "identifier": "binance",
-     *             "has_trading_incentive": false,
-     *             "logo": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274"
-     *           },
-     *           "last": 69476,
-     *           "volume": 20242.03975,
-     *           "cost_to_move_up_usd": 19320706.39585167,
-     *           "cost_to_move_down_usd": 16360235.3694131,
-     *           "converted_last": {
-     *             "btc": 1.000205,
-     *             "eth": 20.291404,
-     *             "usd": 69498
-     *           },
-     *           "converted_volume": {
-     *             "btc": 20249,
-     *             "eth": 410802,
-     *             "usd": 1406996874
-     *           },
-     *           "trust_score": "green",
-     *           "bid_ask_spread_percentage": 0.010014,
-     *           "timestamp": "2024-04-08T04:02:01+00:00",
-     *           "last_traded_at": "2024-04-08T04:02:01+00:00",
-     *           "last_fetch_at": "2024-04-08T04:03:00+00:00",
-     *           "is_anomaly": false,
-     *           "is_stale": false,
-     *           "trade_url": "https://www.binance.com/en/trade/BTC_USDT?ref=37754157",
-     *           "token_info_url": null,
-     *           "coin_id": "bitcoin",
-     *           "target_coin_id": "tether"
-     *         }
-     *       ]
-     *     } */
-    CoinsTickers: {
-      /** @description coin name */
-      name?: string;
-      /** @description list of tickers */
-      tickers?: {
-        /** @description coin ticker base currency */
-        base?: string;
-        /** @description coin ticker target currency */
-        target?: string;
-        /** @description coin ticker exchange */
-        market?: {
-          /** @description exchange name */
-          name: string;
-          /** @description exchange identifier */
-          identifier: string;
-          /** @description exchange trading incentive */
-          has_trading_incentive: boolean;
-          /** @description exchange image url */
-          logo?: string;
-        };
-        /** @description coin ticker last price */
-        last?: number;
-        /** @description coin ticker volume */
-        volume?: number;
-        /** @description coin ticker cost to move up in usd */
-        cost_to_move_up_usd?: number;
-        /** @description coin ticker cost to move down in usd */
-        cost_to_move_down_usd?: number;
-        /** @description coin ticker converted last price */
-        converted_last?: {
-          btc?: number;
-          eth?: number;
-          usd?: number;
-        };
-        /** @description coin ticker converted volume */
-        converted_volume?: {
-          btc?: number;
-          eth?: number;
-          usd?: number;
-        };
-        /** @description coin ticker trust score */
-        trust_score?: string;
-        /** @description coin ticker bid ask spread percentage */
-        bid_ask_spread_percentage?: number;
-        /** @description coin ticker timestamp */
-        timestamp?: string;
-        /** @description coin ticker last traded timestamp */
-        last_traded_at?: string;
-        /** @description coin ticker last fetch timestamp */
-        last_fetch_at?: string;
-        /** @description coin ticker anomaly */
-        is_anomaly?: boolean;
-        /** @description coin ticker stale */
-        is_stale?: boolean;
-        /** @description coin ticker trade url */
-        trade_url?: string;
-        /** @description coin ticker token info url */
-        token_info_url?: string | null;
-        /** @description coin ticker base currency coin id */
-        coin_id?: string;
-        /** @description coin ticker target currency coin id */
-        target_coin_id?: string;
-      }[];
-    };
-    /** @example {
-     *       "id": "bitcoin",
-     *       "symbol": "btc",
-     *       "name": "Bitcoin",
-     *       "localization": {
-     *         "en": "Bitcoin",
-     *         "de": "Bitcoin",
-     *         "es": "Bitcoin",
-     *         "fr": "Bitcoin",
-     *         "it": "Bitcoin",
-     *         "pl": "Bitcoin",
-     *         "ro": "Bitcoin",
-     *         "hu": "Bitcoin",
-     *         "nl": "Bitcoin",
-     *         "pt": "Bitcoin",
-     *         "sv": "Bitcoin",
-     *         "vi": "Bitcoin",
-     *         "tr": "Bitcoin",
-     *         "ru": "Биткоин",
-     *         "ja": "ビットコイン",
-     *         "zh": "比特币",
-     *         "zh-tw": "比特幣",
-     *         "ko": "비트코인",
-     *         "ar": "بيتكوين",
-     *         "th": "บิตคอยน์",
-     *         "id": "Bitcoin",
-     *         "cs": "Bitcoin",
-     *         "da": "Bitcoin",
-     *         "el": "Bitcoin",
-     *         "hi": "Bitcoin",
-     *         "no": "Bitcoin",
-     *         "sk": "Bitcoin",
-     *         "uk": "Bitcoin",
-     *         "he": "Bitcoin",
-     *         "fi": "Bitcoin",
-     *         "bg": "Bitcoin",
-     *         "hr": "Bitcoin",
-     *         "lt": "Bitcoin",
-     *         "sl": "Bitcoin"
-     *       },
-     *       "image": {
-     *         "thumb": "https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png?1696501400",
-     *         "small": "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400"
-     *       },
-     *       "market_data": {
-     *         "current_price": {
-     *           "aed": 154530.09108142683,
-     *           "ars": 33947900.26188303,
-     *           "aud": 61738.405695047535,
-     *           "bch": 165.38167494630605,
-     *           "bdt": 4617857.437514718,
-     *           "bhd": 15859.429741917913,
-     *           "bmd": 42074.70715618848,
-     *           "bnb": 134.15687497173963,
-     *           "brl": 204167.47440069792,
-     *           "btc": 1,
-     *           "cad": 55797.37289517942,
-     *           "chf": 35380.41087410315,
-     *           "clp": 37070945.97434911,
-     *           "cny": 297872.0967829519,
-     *           "czk": 941726.6142466004,
-     *           "dkk": 284202.0244279068,
-     *           "dot": 5078.184550422312,
-     *           "eos": 49611.91197615977,
-     *           "eth": 18.29654321540394,
-     *           "eur": 38057.70863986569,
-     *           "gbp": 33025.65781339986,
-     *           "gel": 113180.96225014742,
-     *           "hkd": 328622.3965080529,
-     *           "huf": 14607917.577557135,
-     *           "idr": 647533950.6044563,
-     *           "ils": 151504.70926336164,
-     *           "inr": 3501412.9510954972,
-     *           "jpy": 5933586.69083973,
-     *           "krw": 54466970.65490067,
-     *           "kwd": 12928.716014953645,
-     *           "lkr": 13628686.368770933,
-     *           "ltc": 573.6621797872364,
-     *           "mmk": 88364275.74483082,
-     *           "mxn": 714058.2700891062,
-     *           "myr": 193333.27938268633,
-     *           "ngn": 37725865.42452484,
-     *           "nok": 429848.16731742636,
-     *           "nzd": 66531.8087825235,
-     *           "php": 2330938.6923034303,
-     *           "pkr": 11705926.359806487,
-     *           "pln": 165640.54862662574,
-     *           "rub": 3755167.3612415865,
-     *           "sar": 157780.1518357064,
-     *           "sek": 423808.00650749775,
-     *           "sgd": 55568.065741178136,
-     *           "thb": 1438863.9771500682,
-     *           "try": 1240206.6063985475,
-     *           "twd": 1291001.3807622658,
-     *           "uah": 1599892.6750505993,
-     *           "usd": 42074.70715618848,
-     *           "vef": 4212.940427549151,
-     *           "vnd": 1021106970.8227047,
-     *           "xag": 1768.3279940253694,
-     *           "xau": 20.39613504103393,
-     *           "xdr": 31351.757663898043,
-     *           "xlm": 324963.64104682615,
-     *           "xrp": 67529.86361098202,
-     *           "yfi": 5.116942760598554,
-     *           "zar": 769994.6998914372,
-     *           "bits": 1000195.713931052,
-     *           "link": 2709.6608365050256,
-     *           "sats": 100019571.3931052
-     *         },
-     *         "market_cap": {
-     *           "aed": 3022434823129.84,
-     *           "ars": 663982757051427.4,
-     *           "aud": 1207533794818.6636,
-     *           "bch": 3239927812.6139565,
-     *           "bdt": 90320099015790.61,
-     *           "bhd": 310192612917.6729,
-     *           "bmd": 822933961870.5416,
-     *           "bnb": 2629923038.0492373,
-     *           "brl": 3993286227042.8438,
-     *           "btc": 19584275,
-     *           "cad": 1091498460326.9937,
-     *           "chf": 692169755329.3134,
-     *           "clp": 725066019537891.1,
-     *           "cny": 5826043276458.686,
-     *           "czk": 18419113668076.95,
-     *           "dkk": 5558672032246.961,
-     *           "dot": 99489102293.36188,
-     *           "eos": 971966018054.8785,
-     *           "eth": 358260658.6305346,
-     *           "eur": 744365987728.8765,
-     *           "gbp": 645995753662.7186,
-     *           "gel": 2213692357431.7495,
-     *           "hkd": 6427484562491.774,
-     *           "huf": 285714442221834.44,
-     *           "idr": 12665035966583838,
-     *           "ils": 2963261756601.5366,
-     *           "inr": 68483700226206.57,
-     *           "jpy": 116054283764084.62,
-     *           "krw": 1065312701660273.2,
-     *           "kwd": 252871147803.5803,
-     *           "lkr": 266561780855891.12,
-     *           "ltc": 11241964101.69766,
-     *           "mmk": 1728305874039080,
-     *           "mxn": 13966176853697.344,
-     *           "myr": 3781381554795.1514,
-     *           "ngn": 737875507571602.2,
-     *           "nok": 8407346818129.712,
-     *           "nzd": 1301287369358.7278,
-     *           "php": 45590539841760.11,
-     *           "pkr": 228954757091481.3,
-     *           "pln": 3239742879771.195,
-     *           "rub": 73446851159342.03,
-     *           "sar": 3086002357014.532,
-     *           "sek": 8289208064431.51,
-     *           "sgd": 1086848883442.4248,
-     *           "thb": 28142561489813.086,
-     *           "try": 24257046694416.734,
-     *           "twd": 25250535365752.875,
-     *           "uah": 31292101755089.6,
-     *           "usd": 822933961870.5416,
-     *           "vef": 82400377602.09746,
-     *           "vnd": 19971704184972804,
-     *           "xag": 34586507200.34415,
-     *           "xau": 398925467.35636365,
-     *           "xdr": 613205127018.0251,
-     *           "xlm": 6366989968394.301,
-     *           "xrp": 1322171541704.1318,
-     *           "yfi": 100197984.57701135,
-     *           "zar": 15060230523975.951,
-     *           "bits": 19587833186725.145,
-     *           "link": 53027090934.88813,
-     *           "sats": 1958783318672514.8
-     *         },
-     *         "total_volume": {
-     *           "aed": 91203312150.08063,
-     *           "ars": 20035974370796.53,
-     *           "aud": 36437868164.37399,
-     *           "bch": 97607892.53714487,
-     *           "bdt": 2725449072027.6714,
-     *           "bhd": 9360199758.84335,
-     *           "bmd": 24832397519.050613,
-     *           "bnb": 79179085.83047172,
-     *           "brl": 120499184128.79588,
-     *           "btc": 590313.2604817993,
-     *           "cad": 32931483969.88901,
-     *           "chf": 20881438911.782093,
-     *           "clp": 21879188925189.88,
-     *           "cny": 175803441475.87073,
-     *           "czk": 555804929370.7711,
-     *           "dkk": 167735395521.93146,
-     *           "dot": 2997133098.5874844,
-     *           "eos": 29280838849.3072,
-     *           "eth": 10798578.648754122,
-     *           "eur": 22461574030.714294,
-     *           "gbp": 19491668952.230877,
-     *           "gel": 66799149326.2464,
-     *           "hkd": 193952199202.66922,
-     *           "huf": 8621560094639.218,
-     *           "idr": 382173081057940.94,
-     *           "ils": 89417738606.47363,
-     *           "inr": 2066526047518.001,
-     *           "jpy": 3501989517686.002,
-     *           "krw": 32146283560336.594,
-     *           "kwd": 7630499109.653902,
-     *           "lkr": 8043620037935.51,
-     *           "ltc": 338574128.0917383,
-     *           "mmk": 52152396774457.34,
-     *           "mxn": 421435584775.31195,
-     *           "myr": 114104866600.03775,
-     *           "ngn": 22265720911481.547,
-     *           "nok": 253695421433.0574,
-     *           "nzd": 39266923884.12937,
-     *           "php": 1375714772890.6108,
-     *           "pkr": 6908811405778.086,
-     *           "pln": 97760679200.94873,
-     *           "rub": 2216291329580.8867,
-     *           "sar": 93121490696.43959,
-     *           "sek": 250130532110.01724,
-     *           "sgd": 32796147403.410156,
-     *           "thb": 849214282675.6979,
-     *           "try": 731967149325.9987,
-     *           "twd": 761946110895.6648,
-     *           "uah": 944253057952.1875,
-     *           "usd": 24832397519.050613,
-     *           "vef": 2486467963.582537,
-     *           "vnd": 602655037260633.8,
-     *           "xag": 1043663204.3259426,
-     *           "xau": 12037753.021334978,
-     *           "xdr": 18503736849.33296,
-     *           "xlm": 191792809959.6043,
-     *           "xrp": 39855973598.82108,
-     *           "yfi": 3020008.107049232,
-     *           "zar": 454449139819.0017,
-     *           "bits": 590313260481.7993,
-     *           "link": 1599235730.4856293,
-     *           "sats": 59031326048179.93
-     *         }
-     *       },
-     *       "community_data": {
-     *         "facebook_likes": null,
-     *         "twitter_followers": null,
-     *         "reddit_average_posts_48h": 0,
-     *         "reddit_average_comments_48h": 0,
-     *         "reddit_subscribers": null,
-     *         "reddit_accounts_active_48h": null
-     *       },
-     *       "developer_data": {
-     *         "forks": 36262,
-     *         "stars": 72871,
-     *         "subscribers": 3961,
-     *         "total_issues": 7736,
-     *         "closed_issues": 7377,
-     *         "pull_requests_merged": 11204,
-     *         "pull_request_contributors": 846,
-     *         "code_additions_deletions_4_weeks": {
-     *           "additions": 973,
-     *           "deletions": -290
-     *         },
-     *         "commit_count_4_weeks": 163
-     *       },
-     *       "public_interest_stats": {
-     *         "alexa_rank": null,
-     *         "bing_matches": null
-     *       }
-     *     } */
-    CoinsHistoricalData: {
-      /** @description coin id */
-      id?: string;
-      /** @description coin symbol */
-      symbol?: string;
-      /** @description coin name */
-      name?: string;
-      /** @description coin localization */
-      localization?: {
-        [key: string]: string | undefined;
-      };
-      /** @description coin image url */
-      image?: {
-        thumb?: string;
-        small?: string;
-      };
-      /** @description coin market data */
-      market_data?: {
-        /** @description coin current price */
-        current_price?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin market cap */
-        market_cap?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-        /** @description coin total volume */
-        total_volume?: {
-          btc?: number;
-          eur?: number;
-          usd?: number;
-        };
-      };
-      /** @description coin community data */
-      community_data?: {
-        /** @description coin facebook likes */
-        facebook_likes?: number;
-        /** @description coin twitter followers */
-        twitter_followers?: number;
-        /** @description coin reddit average posts 48h */
-        reddit_average_posts_48h?: number;
-        /** @description coin reddit average comments 48h */
-        reddit_average_comments_48h?: number;
-        /** @description coin reddit subscribers */
-        reddit_subscribers?: number;
-        /** @description coin reddit accounts active 48h */
-        reddit_accounts_active_48h?: number;
-      };
-      /** @description coin developer data */
-      developer_data?: {
-        /** @description coin repository forks */
-        forks?: number;
-        /** @description coin repository stars */
-        stars?: number;
-        /** @description coin repository subscribers */
-        subscribers?: number;
-        /** @description coin repository total issues */
-        total_issues?: number;
-        /** @description coin repository closed issues */
-        closed_issues?: number;
-        /** @description coin repository pull requests merged */
-        pull_requests_merged?: number;
-        /** @description coin repository pull request contributors */
-        pull_request_contributors?: number;
-        /** @description coin code additions deletions 4 weeks */
-        code_additions_deletions_4_weeks?: {
-          additions?: number;
-          deletions?: number;
-        };
-        /** @description coin commit count 4 weeks */
-        commit_count_4_weeks?: number;
-      };
-      /** @description coin public interest stats */
-      public_interest_stats?: {
-        /** @description coin alexa rank */
-        alexa_rank?: number;
-        /** @description coin bing matches */
-        bing_matches?: number;
-      };
-    };
-    CoinsMarketChart: {
-      /** @example [
-       *       [
-       *         1711843200000,
-       *         69702.3087473573
-       *       ],
-       *       [
-       *         1711929600000,
-       *         71246.95144060145
-       *       ],
-       *       [
-       *         1711983682000,
-       *         68887.74951585678
-       *       ]
-       *     ] */
-      prices?: number[][];
-      /** @example [
-       *       [
-       *         1711843200000,
-       *         1370247487960.0945
-       *       ],
-       *       [
-       *         1711929600000,
-       *         1401370211582.3662
-       *       ],
-       *       [
-       *         1711983682000,
-       *         1355701979725.1584
-       *       ]
-       *     ] */
-      market_caps?: number[][];
-      /** @example [
-       *       [
-       *         1711843200000,
-       *         16408802301.837431
-       *       ],
-       *       [
-       *         1711929600000,
-       *         19723005998.21497
-       *       ],
-       *       [
-       *         1711983682000,
-       *         30137418199.643093
-       *       ]
-       *     ] */
-      total_volumes?: number[][];
-    };
-    CoinsMarketChartRange: {
-      /** @example [
-       *       [
-       *         1704067241331,
-       *         42261.04061756689
-       *       ],
-       *       [
-       *         1704070847420,
-       *         42493.27640875459
-       *       ],
-       *       [
-       *         1704074443652,
-       *         42654.07310665941
-       *       ]
-       *     ] */
-      prices?: number[][];
-      /** @example [
-       *       [
-       *         1704067241331,
-       *         827596236151.1959
-       *       ],
-       *       [
-       *         1704070847420,
-       *         831531023621.4114
-       *       ],
-       *       [
-       *         1704074443652,
-       *         835499399014.9323
-       *       ]
-       *     ] */
-      market_caps?: number[][];
-      /** @example [
-       *       [
-       *         1704067241331,
-       *         14305769170.949772
-       *       ],
-       *       [
-       *         1704070847420,
-       *         14130205376.17086
-       *       ],
-       *       [
-       *         1704074443652,
-       *         13697382902.24235
-       *       ]
-       *     ] */
-      total_volumes?: number[][];
-    };
-    /** @example [
-     *       [
-     *         1709395200000,
-     *         61942,
-     *         62211,
-     *         61721,
-     *         61845
-     *       ],
-     *       [
-     *         1709409600000,
-     *         61828,
-     *         62139,
-     *         61726,
-     *         62139
-     *       ],
-     *       [
-     *         1709424000000,
-     *         62171,
-     *         62210,
-     *         61821,
-     *         62068
-     *       ]
-     *     ] */
-    CoinsOHLC: number[][];
-    SupplyChartBase: number[][];
-    CoinsContractAddress: components['schemas']['CoinsDataBase'] & unknown;
-    /** @example [
-     *       {
-     *         "id": "polygon-pos",
-     *         "chain_identifier": 137,
-     *         "name": "Polygon POS",
-     *         "shortname": "MATIC",
-     *         "native_coin_id": "matic-network"
-     *       },
-     *       {
-     *         "id": "ethereum",
-     *         "chain_identifier": 1,
-     *         "name": "Ethereum",
-     *         "shortname": "Ethereum",
-     *         "native_coin_id": "ethereum"
-     *       },
-     *       {
-     *         "id": "stargaze",
-     *         "chain_identifier": null,
-     *         "name": "Stargaze",
-     *         "shortname": "",
-     *         "native_coin_id": "stargaze"
-     *       }
-     *     ] */
-    AssetPlatforms: {
-      /** @description asset platform id */
-      id?: string;
-      /** @description chainlist's chain id */
-      chain_identifier?: number | null;
-      /** @description chain name */
-      name?: string;
-      /** @description chain shortname */
-      shortname?: string;
-      /** @description chain native coin id */
-      native_coin_id?: string;
-    };
-    /** @example {
-     *       "name": "CoinGecko",
-     *       "logoURI": "https://static.coingecko.com/s/thumbnail-007177f3eca19695592f0b8b0eabbdae282b54154e1be912285c9034ea6cbaf2.png",
-     *       "keywords": [
-     *         "defi"
-     *       ],
-     *       "timestamp": "2024-04-08T14:02:47.028+00:00",
-     *       "tokens": [
-     *         {
-     *           "chainId": 1,
-     *           "address": "0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9",
-     *           "name": "Wrapped Terra Classic",
-     *           "symbol": "LUNC",
-     *           "decimals": 18,
-     *           "logoURI": "https://assets.coingecko.com/coins/images/13628/thumb/wluna.png?1696513376"
-     *         },
-     *         {
-     *           "chainId": 1,
-     *           "address": "0x5bb29c33c4a3c29f56f8aca40b4db91d8a5fe2c5",
-     *           "name": "One Share",
-     *           "symbol": "ONS",
-     *           "decimals": 18,
-     *           "logoURI": "https://assets.coingecko.com/coins/images/13531/thumb/bss.a1671c75.png?1696513292"
-     *         }
-     *       ]
-     *     } */
-    TokenLists: {
-      name?: string;
-      logoURI?: string;
-      keywords?: string[];
-      /** Format: date-time */
-      timestamp?: string;
-      tokens?: {
-        /** @description chainlist's chain id */
-        chainId?: number;
-        /** @description token contract address */
-        address?: string;
-        /** @description token name */
-        name?: string;
-        /** @description token symbol */
-        symbol?: string;
-        /** @description token decimals */
-        decimals?: number;
-        /** @description token image url */
-        logoURI?: string;
-      }[];
-    };
-    /** @example [
-     *       {
-     *         "category_id": "aave-tokens",
-     *         "name": "Aave Tokens"
-     *       },
-     *       {
-     *         "category_id": "aaccount-abstraction",
-     *         "name": "Account Abstraction"
-     *       }
-     *     ] */
-    CategoriesList: {
-      /** @description category id */
-      category_id?: string;
-      /** @description category name */
-      name?: string;
-    };
-    /** @example [
-     *       {
-     *         "id": "layer-1",
-     *         "name": "Layer 1 (L1)",
-     *         "market_cap": 2061406861196.135,
-     *         "market_cap_change_24h": -0.66091235190398,
-     *         "content": "",
-     *         "top_3_coins": [
-     *           "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
-     *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
-     *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970"
-     *         ],
-     *         "volume_24h": 61146432400.17392,
-     *         "updated_at": "2024-04-06T08:25:46.402Z"
-     *       },
-     *       {
-     *         "id": "smart-contract-platform",
-     *         "name": "Smart Contract Platform",
-     *         "market_cap": 744929499224.6548,
-     *         "market_cap_change_24h": -0.584411329310148,
-     *         "content": "Smart contract platforms are usually blockchains that host smart contracts or decentralized applications...",
-     *         "top_3_coins": [
-     *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
-     *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970",
-     *           "https://assets.coingecko.com/coins/images/4128/small/solana.png?1696504756"
-     *         ],
-     *         "volume_24h": 30987638383.630726,
-     *         "updated_at": "2024-04-06T08:25:33.203Z"
-     *       }
-     *     ] */
-    Categories: {
-      /** @description category id */
-      id?: string;
-      /** @description category name */
-      name?: string;
-      /** @description category market cap */
-      market_cap?: number;
-      /** @description category market cap change in 24 hours */
-      market_cap_change_24h?: number;
-      /** @description category description */
-      content?: string;
-      /** @description top 3 coins in the category */
-      top_3_coins?: string[];
-      /** @description category volume in 24 hours */
-      volume_24h?: number;
-      /** @description category last updated time */
-      updated_at?: string;
-    };
-    /** @example [
-     *       {
-     *         "id": "bybit_spot",
-     *         "name": "Bybit",
-     *         "year_established": 2018,
-     *         "country": "British Virgin Islands",
-     *         "description": "Bybit is a cryptocurrency exchange that offers a professional platform featuring an ultra-fast matching engine, excellent customer service and multilingual community support for crypto traders of all levels...",
-     *         "url": "https://www.bybit.com",
-     *         "image": "https://assets.coingecko.com/markets/images/698/small/bybit_spot.png?1706864649",
-     *         "has_trading_incentive": false,
-     *         "trust_score": 10,
-     *         "trust_score_rank": 1,
-     *         "trade_volume_24h_btc": 51075.62712838519,
-     *         "trade_volume_24h_btc_normalized": 47765.58866374526
-     *       },
-     *       {
-     *         "id": "gdax",
-     *         "name": "Coinbase Exchange",
-     *         "year_established": 2012,
-     *         "country": "United States",
-     *         "description": "",
-     *         "url": "https://www.coinbase.com/",
-     *         "image": "https://assets.coingecko.com/markets/images/23/small/Coinbase_Coin_Primary.png?1706864258",
-     *         "has_trading_incentive": false,
-     *         "trust_score": 10,
-     *         "trust_score_rank": 2,
-     *         "trade_volume_24h_btc": 37443.72996076475,
-     *         "trade_volume_24h_btc_normalized": 37443.72996076475
-     *       }
-     *     ] */
-    Exchanges: {
-      /** @description exchange id */
-      id?: string;
-      /** @description exchange name */
-      name?: string;
-      /** @description exchange established year */
-      year_established?: number;
-      /** @description exchange country */
-      country?: string;
-      /** @description exchange description */
-      description?: string;
-      /** @description exchange website url */
-      url?: string;
-      /** @description exchange image url */
-      image?: string;
-      /** @description exchange trading incentive */
-      has_trading_incentive?: boolean;
-      /** @description exchange trust score */
-      trust_score?: number;
-      /** @description exchange trust score rank */
-      trust_score_rank?: number;
-      /** @description exchange trade volume in BTC in 24 hours */
-      trade_volume_24h_btc?: number;
-      /** @description normalized trading volume by traffic in BTC in 24 hours <br>*refers to [`this blog`](https://blog.coingecko.com/trust-score/). */
-      trade_volume_24h_btc_normalized?: number;
-    };
-    /** @example [
-     *       {
-     *         "id": "10kswap-starknet-alpha",
-     *         "name": "10KSwap"
-     *       },
-     *       {
-     *         "id": "1bch",
-     *         "name": "1BCH"
-     *       },
-     *       {
-     *         "id": "3xcalibur",
-     *         "name": "3xcalibur"
-     *       }
-     *     ] */
-    ExchangesList: {
-      /** @description exchange id */
-      id?: string;
-      /** @description exchange name */
-      name?: string;
-    };
-    /** @example {
-     *       "name": "Binance",
-     *       "year_established": 2017,
-     *       "country": "Cayman Islands",
-     *       "description": "",
-     *       "url": "https://www.binance.com/",
-     *       "image": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274",
-     *       "facebook_url": "https://www.facebook.com/binanceexchange",
-     *       "reddit_url": "https://www.reddit.com/r/binance/",
-     *       "telegram_url": "",
-     *       "slack_url": "",
-     *       "other_url_1": "https://medium.com/binanceexchange",
-     *       "other_url_2": "https://steemit.com/@binanceexchange",
-     *       "twitter_handle": "binance",
-     *       "has_trading_incentive": false,
-     *       "centralized": true,
-     *       "public_notice": "",
-     *       "alert_notice": "",
-     *       "trust_score": 9,
-     *       "trust_score_rank": 6,
-     *       "trade_volume_24h_btc": 207319.13377261316,
-     *       "trade_volume_24h_btc_normalized": 81673.29712441542,
-     *       "tickers": [
-     *         {
-     *           "base": "BTC",
-     *           "target": "USDT",
-     *           "market": {
-     *             "name": "Binance",
-     *             "identifier": "binance",
-     *             "has_trading_incentive": false,
-     *             "logo": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274"
-     *           },
-     *           "last": 69476,
-     *           "volume": 20242.03975,
-     *           "cost_to_move_up_usd": 19320706.39585167,
-     *           "cost_to_move_down_usd": 16360235.3694131,
-     *           "converted_last": {
-     *             "btc": 1.000205,
-     *             "eth": 20.291404,
-     *             "usd": 69498
-     *           },
-     *           "converted_volume": {
-     *             "btc": 20249,
-     *             "eth": 410802,
-     *             "usd": 1406996874
-     *           },
-     *           "trust_score": "green",
-     *           "bid_ask_spread_percentage": 0.010014,
-     *           "timestamp": "2024-04-08T04:02:01+00:00",
-     *           "last_traded_at": "2024-04-08T04:02:01+00:00",
-     *           "last_fetch_at": "2024-04-08T04:03:00+00:00",
-     *           "is_anomaly": false,
-     *           "is_stale": false,
-     *           "trade_url": "https://www.binance.com/en/trade/BTC_USDT?ref=37754157",
-     *           "token_info_url": null,
-     *           "coin_id": "bitcoin",
-     *           "target_coin_id": "tether"
-     *         }
-     *       ]
-     *     } */
-    ExchangeData: {
-      /** @description exchange name */
-      name?: string;
-      /** @description exchange established year */
-      year_established?: number;
-      /** @description exchange incorporated country */
-      country?: string;
-      /** @description exchange description */
-      description?: string;
-      /** @description exchange website url */
-      url?: string;
-      /** @description exchange image url */
-      image?: string;
-      /** @description exchange facebook url */
-      facebook_url?: string;
-      /** @description exchange reddit url */
-      reddit_url?: string;
-      /** @description exchange telegram url */
-      telegram_url?: string;
-      /** @description exchange slack url */
-      slack_url?: string;
-      other_url_1?: string;
-      other_url_2?: string;
-      /** @description exchange twitter handle */
-      twitter_handle?: string;
-      /** @description exchange trading incentive */
-      has_trading_incentive?: boolean;
-      /** @description exchange type (true for centralized, false for decentralized) */
-      centralized?: boolean;
-      /** @description public notice for exchange */
-      public_notice?: string;
-      /** @description alert notice for exchange */
-      alert_notice?: string;
-      /** @description exchange trust score */
-      trust_score?: number;
-      /** @description exchange trust score rank */
-      trust_score_rank?: number;
-      trade_volume_24h_btc?: number;
-      /** @description normalized trading volume by traffic in BTC in 24 hours <br>*refers to [`this blog`](https://blog.coingecko.com/trust-score/). */
-      trade_volume_24h_btc_normalized?: number;
-      tickers?: components['schemas']['CoinsTickers'][];
-    };
-    ExchangeTickers: components['schemas']['CoinsTickers'] & unknown;
-    /** @example [
-     *       [
-     *         1711792200000,
-     *         "306800.0517941023777005"
-     *       ],
-     *       [
-     *         1711795800000,
-     *         "302561.8185582217570913"
-     *       ],
-     *       [
-     *         1711799400000,
-     *         "298240.5127048246776691"
-     *       ]
-     *     ] */
-    ExchangeVolumeChart: number[][];
-    /** @example [
-     *       {
-     *         "market": "Deepcoin (Derivatives)",
-     *         "symbol": "ETHUSDT",
-     *         "index_id": "ETH",
-     *         "price": "3395.91",
-     *         "price_percentage_change_24h": 1.5274069068216003,
-     *         "contract_type": "perpetual",
-     *         "index": 3393.5342,
-     *         "basis": -0.0523015571479482,
-     *         "spread": 0.01,
-     *         "funding_rate": -0.007182,
-     *         "open_interest": 9327998764.66,
-     *         "volume_24h": 392642535.23212117,
-     *         "last_traded_at": 1712467658,
-     *         "expired_at": null
-     *       },
-     *       {
-     *         "market": "BYDFi (Futures)",
-     *         "symbol": "BTC-PERPUSDT",
-     *         "index_id": "BTC",
-     *         "price": "69434.1",
-     *         "price_percentage_change_24h": 2.040579301057485,
-     *         "contract_type": "perpetual",
-     *         "index": 69407.5,
-     *         "basis": -0.0005763032738348229,
-     *         "spread": 0.01,
-     *         "funding_rate": 0.012,
-     *         "open_interest": 7690212057.6,
-     *         "volume_24h": 132888173.54699957,
-     *         "last_traded_at": 1712467920,
-     *         "expired_at": null
-     *       }
-     *     ] */
-    DerivativesTickersList: {
-      /** @description derivative market name */
-      market?: string;
-      /** @description derivative ticker symbol */
-      symbol?: string;
-      /** @description derivative underlying asset */
-      index_id?: string;
-      /** @description derivative ticker price */
-      price?: string;
-      /** @description derivative ticker price percentage change in 24 hours */
-      price_percentage_change_24h?: number;
-      /** @description derivative contract type */
-      contract_type?: string;
-      /** @description derivative underlying asset price */
-      index?: number;
-      /** @description difference of derivative price and index price */
-      basis?: number;
-      /** @description derivative bid ask spread */
-      spread?: number;
-      /** @description derivative funding rate */
-      funding_rate?: number;
-      /** @description derivative open interest */
-      open_interest?: number;
-      /** @description derivative volume in 24 hours */
-      volume_24h?: number;
-      /** @description derivative last updated time */
-      last_traded_at?: number;
-      expired_at?: string | null;
-    };
-    /** @example [
-     *       {
-     *         "name": "Binance (Futures)",
-     *         "id": "binance_futures",
-     *         "open_interest_btc": 279958.61,
-     *         "trade_volume_24h_btc": "574366.94",
-     *         "number_of_perpetual_pairs": 330,
-     *         "number_of_futures_pairs": 44,
-     *         "image": "https://assets.coingecko.com/markets/images/466/small/binance_futures.jpg?1706864452",
-     *         "year_established": 2019,
-     *         "country": null,
-     *         "description": "",
-     *         "url": "https://www.binance.com/"
-     *       },
-     *       {
-     *         "name": "Bitget Futures",
-     *         "id": "bitget_futures",
-     *         "open_interest_btc": 123267.93,
-     *         "trade_volume_24h_btc": "228027.47",
-     *         "number_of_perpetual_pairs": 254,
-     *         "number_of_futures_pairs": 0,
-     *         "image": "https://assets.coingecko.com/markets/images/591/small/2023-07-25_21.47.43.jpg?1706864543",
-     *         "year_established": null,
-     *         "country": null,
-     *         "description": "",
-     *         "url": "https://www.bitget.com/en/"
-     *       }
-     *     ] */
-    DerivativesExchanges: {
-      /** @description derivatives exchange name */
-      name?: string;
-      /** @description derivatives exchange id */
-      id?: string;
-      /** @description derivatives exchange open interest in BTC */
-      open_interest_btc?: number;
-      /** @description derivatives exchange trade volume in BTC in 24 hours */
-      trade_volume_24h_btc?: string;
-      /** @description number of perpetual pairs in the derivatives exchange */
-      number_of_perpetual_pairs?: number;
-      /** @description number of futures pairs in the derivatives exchange */
-      number_of_futures_pairs?: number;
-      /** @description derivatives exchange image url */
-      image?: string;
-      /** @description derivatives exchange established year */
-      year_established?: number | null;
-      /** @description derivatives exchange incorporated country */
-      country?: string | null;
-      /** @description derivatives exchange description */
-      description?: string;
-      /** @description derivatives exchange website url */
-      url?: string;
-    };
-    /** @example {
-     *       "name": "Binance (Futures)",
-     *       "open_interest_btc": 280210.26,
-     *       "trade_volume_24h_btc": "568502.31",
-     *       "number_of_perpetual_pairs": 330,
-     *       "number_of_futures_pairs": 44,
-     *       "image": "https://assets.coingecko.com/markets/images/466/small/binance_futures.jpg?1706864452",
-     *       "year_established": 2019,
-     *       "country": null,
-     *       "description": "",
-     *       "url": "https://www.binance.com/",
-     *       "tickers": {
-     *         "tickers": [
-     *           {
-     *             "symbol": "1000BONKUSDT",
-     *             "base": "1000BONK",
-     *             "target": "USDT",
-     *             "trade_url": "https://www.binance.com/en/futuresng/1000BONKUSDT",
-     *             "contract_type": "perpetual",
-     *             "last": 0.023,
-     *             "h24_percentage_change": -0.811,
-     *             "index": 0.0229866,
-     *             "index_basis_percentage": -0.071,
-     *             "bid_ask_spread": 0.000217533173808922,
-     *             "funding_rate": 0.005,
-     *             "open_interest_usd": 28102263.99977152,
-     *             "h24_volume": 2679284723,
-     *             "converted_volume": {
-     *               "btc": "888.799603175094638929930629459045946",
-     *               "eth": "18029.8066338945133622149580216234476206402026327668",
-     *               "usd": "61648664.9602525617243462802989936852339753270611794"
-     *             },
-     *             "converted_last": {
-     *               "btc": "0.000000331730179904099217651505502",
-     *               "eth": "0.0000067293358108303271067525726423602078742716",
-     *               "usd": "0.0230093742673322299700755918127159362875878"
-     *             },
-     *             "last_traded": 1712550723,
-     *             "expired_at": null
-     *           }
-     *         ]
-     *       }
-     *     } */
-    DerivativesExchangesID: {
-      /** @description derivatives exchange name */
-      name?: string;
-      /** @description derivatives exchange open interest in BTC */
-      open_interest_btc?: number;
-      /** @description derivatives exchange trade volume in BTC in 24 hours */
-      trade_volume_24h_btc?: string;
-      /** @description number of perpetual pairs in the derivatives exchange */
-      number_of_perpetual_pairs?: number;
-      /** @description number of futures pairs in the derivatives exchange */
-      number_of_futures_pairs?: number;
-      /** @description derivatives exchange image url */
-      image?: string;
-      /** @description derivatives exchange established year */
-      year_established?: number | null;
-      /** @description derivatives exchange incorporated country */
-      country?: string | null;
-      /** @description derivatives exchange description */
-      description?: string;
-      /** @description derivatives exchange website url */
-      url?: string;
-      tickers?: components['schemas']['DerivativesTickersList'][];
-    };
-    /** @example [
-     *       {
-     *         "id": "binance_futures",
-     *         "name": "Binance (Futures)"
-     *       },
-     *       {
-     *         "id": "bybit",
-     *         "name": "Bybit (Futures)"
-     *       },
-     *       {
-     *         "id": "deepcoin_derivatives",
-     *         "name": "Deepcoin (Derivatives)"
-     *       }
-     *     ] */
-    DerivativesExchangesList: {
-      /** @description derivatives exchange id */
-      id?: string;
-      /** @description derivatives exchange name */
-      name?: string;
-    };
-    /** @example [
-     *       {
-     *         "id": "bored-ape-yacht-club",
-     *         "contract_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
-     *         "name": "Bored Ape Yacht Club",
-     *         "asset_platform_id": "ethereum",
-     *         "symbol": "BAYC"
-     *       },
-     *       {
-     *         "id": "pudgy-penguins",
-     *         "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
-     *         "name": "Pudgy Penguins",
-     *         "asset_platform_id": "ethereum",
-     *         "symbol": "PPG"
-     *       }
-     *     ] */
-    NFTList: {
-      /** @description nft collection id */
-      id?: string;
-      /** @description nft collection contract address */
-      contract_address?: string;
-      /** @description nft collection name */
-      name?: string;
-      /** @description nft collection asset platform id */
-      asset_platform_id?: string;
-      /** @description nft collection symbol */
-      symbol?: string;
-    };
-    /** @example {
-     *       "id": "pudgy-penguins",
-     *       "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
-     *       "asset_platform_id": "ethereum",
-     *       "name": "Pudgy Penguins",
-     *       "symbol": "PPG",
-     *       "image": {
-     *         "small": "https://assets.coingecko.com/nft_contracts/images/38/small/da64989d9762c8a61b3c65917edfdf97.png?1707287183"
-     *       },
-     *       "description": "Pudgy Penguins is a collection of 8,888 unique NFTs featuring cute cartoon penguins, which are generated from a collection of 150 different hand-drawn traits.",
-     *       "native_currency": "ethereum",
-     *       "native_currency_symbol": "ETH",
-     *       "floor_price": {
-     *         "native_currency": 12.5,
-     *         "usd": 42317
-     *       },
-     *       "market_cap": {
-     *         "native_currency": 111100,
-     *         "usd": 376114941
-     *       },
-     *       "volume_24h": {
-     *         "native_currency": 429.88,
-     *         "usd": 1455314
-     *       },
-     *       "floor_price_in_usd_24h_percentage_change": 1.07067,
-     *       "floor_price_24h_percentage_change": {
-     *         "usd": 1.070670607177908,
-     *         "native_currency": 1.214574898785425
-     *       },
-     *       "market_cap_24h_percentage_change": {
-     *         "usd": 1.0706706071776666,
-     *         "native_currency": -0.4048582995951417
-     *       },
-     *       "volume_24h_percentage_change": {
-     *         "usd": -3.1983377669874073,
-     *         "native_currency": -1.801855313900942
-     *       },
-     *       "number_of_unique_addresses": 4752,
-     *       "number_of_unique_addresses_24h_percentage_change": 0.08425,
-     *       "volume_in_usd_24h_percentage_change": -3.19834,
-     *       "total_supply": 8888,
-     *       "one_day_sales": 36,
-     *       "one_day_sales_24h_percentage_change": -2.7027027027027,
-     *       "one_day_average_sale_price": 11.941194388888889,
-     *       "one_day_average_sale_price_24h_percentage_change": 0.925870927379588,
-     *       "links": {
-     *         "homepage": "https://www.pudgypenguins.com/",
-     *         "twitter": "https://twitter.com/pudgypenguins",
-     *         "discord": "https://discord.gg/pudgypenguins"
-     *       },
-     *       "floor_price_7d_percentage_change": {
-     *         "usd": -18.00149482623651,
-     *         "native_currency": -13.793103448275861
-     *       },
-     *       "floor_price_14d_percentage_change": {
-     *         "usd": -8.632353394310407,
-     *         "native_currency": -8.619051100226626
-     *       },
-     *       "floor_price_30d_percentage_change": {
-     *         "usd": -14.376564931440935,
-     *         "native_currency": -0.7779012541673281
-     *       },
-     *       "floor_price_60d_percentage_change": {
-     *         "usd": 15.27797587032817,
-     *         "native_currency": -18.0327868852459
-     *       },
-     *       "floor_price_1y_percentage_change": {
-     *         "usd": 429.5685372855,
-     *         "native_currency": 196.20853080568722
-     *       },
-     *       "explorers": [
-     *         {
-     *           "name": "Etherscan",
-     *           "link": "https://etherscan.io/token/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
-     *         },
-     *         {
-     *           "name": "Ethplorer",
-     *           "link": "https://ethplorer.io/address/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
-     *         }
-     *       ]
-     *     } */
-    NFTData: {
-      /** @description nft collection id */
-      id?: string;
-      /** @description nft collection contract address */
-      contract_address?: string;
-      /** @description nft collection asset platform id */
-      asset_platform_id?: string;
-      /** @description nft collection name */
-      name?: string;
-      /** @description nft collection symbol */
-      symbol?: string;
-      /** @description nft collection image url */
-      image?: {
-        small?: string;
-      };
-      /** @description nft collection description */
-      description?: string;
-      /** @description nft collection native currency */
-      native_currency?: string;
-      /** @description nft collection native currency symbol */
-      native_currency_symbol?: string;
-      /** @description nft collection floor price */
-      floor_price?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection market cap */
-      market_cap?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection volume in 24 hours */
-      volume_24h?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection floor price in usd 24 hours percentage change */
-      floor_price_in_usd_24h_percentage_change?: number;
-      floor_price_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection market cap 24 hours percentage change */
-      market_cap_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection volume in 24 hours percentage change */
-      volume_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description number of unique address owning the nfts */
-      number_of_unique_addresses?: number;
-      /** @description number of unique address owning the nfts 24 hours percentage change */
-      number_of_unique_addresses_24h_percentage_change?: number;
-      /** @description nft collection volume in usd 24 hours percentage change */
-      volume_in_usd_24h_percentage_change?: number;
-      /** @description nft collection total supply */
-      total_supply?: number;
-      /** @description nft collection one day sales */
-      one_day_sales?: number;
-      /** @description nft collection one day sales 24 hours percentage change */
-      one_day_sales_24h_percentage_change?: number;
-      /** @description nft collection one day average sale price */
-      one_day_average_sale_price?: number;
-      /** @description nft collection one day average sale price 24 hours percentage change */
-      one_day_average_sale_price_24h_percentage_change?: number;
-      /** @description nft collection links */
-      links?: {
-        homepage?: string;
-        twitter?: string;
-        discord?: string;
-      };
-      /** @description nft collection floor price 7 days percentage change */
-      floor_price_7d_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection floor price 14 days percentage change */
-      floor_price_14d_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection floor price 30 days percentage change */
-      floor_price_30d_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection floor price 60 days percentage change */
-      floor_price_60d_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection floor price 1 year percentage change */
-      floor_price_1y_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection block explorers links */
-      explorers?: {
-        name?: string;
-        link?: string;
-      }[];
-    };
-    /** @example [
-     *       {
-     *         "id": "pudgy-penguins",
-     *         "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
-     *         "asset_platform_id": "ethereum",
-     *         "name": "Pudgy Penguins",
-     *         "symbol": "PPG",
-     *         "image": {
-     *           "small": "https://assets.coingecko.com/nft_contracts/images/38/small/da64989d9762c8a61b3c65917edfdf97.png?1707287183"
-     *         },
-     *         "description": "Pudgy Penguins is a collection of 8,888 unique NFTs featuring cute cartoon penguins, which are generated from a collection of 150 different hand-drawn traits...",
-     *         "native_currency": "ethereum",
-     *         "native_currency_symbol": "ETH",
-     *         "floor_price": {
-     *           "native_currency": 12.17,
-     *           "usd": 44360
-     *         },
-     *         "market_cap": {
-     *           "native_currency": 108211,
-     *           "usd": 394267328
-     *         },
-     *         "volume_24h": {
-     *           "native_currency": 402.37,
-     *           "usd": 1466028
-     *         },
-     *         "floor_price_in_usd_24h_percentage_change": 8.27604,
-     *         "floor_price_24h_percentage_change": {
-     *           "usd": 8.276036095552893,
-     *           "native_currency": 1.627709265442404
-     *         },
-     *         "market_cap_24h_percentage_change": {
-     *           "usd": 8.276036095552811,
-     *           "native_currency": 1.627709265442404
-     *         },
-     *         "volume_24h_percentage_change": {
-     *           "usd": 32.68767488214406,
-     *           "native_currency": 24.54043325089837
-     *         },
-     *         "number_of_unique_addresses": 4756,
-     *         "number_of_unique_addresses_24h_percentage_change": 0.10524,
-     *         "volume_in_usd_24h_percentage_change": 32.68767,
-     *         "total_supply": 8888,
-     *         "one_day_sales": 33,
-     *         "one_day_sales_24h_percentage_change": 22.2222222222222,
-     *         "one_day_average_sale_price": 12.19299902909091,
-     *         "one_day_average_sale_price_24h_percentage_change": 1.8967181143714
-     *       }
-     *     ] */
-    NFTsMarkets: {
-      /** @description nft collection id */
-      id?: string;
-      /** @description nft collection contract address */
-      contract_address?: string;
-      /** @description nft collection asset platform id */
-      asset_platform_id?: string;
-      /** @description nft collection name */
-      name?: string;
-      /** @description nft collection symbol */
-      symbol?: string;
-      /** @description nft collection image url */
-      image?: {
-        small?: string;
-      };
-      /** @description nft collection description */
-      description?: string;
-      /** @description nft collection native currency */
-      native_currency?: string;
-      /** @description nft collection native currency symbol */
-      native_currency_symbol?: string;
-      /** @description nft collection floor price */
-      floor_price?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection market cap */
-      market_cap?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection volume in 24 hours */
-      volume_24h?: {
-        native_currency?: number;
-        usd?: number;
-      };
-      /** @description nft collection floor price in usd 24 hours percentage change */
-      floor_price_in_usd_24h_percentage_change?: number;
-      /** @description nft collection floor price 24 hours percentage change */
-      floor_price_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection market cap 24 hours percentage change */
-      market_cap_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description nft collection volume in 24 hours percentage change */
-      volume_24h_percentage_change?: {
-        usd?: number;
-        native_currency?: number;
-      };
-      /** @description number of unique address owning the nfts */
-      number_of_unique_addresses?: number;
-      /** @description number of unique address owning the nfts 24 hours percentage change */
-      number_of_unique_addresses_24h_percentage_change?: number;
-      /** @description nft collection volume in usd 24 hours percentage change */
-      volume_in_usd_24h_percentage_change?: number;
-      /** @description nft collection total supply */
-      total_supply?: number;
-      /** @description nft collection one day sales */
-      one_day_sales?: number;
-      /** @description nft collection one day sales 24 hours percentage change */
-      one_day_sales_24h_percentage_change?: number;
-      /** @description nft collection one day average sale price */
-      one_day_average_sale_price?: number;
-      /** @description nft collection one day average sale price 24 hours percentage change */
-      one_day_average_sale_price_24h_percentage_change?: number;
-    }[];
-    /** @example {
-     *       "floor_price_usd": [
-     *         [
-     *           1626912000000,
-     *           90.16757646534482
-     *         ],
-     *         [
-     *           1626998400000,
-     *           97.32160550000182
-     *         ],
-     *         [
-     *           1627084800000,
-     *           95.2719573507527
-     *         ]
-     *       ],
-     *       "floor_price_native": [
-     *         [
-     *           1626912000000,
-     *           0.045
-     *         ],
-     *         [
-     *           1626998400000,
-     *           0.048
-     *         ],
-     *         [
-     *           1627084800000,
-     *           0.045
-     *         ]
-     *       ],
-     *       "h24_volume_usd": [
-     *         [
-     *           1626912000000,
-     *           2860.115525480738
-     *         ],
-     *         [
-     *           1626998400000,
-     *           2143.50836113754
-     *         ],
-     *         [
-     *           1627084800000,
-     *           925.4082790669777
-     *         ]
-     *       ],
-     *       "h24_volume_native": [
-     *         [
-     *           1626912000000,
-     *           1.4274
-     *         ],
-     *         [
-     *           1626998400000,
-     *           1.0572
-     *         ],
-     *         [
-     *           1627084800000,
-     *           0.4371
-     *         ]
-     *       ],
-     *       "market_cap_usd": [
-     *         [
-     *           1626912000000,
-     *           33281860.868135665
-     *         ],
-     *         [
-     *           1626998400000,
-     *           38474832.81210672
-     *         ],
-     *         [
-     *           1627084800000,
-     *           44827378.86746599
-     *         ]
-     *       ],
-     *       "market_cap_native": [
-     *         [
-     *           1626912000000,
-     *           11012.23
-     *         ],
-     *         [
-     *           1626998400000,
-     *           12709.84
-     *         ],
-     *         [
-     *           1627084800000,
-     *           14220.8
-     *         ]
-     *       ]
-     *     } */
-    NFTMarketChart: {
-      /** @description nft collection floor price in usd */
-      floor_price_usd?: number[][];
-      /** @description nft collection floor price in native currency */
-      floor_price_native?: number[][];
-      /** @description nft collection volume in 24 hours in usd */
-      h24_volume_usd?: number[][];
-      /** @description nft collection volume in 24 hours in native currency */
-      h24_volume_native?: number[][];
-      /** @description nft collection market cap in usd */
-      market_cap_usd?: number[][];
-      /** @description nft collection market cap in native currency */
-      market_cap_native?: number[][];
-    };
-    /** @example {
-     *       "tickers": [
-     *         {
-     *           "floor_price_in_native_currency": 44.21,
-     *           "h24_volume_in_native_currency": 0,
-     *           "native_currency": "ethereum",
-     *           "native_currency_symbol": "ETH",
-     *           "updated_at": "2024-04-08T15:36:00.225Z",
-     *           "nft_marketplace_id": "looksrare",
-     *           "name": "LooksRare",
-     *           "image": "https://assets.coingecko.com/nft_marketplaces/images/2/small/Looksrare.jpg?1686193414",
-     *           "nft_collection_url": "https://looksrare.org/collections/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8?ref=9247712"
-     *         },
-     *         {
-     *           "floor_price_in_native_currency": 12.17,
-     *           "h24_volume_in_native_currency": 402.37,
-     *           "native_currency": "ethereum",
-     *           "native_currency_symbol": "ETH",
-     *           "updated_at": "2024-04-08T12:28:11.797Z",
-     *           "nft_marketplace_id": "blur",
-     *           "name": "Blur",
-     *           "image": "https://assets.coingecko.com/nft_marketplaces/images/20/small/blur_logo.jpg?1690993708",
-     *           "nft_collection_url": "https://blur.io/collection/pudgypenguins"
-     *         },
-     *         {
-     *           "floor_price_in_native_currency": 12.84,
-     *           "h24_volume_in_native_currency": 0,
-     *           "native_currency": "ethereum",
-     *           "native_currency_symbol": "ETH",
-     *           "updated_at": "2024-04-08T12:28:11.897Z",
-     *           "nft_marketplace_id": "opensea",
-     *           "name": "OpenSea",
-     *           "image": "https://assets.coingecko.com/nft_marketplaces/images/1/small/Opensea.png?1686193426",
-     *           "nft_collection_url": "https://opensea.io/collection/pudgypenguins"
-     *         },
-     *         {
-     *           "floor_price_in_native_currency": 199,
-     *           "h24_volume_in_native_currency": 0,
-     *           "native_currency": "ethereum",
-     *           "native_currency_symbol": "ETH",
-     *           "updated_at": "2024-04-08T12:28:11.979Z",
-     *           "nft_marketplace_id": "x2y2",
-     *           "name": "X2Y2",
-     *           "image": "https://assets.coingecko.com/nft_marketplaces/images/21/small/Logo.png?1693192556",
-     *           "nft_collection_url": "https://x2y2.io/collection/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
-     *         }
-     *       ]
-     *     } */
-    NFTTickers: {
-      tickers?: {
-        /** @description nft collection floor price in native currency */
-        floor_price_in_native_currency?: number;
-        /** @description nft collection volume in 24 hours in native currency */
-        h24_volume_in_native_currency?: number;
-        /** @description nft collection native currency */
-        native_currency?: string;
-        /** @description nft collection native currency symbol */
-        native_currency_symbol?: string;
-        /** @description last updated time */
-        updated_at?: string;
-        /** @description nft marketplace id */
-        nft_marketplace_id?: string;
-        /** @description nft marketplace name */
-        name?: string;
-        /** @description nft marketplace image url */
-        image?: string;
-        /** @description nft collection url in the nft marketplace */
-        nft_collection_url?: string;
-      }[];
-    };
-    /** @example {
-     *       "rates": {
-     *         "btc": {
-     *           "name": "Bitcoin",
-     *           "unit": "BTC",
-     *           "value": 1,
-     *           "type": "crypto"
-     *         },
-     *         "eth": {
-     *           "name": "Ether",
-     *           "unit": "ETH",
-     *           "value": 20.656,
-     *           "type": "crypto"
-     *         },
-     *         "ltc": {
-     *           "name": "Litecoin",
-     *           "unit": "LTC",
-     *           "value": 684.945,
-     *           "type": "crypto"
-     *         },
-     *         "bch": {
-     *           "name": "Bitcoin Cash",
-     *           "unit": "BCH",
-     *           "value": 102.254,
-     *           "type": "crypto"
-     *         },
-     *         "bnb": {
-     *           "name": "Binance Coin",
-     *           "unit": "BNB",
-     *           "value": 119.846,
-     *           "type": "crypto"
-     *         }
-     *       }
-     *     } */
-    ExchangeRates: {
-      rates?: {
-        [key: string]:
-          | {
-              /** @description name of the currency */
-              name?: string;
-              /** @description unit of the currency */
-              unit?: string;
-              /** @description value of the currency */
-              value?: number;
-              /** @description type of the currency */
-              type?: string;
-            }
-          | undefined;
-      };
-    };
-    /** @example {
-     *       "coins": [
-     *         {
-     *           "id": "ethereum",
-     *           "name": "Ethereum",
-     *           "api_symbol": "ethereum",
-     *           "symbol": "ETH",
-     *           "market_cap_rank": 2,
-     *           "thumb": "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png",
-     *           "large": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
-     *         },
-     *         {
-     *           "id": "ethereum-classic",
-     *           "name": "Ethereum Classic",
-     *           "api_symbol": "ethereum-classic",
-     *           "symbol": "ETC",
-     *           "market_cap_rank": 27,
-     *           "thumb": "https://assets.coingecko.com/coins/images/453/thumb/ethereum-classic-logo.png",
-     *           "large": "https://assets.coingecko.com/coins/images/453/large/ethereum-classic-logo.png"
-     *         },
-     *         {
-     *           "id": "sweth",
-     *           "name": "Swell Ethereum",
-     *           "api_symbol": "sweth",
-     *           "symbol": "SWETH",
-     *           "market_cap_rank": 142,
-     *           "thumb": "https://assets.coingecko.com/coins/images/30326/thumb/_lB7zEtS_400x400.jpg",
-     *           "large": "https://assets.coingecko.com/coins/images/30326/large/_lB7zEtS_400x400.jpg"
-     *         }
-     *       ],
-     *       "exchanges": [
-     *         {
-     *           "id": "uniswap_v3",
-     *           "name": "Uniswap V3 (Ethereum)",
-     *           "market_type": "spot",
-     *           "thumb": "https://assets.coingecko.com/markets/images/665/thumb/uniswap-v3.png",
-     *           "large": "https://assets.coingecko.com/markets/images/665/large/uniswap-v3.png"
-     *         },
-     *         {
-     *           "id": "uniswap_v2",
-     *           "name": "Uniswap V2 (Ethereum)",
-     *           "market_type": "spot",
-     *           "thumb": "https://assets.coingecko.com/markets/images/535/thumb/256x256_Black-1.png",
-     *           "large": "https://assets.coingecko.com/markets/images/535/large/256x256_Black-1.png"
-     *         },
-     *         {
-     *           "id": "curve_ethereum",
-     *           "name": "Curve (Ethereum)",
-     *           "market_type": "spot",
-     *           "thumb": "https://assets.coingecko.com/markets/images/538/thumb/Curve.png",
-     *           "large": "https://assets.coingecko.com/markets/images/538/large/Curve.png"
-     *         }
-     *       ],
-     *       "icos": [],
-     *       "categories": [
-     *         {
-     *           "id": 158,
-     *           "name": "Ethereum PoS IOU"
-     *         },
-     *         {
-     *           "id": 146,
-     *           "name": "Ethereum Ecosystem"
-     *         },
-     *         {
-     *           "id": 167,
-     *           "name": "EthereumPoW Ecosystem"
-     *         }
-     *       ],
-     *       "nfts": [
-     *         {
-     *           "id": "cyberkongz-genkai",
-     *           "name": "CyberKongz Genkai (Ethereum)",
-     *           "symbol": "GENKAI",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3388/thumb/cyberkongz-genkai.png"
-     *         },
-     *         {
-     *           "id": "ethereum-peppets",
-     *           "name": "Ethereum Peppets",
-     *           "symbol": "PEPPET",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3880/thumb/ethereum-peppets.png"
-     *         },
-     *         {
-     *           "id": "ens-ethereum-name-service",
-     *           "name": "ENS: Ethereum Name Service",
-     *           "symbol": "ENS",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/373/thumb/ens-ethereum-name-service.png"
-     *         },
-     *         {
-     *           "id": "league-of-kingdoms-ethereum",
-     *           "name": "League of Kingdoms (Ethereum)",
-     *           "symbol": "LOKR",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/1001/thumb/league-of-kingdoms-ethereum.jpg"
-     *         }
-     *       ]
-     *     } */
-    Search: {
-      coins?: {
-        /** @description coin id */
-        id?: string;
-        /** @description coin name */
-        name?: string;
-        /** @description coin api symbol */
-        api_symbol?: string;
-        /** @description coin symbol */
-        symbol?: string;
-        /** @description coin market cap rank */
-        market_cap_rank?: number;
-        /** @description coin thumb image url */
-        thumb?: string;
-        /** @description coin large image url */
-        large?: string;
-      }[];
-      exchanges?: {
-        /** @description exchange id */
-        id?: string;
-        /** @description exchange name */
-        name?: string;
-        /** @description exchange market type */
-        market_type?: string;
-        /** @description exchange thumb image url */
-        thumb?: string;
-        /** @description exchange large image url */
-        large?: string;
-      }[];
-      icos?: string[];
-      categories?: {
-        /** @description category id */
-        id?: number;
-        /** @description category name */
-        name?: string;
-      }[];
-      nfts?: {
-        /** @description nft collection id */
-        id?: string;
-        /** @description nft name */
-        name?: string;
-        /** @description nft collection symbol */
-        symbol?: string;
-        /** @description nft collection thumb image url */
-        thumb?: string;
-      }[];
-    };
-    /** @example {
-     *       "coins": [
-     *         {
-     *           "item": {
-     *             "id": "moon-tropica",
-     *             "coin_id": 28470,
-     *             "name": "Moon Tropica",
-     *             "symbol": "CAH",
-     *             "market_cap_rank": 530,
-     *             "thumb": "https://assets.coingecko.com/coins/images/28470/standard/MTLOGO.png?1696527464",
-     *             "small": "https://assets.coingecko.com/coins/images/28470/small/MTLOGO.png?1696527464",
-     *             "large": "https://assets.coingecko.com/coins/images/28470/large/MTLOGO.png?1696527464",
-     *             "slug": "moon-tropica",
-     *             "price_btc": 0.0005301634743332989,
-     *             "score": 0,
-     *             "data": {
-     *               "price": 36.97171180169754,
-     *               "price_btc": "0.000530163474333299",
-     *               "price_change_percentage_24h": {
-     *                 "aed": -4.044674476087556,
-     *                 "ars": -4.049900089458546,
-     *                 "aud": -4.049900089458019,
-     *                 "bch": -2.3756796248748864,
-     *                 "bdt": -4.049900089458495,
-     *                 "bhd": -4.169270133964371,
-     *                 "bmd": -4.049900089458533,
-     *                 "bnb": -3.4734695990217044,
-     *                 "brl": -4.0499000894584745,
-     *                 "btc": -5.9858537505924625,
-     *                 "cad": -4.049900089458477,
-     *                 "chf": -4.04990008945855,
-     *                 "clp": -5.025675567567188,
-     *                 "cny": -4.049900089458403,
-     *                 "czk": -4.049900089458641,
-     *                 "dkk": -4.049900089458638,
-     *                 "dot": -5.982387795212445,
-     *                 "eos": -5.74405098071799,
-     *                 "eth": -5.0568944511997085,
-     *                 "eur": -4.096616197526041,
-     *                 "gbp": -4.049900089458471,
-     *                 "gel": -4.049900089458967,
-     *                 "hkd": -4.0499000894585215,
-     *                 "huf": -4.053877164508182,
-     *                 "idr": -4.049900089458211,
-     *                 "ils": -4.4092202121097746,
-     *                 "inr": -4.049900089458557,
-     *                 "jpy": -4.049900089459048,
-     *                 "krw": -4.049900089458465,
-     *                 "kwd": -4.120414696850362,
-     *                 "lkr": -4.049900089458902,
-     *                 "ltc": -5.293413388383373,
-     *                 "mmk": -4.049900089458767,
-     *                 "mxn": -4.0499000894591966,
-     *                 "myr": -4.049900089458715,
-     *                 "ngn": -4.049900089458488,
-     *                 "nok": -4.0499000894585375,
-     *                 "nzd": -4.049900089458602,
-     *                 "php": -4.049900089458442,
-     *                 "pkr": -4.049900089458451,
-     *                 "pln": -4.049900089458555,
-     *                 "rub": -4.049900089458471,
-     *                 "sar": -4.049900089458411,
-     *                 "sek": -4.049900089458544,
-     *                 "sgd": -4.049900089458575,
-     *                 "thb": -4.041056870708535,
-     *                 "try": -4.049900089458374,
-     *                 "twd": -4.0499000894584665,
-     *                 "uah": -4.17945939929411,
-     *                 "usd": -4.049900089458533,
-     *                 "vef": -4.049900089458404,
-     *                 "vnd": -4.049900089458679,
-     *                 "xag": -4.062083010251626,
-     *                 "xau": -4.049900089458423,
-     *                 "xdr": -4.049900089458524,
-     *                 "xlm": -4.124939249003918,
-     *                 "xrp": -4.481270699934758,
-     *                 "yfi": -4.04427366181248,
-     *                 "zar": -4.0499000894588,
-     *                 "bits": -5.9858537505924465,
-     *                 "link": -5.120058065995313,
-     *                 "sats": -5.9858537505924545
-     *               },
-     *               "market_cap": "$99,703,583",
-     *               "market_cap_btc": "1428.83459310001",
-     *               "total_volume": "$282,142",
-     *               "total_volume_btc": "4.04583894742915",
-     *               "sparkline": "https://www.coingecko.com/coins/28470/sparkline.svg",
-     *               "content": null
-     *             }
-     *           }
-     *         },
-     *         {
-     *           "item": {
-     *             "id": "gala",
-     *             "coin_id": 12493,
-     *             "name": "GALA",
-     *             "symbol": "GALA",
-     *             "market_cap_rank": 53,
-     *             "thumb": "https://assets.coingecko.com/coins/images/12493/standard/GALA_token_image_-_200PNG.png?1709725869",
-     *             "small": "https://assets.coingecko.com/coins/images/12493/small/GALA_token_image_-_200PNG.png?1709725869",
-     *             "large": "https://assets.coingecko.com/coins/images/12493/large/GALA_token_image_-_200PNG.png?1709725869",
-     *             "slug": "gala",
-     *             "price_btc": 8.995385509920279e-7,
-     *             "score": 1,
-     *             "data": {
-     *               "price": 0.06273061361614252,
-     *               "price_btc": "0.000000899538550992028",
-     *               "price_change_percentage_24h": {
-     *                 "aed": 9.607800289428866,
-     *                 "ars": 9.601831178453207,
-     *                 "aud": 9.60183117845384,
-     *                 "bch": 11.467421966306494,
-     *                 "bdt": 9.601831178453276,
-     *                 "bhd": 9.465477224909796,
-     *                 "bmd": 9.601831178453173,
-     *                 "bnb": 10.223428485128215,
-     *                 "brl": 9.601831178453361,
-     *                 "btc": 7.387458257241243,
-     *                 "cad": 9.601831178453283,
-     *                 "chf": 9.601831178453216,
-     *                 "clp": 8.487222863095175,
-     *                 "cny": 9.601831178453274,
-     *                 "czk": 9.601831178453118,
-     *                 "dkk": 9.601831178453255,
-     *                 "dot": 7.376880264270369,
-     *                 "eos": 7.628589329562328,
-     *                 "eth": 8.451082207534835,
-     *                 "eur": 9.548468326361439,
-     *                 "gbp": 9.601831178453317,
-     *                 "gel": 9.601831178452892,
-     *                 "hkd": 9.601831178453269,
-     *                 "huf": 9.597288247194557,
-     *                 "idr": 9.601831178452711,
-     *                 "ils": 9.191387172052512,
-     *                 "inr": 9.601831178453226,
-     *                 "jpy": 9.601831178453017,
-     *                 "krw": 9.601831178453276,
-     *                 "kwd": 9.521283788693184,
-     *                 "lkr": 9.601831178453256,
-     *                 "ltc": 8.065248250452148,
-     *                 "mmk": 9.601831178452926,
-     *                 "mxn": 9.601831178453205,
-     *                 "myr": 9.601831178453285,
-     *                 "ngn": 9.601831178453272,
-     *                 "nok": 9.601831178453201,
-     *                 "nzd": 9.60183117845338,
-     *                 "php": 9.601831178453331,
-     *                 "pkr": 9.601831178452992,
-     *                 "pln": 9.601831178453399,
-     *                 "rub": 9.601831178453267,
-     *                 "sar": 9.601831178453297,
-     *                 "sek": 9.601831178453194,
-     *                 "sgd": 9.601831178453194,
-     *                 "thb": 9.61193260585552,
-     *                 "try": 9.60183117845312,
-     *                 "twd": 9.601831178452995,
-     *                 "uah": 9.453838236106627,
-     *                 "usd": 9.601831178453173,
-     *                 "vef": 9.601831178453372,
-     *                 "vnd": 9.60183117845306,
-     *                 "xag": 9.587914877904465,
-     *                 "xau": 9.601831178453322,
-     *                 "xdr": 9.601831178453349,
-     *                 "xlm": 9.491125969692098,
-     *                 "xrp": 8.997673436109869,
-     *                 "yfi": 9.544091113766347,
-     *                 "zar": 9.6018311784527,
-     *                 "bits": 7.387458257241251,
-     *                 "link": 8.376626532676953,
-     *                 "sats": 7.38745825724125
-     *               },
-     *               "market_cap": "$2,365,621,969",
-     *               "market_cap_btc": "33901.3141933559",
-     *               "total_volume": "$212,777,204",
-     *               "total_volume_btc": "3051.16253202022",
-     *               "sparkline": "https://www.coingecko.com/coins/12493/sparkline.svg",
-     *               "content": {
-     *                 "title": "What is GALA?",
-     *                 "description": "Gala is a blockchain gaming ecosystem. Gamers can explore different type of games and have their experiences interact across each other on the Gala platform. The GALA token is the utility token and primary medium of exchange of the ecosystem. Game items are represented as NFTs on the Ethereum blockchain and users can trade them on all marketplaces."
-     *               }
-     *             }
-     *           }
-     *         }
-     *       ],
-     *       "nfts": [
-     *         {
-     *           "id": "chameleon-travel-club",
-     *           "name": "ChameleonTravelClub",
-     *           "symbol": "CTC",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3610/standard/chameleon-travel-club.png?1707290106",
-     *           "nft_contract_id": 3610,
-     *           "native_currency_symbol": "eth",
-     *           "floor_price_in_native_currency": 4.29,
-     *           "floor_price_24h_percentage_change": 57.3120347225931,
-     *           "data": {
-     *             "floor_price": "4.29 ETH",
-     *             "floor_price_in_usd_24h_percentage_change": "57.3120347225931",
-     *             "h24_volume": "11.26 ETH",
-     *             "h24_average_sale_price": "2.82 ETH",
-     *             "sparkline": "https://www.coingecko.com/nft/3610/sparkline.svg",
-     *             "content": null
-     *           }
-     *         },
-     *         {
-     *           "id": "natcats",
-     *           "name": "Natcats",
-     *           "symbol": "DMTNATCATS",
-     *           "thumb": "https://assets.coingecko.com/nft_contracts/images/4171/standard/natcats.png?1709517703",
-     *           "nft_contract_id": 4171,
-     *           "native_currency_symbol": "btc",
-     *           "floor_price_in_native_currency": 0.05139,
-     *           "floor_price_24h_percentage_change": 52.5917829733019,
-     *           "data": {
-     *             "floor_price": "0.051 BTC",
-     *             "floor_price_in_usd_24h_percentage_change": "52.5917829733019",
-     *             "h24_volume": "3.93 BTC",
-     *             "h24_average_sale_price": "0.049 BTC",
-     *             "sparkline": "https://www.coingecko.com/nft/4171/sparkline.svg",
-     *             "content": null
-     *           }
-     *         }
-     *       ],
-     *       "categories": [
-     *         {
-     *           "id": 251,
-     *           "name": "Solana Meme Coins",
-     *           "market_cap_1h_change": 1.4453764946553134,
-     *           "slug": "solana-meme-coins",
-     *           "coins_count": 79,
-     *           "data": {
-     *             "market_cap": 8237562936.011124,
-     *             "market_cap_btc": 118852.27622489528,
-     *             "total_volume": 1207846273.3244412,
-     *             "total_volume_btc": 17426.911336459012,
-     *             "market_cap_change_percentage_24h": {
-     *               "aed": 14.230396523539737,
-     *               "ars": 14.224569755904016,
-     *               "aud": 14.224175671448258,
-     *               "bch": 10.54444640788801,
-     *               "bdt": 14.22417567144842,
-     *               "bhd": 14.082071130168746,
-     *               "bmd": 14.224175671448535,
-     *               "bnb": 12.624477239332412,
-     *               "brl": 14.221695576046988,
-     *               "btc": 11.84681099262996,
-     *               "cad": 14.232580997300973,
-     *               "chf": 14.224175671448508,
-     *               "clp": 13.062559896881549,
-     *               "cny": 14.217858661401426,
-     *               "czk": 14.224175671448577,
-     *               "dkk": 14.224175671448444,
-     *               "dot": 10.696648493582588,
-     *               "eos": 10.12173144446242,
-     *               "eth": 11.884759639001178,
-     *               "eur": 14.168562295958932,
-     *               "gbp": 14.224175671448489,
-     *               "gel": 14.224175671449085,
-     *               "hkd": 14.224175671448705,
-     *               "huf": 14.21944114673665,
-     *               "idr": 14.224175671448897,
-     *               "ils": 13.796421611262415,
-     *               "inr": 14.224175671448592,
-     *               "jpy": 14.224175671448288,
-     *               "krw": 14.224175671448533,
-     *               "kwd": 14.140231278377183,
-     *               "lkr": 14.2241756714485,
-     *               "ltc": 8.642866877624703,
-     *               "mmk": 14.224175671448963,
-     *               "mxn": 14.224175671448078,
-     *               "myr": 14.224175671448464,
-     *               "ngn": 14.224175671448572,
-     *               "nok": 14.224175671448524,
-     *               "nzd": 14.22417567144808,
-     *               "php": 14.224175671448599,
-     *               "pkr": 14.224175671448386,
-     *               "pln": 14.206825106648202,
-     *               "rub": 14.224175671448602,
-     *               "sar": 14.224175671448705,
-     *               "sek": 14.224175671448574,
-     *               "sgd": 14.224175671448508,
-     *               "thb": 14.234703116161398,
-     *               "try": 14.224175671448606,
-     *               "twd": 14.224175671448991,
-     *               "uah": 14.06994127898445,
-     *               "usd": 14.224175671448535,
-     *               "vef": 14.224175671448553,
-     *               "vnd": 14.224175671448933,
-     *               "xag": 14.209672465238517,
-     *               "xau": 14.224175671448783,
-     *               "xdr": 14.224175671448712,
-     *               "xlm": 11.83204356427227,
-     *               "xrp": 12.417240014724353,
-     *               "yfi": 12.795491855495357,
-     *               "zar": 14.224175671448144,
-     *               "bits": 11.846810992629957,
-     *               "link": 11.65665127230344,
-     *               "sats": 11.846810992629955
-     *             },
-     *             "sparkline": "https://www.coingecko.com/categories/25211443/sparkline.svg"
-     *           }
-     *         },
-     *         {
-     *           "id": 327,
-     *           "name": "Gaming Platform",
-     *           "market_cap_1h_change": 1.1050692959116248,
-     *           "slug": "gaming-platform",
-     *           "coins_count": 20,
-     *           "data": {
-     *             "market_cap": 3665275001.853747,
-     *             "market_cap_btc": 52882.90728027729,
-     *             "total_volume": 218189404.503211,
-     *             "total_volume_btc": 3148.0557508090187,
-     *             "market_cap_change_percentage_24h": {
-     *               "aed": 5.953195292443641,
-     *               "ars": 5.947790735793044,
-     *               "aud": 5.947425206927055,
-     *               "bch": 2.53433127439418,
-     *               "bdt": 5.947425206927214,
-     *               "bhd": 5.815617643683333,
-     *               "bmd": 5.9474252069273215,
-     *               "bnb": 4.4636418572644425,
-     *               "brl": 5.945124820686694,
-     *               "btc": 3.742325760876501,
-     *               "cad": 5.955221477960618,
-     *               "chf": 5.947425206927288,
-     *               "clp": 4.869980789651604,
-     *               "cny": 5.941565931116702,
-     *               "czk": 5.947425206927346,
-     *               "dkk": 5.947425206927227,
-     *               "dot": 2.675504708088687,
-     *               "eos": 2.1422464840411943,
-     *               "eth": 3.7775246261734994,
-     *               "eur": 5.895841609098276,
-     *               "gbp": 5.94742520692727,
-     *               "gel": 5.947425206927817,
-     *               "hkd": 5.947425206927471,
-     *               "huf": 5.943033748640541,
-     *               "idr": 5.9474252069276545,
-     *               "ils": 5.550666455707389,
-     *               "inr": 5.94742520692736,
-     *               "jpy": 5.94742520692707,
-     *               "krw": 5.947425206927302,
-     *               "kwd": 5.86956347359295,
-     *               "lkr": 5.94742520692729,
-     *               "ltc": 0.7705413072238989,
-     *               "mmk": 5.947425206927696,
-     *               "mxn": 5.947425206926885,
-     *               "myr": 5.947425206927239,
-     *               "ngn": 5.947425206927365,
-     *               "nok": 5.9474252069272895,
-     *               "nzd": 5.947425206926885,
-     *               "php": 5.947425206927361,
-     *               "pkr": 5.947425206927167,
-     *               "pln": 5.931331874183391,
-     *               "rub": 5.94742520692736,
-     *               "sar": 5.947425206927473,
-     *               "sek": 5.9474252069273605,
-     *               "sgd": 5.947425206927288,
-     *               "thb": 5.957189826849315,
-     *               "try": 5.947425206927379,
-     *               "twd": 5.947425206927743,
-     *               "uah": 5.804366728598461,
-     *               "usd": 5.9474252069273215,
-     *               "vef": 5.94742520692733,
-     *               "vnd": 5.94742520692767,
-     *               "xag": 5.933972911507694,
-     *               "xau": 5.947425206927534,
-     *               "xdr": 5.947425206927486,
-     *               "xlm": 3.7286283890002943,
-     *               "xrp": 4.2714211629570755,
-     *               "yfi": 4.622264654484985,
-     *               "zar": 5.9474252069269395,
-     *               "bits": 3.742325760876498,
-     *               "link": 3.5659451249189047,
-     *               "sats": 3.742325760876507
-     *             },
-     *             "sparkline": "https://www.coingecko.com/categories/25211410/sparkline.svg"
-     *           }
-     *         }
-     *       ]
-     *     } */
-    TrendingSearch: {
-      coins?: {
-        /** @description coin id */
-        id?: string;
-        coin_id?: number;
-        /** @description coin name */
-        name?: string;
-        /** @description coin symbol */
-        symbol?: string;
-        /** @description coin market cap rank */
-        market_cap_rank?: number;
-        /** @description coin thumb image url */
-        thumb?: string;
-        /** @description coin small image url */
-        small?: string;
-        /** @description coin large image url */
-        large?: string;
-        /** @description coin web slug */
-        slug?: string;
-        /** @description coin price in btc */
-        price_btc?: number;
-        /** @description coin sequence in the list */
-        score?: number;
-        data?: {
-          /** @description coin price in usd */
-          price?: number;
-          /** @description coin price in btc */
-          price_btc?: string;
-          /** @description coin price change percentage in 24 hours */
-          price_change_percentage_24h?: {
-            btc?: number;
+        /** @example {
+         *       "usd": 67187.33589365664,
+         *       "usd_market_cap": 1317802988326.2493,
+         *       "usd_24h_vol": 31260929299.52484,
+         *       "usd_24h_change": 3.637278946773539,
+         *       "last_updated_at": 1711356300
+         *     } */
+        SimplePrice: {
+            /** @description price in USD */
             usd?: number;
-          };
-          /** @description coin market cap in usd */
-          market_cap?: string;
-          /** @description coin market cap in btc */
-          market_cap_btc?: string;
-          /** @description coin total volume in usd */
-          total_volume?: string;
-          /** @description coin total volume in btc */
-          total_volume_btc?: string;
-          /** @description coin sparkline image url */
-          sparkline?: string;
-          content?: string;
+            /** @description market cap in USD */
+            usd_market_cap?: number;
+            /** @description 24h volume in USD */
+            usd_24h_vol?: number;
+            /** @description 24h change in USD */
+            usd_24h_change?: number;
+            /** @description last updated timestamp */
+            last_updated_at?: number;
         };
-      }[];
-      nfts?: {
-        /** @description nft collection id */
-        id?: string;
-        /** @description nft collection name */
-        name?: string;
-        /** @description nft collection symbol */
-        symbol?: string;
-        /** @description nft collection thumb image url */
-        thumb?: string;
-        nft_contract_id?: number;
-        /** @description nft collection native currency symbol */
-        native_currency_symbol?: string;
-        /** @description nft collection floor price in native currency */
-        floor_price_in_native_currency?: number;
-        /** @description nft collection floor price 24 hours percentage change */
-        floor_price_24h_percentage_change?: number;
-        data?: {
-          /** @description nft collection floor price */
-          floor_price?: string;
-          /** @description nft collection floor price in usd 24 hours percentage change */
-          floor_price_in_usd_24h_percentage_change?: string;
-          /** @description nft collection volume in 24 hours */
-          h24_volume?: string;
-          /** @description nft collection 24 hours average sale price */
-          h24_average_sale_price?: string;
-          /** @description nft collection sparkline image url */
-          sparkline?: string;
-          content?: string;
-        };
-      }[];
-      categories?: {
-        id?: number;
-        /** @description category name */
-        name?: string;
-        /** @description category market cap 1 hour change */
-        market_cap_1h_change?: number;
-        /** @description category web slug */
-        slug?: string;
-        /** @description category number of coins */
-        coins_count?: number;
-        data?: {
-          /** @description category market cap */
-          market_cap?: number;
-          /** @description category market cap in btc */
-          market_cap_btc?: number;
-          /** @description category total volume */
-          total_volume?: number;
-          /** @description category total volume in btc */
-          total_volume_btc?: number;
-          /** @description category market cap change percentage in 24 hours */
-          market_cap_change_percentage_24h?: {
-            btc?: number;
+        /** @example [
+         *       "btc",
+         *       "eth",
+         *       "ltc",
+         *       "bch",
+         *       "bnb",
+         *       "eos",
+         *       "xrp",
+         *       "xlm",
+         *       "link",
+         *       "dot",
+         *       "yfi",
+         *       "usd",
+         *       "aed",
+         *       "ars",
+         *       "aud",
+         *       "bdt",
+         *       "bhd",
+         *       "bmd",
+         *       "brl",
+         *       "cad",
+         *       "chf",
+         *       "clp",
+         *       "cny",
+         *       "czk",
+         *       "dkk",
+         *       "eur",
+         *       "gbp",
+         *       "gel",
+         *       "hkd",
+         *       "huf",
+         *       "idr",
+         *       "ils",
+         *       "inr",
+         *       "jpy",
+         *       "krw",
+         *       "kwd",
+         *       "lkr",
+         *       "mmk",
+         *       "mxn",
+         *       "myr",
+         *       "ngn",
+         *       "nok",
+         *       "nzd",
+         *       "php",
+         *       "pkr",
+         *       "pln",
+         *       "rub",
+         *       "sar",
+         *       "sek",
+         *       "sgd",
+         *       "thb",
+         *       "try",
+         *       "twd",
+         *       "uah",
+         *       "vef",
+         *       "vnd",
+         *       "zar",
+         *       "xdr",
+         *       "xag",
+         *       "xau",
+         *       "bits",
+         *       "sats"
+         *     ] */
+        CurrencyList: string[];
+        /** @example [
+         *       {
+         *         "id": "0chain",
+         *         "symbol": "zcn",
+         *         "name": "Zus",
+         *         "platforms": {
+         *           "ethereum": "0xb9ef770b6a5e12e45983c5d80545258aa38f3b78",
+         *           "polygon-pos": "0x8bb30e0e67b11b978a5040144c410e1ccddcba30"
+         *         }
+         *       },
+         *       {
+         *         "id": "01coin",
+         *         "symbol": "zoc",
+         *         "name": "01coin",
+         *         "platforms": {}
+         *       }
+         *     ] */
+        CoinsList: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description coin asset platform and contract address */
+            platforms?: {
+                [key: string]: string | undefined;
+            };
+        }[];
+        TopGainersLosers: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description coin image url */
+            image?: string;
+            /** @description coin rank by market cap */
+            market_cap_rank?: number;
+            /** @description coin price in USD */
             usd?: number;
-          };
-          /** @description category sparkline image url */
-          sparkline?: string;
+            /** @description coin 24h volume in USD */
+            usd_24h_vol?: number;
+            /** @description coin 1 year change in USD */
+            usd_1y_change?: number;
+        }[];
+        /** @example [
+         *       {
+         *         "id": "long-johnson",
+         *         "symbol": "olong",
+         *         "name": "Long Johnson",
+         *         "activated_at": 1712562430
+         *       },
+         *       {
+         *         "id": "dogita",
+         *         "symbol": "doga",
+         *         "name": "DOGITA",
+         *         "activated_at": 1712562282
+         *       },
+         *       {
+         *         "id": "bebe-on-base",
+         *         "symbol": "bebe",
+         *         "name": "Bebe on Base",
+         *         "activated_at": 1712561709
+         *       }
+         *     ] */
+        CoinsListNew: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description timestamp when coin was activated on CoinGecko */
+            activated_at?: number;
+        }[];
+        /** @example [
+         *       {
+         *         "id": "bitcoin",
+         *         "symbol": "btc",
+         *         "name": "Bitcoin",
+         *         "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+         *         "current_price": 70187,
+         *         "market_cap": 1381651251183,
+         *         "market_cap_rank": 1,
+         *         "fully_diluted_valuation": 1474623675796,
+         *         "total_volume": 20154184933,
+         *         "high_24h": 70215,
+         *         "low_24h": 68060,
+         *         "price_change_24h": 2126.88,
+         *         "price_change_percentage_24h": 3.12502,
+         *         "market_cap_change_24h": 44287678051,
+         *         "market_cap_change_percentage_24h": 3.31157,
+         *         "circulating_supply": 19675987,
+         *         "total_supply": 21000000,
+         *         "max_supply": 21000000,
+         *         "ath": 73738,
+         *         "ath_change_percentage": -4.77063,
+         *         "ath_date": "2024-03-14T07:10:36.635Z",
+         *         "atl": 67.81,
+         *         "atl_change_percentage": 103455.83335,
+         *         "atl_date": "2013-07-06T00:00:00.000Z",
+         *         "roi": null,
+         *         "last_updated": "2024-04-07T16:49:31.736Z"
+         *       }
+         *     ] */
+        CoinsMarkets: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description coin image url */
+            image?: string;
+            /** @description coin current price in currency */
+            current_price?: number;
+            /** @description coin market cap in currency */
+            market_cap?: number;
+            /** @description coin rank by market cap */
+            market_cap_rank?: number;
+            /** @description coin fully diluted valuation (fdv) in currency */
+            fully_diluted_valuation?: number;
+            /** @description coin total trading volume in currency */
+            total_volume?: number;
+            /** @description coin 24h price high in currency */
+            high_24h?: number;
+            /** @description coin 24h price low in currency */
+            low_24h?: number;
+            /** @description coin 24h price change in currency */
+            price_change_24h?: number;
+            /** @description coin 24h price change in percentage */
+            price_change_percentage_24h?: number;
+            /** @description coin 24h market cap change in currency */
+            market_cap_change_24h?: number;
+            /** @description coin 24h market cap change in percentage */
+            market_cap_change_percentage_24h?: number;
+            /** @description coin circulating supply */
+            circulating_supply?: number;
+            /** @description coin total supply */
+            total_supply?: number;
+            /** @description coin max supply */
+            max_supply?: number;
+            /** @description coin all time high (ath) in currency */
+            ath?: number;
+            /** @description coin all time high (ath) change in percentage */
+            ath_change_percentage?: number;
+            /**
+             * Format: date-time
+             * @description coin all time high (ath) date
+             */
+            ath_date?: string;
+            /** @description coin all time low (atl) in currency */
+            atl?: number;
+            /** @description coin all time low (atl) change in percentage */
+            atl_change_percentage?: number;
+            /**
+             * Format: date-time
+             * @description coin all time low (atl) date
+             */
+            atl_date?: string;
+            /** @example null */
+            roi?: string;
+            /**
+             * Format: date-time
+             * @description coin last updated timestamp
+             */
+            last_updated?: string;
+            /** @description coin 1h price change in percentage */
+            price_change_percentage_1h?: number;
+            /** @description coin price sparkline in 7 days */
+            sparkline_in_7d?: {
+                price?: number[];
+            };
         };
-      }[];
-    };
-    /** @example {
-     *       "date": {
-     *         "active_cryptocurrencies": 13690,
-     *         "upcoming_icos": 0,
-     *         "ongoing_icos": 49,
-     *         "ended_icos": 3376,
-     *         "markets": 1046,
-     *         "total_market_cap": {
-     *           "btc": 39003738.08471593,
-     *           "eth": 803832137.2075309,
-     *           "ltc": 26721173267.535767,
-     *           "bch": 3981159931.513415,
-     *           "bnb": 4670513150.58714,
-     *           "eos": 2641998753398.4077,
-     *           "xrp": 4567762968374.063,
-     *           "xlm": 21049307801356.547,
-     *           "link": 153517938957.19897,
-     *           "dot": 315120726481.16595,
-     *           "yfi": 324671967.6108449,
-     *           "usd": 2721226850772.6313,
-     *           "aed": 9993705609462.484,
-     *           "ars": 2341775032921961.5,
-     *           "aud": 4135040261091.559,
-     *           "bdt": 298245137607204.1,
-     *           "bhd": 1024582727718.6569,
-     *           "bmd": 2721226850772.6313,
-     *           "brl": 13785980136430.713,
-     *           "cad": 3698283351542.5464,
-     *           "chf": 2454228235855.375,
-     *           "clp": 2557393918759367.5,
-     *           "cny": 19681001075527.992,
-     *           "czk": 63568675602103.72,
-     *           "dkk": 18728571677757.562,
-     *           "eur": 2508293570926.523,
-     *           "gbp": 2153208842849.7563,
-     *           "gel": 7292887960070.655,
-     *           "hkd": 21307070180207.188,
-     *           "huf": 979811947048335,
-     *           "idr": 43234171898362830,
-     *           "ils": 10201683535213.324,
-     *           "inr": 226670207147326.38,
-     *           "jpy": 412551596711385.75,
-     *           "krw": 3677112086909555,
-     *           "kwd": 836219405108.1758,
-     *           "lkr": 812593109477405.5,
-     *           "mmk": 5706555839881336,
-     *           "mxn": 44773978111872.44,
-     *           "myr": 12919024474043.053,
-     *           "ngn": 3522998071018357,
-     *           "nok": 29197131372679.86,
-     *           "nzd": 4524820631515.687,
-     *           "php": 153994230206450,
-     *           "pkr": 755251422720380.5,
-     *           "pln": 10747177948492.383,
-     *           "rub": 251732363568358.97,
-     *           "sar": 10207395390373.113,
-     *           "sek": 29054498267296.645,
-     *           "sgd": 3672056167154.7974,
-     *           "thb": 99649147572586.36,
-     *           "try": 87273829665781.25,
-     *           "twd": 87422678053291.61,
-     *           "uah": 105534042826571.94,
-     *           "vef": 272476444567.86353,
-     *           "vnd": 67937284004880150,
-     *           "zar": 50878778428895.97,
-     *           "xdr": 2052425485204.5413,
-     *           "xag": 99002369095.9216,
-     *           "xau": 1167950564.3516145,
-     *           "bits": 39003738084715.93,
-     *           "sats": 3900373808471593.5
-     *         },
-     *         "total_volume": {
-     *           "btc": 993675.225562481,
-     *           "eth": 20478757.151921887,
-     *           "ltc": 680759567.6148158,
-     *           "bch": 101425662.95452334,
-     *           "bnb": 118987908.24412876,
-     *           "eos": 67308643636.075134,
-     *           "xrp": 116370202467.68745,
-     *           "xlm": 536260797157.8833,
-     *           "link": 3911085965.397742,
-     *           "dot": 8028144848.205925,
-     *           "yfi": 8271476.183867172,
-     *           "usd": 69327091133.54892,
-     *           "aed": 254603742187.9583,
-     *           "ars": 59660021021604.7,
-     *           "aud": 105345981331.98444,
-     *           "bdt": 7598215425943.58,
-     *           "bhd": 26102689718.14816,
-     *           "bmd": 69327091133.54892,
-     *           "brl": 351217283120.7607,
-     *           "cad": 94218983205.04971,
-     *           "chf": 62524924932.79855,
-     *           "clp": 65153216175224.445,
-     *           "cny": 501401253914.27954,
-     *           "czk": 1619501647007.038,
-     *           "dkk": 477136772017.5372,
-     *           "eur": 63902315579.43983,
-     *           "gbp": 54856031438.69647,
-     *           "gel": 185796604237.91116,
-     *           "hkd": 542827657221.1319,
-     *           "huf": 24962090950805.31,
-     *           "idr": 1101451492157040.8,
-     *           "ils": 259902273109.11288,
-     *           "inr": 5774743147085.059,
-     *           "jpy": 10510333651301.709,
-     *           "krw": 93679615385638.72,
-     *           "kwd": 21303868469.883915,
-     *           "lkr": 20701955274048.176,
-     *           "mmk": 145382556642718.72,
-     *           "mxn": 1140680226674.9573,
-     *           "myr": 329130365156.52313,
-     *           "ngn": 89753343519839.38,
-     *           "nok": 743838091608.2996,
-     *           "nzd": 115276185884.68079,
-     *           "php": 3923220156574.6226,
-     *           "pkr": 19241094948336.27,
-     *           "pln": 273799512470.6537,
-     *           "rub": 6413236921211.558,
-     *           "sar": 260047790673.40265,
-     *           "sek": 740204312126.5353,
-     *           "sgd": 93550808700.7045,
-     *           "thb": 2538702546310.5654,
-     *           "try": 2223423872616.704,
-     *           "twd": 2227215995174.6167,
-     *           "uah": 2688628550997.977,
-     *           "vef": 6941721635.202251,
-     *           "vnd": 1730798106094996.5,
-     *           "zar": 1296208622923.966,
-     *           "xdr": 52288433291.474365,
-     *           "xag": 2522224952.6170354,
-     *           "xau": 29755187.514519222,
-     *           "bits": 993675225562.481,
-     *           "sats": 99367522556248.1
-     *         },
-     *         "market_cap_percentage": {
-     *           "btc": 50.446526323358434,
-     *           "eth": 14.922806691821144,
-     *           "usdt": 3.9290064119981887,
-     *           "bnb": 3.2939520356345176,
-     *           "sol": 2.9507480132815944,
-     *           "usdc": 1.2092204926353505,
-     *           "xrp": 1.2052348104116084,
-     *           "steth": 1.1830926679376446,
-     *           "doge": 1.0577856035454278,
-     *           "ada": 0.7659872946940993
-     *         },
-     *         "market_cap_change_percentage_24h_usd": 1.721795060602718,
-     *         "updated_at": 1712512855
-     *       }
-     *     } */
-    Global: {
-      data?: {
-        /** @description number of active cryptocurrencies */
-        active_cryptocurrencies?: number;
-        /** @description number of upcoming icos */
-        upcoming_icos?: number;
-        /** @description number of ongoing icos */
-        ongoing_icos?: number;
-        /** @description number of ended icos */
-        ended_icos?: number;
-        /** @description number of exchanges */
-        markets?: number;
-        /** @description cryptocurrencies total market cap */
-        total_market_cap?: {
-          btc?: number;
-          eth?: number;
+        CoinsDataBase: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description coin web slug */
+            web_slug?: string;
+            /** @description coin asset platform id */
+            asset_platform_id?: string;
+            /** @description coin asset platform and contract address */
+            platforms?: {
+                [key: string]: string | undefined;
+            };
+            /** @description detailed coin asset platform and contract address */
+            detail_platforms?: {
+                [key: string]: string | undefined;
+            };
+            /** @description blockchain block time in minutes */
+            block_time_in_minutes?: number;
+            /** @description blockchain hashing algorithm */
+            hashing_algorithm?: string;
+            /** @description coin categories */
+            categories?: string[];
+            /** @description preview listing coin */
+            preview_listing?: boolean;
+            /** @description public notice */
+            public_notice?: string;
+            /** @description additional notices */
+            additional_notices?: string[];
+            /** @description coin name localization */
+            localization?: {
+                [key: string]: string | undefined;
+            };
+            /** @description coin description */
+            description?: {
+                [key: string]: string | undefined;
+            };
+            /** @description links */
+            links?: {
+                /** @description coin website url */
+                homepage?: string[];
+                /** @description coin whitepaper url */
+                whitepaper?: string[];
+                /** @description coin block explorer url */
+                blockchain_site?: string[];
+                /** @description coin official forum url */
+                official_forum_url?: string[];
+                /** @description coin chat url */
+                chat_url?: string[];
+                /** @description coin announcement url */
+                announcement_url?: string[];
+                /** @description coin twitter handle */
+                twitter_screen_name?: string;
+                /** @description coin facebook username */
+                facebook_username?: string;
+                /** @description coin bitcointalk thread identifier */
+                bitcointalk_thread_identifier?: string;
+                /** @description coin telegram channel identifier */
+                telegram_channel_identifier?: string;
+                /** @description coin subreddit url */
+                subreddit_url?: string;
+                /** @description coin repository url */
+                repos_url?: {
+                    /** @description coin github repository url */
+                    github?: string[];
+                    /** @description coin bitbucket repository url */
+                    bitbucket?: string[];
+                };
+            };
+            /** @description coin image url */
+            image?: {
+                thumb?: string;
+                small?: string;
+                large?: string;
+            };
+            /** @description coin country of origin */
+            country_origin?: string;
+            /**
+             * Format: date-time
+             * @description coin genesis date
+             */
+            genesis_date?: string;
+            /** @description coin sentiment votes up percentage */
+            sentiment_votes_up_percentage?: number;
+            /** @description coin sentiment votes down percentage */
+            sentiment_votes_down_percentage?: number;
+            /** @description coin rank by market cap */
+            market_cap_rank?: number;
+            /** @description coin market data */
+            market_data?: {
+                /** @description coin current price in currency */
+                current_price?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description total value locked */
+                total_value_locked?: number;
+                /** @description market cap to total value locked ratio */
+                mcap_to_tvl_ratio?: number;
+                /** @description fully diluted valuation to total value locked ratio */
+                fdv_to_tvl_ratio?: number;
+                /** @description coin return on investment */
+                roi?: number;
+                /** @description coin all time high (ath) in currency */
+                ath?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin all time high (ath) change in percentage */
+                ath_change_percentage?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin all time high (ath) date */
+                ath_date?: {
+                    btc?: string;
+                    eur?: string;
+                    usd?: string;
+                };
+                /** @description coin all time low (atl) in currency */
+                atl?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin all time low (atl) change in percentage */
+                atl_change_percentage?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin all time low (atl) date */
+                atl_date?: {
+                    btc?: string;
+                    eur?: string;
+                    usd?: string;
+                };
+                /** @description coin market cap in currency */
+                market_cap?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin rank by market cap */
+                market_cap_rank?: number;
+                /** @description coin fully diluted valuation (fdv) in currency */
+                fully_diluted_valuation?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description market cap to fully diluted valuation ratio */
+                market_cap_fdv_ratio?: number;
+                /** @description coin total trading volume in currency */
+                total_volume?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h price high in currency */
+                high_24h?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h price low in currency */
+                low_24h?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h price change in currency */
+                price_change_24h?: number;
+                /** @description coin 24h price change in percentage */
+                price_change_percentage_24h?: number;
+                /** @description coin 7d price change in percentage */
+                price_change_percentage_7d?: number;
+                /** @description coin 14d price change in percentage */
+                price_change_percentage_14d?: number;
+                /** @description coin 30d price change in percentage */
+                price_change_percentage_30d?: number;
+                /** @description coin 60d price change in percentage */
+                price_change_percentage_60d?: number;
+                /** @description coin 200d price change in percentage */
+                price_change_percentage_200d?: number;
+                /** @description coin 1y price change in percentage */
+                price_change_percentage_1y?: number;
+                /** @description coin 24h market cap change in currency */
+                market_cap_change_24h?: number;
+                /** @description coin 24h market cap change in percentage */
+                market_cap_change_percentage_24h?: number;
+                /** @description coin 1h price change in currency */
+                price_change_percentage_1h_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h price change in currency */
+                price_change_percentage_24h_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 7d price change in currency */
+                price_change_percentage_7d_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 14d price change in currency */
+                price_change_percentage_14d_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 30d price change in currency */
+                price_change_percentage_30d_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 60d price change in currency */
+                price_change_percentage_60d_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 200d price change in currency */
+                price_change_percentage_200d_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 1y price change in currency */
+                price_change_percentage_1y_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h market cap change in currency */
+                market_cap_change_24h_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin 24h market cap change in percentage */
+                market_cap_change_percentage_24h_in_currency?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin total supply */
+                total_supply?: number;
+                /** @description coin max supply */
+                max_supply?: number;
+                /** @description coin circulating supply */
+                circulating_supply?: number;
+                /**
+                 * Format: date-time
+                 * @description coin market data last updated timestamp
+                 */
+                last_updated?: string;
+            };
+            /** @description coin community data */
+            community_data?: {
+                /** @description coin facebook likes */
+                facebook_likes?: number;
+                /** @description coin twitter followers */
+                twitter_followers?: number;
+                /** @description coin reddit average posts in 48 hours */
+                reddit_average_posts_48h?: number;
+                /** @description coin reddit average comments in 48 hours */
+                reddit_average_comments_48h?: number;
+                /** @description coin reddit subscribers */
+                reddit_subscribers?: number;
+                /** @description coin reddit active accounts in 48 hours */
+                reddit_accounts_active_48h?: number;
+                /** @description coin telegram channel user count */
+                telegram_channel_user_count?: number;
+            };
+            /** @description coin developer data */
+            developer_data?: {
+                /** @description coin repository forks */
+                forks?: number;
+                /** @description coin repository stars */
+                stars?: number;
+                /** @description coin repository subscribers */
+                subscribers?: number;
+                /** @description coin repository total issues */
+                total_issues?: number;
+                /** @description coin repository closed issues */
+                closed_issues?: number;
+                /** @description coin repository pull requests merged */
+                pull_requests_merged?: number;
+                /** @description coin repository pull request contributors */
+                pull_request_contributors?: number;
+                /** @description coin code additions and deletions in 4 weeks */
+                code_additions_deletions_4_weeks?: {
+                    additions?: number;
+                    deletions?: number;
+                };
+                /** @description coin repository commit count in 4 weeks */
+                commit_count_4_weeks?: number;
+                /**
+                 * @description coin repository last 4 weeks commit activity series
+                 * @example []
+                 */
+                last_4_weeks_commit_activity_series?: number[];
+            };
+            /**
+             * @description coin status updates
+             * @example []
+             */
+            status_updates?: Record<string, never>[];
+            /**
+             * Format: date-time
+             * @description coin last updated timestamp
+             */
+            last_updated?: string;
+            /** @description coin tickers */
+            tickers?: {
+                /** @description coin ticker base currency */
+                base?: string;
+                /** @description coin ticker target currency */
+                target?: string;
+                /** @description coin ticker exchange */
+                market?: {
+                    /** @description coin ticker exchange name */
+                    name?: string;
+                    /** @description coin ticker exchange identifier */
+                    identifier?: string;
+                    /** @description coin ticker exchange trading incentive */
+                    has_trading_incentive?: boolean;
+                };
+                /** @description coin ticker last price */
+                last?: number;
+                /** @description coin ticker volume */
+                volume?: number;
+                /** @description coin ticker converted last price */
+                converted_last?: {
+                    btc?: number;
+                    eth?: number;
+                    usd?: number;
+                };
+                /** @description coin ticker converted volume */
+                converted_volume?: {
+                    btc?: number;
+                    eth?: number;
+                    usd?: number;
+                };
+                /** @description coin ticker trust score */
+                trust_score?: string;
+                /** @description coin ticker bid ask spread percentage */
+                bid_ask_spread_percentage?: number;
+                /**
+                 * Format: date-time
+                 * @description coin ticker timestamp
+                 */
+                timestamp?: string;
+                /**
+                 * Format: date-time
+                 * @description coin ticker last traded timestamp
+                 */
+                last_traded_at?: string;
+                /**
+                 * Format: date-time
+                 * @description coin ticker last fetch timestamp
+                 */
+                last_fetch_at?: string;
+                /** @description coin ticker anomaly */
+                is_anomaly?: boolean;
+                /** @description coin ticker stale */
+                is_stale?: boolean;
+                /** @description coin ticker trade url */
+                trade_url?: string;
+                /** @description coin ticker token info url */
+                token_info_url?: string;
+                /** @description coin ticker base currency coin id */
+                coin_id?: string;
+                /** @description coin ticker target currency coin id */
+                target_coin_id?: string;
+            }[];
         };
-        /** @description cryptocurrencies total volume */
-        total_volume?: {
-          btc?: number;
-          eth?: number;
+        CoinsID: components["schemas"]["CoinsDataBase"] & unknown;
+        /** @example {
+         *       "name": "Bitcoin",
+         *       "tickers": [
+         *         {
+         *           "base": "BTC",
+         *           "target": "USDT",
+         *           "market": {
+         *             "name": "Binance",
+         *             "identifier": "binance",
+         *             "has_trading_incentive": false,
+         *             "logo": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274"
+         *           },
+         *           "last": 69476,
+         *           "volume": 20242.03975,
+         *           "cost_to_move_up_usd": 19320706.39585167,
+         *           "cost_to_move_down_usd": 16360235.3694131,
+         *           "converted_last": {
+         *             "btc": 1.000205,
+         *             "eth": 20.291404,
+         *             "usd": 69498
+         *           },
+         *           "converted_volume": {
+         *             "btc": 20249,
+         *             "eth": 410802,
+         *             "usd": 1406996874
+         *           },
+         *           "trust_score": "green",
+         *           "bid_ask_spread_percentage": 0.010014,
+         *           "timestamp": "2024-04-08T04:02:01+00:00",
+         *           "last_traded_at": "2024-04-08T04:02:01+00:00",
+         *           "last_fetch_at": "2024-04-08T04:03:00+00:00",
+         *           "is_anomaly": false,
+         *           "is_stale": false,
+         *           "trade_url": "https://www.binance.com/en/trade/BTC_USDT?ref=37754157",
+         *           "token_info_url": null,
+         *           "coin_id": "bitcoin",
+         *           "target_coin_id": "tether"
+         *         }
+         *       ]
+         *     } */
+        CoinsTickers: {
+            /** @description coin name */
+            name?: string;
+            /** @description list of tickers */
+            tickers?: {
+                /** @description coin ticker base currency */
+                base?: string;
+                /** @description coin ticker target currency */
+                target?: string;
+                /** @description coin ticker exchange */
+                market?: {
+                    /** @description exchange name */
+                    name: string;
+                    /** @description exchange identifier */
+                    identifier: string;
+                    /** @description exchange trading incentive */
+                    has_trading_incentive: boolean;
+                    /** @description exchange image url */
+                    logo?: string;
+                };
+                /** @description coin ticker last price */
+                last?: number;
+                /** @description coin ticker volume */
+                volume?: number;
+                /** @description coin ticker cost to move up in usd */
+                cost_to_move_up_usd?: number;
+                /** @description coin ticker cost to move down in usd */
+                cost_to_move_down_usd?: number;
+                /** @description coin ticker converted last price */
+                converted_last?: {
+                    btc?: number;
+                    eth?: number;
+                    usd?: number;
+                };
+                /** @description coin ticker converted volume */
+                converted_volume?: {
+                    btc?: number;
+                    eth?: number;
+                    usd?: number;
+                };
+                /** @description coin ticker trust score */
+                trust_score?: string;
+                /** @description coin ticker bid ask spread percentage */
+                bid_ask_spread_percentage?: number;
+                /** @description coin ticker timestamp */
+                timestamp?: string;
+                /** @description coin ticker last traded timestamp */
+                last_traded_at?: string;
+                /** @description coin ticker last fetch timestamp */
+                last_fetch_at?: string;
+                /** @description coin ticker anomaly */
+                is_anomaly?: boolean;
+                /** @description coin ticker stale */
+                is_stale?: boolean;
+                /** @description coin ticker trade url */
+                trade_url?: string;
+                /** @description coin ticker token info url */
+                token_info_url?: string | null;
+                /** @description coin ticker base currency coin id */
+                coin_id?: string;
+                /** @description coin ticker target currency coin id */
+                target_coin_id?: string;
+            }[];
         };
-        /** @description cryptocurrencies market cap percentage */
-        market_cap_percentage?: {
-          btc?: number;
-          eth?: number;
+        /** @example {
+         *       "id": "bitcoin",
+         *       "symbol": "btc",
+         *       "name": "Bitcoin",
+         *       "localization": {
+         *         "en": "Bitcoin",
+         *         "de": "Bitcoin",
+         *         "es": "Bitcoin",
+         *         "fr": "Bitcoin",
+         *         "it": "Bitcoin",
+         *         "pl": "Bitcoin",
+         *         "ro": "Bitcoin",
+         *         "hu": "Bitcoin",
+         *         "nl": "Bitcoin",
+         *         "pt": "Bitcoin",
+         *         "sv": "Bitcoin",
+         *         "vi": "Bitcoin",
+         *         "tr": "Bitcoin",
+         *         "ru": "Биткоин",
+         *         "ja": "ビットコイン",
+         *         "zh": "比特币",
+         *         "zh-tw": "比特幣",
+         *         "ko": "비트코인",
+         *         "ar": "بيتكوين",
+         *         "th": "บิตคอยน์",
+         *         "id": "Bitcoin",
+         *         "cs": "Bitcoin",
+         *         "da": "Bitcoin",
+         *         "el": "Bitcoin",
+         *         "hi": "Bitcoin",
+         *         "no": "Bitcoin",
+         *         "sk": "Bitcoin",
+         *         "uk": "Bitcoin",
+         *         "he": "Bitcoin",
+         *         "fi": "Bitcoin",
+         *         "bg": "Bitcoin",
+         *         "hr": "Bitcoin",
+         *         "lt": "Bitcoin",
+         *         "sl": "Bitcoin"
+         *       },
+         *       "image": {
+         *         "thumb": "https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png?1696501400",
+         *         "small": "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400"
+         *       },
+         *       "market_data": {
+         *         "current_price": {
+         *           "aed": 154530.09108142683,
+         *           "ars": 33947900.26188303,
+         *           "aud": 61738.405695047535,
+         *           "bch": 165.38167494630605,
+         *           "bdt": 4617857.437514718,
+         *           "bhd": 15859.429741917913,
+         *           "bmd": 42074.70715618848,
+         *           "bnb": 134.15687497173963,
+         *           "brl": 204167.47440069792,
+         *           "btc": 1,
+         *           "cad": 55797.37289517942,
+         *           "chf": 35380.41087410315,
+         *           "clp": 37070945.97434911,
+         *           "cny": 297872.0967829519,
+         *           "czk": 941726.6142466004,
+         *           "dkk": 284202.0244279068,
+         *           "dot": 5078.184550422312,
+         *           "eos": 49611.91197615977,
+         *           "eth": 18.29654321540394,
+         *           "eur": 38057.70863986569,
+         *           "gbp": 33025.65781339986,
+         *           "gel": 113180.96225014742,
+         *           "hkd": 328622.3965080529,
+         *           "huf": 14607917.577557135,
+         *           "idr": 647533950.6044563,
+         *           "ils": 151504.70926336164,
+         *           "inr": 3501412.9510954972,
+         *           "jpy": 5933586.69083973,
+         *           "krw": 54466970.65490067,
+         *           "kwd": 12928.716014953645,
+         *           "lkr": 13628686.368770933,
+         *           "ltc": 573.6621797872364,
+         *           "mmk": 88364275.74483082,
+         *           "mxn": 714058.2700891062,
+         *           "myr": 193333.27938268633,
+         *           "ngn": 37725865.42452484,
+         *           "nok": 429848.16731742636,
+         *           "nzd": 66531.8087825235,
+         *           "php": 2330938.6923034303,
+         *           "pkr": 11705926.359806487,
+         *           "pln": 165640.54862662574,
+         *           "rub": 3755167.3612415865,
+         *           "sar": 157780.1518357064,
+         *           "sek": 423808.00650749775,
+         *           "sgd": 55568.065741178136,
+         *           "thb": 1438863.9771500682,
+         *           "try": 1240206.6063985475,
+         *           "twd": 1291001.3807622658,
+         *           "uah": 1599892.6750505993,
+         *           "usd": 42074.70715618848,
+         *           "vef": 4212.940427549151,
+         *           "vnd": 1021106970.8227047,
+         *           "xag": 1768.3279940253694,
+         *           "xau": 20.39613504103393,
+         *           "xdr": 31351.757663898043,
+         *           "xlm": 324963.64104682615,
+         *           "xrp": 67529.86361098202,
+         *           "yfi": 5.116942760598554,
+         *           "zar": 769994.6998914372,
+         *           "bits": 1000195.713931052,
+         *           "link": 2709.6608365050256,
+         *           "sats": 100019571.3931052
+         *         },
+         *         "market_cap": {
+         *           "aed": 3022434823129.84,
+         *           "ars": 663982757051427.4,
+         *           "aud": 1207533794818.6636,
+         *           "bch": 3239927812.6139565,
+         *           "bdt": 90320099015790.61,
+         *           "bhd": 310192612917.6729,
+         *           "bmd": 822933961870.5416,
+         *           "bnb": 2629923038.0492373,
+         *           "brl": 3993286227042.8438,
+         *           "btc": 19584275,
+         *           "cad": 1091498460326.9937,
+         *           "chf": 692169755329.3134,
+         *           "clp": 725066019537891.1,
+         *           "cny": 5826043276458.686,
+         *           "czk": 18419113668076.95,
+         *           "dkk": 5558672032246.961,
+         *           "dot": 99489102293.36188,
+         *           "eos": 971966018054.8785,
+         *           "eth": 358260658.6305346,
+         *           "eur": 744365987728.8765,
+         *           "gbp": 645995753662.7186,
+         *           "gel": 2213692357431.7495,
+         *           "hkd": 6427484562491.774,
+         *           "huf": 285714442221834.44,
+         *           "idr": 12665035966583838,
+         *           "ils": 2963261756601.5366,
+         *           "inr": 68483700226206.57,
+         *           "jpy": 116054283764084.62,
+         *           "krw": 1065312701660273.2,
+         *           "kwd": 252871147803.5803,
+         *           "lkr": 266561780855891.12,
+         *           "ltc": 11241964101.69766,
+         *           "mmk": 1728305874039080,
+         *           "mxn": 13966176853697.344,
+         *           "myr": 3781381554795.1514,
+         *           "ngn": 737875507571602.2,
+         *           "nok": 8407346818129.712,
+         *           "nzd": 1301287369358.7278,
+         *           "php": 45590539841760.11,
+         *           "pkr": 228954757091481.3,
+         *           "pln": 3239742879771.195,
+         *           "rub": 73446851159342.03,
+         *           "sar": 3086002357014.532,
+         *           "sek": 8289208064431.51,
+         *           "sgd": 1086848883442.4248,
+         *           "thb": 28142561489813.086,
+         *           "try": 24257046694416.734,
+         *           "twd": 25250535365752.875,
+         *           "uah": 31292101755089.6,
+         *           "usd": 822933961870.5416,
+         *           "vef": 82400377602.09746,
+         *           "vnd": 19971704184972804,
+         *           "xag": 34586507200.34415,
+         *           "xau": 398925467.35636365,
+         *           "xdr": 613205127018.0251,
+         *           "xlm": 6366989968394.301,
+         *           "xrp": 1322171541704.1318,
+         *           "yfi": 100197984.57701135,
+         *           "zar": 15060230523975.951,
+         *           "bits": 19587833186725.145,
+         *           "link": 53027090934.88813,
+         *           "sats": 1958783318672514.8
+         *         },
+         *         "total_volume": {
+         *           "aed": 91203312150.08063,
+         *           "ars": 20035974370796.53,
+         *           "aud": 36437868164.37399,
+         *           "bch": 97607892.53714487,
+         *           "bdt": 2725449072027.6714,
+         *           "bhd": 9360199758.84335,
+         *           "bmd": 24832397519.050613,
+         *           "bnb": 79179085.83047172,
+         *           "brl": 120499184128.79588,
+         *           "btc": 590313.2604817993,
+         *           "cad": 32931483969.88901,
+         *           "chf": 20881438911.782093,
+         *           "clp": 21879188925189.88,
+         *           "cny": 175803441475.87073,
+         *           "czk": 555804929370.7711,
+         *           "dkk": 167735395521.93146,
+         *           "dot": 2997133098.5874844,
+         *           "eos": 29280838849.3072,
+         *           "eth": 10798578.648754122,
+         *           "eur": 22461574030.714294,
+         *           "gbp": 19491668952.230877,
+         *           "gel": 66799149326.2464,
+         *           "hkd": 193952199202.66922,
+         *           "huf": 8621560094639.218,
+         *           "idr": 382173081057940.94,
+         *           "ils": 89417738606.47363,
+         *           "inr": 2066526047518.001,
+         *           "jpy": 3501989517686.002,
+         *           "krw": 32146283560336.594,
+         *           "kwd": 7630499109.653902,
+         *           "lkr": 8043620037935.51,
+         *           "ltc": 338574128.0917383,
+         *           "mmk": 52152396774457.34,
+         *           "mxn": 421435584775.31195,
+         *           "myr": 114104866600.03775,
+         *           "ngn": 22265720911481.547,
+         *           "nok": 253695421433.0574,
+         *           "nzd": 39266923884.12937,
+         *           "php": 1375714772890.6108,
+         *           "pkr": 6908811405778.086,
+         *           "pln": 97760679200.94873,
+         *           "rub": 2216291329580.8867,
+         *           "sar": 93121490696.43959,
+         *           "sek": 250130532110.01724,
+         *           "sgd": 32796147403.410156,
+         *           "thb": 849214282675.6979,
+         *           "try": 731967149325.9987,
+         *           "twd": 761946110895.6648,
+         *           "uah": 944253057952.1875,
+         *           "usd": 24832397519.050613,
+         *           "vef": 2486467963.582537,
+         *           "vnd": 602655037260633.8,
+         *           "xag": 1043663204.3259426,
+         *           "xau": 12037753.021334978,
+         *           "xdr": 18503736849.33296,
+         *           "xlm": 191792809959.6043,
+         *           "xrp": 39855973598.82108,
+         *           "yfi": 3020008.107049232,
+         *           "zar": 454449139819.0017,
+         *           "bits": 590313260481.7993,
+         *           "link": 1599235730.4856293,
+         *           "sats": 59031326048179.93
+         *         }
+         *       },
+         *       "community_data": {
+         *         "facebook_likes": null,
+         *         "twitter_followers": null,
+         *         "reddit_average_posts_48h": 0,
+         *         "reddit_average_comments_48h": 0,
+         *         "reddit_subscribers": null,
+         *         "reddit_accounts_active_48h": null
+         *       },
+         *       "developer_data": {
+         *         "forks": 36262,
+         *         "stars": 72871,
+         *         "subscribers": 3961,
+         *         "total_issues": 7736,
+         *         "closed_issues": 7377,
+         *         "pull_requests_merged": 11204,
+         *         "pull_request_contributors": 846,
+         *         "code_additions_deletions_4_weeks": {
+         *           "additions": 973,
+         *           "deletions": -290
+         *         },
+         *         "commit_count_4_weeks": 163
+         *       },
+         *       "public_interest_stats": {
+         *         "alexa_rank": null,
+         *         "bing_matches": null
+         *       }
+         *     } */
+        CoinsHistoricalData: {
+            /** @description coin id */
+            id?: string;
+            /** @description coin symbol */
+            symbol?: string;
+            /** @description coin name */
+            name?: string;
+            /** @description coin localization */
+            localization?: {
+                [key: string]: string | undefined;
+            };
+            /** @description coin image url */
+            image?: {
+                thumb?: string;
+                small?: string;
+            };
+            /** @description coin market data */
+            market_data?: {
+                /** @description coin current price */
+                current_price?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin market cap */
+                market_cap?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+                /** @description coin total volume */
+                total_volume?: {
+                    btc?: number;
+                    eur?: number;
+                    usd?: number;
+                };
+            };
+            /** @description coin community data */
+            community_data?: {
+                /** @description coin facebook likes */
+                facebook_likes?: number;
+                /** @description coin twitter followers */
+                twitter_followers?: number;
+                /** @description coin reddit average posts 48h */
+                reddit_average_posts_48h?: number;
+                /** @description coin reddit average comments 48h */
+                reddit_average_comments_48h?: number;
+                /** @description coin reddit subscribers */
+                reddit_subscribers?: number;
+                /** @description coin reddit accounts active 48h */
+                reddit_accounts_active_48h?: number;
+            };
+            /** @description coin developer data */
+            developer_data?: {
+                /** @description coin repository forks */
+                forks?: number;
+                /** @description coin repository stars */
+                stars?: number;
+                /** @description coin repository subscribers */
+                subscribers?: number;
+                /** @description coin repository total issues */
+                total_issues?: number;
+                /** @description coin repository closed issues */
+                closed_issues?: number;
+                /** @description coin repository pull requests merged */
+                pull_requests_merged?: number;
+                /** @description coin repository pull request contributors */
+                pull_request_contributors?: number;
+                /** @description coin code additions deletions 4 weeks */
+                code_additions_deletions_4_weeks?: {
+                    additions?: number;
+                    deletions?: number;
+                };
+                /** @description coin commit count 4 weeks */
+                commit_count_4_weeks?: number;
+            };
+            /** @description coin public interest stats */
+            public_interest_stats?: {
+                /** @description coin alexa rank */
+                alexa_rank?: number;
+                /** @description coin bing matches */
+                bing_matches?: number;
+            };
         };
-      };
-      /** @description cryptocurrencies market cap change percentage in 24 hours in usd */
-      market_cap_change_percentage_24h_usd?: number;
-      updated_at?: number;
+        CoinsMarketChart: {
+            /** @example [
+             *       [
+             *         1711843200000,
+             *         69702.3087473573
+             *       ],
+             *       [
+             *         1711929600000,
+             *         71246.95144060145
+             *       ],
+             *       [
+             *         1711983682000,
+             *         68887.74951585678
+             *       ]
+             *     ] */
+            prices?: number[][];
+            /** @example [
+             *       [
+             *         1711843200000,
+             *         1370247487960.0945
+             *       ],
+             *       [
+             *         1711929600000,
+             *         1401370211582.3662
+             *       ],
+             *       [
+             *         1711983682000,
+             *         1355701979725.1584
+             *       ]
+             *     ] */
+            market_caps?: number[][];
+            /** @example [
+             *       [
+             *         1711843200000,
+             *         16408802301.837431
+             *       ],
+             *       [
+             *         1711929600000,
+             *         19723005998.21497
+             *       ],
+             *       [
+             *         1711983682000,
+             *         30137418199.643093
+             *       ]
+             *     ] */
+            total_volumes?: number[][];
+        };
+        CoinsMarketChartRange: {
+            /** @example [
+             *       [
+             *         1704067241331,
+             *         42261.04061756689
+             *       ],
+             *       [
+             *         1704070847420,
+             *         42493.27640875459
+             *       ],
+             *       [
+             *         1704074443652,
+             *         42654.07310665941
+             *       ]
+             *     ] */
+            prices?: number[][];
+            /** @example [
+             *       [
+             *         1704067241331,
+             *         827596236151.1959
+             *       ],
+             *       [
+             *         1704070847420,
+             *         831531023621.4114
+             *       ],
+             *       [
+             *         1704074443652,
+             *         835499399014.9323
+             *       ]
+             *     ] */
+            market_caps?: number[][];
+            /** @example [
+             *       [
+             *         1704067241331,
+             *         14305769170.949772
+             *       ],
+             *       [
+             *         1704070847420,
+             *         14130205376.17086
+             *       ],
+             *       [
+             *         1704074443652,
+             *         13697382902.24235
+             *       ]
+             *     ] */
+            total_volumes?: number[][];
+        };
+        /** @example [
+         *       [
+         *         1709395200000,
+         *         61942,
+         *         62211,
+         *         61721,
+         *         61845
+         *       ],
+         *       [
+         *         1709409600000,
+         *         61828,
+         *         62139,
+         *         61726,
+         *         62139
+         *       ],
+         *       [
+         *         1709424000000,
+         *         62171,
+         *         62210,
+         *         61821,
+         *         62068
+         *       ]
+         *     ] */
+        CoinsOHLC: number[][];
+        SupplyChartBase: number[][];
+        CoinsContractAddress: components["schemas"]["CoinsDataBase"] & unknown;
+        /** @example [
+         *       {
+         *         "id": "polygon-pos",
+         *         "chain_identifier": 137,
+         *         "name": "Polygon POS",
+         *         "shortname": "MATIC",
+         *         "native_coin_id": "matic-network"
+         *       },
+         *       {
+         *         "id": "ethereum",
+         *         "chain_identifier": 1,
+         *         "name": "Ethereum",
+         *         "shortname": "Ethereum",
+         *         "native_coin_id": "ethereum"
+         *       },
+         *       {
+         *         "id": "stargaze",
+         *         "chain_identifier": null,
+         *         "name": "Stargaze",
+         *         "shortname": "",
+         *         "native_coin_id": "stargaze"
+         *       }
+         *     ] */
+        AssetPlatforms: {
+            /** @description asset platform id */
+            id?: string;
+            /** @description chainlist's chain id */
+            chain_identifier?: number | null;
+            /** @description chain name */
+            name?: string;
+            /** @description chain shortname */
+            shortname?: string;
+            /** @description chain native coin id */
+            native_coin_id?: string;
+        };
+        /** @example {
+         *       "name": "CoinGecko",
+         *       "logoURI": "https://static.coingecko.com/s/thumbnail-007177f3eca19695592f0b8b0eabbdae282b54154e1be912285c9034ea6cbaf2.png",
+         *       "keywords": [
+         *         "defi"
+         *       ],
+         *       "timestamp": "2024-04-08T14:02:47.028+00:00",
+         *       "tokens": [
+         *         {
+         *           "chainId": 1,
+         *           "address": "0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9",
+         *           "name": "Wrapped Terra Classic",
+         *           "symbol": "LUNC",
+         *           "decimals": 18,
+         *           "logoURI": "https://assets.coingecko.com/coins/images/13628/thumb/wluna.png?1696513376"
+         *         },
+         *         {
+         *           "chainId": 1,
+         *           "address": "0x5bb29c33c4a3c29f56f8aca40b4db91d8a5fe2c5",
+         *           "name": "One Share",
+         *           "symbol": "ONS",
+         *           "decimals": 18,
+         *           "logoURI": "https://assets.coingecko.com/coins/images/13531/thumb/bss.a1671c75.png?1696513292"
+         *         }
+         *       ]
+         *     } */
+        TokenLists: {
+            name?: string;
+            logoURI?: string;
+            keywords?: string[];
+            /** Format: date-time */
+            timestamp?: string;
+            tokens?: {
+                /** @description chainlist's chain id */
+                chainId?: number;
+                /** @description token contract address */
+                address?: string;
+                /** @description token name */
+                name?: string;
+                /** @description token symbol */
+                symbol?: string;
+                /** @description token decimals */
+                decimals?: number;
+                /** @description token image url */
+                logoURI?: string;
+            }[];
+        };
+        /** @example [
+         *       {
+         *         "category_id": "aave-tokens",
+         *         "name": "Aave Tokens"
+         *       },
+         *       {
+         *         "category_id": "aaccount-abstraction",
+         *         "name": "Account Abstraction"
+         *       }
+         *     ] */
+        CategoriesList: {
+            /** @description category id */
+            category_id?: string;
+            /** @description category name */
+            name?: string;
+        };
+        /** @example [
+         *       {
+         *         "id": "layer-1",
+         *         "name": "Layer 1 (L1)",
+         *         "market_cap": 2061406861196.135,
+         *         "market_cap_change_24h": -0.66091235190398,
+         *         "content": "",
+         *         "top_3_coins": [
+         *           "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
+         *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
+         *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970"
+         *         ],
+         *         "volume_24h": 61146432400.17392,
+         *         "updated_at": "2024-04-06T08:25:46.402Z"
+         *       },
+         *       {
+         *         "id": "smart-contract-platform",
+         *         "name": "Smart Contract Platform",
+         *         "market_cap": 744929499224.6548,
+         *         "market_cap_change_24h": -0.584411329310148,
+         *         "content": "Smart contract platforms are usually blockchains that host smart contracts or decentralized applications...",
+         *         "top_3_coins": [
+         *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
+         *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970",
+         *           "https://assets.coingecko.com/coins/images/4128/small/solana.png?1696504756"
+         *         ],
+         *         "volume_24h": 30987638383.630726,
+         *         "updated_at": "2024-04-06T08:25:33.203Z"
+         *       }
+         *     ] */
+        Categories: {
+            /** @description category id */
+            id?: string;
+            /** @description category name */
+            name?: string;
+            /** @description category market cap */
+            market_cap?: number;
+            /** @description category market cap change in 24 hours */
+            market_cap_change_24h?: number;
+            /** @description category description */
+            content?: string;
+            /** @description top 3 coins in the category */
+            top_3_coins?: string[];
+            /** @description category volume in 24 hours */
+            volume_24h?: number;
+            /** @description category last updated time */
+            updated_at?: string;
+        };
+        /** @example [
+         *       {
+         *         "id": "bybit_spot",
+         *         "name": "Bybit",
+         *         "year_established": 2018,
+         *         "country": "British Virgin Islands",
+         *         "description": "Bybit is a cryptocurrency exchange that offers a professional platform featuring an ultra-fast matching engine, excellent customer service and multilingual community support for crypto traders of all levels...",
+         *         "url": "https://www.bybit.com",
+         *         "image": "https://assets.coingecko.com/markets/images/698/small/bybit_spot.png?1706864649",
+         *         "has_trading_incentive": false,
+         *         "trust_score": 10,
+         *         "trust_score_rank": 1,
+         *         "trade_volume_24h_btc": 51075.62712838519,
+         *         "trade_volume_24h_btc_normalized": 47765.58866374526
+         *       },
+         *       {
+         *         "id": "gdax",
+         *         "name": "Coinbase Exchange",
+         *         "year_established": 2012,
+         *         "country": "United States",
+         *         "description": "",
+         *         "url": "https://www.coinbase.com/",
+         *         "image": "https://assets.coingecko.com/markets/images/23/small/Coinbase_Coin_Primary.png?1706864258",
+         *         "has_trading_incentive": false,
+         *         "trust_score": 10,
+         *         "trust_score_rank": 2,
+         *         "trade_volume_24h_btc": 37443.72996076475,
+         *         "trade_volume_24h_btc_normalized": 37443.72996076475
+         *       }
+         *     ] */
+        Exchanges: {
+            /** @description exchange id */
+            id?: string;
+            /** @description exchange name */
+            name?: string;
+            /** @description exchange established year */
+            year_established?: number;
+            /** @description exchange country */
+            country?: string;
+            /** @description exchange description */
+            description?: string;
+            /** @description exchange website url */
+            url?: string;
+            /** @description exchange image url */
+            image?: string;
+            /** @description exchange trading incentive */
+            has_trading_incentive?: boolean;
+            /** @description exchange trust score */
+            trust_score?: number;
+            /** @description exchange trust score rank */
+            trust_score_rank?: number;
+            /** @description exchange trade volume in BTC in 24 hours */
+            trade_volume_24h_btc?: number;
+            /** @description normalized trading volume by traffic in BTC in 24 hours <br>*refers to [`this blog`](https://blog.coingecko.com/trust-score/). */
+            trade_volume_24h_btc_normalized?: number;
+        };
+        /** @example [
+         *       {
+         *         "id": "10kswap-starknet-alpha",
+         *         "name": "10KSwap"
+         *       },
+         *       {
+         *         "id": "1bch",
+         *         "name": "1BCH"
+         *       },
+         *       {
+         *         "id": "3xcalibur",
+         *         "name": "3xcalibur"
+         *       }
+         *     ] */
+        ExchangesList: {
+            /** @description exchange id */
+            id?: string;
+            /** @description exchange name */
+            name?: string;
+        };
+        /** @example {
+         *       "name": "Binance",
+         *       "year_established": 2017,
+         *       "country": "Cayman Islands",
+         *       "description": "",
+         *       "url": "https://www.binance.com/",
+         *       "image": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274",
+         *       "facebook_url": "https://www.facebook.com/binanceexchange",
+         *       "reddit_url": "https://www.reddit.com/r/binance/",
+         *       "telegram_url": "",
+         *       "slack_url": "",
+         *       "other_url_1": "https://medium.com/binanceexchange",
+         *       "other_url_2": "https://steemit.com/@binanceexchange",
+         *       "twitter_handle": "binance",
+         *       "has_trading_incentive": false,
+         *       "centralized": true,
+         *       "public_notice": "",
+         *       "alert_notice": "",
+         *       "trust_score": 9,
+         *       "trust_score_rank": 6,
+         *       "trade_volume_24h_btc": 207319.13377261316,
+         *       "trade_volume_24h_btc_normalized": 81673.29712441542,
+         *       "tickers": [
+         *         {
+         *           "base": "BTC",
+         *           "target": "USDT",
+         *           "market": {
+         *             "name": "Binance",
+         *             "identifier": "binance",
+         *             "has_trading_incentive": false,
+         *             "logo": "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1706864274"
+         *           },
+         *           "last": 69476,
+         *           "volume": 20242.03975,
+         *           "cost_to_move_up_usd": 19320706.39585167,
+         *           "cost_to_move_down_usd": 16360235.3694131,
+         *           "converted_last": {
+         *             "btc": 1.000205,
+         *             "eth": 20.291404,
+         *             "usd": 69498
+         *           },
+         *           "converted_volume": {
+         *             "btc": 20249,
+         *             "eth": 410802,
+         *             "usd": 1406996874
+         *           },
+         *           "trust_score": "green",
+         *           "bid_ask_spread_percentage": 0.010014,
+         *           "timestamp": "2024-04-08T04:02:01+00:00",
+         *           "last_traded_at": "2024-04-08T04:02:01+00:00",
+         *           "last_fetch_at": "2024-04-08T04:03:00+00:00",
+         *           "is_anomaly": false,
+         *           "is_stale": false,
+         *           "trade_url": "https://www.binance.com/en/trade/BTC_USDT?ref=37754157",
+         *           "token_info_url": null,
+         *           "coin_id": "bitcoin",
+         *           "target_coin_id": "tether"
+         *         }
+         *       ]
+         *     } */
+        ExchangeData: {
+            /** @description exchange name */
+            name?: string;
+            /** @description exchange established year */
+            year_established?: number;
+            /** @description exchange incorporated country */
+            country?: string;
+            /** @description exchange description */
+            description?: string;
+            /** @description exchange website url */
+            url?: string;
+            /** @description exchange image url */
+            image?: string;
+            /** @description exchange facebook url */
+            facebook_url?: string;
+            /** @description exchange reddit url */
+            reddit_url?: string;
+            /** @description exchange telegram url */
+            telegram_url?: string;
+            /** @description exchange slack url */
+            slack_url?: string;
+            other_url_1?: string;
+            other_url_2?: string;
+            /** @description exchange twitter handle */
+            twitter_handle?: string;
+            /** @description exchange trading incentive */
+            has_trading_incentive?: boolean;
+            /** @description exchange type (true for centralized, false for decentralized) */
+            centralized?: boolean;
+            /** @description public notice for exchange */
+            public_notice?: string;
+            /** @description alert notice for exchange */
+            alert_notice?: string;
+            /** @description exchange trust score */
+            trust_score?: number;
+            /** @description exchange trust score rank */
+            trust_score_rank?: number;
+            trade_volume_24h_btc?: number;
+            /** @description normalized trading volume by traffic in BTC in 24 hours <br>*refers to [`this blog`](https://blog.coingecko.com/trust-score/). */
+            trade_volume_24h_btc_normalized?: number;
+            tickers?: components["schemas"]["CoinsTickers"][];
+        };
+        ExchangeTickers: components["schemas"]["CoinsTickers"] & unknown;
+        /** @example [
+         *       [
+         *         1711792200000,
+         *         "306800.0517941023777005"
+         *       ],
+         *       [
+         *         1711795800000,
+         *         "302561.8185582217570913"
+         *       ],
+         *       [
+         *         1711799400000,
+         *         "298240.5127048246776691"
+         *       ]
+         *     ] */
+        ExchangeVolumeChart: number[][];
+        /** @example [
+         *       {
+         *         "market": "Deepcoin (Derivatives)",
+         *         "symbol": "ETHUSDT",
+         *         "index_id": "ETH",
+         *         "price": "3395.91",
+         *         "price_percentage_change_24h": 1.5274069068216003,
+         *         "contract_type": "perpetual",
+         *         "index": 3393.5342,
+         *         "basis": -0.0523015571479482,
+         *         "spread": 0.01,
+         *         "funding_rate": -0.007182,
+         *         "open_interest": 9327998764.66,
+         *         "volume_24h": 392642535.23212117,
+         *         "last_traded_at": 1712467658,
+         *         "expired_at": null
+         *       },
+         *       {
+         *         "market": "BYDFi (Futures)",
+         *         "symbol": "BTC-PERPUSDT",
+         *         "index_id": "BTC",
+         *         "price": "69434.1",
+         *         "price_percentage_change_24h": 2.040579301057485,
+         *         "contract_type": "perpetual",
+         *         "index": 69407.5,
+         *         "basis": -0.0005763032738348229,
+         *         "spread": 0.01,
+         *         "funding_rate": 0.012,
+         *         "open_interest": 7690212057.6,
+         *         "volume_24h": 132888173.54699957,
+         *         "last_traded_at": 1712467920,
+         *         "expired_at": null
+         *       }
+         *     ] */
+        DerivativesTickersList: {
+            /** @description derivative market name */
+            market?: string;
+            /** @description derivative ticker symbol */
+            symbol?: string;
+            /** @description derivative underlying asset */
+            index_id?: string;
+            /** @description derivative ticker price */
+            price?: string;
+            /** @description derivative ticker price percentage change in 24 hours */
+            price_percentage_change_24h?: number;
+            /** @description derivative contract type */
+            contract_type?: string;
+            /** @description derivative underlying asset price */
+            index?: number;
+            /** @description difference of derivative price and index price */
+            basis?: number;
+            /** @description derivative bid ask spread */
+            spread?: number;
+            /** @description derivative funding rate */
+            funding_rate?: number;
+            /** @description derivative open interest */
+            open_interest?: number;
+            /** @description derivative volume in 24 hours */
+            volume_24h?: number;
+            /** @description derivative last updated time */
+            last_traded_at?: number;
+            expired_at?: string | null;
+        };
+        /** @example [
+         *       {
+         *         "name": "Binance (Futures)",
+         *         "id": "binance_futures",
+         *         "open_interest_btc": 279958.61,
+         *         "trade_volume_24h_btc": "574366.94",
+         *         "number_of_perpetual_pairs": 330,
+         *         "number_of_futures_pairs": 44,
+         *         "image": "https://assets.coingecko.com/markets/images/466/small/binance_futures.jpg?1706864452",
+         *         "year_established": 2019,
+         *         "country": null,
+         *         "description": "",
+         *         "url": "https://www.binance.com/"
+         *       },
+         *       {
+         *         "name": "Bitget Futures",
+         *         "id": "bitget_futures",
+         *         "open_interest_btc": 123267.93,
+         *         "trade_volume_24h_btc": "228027.47",
+         *         "number_of_perpetual_pairs": 254,
+         *         "number_of_futures_pairs": 0,
+         *         "image": "https://assets.coingecko.com/markets/images/591/small/2023-07-25_21.47.43.jpg?1706864543",
+         *         "year_established": null,
+         *         "country": null,
+         *         "description": "",
+         *         "url": "https://www.bitget.com/en/"
+         *       }
+         *     ] */
+        DerivativesExchanges: {
+            /** @description derivatives exchange name */
+            name?: string;
+            /** @description derivatives exchange id */
+            id?: string;
+            /** @description derivatives exchange open interest in BTC */
+            open_interest_btc?: number;
+            /** @description derivatives exchange trade volume in BTC in 24 hours */
+            trade_volume_24h_btc?: string;
+            /** @description number of perpetual pairs in the derivatives exchange */
+            number_of_perpetual_pairs?: number;
+            /** @description number of futures pairs in the derivatives exchange */
+            number_of_futures_pairs?: number;
+            /** @description derivatives exchange image url */
+            image?: string;
+            /** @description derivatives exchange established year */
+            year_established?: number | null;
+            /** @description derivatives exchange incorporated country */
+            country?: string | null;
+            /** @description derivatives exchange description */
+            description?: string;
+            /** @description derivatives exchange website url */
+            url?: string;
+        };
+        /** @example {
+         *       "name": "Binance (Futures)",
+         *       "open_interest_btc": 280210.26,
+         *       "trade_volume_24h_btc": "568502.31",
+         *       "number_of_perpetual_pairs": 330,
+         *       "number_of_futures_pairs": 44,
+         *       "image": "https://assets.coingecko.com/markets/images/466/small/binance_futures.jpg?1706864452",
+         *       "year_established": 2019,
+         *       "country": null,
+         *       "description": "",
+         *       "url": "https://www.binance.com/",
+         *       "tickers": {
+         *         "tickers": [
+         *           {
+         *             "symbol": "1000BONKUSDT",
+         *             "base": "1000BONK",
+         *             "target": "USDT",
+         *             "trade_url": "https://www.binance.com/en/futuresng/1000BONKUSDT",
+         *             "contract_type": "perpetual",
+         *             "last": 0.023,
+         *             "h24_percentage_change": -0.811,
+         *             "index": 0.0229866,
+         *             "index_basis_percentage": -0.071,
+         *             "bid_ask_spread": 0.000217533173808922,
+         *             "funding_rate": 0.005,
+         *             "open_interest_usd": 28102263.99977152,
+         *             "h24_volume": 2679284723,
+         *             "converted_volume": {
+         *               "btc": "888.799603175094638929930629459045946",
+         *               "eth": "18029.8066338945133622149580216234476206402026327668",
+         *               "usd": "61648664.9602525617243462802989936852339753270611794"
+         *             },
+         *             "converted_last": {
+         *               "btc": "0.000000331730179904099217651505502",
+         *               "eth": "0.0000067293358108303271067525726423602078742716",
+         *               "usd": "0.0230093742673322299700755918127159362875878"
+         *             },
+         *             "last_traded": 1712550723,
+         *             "expired_at": null
+         *           }
+         *         ]
+         *       }
+         *     } */
+        DerivativesExchangesID: {
+            /** @description derivatives exchange name */
+            name?: string;
+            /** @description derivatives exchange open interest in BTC */
+            open_interest_btc?: number;
+            /** @description derivatives exchange trade volume in BTC in 24 hours */
+            trade_volume_24h_btc?: string;
+            /** @description number of perpetual pairs in the derivatives exchange */
+            number_of_perpetual_pairs?: number;
+            /** @description number of futures pairs in the derivatives exchange */
+            number_of_futures_pairs?: number;
+            /** @description derivatives exchange image url */
+            image?: string;
+            /** @description derivatives exchange established year */
+            year_established?: number | null;
+            /** @description derivatives exchange incorporated country */
+            country?: string | null;
+            /** @description derivatives exchange description */
+            description?: string;
+            /** @description derivatives exchange website url */
+            url?: string;
+            tickers?: components["schemas"]["DerivativesTickersList"][];
+        };
+        /** @example [
+         *       {
+         *         "id": "binance_futures",
+         *         "name": "Binance (Futures)"
+         *       },
+         *       {
+         *         "id": "bybit",
+         *         "name": "Bybit (Futures)"
+         *       },
+         *       {
+         *         "id": "deepcoin_derivatives",
+         *         "name": "Deepcoin (Derivatives)"
+         *       }
+         *     ] */
+        DerivativesExchangesList: {
+            /** @description derivatives exchange id */
+            id?: string;
+            /** @description derivatives exchange name */
+            name?: string;
+        };
+        /** @example [
+         *       {
+         *         "id": "bored-ape-yacht-club",
+         *         "contract_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
+         *         "name": "Bored Ape Yacht Club",
+         *         "asset_platform_id": "ethereum",
+         *         "symbol": "BAYC"
+         *       },
+         *       {
+         *         "id": "pudgy-penguins",
+         *         "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
+         *         "name": "Pudgy Penguins",
+         *         "asset_platform_id": "ethereum",
+         *         "symbol": "PPG"
+         *       }
+         *     ] */
+        NFTList: {
+            /** @description nft collection id */
+            id?: string;
+            /** @description nft collection contract address */
+            contract_address?: string;
+            /** @description nft collection name */
+            name?: string;
+            /** @description nft collection asset platform id */
+            asset_platform_id?: string;
+            /** @description nft collection symbol */
+            symbol?: string;
+        };
+        /** @example {
+         *       "id": "pudgy-penguins",
+         *       "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
+         *       "asset_platform_id": "ethereum",
+         *       "name": "Pudgy Penguins",
+         *       "symbol": "PPG",
+         *       "image": {
+         *         "small": "https://assets.coingecko.com/nft_contracts/images/38/small/da64989d9762c8a61b3c65917edfdf97.png?1707287183"
+         *       },
+         *       "description": "Pudgy Penguins is a collection of 8,888 unique NFTs featuring cute cartoon penguins, which are generated from a collection of 150 different hand-drawn traits.",
+         *       "native_currency": "ethereum",
+         *       "native_currency_symbol": "ETH",
+         *       "floor_price": {
+         *         "native_currency": 12.5,
+         *         "usd": 42317
+         *       },
+         *       "market_cap": {
+         *         "native_currency": 111100,
+         *         "usd": 376114941
+         *       },
+         *       "volume_24h": {
+         *         "native_currency": 429.88,
+         *         "usd": 1455314
+         *       },
+         *       "floor_price_in_usd_24h_percentage_change": 1.07067,
+         *       "floor_price_24h_percentage_change": {
+         *         "usd": 1.070670607177908,
+         *         "native_currency": 1.214574898785425
+         *       },
+         *       "market_cap_24h_percentage_change": {
+         *         "usd": 1.0706706071776666,
+         *         "native_currency": -0.4048582995951417
+         *       },
+         *       "volume_24h_percentage_change": {
+         *         "usd": -3.1983377669874073,
+         *         "native_currency": -1.801855313900942
+         *       },
+         *       "number_of_unique_addresses": 4752,
+         *       "number_of_unique_addresses_24h_percentage_change": 0.08425,
+         *       "volume_in_usd_24h_percentage_change": -3.19834,
+         *       "total_supply": 8888,
+         *       "one_day_sales": 36,
+         *       "one_day_sales_24h_percentage_change": -2.7027027027027,
+         *       "one_day_average_sale_price": 11.941194388888889,
+         *       "one_day_average_sale_price_24h_percentage_change": 0.925870927379588,
+         *       "links": {
+         *         "homepage": "https://www.pudgypenguins.com/",
+         *         "twitter": "https://twitter.com/pudgypenguins",
+         *         "discord": "https://discord.gg/pudgypenguins"
+         *       },
+         *       "floor_price_7d_percentage_change": {
+         *         "usd": -18.00149482623651,
+         *         "native_currency": -13.793103448275861
+         *       },
+         *       "floor_price_14d_percentage_change": {
+         *         "usd": -8.632353394310407,
+         *         "native_currency": -8.619051100226626
+         *       },
+         *       "floor_price_30d_percentage_change": {
+         *         "usd": -14.376564931440935,
+         *         "native_currency": -0.7779012541673281
+         *       },
+         *       "floor_price_60d_percentage_change": {
+         *         "usd": 15.27797587032817,
+         *         "native_currency": -18.0327868852459
+         *       },
+         *       "floor_price_1y_percentage_change": {
+         *         "usd": 429.5685372855,
+         *         "native_currency": 196.20853080568722
+         *       },
+         *       "explorers": [
+         *         {
+         *           "name": "Etherscan",
+         *           "link": "https://etherscan.io/token/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
+         *         },
+         *         {
+         *           "name": "Ethplorer",
+         *           "link": "https://ethplorer.io/address/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
+         *         }
+         *       ]
+         *     } */
+        NFTData: {
+            /** @description nft collection id */
+            id?: string;
+            /** @description nft collection contract address */
+            contract_address?: string;
+            /** @description nft collection asset platform id */
+            asset_platform_id?: string;
+            /** @description nft collection name */
+            name?: string;
+            /** @description nft collection symbol */
+            symbol?: string;
+            /** @description nft collection image url */
+            image?: {
+                small?: string;
+            };
+            /** @description nft collection description */
+            description?: string;
+            /** @description nft collection native currency */
+            native_currency?: string;
+            /** @description nft collection native currency symbol */
+            native_currency_symbol?: string;
+            /** @description nft collection floor price */
+            floor_price?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection market cap */
+            market_cap?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection volume in 24 hours */
+            volume_24h?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection floor price in usd 24 hours percentage change */
+            floor_price_in_usd_24h_percentage_change?: number;
+            floor_price_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection market cap 24 hours percentage change */
+            market_cap_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection volume in 24 hours percentage change */
+            volume_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description number of unique address owning the nfts */
+            number_of_unique_addresses?: number;
+            /** @description number of unique address owning the nfts 24 hours percentage change */
+            number_of_unique_addresses_24h_percentage_change?: number;
+            /** @description nft collection volume in usd 24 hours percentage change */
+            volume_in_usd_24h_percentage_change?: number;
+            /** @description nft collection total supply */
+            total_supply?: number;
+            /** @description nft collection one day sales */
+            one_day_sales?: number;
+            /** @description nft collection one day sales 24 hours percentage change */
+            one_day_sales_24h_percentage_change?: number;
+            /** @description nft collection one day average sale price */
+            one_day_average_sale_price?: number;
+            /** @description nft collection one day average sale price 24 hours percentage change */
+            one_day_average_sale_price_24h_percentage_change?: number;
+            /** @description nft collection links */
+            links?: {
+                homepage?: string;
+                twitter?: string;
+                discord?: string;
+            };
+            /** @description nft collection floor price 7 days percentage change */
+            floor_price_7d_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection floor price 14 days percentage change */
+            floor_price_14d_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection floor price 30 days percentage change */
+            floor_price_30d_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection floor price 60 days percentage change */
+            floor_price_60d_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection floor price 1 year percentage change */
+            floor_price_1y_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection block explorers links */
+            explorers?: {
+                name?: string;
+                link?: string;
+            }[];
+        };
+        /** @example [
+         *       {
+         *         "id": "pudgy-penguins",
+         *         "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
+         *         "asset_platform_id": "ethereum",
+         *         "name": "Pudgy Penguins",
+         *         "symbol": "PPG",
+         *         "image": {
+         *           "small": "https://assets.coingecko.com/nft_contracts/images/38/small/da64989d9762c8a61b3c65917edfdf97.png?1707287183"
+         *         },
+         *         "description": "Pudgy Penguins is a collection of 8,888 unique NFTs featuring cute cartoon penguins, which are generated from a collection of 150 different hand-drawn traits...",
+         *         "native_currency": "ethereum",
+         *         "native_currency_symbol": "ETH",
+         *         "floor_price": {
+         *           "native_currency": 12.17,
+         *           "usd": 44360
+         *         },
+         *         "market_cap": {
+         *           "native_currency": 108211,
+         *           "usd": 394267328
+         *         },
+         *         "volume_24h": {
+         *           "native_currency": 402.37,
+         *           "usd": 1466028
+         *         },
+         *         "floor_price_in_usd_24h_percentage_change": 8.27604,
+         *         "floor_price_24h_percentage_change": {
+         *           "usd": 8.276036095552893,
+         *           "native_currency": 1.627709265442404
+         *         },
+         *         "market_cap_24h_percentage_change": {
+         *           "usd": 8.276036095552811,
+         *           "native_currency": 1.627709265442404
+         *         },
+         *         "volume_24h_percentage_change": {
+         *           "usd": 32.68767488214406,
+         *           "native_currency": 24.54043325089837
+         *         },
+         *         "number_of_unique_addresses": 4756,
+         *         "number_of_unique_addresses_24h_percentage_change": 0.10524,
+         *         "volume_in_usd_24h_percentage_change": 32.68767,
+         *         "total_supply": 8888,
+         *         "one_day_sales": 33,
+         *         "one_day_sales_24h_percentage_change": 22.2222222222222,
+         *         "one_day_average_sale_price": 12.19299902909091,
+         *         "one_day_average_sale_price_24h_percentage_change": 1.8967181143714
+         *       }
+         *     ] */
+        NFTsMarkets: {
+            /** @description nft collection id */
+            id?: string;
+            /** @description nft collection contract address */
+            contract_address?: string;
+            /** @description nft collection asset platform id */
+            asset_platform_id?: string;
+            /** @description nft collection name */
+            name?: string;
+            /** @description nft collection symbol */
+            symbol?: string;
+            /** @description nft collection image url */
+            image?: {
+                small?: string;
+            };
+            /** @description nft collection description */
+            description?: string;
+            /** @description nft collection native currency */
+            native_currency?: string;
+            /** @description nft collection native currency symbol */
+            native_currency_symbol?: string;
+            /** @description nft collection floor price */
+            floor_price?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection market cap */
+            market_cap?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection volume in 24 hours */
+            volume_24h?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection floor price in usd 24 hours percentage change */
+            floor_price_in_usd_24h_percentage_change?: number;
+            /** @description nft collection floor price 24 hours percentage change */
+            floor_price_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection market cap 24 hours percentage change */
+            market_cap_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description nft collection volume in 24 hours percentage change */
+            volume_24h_percentage_change?: {
+                usd?: number;
+                native_currency?: number;
+            };
+            /** @description number of unique address owning the nfts */
+            number_of_unique_addresses?: number;
+            /** @description number of unique address owning the nfts 24 hours percentage change */
+            number_of_unique_addresses_24h_percentage_change?: number;
+            /** @description nft collection volume in usd 24 hours percentage change */
+            volume_in_usd_24h_percentage_change?: number;
+            /** @description nft collection total supply */
+            total_supply?: number;
+            /** @description nft collection one day sales */
+            one_day_sales?: number;
+            /** @description nft collection one day sales 24 hours percentage change */
+            one_day_sales_24h_percentage_change?: number;
+            /** @description nft collection one day average sale price */
+            one_day_average_sale_price?: number;
+            /** @description nft collection one day average sale price 24 hours percentage change */
+            one_day_average_sale_price_24h_percentage_change?: number;
+        }[];
+        /** @example {
+         *       "floor_price_usd": [
+         *         [
+         *           1626912000000,
+         *           90.16757646534482
+         *         ],
+         *         [
+         *           1626998400000,
+         *           97.32160550000182
+         *         ],
+         *         [
+         *           1627084800000,
+         *           95.2719573507527
+         *         ]
+         *       ],
+         *       "floor_price_native": [
+         *         [
+         *           1626912000000,
+         *           0.045
+         *         ],
+         *         [
+         *           1626998400000,
+         *           0.048
+         *         ],
+         *         [
+         *           1627084800000,
+         *           0.045
+         *         ]
+         *       ],
+         *       "h24_volume_usd": [
+         *         [
+         *           1626912000000,
+         *           2860.115525480738
+         *         ],
+         *         [
+         *           1626998400000,
+         *           2143.50836113754
+         *         ],
+         *         [
+         *           1627084800000,
+         *           925.4082790669777
+         *         ]
+         *       ],
+         *       "h24_volume_native": [
+         *         [
+         *           1626912000000,
+         *           1.4274
+         *         ],
+         *         [
+         *           1626998400000,
+         *           1.0572
+         *         ],
+         *         [
+         *           1627084800000,
+         *           0.4371
+         *         ]
+         *       ],
+         *       "market_cap_usd": [
+         *         [
+         *           1626912000000,
+         *           33281860.868135665
+         *         ],
+         *         [
+         *           1626998400000,
+         *           38474832.81210672
+         *         ],
+         *         [
+         *           1627084800000,
+         *           44827378.86746599
+         *         ]
+         *       ],
+         *       "market_cap_native": [
+         *         [
+         *           1626912000000,
+         *           11012.23
+         *         ],
+         *         [
+         *           1626998400000,
+         *           12709.84
+         *         ],
+         *         [
+         *           1627084800000,
+         *           14220.8
+         *         ]
+         *       ]
+         *     } */
+        NFTMarketChart: {
+            /** @description nft collection floor price in usd */
+            floor_price_usd?: number[][];
+            /** @description nft collection floor price in native currency */
+            floor_price_native?: number[][];
+            /** @description nft collection volume in 24 hours in usd */
+            h24_volume_usd?: number[][];
+            /** @description nft collection volume in 24 hours in native currency */
+            h24_volume_native?: number[][];
+            /** @description nft collection market cap in usd */
+            market_cap_usd?: number[][];
+            /** @description nft collection market cap in native currency */
+            market_cap_native?: number[][];
+        };
+        /** @example {
+         *       "tickers": [
+         *         {
+         *           "floor_price_in_native_currency": 44.21,
+         *           "h24_volume_in_native_currency": 0,
+         *           "native_currency": "ethereum",
+         *           "native_currency_symbol": "ETH",
+         *           "updated_at": "2024-04-08T15:36:00.225Z",
+         *           "nft_marketplace_id": "looksrare",
+         *           "name": "LooksRare",
+         *           "image": "https://assets.coingecko.com/nft_marketplaces/images/2/small/Looksrare.jpg?1686193414",
+         *           "nft_collection_url": "https://looksrare.org/collections/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8?ref=9247712"
+         *         },
+         *         {
+         *           "floor_price_in_native_currency": 12.17,
+         *           "h24_volume_in_native_currency": 402.37,
+         *           "native_currency": "ethereum",
+         *           "native_currency_symbol": "ETH",
+         *           "updated_at": "2024-04-08T12:28:11.797Z",
+         *           "nft_marketplace_id": "blur",
+         *           "name": "Blur",
+         *           "image": "https://assets.coingecko.com/nft_marketplaces/images/20/small/blur_logo.jpg?1690993708",
+         *           "nft_collection_url": "https://blur.io/collection/pudgypenguins"
+         *         },
+         *         {
+         *           "floor_price_in_native_currency": 12.84,
+         *           "h24_volume_in_native_currency": 0,
+         *           "native_currency": "ethereum",
+         *           "native_currency_symbol": "ETH",
+         *           "updated_at": "2024-04-08T12:28:11.897Z",
+         *           "nft_marketplace_id": "opensea",
+         *           "name": "OpenSea",
+         *           "image": "https://assets.coingecko.com/nft_marketplaces/images/1/small/Opensea.png?1686193426",
+         *           "nft_collection_url": "https://opensea.io/collection/pudgypenguins"
+         *         },
+         *         {
+         *           "floor_price_in_native_currency": 199,
+         *           "h24_volume_in_native_currency": 0,
+         *           "native_currency": "ethereum",
+         *           "native_currency_symbol": "ETH",
+         *           "updated_at": "2024-04-08T12:28:11.979Z",
+         *           "nft_marketplace_id": "x2y2",
+         *           "name": "X2Y2",
+         *           "image": "https://assets.coingecko.com/nft_marketplaces/images/21/small/Logo.png?1693192556",
+         *           "nft_collection_url": "https://x2y2.io/collection/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
+         *         }
+         *       ]
+         *     } */
+        NFTTickers: {
+            tickers?: {
+                /** @description nft collection floor price in native currency */
+                floor_price_in_native_currency?: number;
+                /** @description nft collection volume in 24 hours in native currency */
+                h24_volume_in_native_currency?: number;
+                /** @description nft collection native currency */
+                native_currency?: string;
+                /** @description nft collection native currency symbol */
+                native_currency_symbol?: string;
+                /** @description last updated time */
+                updated_at?: string;
+                /** @description nft marketplace id */
+                nft_marketplace_id?: string;
+                /** @description nft marketplace name */
+                name?: string;
+                /** @description nft marketplace image url */
+                image?: string;
+                /** @description nft collection url in the nft marketplace */
+                nft_collection_url?: string;
+            }[];
+        };
+        /** @example {
+         *       "rates": {
+         *         "btc": {
+         *           "name": "Bitcoin",
+         *           "unit": "BTC",
+         *           "value": 1,
+         *           "type": "crypto"
+         *         },
+         *         "eth": {
+         *           "name": "Ether",
+         *           "unit": "ETH",
+         *           "value": 20.656,
+         *           "type": "crypto"
+         *         },
+         *         "ltc": {
+         *           "name": "Litecoin",
+         *           "unit": "LTC",
+         *           "value": 684.945,
+         *           "type": "crypto"
+         *         },
+         *         "bch": {
+         *           "name": "Bitcoin Cash",
+         *           "unit": "BCH",
+         *           "value": 102.254,
+         *           "type": "crypto"
+         *         },
+         *         "bnb": {
+         *           "name": "Binance Coin",
+         *           "unit": "BNB",
+         *           "value": 119.846,
+         *           "type": "crypto"
+         *         }
+         *       }
+         *     } */
+        ExchangeRates: {
+            rates?: {
+                [key: string]: {
+                    /** @description name of the currency */
+                    name?: string;
+                    /** @description unit of the currency */
+                    unit?: string;
+                    /** @description value of the currency */
+                    value?: number;
+                    /** @description type of the currency */
+                    type?: string;
+                } | undefined;
+            };
+        };
+        /** @example {
+         *       "coins": [
+         *         {
+         *           "id": "ethereum",
+         *           "name": "Ethereum",
+         *           "api_symbol": "ethereum",
+         *           "symbol": "ETH",
+         *           "market_cap_rank": 2,
+         *           "thumb": "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png",
+         *           "large": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+         *         },
+         *         {
+         *           "id": "ethereum-classic",
+         *           "name": "Ethereum Classic",
+         *           "api_symbol": "ethereum-classic",
+         *           "symbol": "ETC",
+         *           "market_cap_rank": 27,
+         *           "thumb": "https://assets.coingecko.com/coins/images/453/thumb/ethereum-classic-logo.png",
+         *           "large": "https://assets.coingecko.com/coins/images/453/large/ethereum-classic-logo.png"
+         *         },
+         *         {
+         *           "id": "sweth",
+         *           "name": "Swell Ethereum",
+         *           "api_symbol": "sweth",
+         *           "symbol": "SWETH",
+         *           "market_cap_rank": 142,
+         *           "thumb": "https://assets.coingecko.com/coins/images/30326/thumb/_lB7zEtS_400x400.jpg",
+         *           "large": "https://assets.coingecko.com/coins/images/30326/large/_lB7zEtS_400x400.jpg"
+         *         }
+         *       ],
+         *       "exchanges": [
+         *         {
+         *           "id": "uniswap_v3",
+         *           "name": "Uniswap V3 (Ethereum)",
+         *           "market_type": "spot",
+         *           "thumb": "https://assets.coingecko.com/markets/images/665/thumb/uniswap-v3.png",
+         *           "large": "https://assets.coingecko.com/markets/images/665/large/uniswap-v3.png"
+         *         },
+         *         {
+         *           "id": "uniswap_v2",
+         *           "name": "Uniswap V2 (Ethereum)",
+         *           "market_type": "spot",
+         *           "thumb": "https://assets.coingecko.com/markets/images/535/thumb/256x256_Black-1.png",
+         *           "large": "https://assets.coingecko.com/markets/images/535/large/256x256_Black-1.png"
+         *         },
+         *         {
+         *           "id": "curve_ethereum",
+         *           "name": "Curve (Ethereum)",
+         *           "market_type": "spot",
+         *           "thumb": "https://assets.coingecko.com/markets/images/538/thumb/Curve.png",
+         *           "large": "https://assets.coingecko.com/markets/images/538/large/Curve.png"
+         *         }
+         *       ],
+         *       "icos": [],
+         *       "categories": [
+         *         {
+         *           "id": 158,
+         *           "name": "Ethereum PoS IOU"
+         *         },
+         *         {
+         *           "id": 146,
+         *           "name": "Ethereum Ecosystem"
+         *         },
+         *         {
+         *           "id": 167,
+         *           "name": "EthereumPoW Ecosystem"
+         *         }
+         *       ],
+         *       "nfts": [
+         *         {
+         *           "id": "cyberkongz-genkai",
+         *           "name": "CyberKongz Genkai (Ethereum)",
+         *           "symbol": "GENKAI",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3388/thumb/cyberkongz-genkai.png"
+         *         },
+         *         {
+         *           "id": "ethereum-peppets",
+         *           "name": "Ethereum Peppets",
+         *           "symbol": "PEPPET",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3880/thumb/ethereum-peppets.png"
+         *         },
+         *         {
+         *           "id": "ens-ethereum-name-service",
+         *           "name": "ENS: Ethereum Name Service",
+         *           "symbol": "ENS",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/373/thumb/ens-ethereum-name-service.png"
+         *         },
+         *         {
+         *           "id": "league-of-kingdoms-ethereum",
+         *           "name": "League of Kingdoms (Ethereum)",
+         *           "symbol": "LOKR",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/1001/thumb/league-of-kingdoms-ethereum.jpg"
+         *         }
+         *       ]
+         *     } */
+        Search: {
+            coins?: {
+                /** @description coin id */
+                id?: string;
+                /** @description coin name */
+                name?: string;
+                /** @description coin api symbol */
+                api_symbol?: string;
+                /** @description coin symbol */
+                symbol?: string;
+                /** @description coin market cap rank */
+                market_cap_rank?: number;
+                /** @description coin thumb image url */
+                thumb?: string;
+                /** @description coin large image url */
+                large?: string;
+            }[];
+            exchanges?: {
+                /** @description exchange id */
+                id?: string;
+                /** @description exchange name */
+                name?: string;
+                /** @description exchange market type */
+                market_type?: string;
+                /** @description exchange thumb image url */
+                thumb?: string;
+                /** @description exchange large image url */
+                large?: string;
+            }[];
+            icos?: string[];
+            categories?: {
+                /** @description category id */
+                id?: number;
+                /** @description category name */
+                name?: string;
+            }[];
+            nfts?: {
+                /** @description nft collection id */
+                id?: string;
+                /** @description nft name */
+                name?: string;
+                /** @description nft collection symbol */
+                symbol?: string;
+                /** @description nft collection thumb image url */
+                thumb?: string;
+            }[];
+        };
+        /** @example {
+         *       "coins": [
+         *         {
+         *           "item": {
+         *             "id": "moon-tropica",
+         *             "coin_id": 28470,
+         *             "name": "Moon Tropica",
+         *             "symbol": "CAH",
+         *             "market_cap_rank": 530,
+         *             "thumb": "https://assets.coingecko.com/coins/images/28470/standard/MTLOGO.png?1696527464",
+         *             "small": "https://assets.coingecko.com/coins/images/28470/small/MTLOGO.png?1696527464",
+         *             "large": "https://assets.coingecko.com/coins/images/28470/large/MTLOGO.png?1696527464",
+         *             "slug": "moon-tropica",
+         *             "price_btc": 0.0005301634743332989,
+         *             "score": 0,
+         *             "data": {
+         *               "price": 36.97171180169754,
+         *               "price_btc": "0.000530163474333299",
+         *               "price_change_percentage_24h": {
+         *                 "aed": -4.044674476087556,
+         *                 "ars": -4.049900089458546,
+         *                 "aud": -4.049900089458019,
+         *                 "bch": -2.3756796248748864,
+         *                 "bdt": -4.049900089458495,
+         *                 "bhd": -4.169270133964371,
+         *                 "bmd": -4.049900089458533,
+         *                 "bnb": -3.4734695990217044,
+         *                 "brl": -4.0499000894584745,
+         *                 "btc": -5.9858537505924625,
+         *                 "cad": -4.049900089458477,
+         *                 "chf": -4.04990008945855,
+         *                 "clp": -5.025675567567188,
+         *                 "cny": -4.049900089458403,
+         *                 "czk": -4.049900089458641,
+         *                 "dkk": -4.049900089458638,
+         *                 "dot": -5.982387795212445,
+         *                 "eos": -5.74405098071799,
+         *                 "eth": -5.0568944511997085,
+         *                 "eur": -4.096616197526041,
+         *                 "gbp": -4.049900089458471,
+         *                 "gel": -4.049900089458967,
+         *                 "hkd": -4.0499000894585215,
+         *                 "huf": -4.053877164508182,
+         *                 "idr": -4.049900089458211,
+         *                 "ils": -4.4092202121097746,
+         *                 "inr": -4.049900089458557,
+         *                 "jpy": -4.049900089459048,
+         *                 "krw": -4.049900089458465,
+         *                 "kwd": -4.120414696850362,
+         *                 "lkr": -4.049900089458902,
+         *                 "ltc": -5.293413388383373,
+         *                 "mmk": -4.049900089458767,
+         *                 "mxn": -4.0499000894591966,
+         *                 "myr": -4.049900089458715,
+         *                 "ngn": -4.049900089458488,
+         *                 "nok": -4.0499000894585375,
+         *                 "nzd": -4.049900089458602,
+         *                 "php": -4.049900089458442,
+         *                 "pkr": -4.049900089458451,
+         *                 "pln": -4.049900089458555,
+         *                 "rub": -4.049900089458471,
+         *                 "sar": -4.049900089458411,
+         *                 "sek": -4.049900089458544,
+         *                 "sgd": -4.049900089458575,
+         *                 "thb": -4.041056870708535,
+         *                 "try": -4.049900089458374,
+         *                 "twd": -4.0499000894584665,
+         *                 "uah": -4.17945939929411,
+         *                 "usd": -4.049900089458533,
+         *                 "vef": -4.049900089458404,
+         *                 "vnd": -4.049900089458679,
+         *                 "xag": -4.062083010251626,
+         *                 "xau": -4.049900089458423,
+         *                 "xdr": -4.049900089458524,
+         *                 "xlm": -4.124939249003918,
+         *                 "xrp": -4.481270699934758,
+         *                 "yfi": -4.04427366181248,
+         *                 "zar": -4.0499000894588,
+         *                 "bits": -5.9858537505924465,
+         *                 "link": -5.120058065995313,
+         *                 "sats": -5.9858537505924545
+         *               },
+         *               "market_cap": "$99,703,583",
+         *               "market_cap_btc": "1428.83459310001",
+         *               "total_volume": "$282,142",
+         *               "total_volume_btc": "4.04583894742915",
+         *               "sparkline": "https://www.coingecko.com/coins/28470/sparkline.svg",
+         *               "content": null
+         *             }
+         *           }
+         *         },
+         *         {
+         *           "item": {
+         *             "id": "gala",
+         *             "coin_id": 12493,
+         *             "name": "GALA",
+         *             "symbol": "GALA",
+         *             "market_cap_rank": 53,
+         *             "thumb": "https://assets.coingecko.com/coins/images/12493/standard/GALA_token_image_-_200PNG.png?1709725869",
+         *             "small": "https://assets.coingecko.com/coins/images/12493/small/GALA_token_image_-_200PNG.png?1709725869",
+         *             "large": "https://assets.coingecko.com/coins/images/12493/large/GALA_token_image_-_200PNG.png?1709725869",
+         *             "slug": "gala",
+         *             "price_btc": 8.995385509920279e-7,
+         *             "score": 1,
+         *             "data": {
+         *               "price": 0.06273061361614252,
+         *               "price_btc": "0.000000899538550992028",
+         *               "price_change_percentage_24h": {
+         *                 "aed": 9.607800289428866,
+         *                 "ars": 9.601831178453207,
+         *                 "aud": 9.60183117845384,
+         *                 "bch": 11.467421966306494,
+         *                 "bdt": 9.601831178453276,
+         *                 "bhd": 9.465477224909796,
+         *                 "bmd": 9.601831178453173,
+         *                 "bnb": 10.223428485128215,
+         *                 "brl": 9.601831178453361,
+         *                 "btc": 7.387458257241243,
+         *                 "cad": 9.601831178453283,
+         *                 "chf": 9.601831178453216,
+         *                 "clp": 8.487222863095175,
+         *                 "cny": 9.601831178453274,
+         *                 "czk": 9.601831178453118,
+         *                 "dkk": 9.601831178453255,
+         *                 "dot": 7.376880264270369,
+         *                 "eos": 7.628589329562328,
+         *                 "eth": 8.451082207534835,
+         *                 "eur": 9.548468326361439,
+         *                 "gbp": 9.601831178453317,
+         *                 "gel": 9.601831178452892,
+         *                 "hkd": 9.601831178453269,
+         *                 "huf": 9.597288247194557,
+         *                 "idr": 9.601831178452711,
+         *                 "ils": 9.191387172052512,
+         *                 "inr": 9.601831178453226,
+         *                 "jpy": 9.601831178453017,
+         *                 "krw": 9.601831178453276,
+         *                 "kwd": 9.521283788693184,
+         *                 "lkr": 9.601831178453256,
+         *                 "ltc": 8.065248250452148,
+         *                 "mmk": 9.601831178452926,
+         *                 "mxn": 9.601831178453205,
+         *                 "myr": 9.601831178453285,
+         *                 "ngn": 9.601831178453272,
+         *                 "nok": 9.601831178453201,
+         *                 "nzd": 9.60183117845338,
+         *                 "php": 9.601831178453331,
+         *                 "pkr": 9.601831178452992,
+         *                 "pln": 9.601831178453399,
+         *                 "rub": 9.601831178453267,
+         *                 "sar": 9.601831178453297,
+         *                 "sek": 9.601831178453194,
+         *                 "sgd": 9.601831178453194,
+         *                 "thb": 9.61193260585552,
+         *                 "try": 9.60183117845312,
+         *                 "twd": 9.601831178452995,
+         *                 "uah": 9.453838236106627,
+         *                 "usd": 9.601831178453173,
+         *                 "vef": 9.601831178453372,
+         *                 "vnd": 9.60183117845306,
+         *                 "xag": 9.587914877904465,
+         *                 "xau": 9.601831178453322,
+         *                 "xdr": 9.601831178453349,
+         *                 "xlm": 9.491125969692098,
+         *                 "xrp": 8.997673436109869,
+         *                 "yfi": 9.544091113766347,
+         *                 "zar": 9.6018311784527,
+         *                 "bits": 7.387458257241251,
+         *                 "link": 8.376626532676953,
+         *                 "sats": 7.38745825724125
+         *               },
+         *               "market_cap": "$2,365,621,969",
+         *               "market_cap_btc": "33901.3141933559",
+         *               "total_volume": "$212,777,204",
+         *               "total_volume_btc": "3051.16253202022",
+         *               "sparkline": "https://www.coingecko.com/coins/12493/sparkline.svg",
+         *               "content": {
+         *                 "title": "What is GALA?",
+         *                 "description": "Gala is a blockchain gaming ecosystem. Gamers can explore different type of games and have their experiences interact across each other on the Gala platform. The GALA token is the utility token and primary medium of exchange of the ecosystem. Game items are represented as NFTs on the Ethereum blockchain and users can trade them on all marketplaces."
+         *               }
+         *             }
+         *           }
+         *         }
+         *       ],
+         *       "nfts": [
+         *         {
+         *           "id": "chameleon-travel-club",
+         *           "name": "ChameleonTravelClub",
+         *           "symbol": "CTC",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/3610/standard/chameleon-travel-club.png?1707290106",
+         *           "nft_contract_id": 3610,
+         *           "native_currency_symbol": "eth",
+         *           "floor_price_in_native_currency": 4.29,
+         *           "floor_price_24h_percentage_change": 57.3120347225931,
+         *           "data": {
+         *             "floor_price": "4.29 ETH",
+         *             "floor_price_in_usd_24h_percentage_change": "57.3120347225931",
+         *             "h24_volume": "11.26 ETH",
+         *             "h24_average_sale_price": "2.82 ETH",
+         *             "sparkline": "https://www.coingecko.com/nft/3610/sparkline.svg",
+         *             "content": null
+         *           }
+         *         },
+         *         {
+         *           "id": "natcats",
+         *           "name": "Natcats",
+         *           "symbol": "DMTNATCATS",
+         *           "thumb": "https://assets.coingecko.com/nft_contracts/images/4171/standard/natcats.png?1709517703",
+         *           "nft_contract_id": 4171,
+         *           "native_currency_symbol": "btc",
+         *           "floor_price_in_native_currency": 0.05139,
+         *           "floor_price_24h_percentage_change": 52.5917829733019,
+         *           "data": {
+         *             "floor_price": "0.051 BTC",
+         *             "floor_price_in_usd_24h_percentage_change": "52.5917829733019",
+         *             "h24_volume": "3.93 BTC",
+         *             "h24_average_sale_price": "0.049 BTC",
+         *             "sparkline": "https://www.coingecko.com/nft/4171/sparkline.svg",
+         *             "content": null
+         *           }
+         *         }
+         *       ],
+         *       "categories": [
+         *         {
+         *           "id": 251,
+         *           "name": "Solana Meme Coins",
+         *           "market_cap_1h_change": 1.4453764946553134,
+         *           "slug": "solana-meme-coins",
+         *           "coins_count": 79,
+         *           "data": {
+         *             "market_cap": 8237562936.011124,
+         *             "market_cap_btc": 118852.27622489528,
+         *             "total_volume": 1207846273.3244412,
+         *             "total_volume_btc": 17426.911336459012,
+         *             "market_cap_change_percentage_24h": {
+         *               "aed": 14.230396523539737,
+         *               "ars": 14.224569755904016,
+         *               "aud": 14.224175671448258,
+         *               "bch": 10.54444640788801,
+         *               "bdt": 14.22417567144842,
+         *               "bhd": 14.082071130168746,
+         *               "bmd": 14.224175671448535,
+         *               "bnb": 12.624477239332412,
+         *               "brl": 14.221695576046988,
+         *               "btc": 11.84681099262996,
+         *               "cad": 14.232580997300973,
+         *               "chf": 14.224175671448508,
+         *               "clp": 13.062559896881549,
+         *               "cny": 14.217858661401426,
+         *               "czk": 14.224175671448577,
+         *               "dkk": 14.224175671448444,
+         *               "dot": 10.696648493582588,
+         *               "eos": 10.12173144446242,
+         *               "eth": 11.884759639001178,
+         *               "eur": 14.168562295958932,
+         *               "gbp": 14.224175671448489,
+         *               "gel": 14.224175671449085,
+         *               "hkd": 14.224175671448705,
+         *               "huf": 14.21944114673665,
+         *               "idr": 14.224175671448897,
+         *               "ils": 13.796421611262415,
+         *               "inr": 14.224175671448592,
+         *               "jpy": 14.224175671448288,
+         *               "krw": 14.224175671448533,
+         *               "kwd": 14.140231278377183,
+         *               "lkr": 14.2241756714485,
+         *               "ltc": 8.642866877624703,
+         *               "mmk": 14.224175671448963,
+         *               "mxn": 14.224175671448078,
+         *               "myr": 14.224175671448464,
+         *               "ngn": 14.224175671448572,
+         *               "nok": 14.224175671448524,
+         *               "nzd": 14.22417567144808,
+         *               "php": 14.224175671448599,
+         *               "pkr": 14.224175671448386,
+         *               "pln": 14.206825106648202,
+         *               "rub": 14.224175671448602,
+         *               "sar": 14.224175671448705,
+         *               "sek": 14.224175671448574,
+         *               "sgd": 14.224175671448508,
+         *               "thb": 14.234703116161398,
+         *               "try": 14.224175671448606,
+         *               "twd": 14.224175671448991,
+         *               "uah": 14.06994127898445,
+         *               "usd": 14.224175671448535,
+         *               "vef": 14.224175671448553,
+         *               "vnd": 14.224175671448933,
+         *               "xag": 14.209672465238517,
+         *               "xau": 14.224175671448783,
+         *               "xdr": 14.224175671448712,
+         *               "xlm": 11.83204356427227,
+         *               "xrp": 12.417240014724353,
+         *               "yfi": 12.795491855495357,
+         *               "zar": 14.224175671448144,
+         *               "bits": 11.846810992629957,
+         *               "link": 11.65665127230344,
+         *               "sats": 11.846810992629955
+         *             },
+         *             "sparkline": "https://www.coingecko.com/categories/25211443/sparkline.svg"
+         *           }
+         *         },
+         *         {
+         *           "id": 327,
+         *           "name": "Gaming Platform",
+         *           "market_cap_1h_change": 1.1050692959116248,
+         *           "slug": "gaming-platform",
+         *           "coins_count": 20,
+         *           "data": {
+         *             "market_cap": 3665275001.853747,
+         *             "market_cap_btc": 52882.90728027729,
+         *             "total_volume": 218189404.503211,
+         *             "total_volume_btc": 3148.0557508090187,
+         *             "market_cap_change_percentage_24h": {
+         *               "aed": 5.953195292443641,
+         *               "ars": 5.947790735793044,
+         *               "aud": 5.947425206927055,
+         *               "bch": 2.53433127439418,
+         *               "bdt": 5.947425206927214,
+         *               "bhd": 5.815617643683333,
+         *               "bmd": 5.9474252069273215,
+         *               "bnb": 4.4636418572644425,
+         *               "brl": 5.945124820686694,
+         *               "btc": 3.742325760876501,
+         *               "cad": 5.955221477960618,
+         *               "chf": 5.947425206927288,
+         *               "clp": 4.869980789651604,
+         *               "cny": 5.941565931116702,
+         *               "czk": 5.947425206927346,
+         *               "dkk": 5.947425206927227,
+         *               "dot": 2.675504708088687,
+         *               "eos": 2.1422464840411943,
+         *               "eth": 3.7775246261734994,
+         *               "eur": 5.895841609098276,
+         *               "gbp": 5.94742520692727,
+         *               "gel": 5.947425206927817,
+         *               "hkd": 5.947425206927471,
+         *               "huf": 5.943033748640541,
+         *               "idr": 5.9474252069276545,
+         *               "ils": 5.550666455707389,
+         *               "inr": 5.94742520692736,
+         *               "jpy": 5.94742520692707,
+         *               "krw": 5.947425206927302,
+         *               "kwd": 5.86956347359295,
+         *               "lkr": 5.94742520692729,
+         *               "ltc": 0.7705413072238989,
+         *               "mmk": 5.947425206927696,
+         *               "mxn": 5.947425206926885,
+         *               "myr": 5.947425206927239,
+         *               "ngn": 5.947425206927365,
+         *               "nok": 5.9474252069272895,
+         *               "nzd": 5.947425206926885,
+         *               "php": 5.947425206927361,
+         *               "pkr": 5.947425206927167,
+         *               "pln": 5.931331874183391,
+         *               "rub": 5.94742520692736,
+         *               "sar": 5.947425206927473,
+         *               "sek": 5.9474252069273605,
+         *               "sgd": 5.947425206927288,
+         *               "thb": 5.957189826849315,
+         *               "try": 5.947425206927379,
+         *               "twd": 5.947425206927743,
+         *               "uah": 5.804366728598461,
+         *               "usd": 5.9474252069273215,
+         *               "vef": 5.94742520692733,
+         *               "vnd": 5.94742520692767,
+         *               "xag": 5.933972911507694,
+         *               "xau": 5.947425206927534,
+         *               "xdr": 5.947425206927486,
+         *               "xlm": 3.7286283890002943,
+         *               "xrp": 4.2714211629570755,
+         *               "yfi": 4.622264654484985,
+         *               "zar": 5.9474252069269395,
+         *               "bits": 3.742325760876498,
+         *               "link": 3.5659451249189047,
+         *               "sats": 3.742325760876507
+         *             },
+         *             "sparkline": "https://www.coingecko.com/categories/25211410/sparkline.svg"
+         *           }
+         *         }
+         *       ]
+         *     } */
+        TrendingSearch: {
+            coins?: {
+                /** @description coin id */
+                id?: string;
+                coin_id?: number;
+                /** @description coin name */
+                name?: string;
+                /** @description coin symbol */
+                symbol?: string;
+                /** @description coin market cap rank */
+                market_cap_rank?: number;
+                /** @description coin thumb image url */
+                thumb?: string;
+                /** @description coin small image url */
+                small?: string;
+                /** @description coin large image url */
+                large?: string;
+                /** @description coin web slug */
+                slug?: string;
+                /** @description coin price in btc */
+                price_btc?: number;
+                /** @description coin sequence in the list */
+                score?: number;
+                data?: {
+                    /** @description coin price in usd */
+                    price?: number;
+                    /** @description coin price in btc */
+                    price_btc?: string;
+                    /** @description coin price change percentage in 24 hours */
+                    price_change_percentage_24h?: {
+                        btc?: number;
+                        usd?: number;
+                    };
+                    /** @description coin market cap in usd */
+                    market_cap?: string;
+                    /** @description coin market cap in btc */
+                    market_cap_btc?: string;
+                    /** @description coin total volume in usd */
+                    total_volume?: string;
+                    /** @description coin total volume in btc */
+                    total_volume_btc?: string;
+                    /** @description coin sparkline image url */
+                    sparkline?: string;
+                    content?: string;
+                };
+            }[];
+            nfts?: {
+                /** @description nft collection id */
+                id?: string;
+                /** @description nft collection name */
+                name?: string;
+                /** @description nft collection symbol */
+                symbol?: string;
+                /** @description nft collection thumb image url */
+                thumb?: string;
+                nft_contract_id?: number;
+                /** @description nft collection native currency symbol */
+                native_currency_symbol?: string;
+                /** @description nft collection floor price in native currency */
+                floor_price_in_native_currency?: number;
+                /** @description nft collection floor price 24 hours percentage change */
+                floor_price_24h_percentage_change?: number;
+                data?: {
+                    /** @description nft collection floor price */
+                    floor_price?: string;
+                    /** @description nft collection floor price in usd 24 hours percentage change */
+                    floor_price_in_usd_24h_percentage_change?: string;
+                    /** @description nft collection volume in 24 hours */
+                    h24_volume?: string;
+                    /** @description nft collection 24 hours average sale price */
+                    h24_average_sale_price?: string;
+                    /** @description nft collection sparkline image url */
+                    sparkline?: string;
+                    content?: string;
+                };
+            }[];
+            categories?: {
+                id?: number;
+                /** @description category name */
+                name?: string;
+                /** @description category market cap 1 hour change */
+                market_cap_1h_change?: number;
+                /** @description category web slug */
+                slug?: string;
+                /** @description category number of coins */
+                coins_count?: number;
+                data?: {
+                    /** @description category market cap */
+                    market_cap?: number;
+                    /** @description category market cap in btc */
+                    market_cap_btc?: number;
+                    /** @description category total volume */
+                    total_volume?: number;
+                    /** @description category total volume in btc */
+                    total_volume_btc?: number;
+                    /** @description category market cap change percentage in 24 hours */
+                    market_cap_change_percentage_24h?: {
+                        btc?: number;
+                        usd?: number;
+                    };
+                    /** @description category sparkline image url */
+                    sparkline?: string;
+                };
+            }[];
+        };
+        /** @example {
+         *       "date": {
+         *         "active_cryptocurrencies": 13690,
+         *         "upcoming_icos": 0,
+         *         "ongoing_icos": 49,
+         *         "ended_icos": 3376,
+         *         "markets": 1046,
+         *         "total_market_cap": {
+         *           "btc": 39003738.08471593,
+         *           "eth": 803832137.2075309,
+         *           "ltc": 26721173267.535767,
+         *           "bch": 3981159931.513415,
+         *           "bnb": 4670513150.58714,
+         *           "eos": 2641998753398.4077,
+         *           "xrp": 4567762968374.063,
+         *           "xlm": 21049307801356.547,
+         *           "link": 153517938957.19897,
+         *           "dot": 315120726481.16595,
+         *           "yfi": 324671967.6108449,
+         *           "usd": 2721226850772.6313,
+         *           "aed": 9993705609462.484,
+         *           "ars": 2341775032921961.5,
+         *           "aud": 4135040261091.559,
+         *           "bdt": 298245137607204.1,
+         *           "bhd": 1024582727718.6569,
+         *           "bmd": 2721226850772.6313,
+         *           "brl": 13785980136430.713,
+         *           "cad": 3698283351542.5464,
+         *           "chf": 2454228235855.375,
+         *           "clp": 2557393918759367.5,
+         *           "cny": 19681001075527.992,
+         *           "czk": 63568675602103.72,
+         *           "dkk": 18728571677757.562,
+         *           "eur": 2508293570926.523,
+         *           "gbp": 2153208842849.7563,
+         *           "gel": 7292887960070.655,
+         *           "hkd": 21307070180207.188,
+         *           "huf": 979811947048335,
+         *           "idr": 43234171898362830,
+         *           "ils": 10201683535213.324,
+         *           "inr": 226670207147326.38,
+         *           "jpy": 412551596711385.75,
+         *           "krw": 3677112086909555,
+         *           "kwd": 836219405108.1758,
+         *           "lkr": 812593109477405.5,
+         *           "mmk": 5706555839881336,
+         *           "mxn": 44773978111872.44,
+         *           "myr": 12919024474043.053,
+         *           "ngn": 3522998071018357,
+         *           "nok": 29197131372679.86,
+         *           "nzd": 4524820631515.687,
+         *           "php": 153994230206450,
+         *           "pkr": 755251422720380.5,
+         *           "pln": 10747177948492.383,
+         *           "rub": 251732363568358.97,
+         *           "sar": 10207395390373.113,
+         *           "sek": 29054498267296.645,
+         *           "sgd": 3672056167154.7974,
+         *           "thb": 99649147572586.36,
+         *           "try": 87273829665781.25,
+         *           "twd": 87422678053291.61,
+         *           "uah": 105534042826571.94,
+         *           "vef": 272476444567.86353,
+         *           "vnd": 67937284004880150,
+         *           "zar": 50878778428895.97,
+         *           "xdr": 2052425485204.5413,
+         *           "xag": 99002369095.9216,
+         *           "xau": 1167950564.3516145,
+         *           "bits": 39003738084715.93,
+         *           "sats": 3900373808471593.5
+         *         },
+         *         "total_volume": {
+         *           "btc": 993675.225562481,
+         *           "eth": 20478757.151921887,
+         *           "ltc": 680759567.6148158,
+         *           "bch": 101425662.95452334,
+         *           "bnb": 118987908.24412876,
+         *           "eos": 67308643636.075134,
+         *           "xrp": 116370202467.68745,
+         *           "xlm": 536260797157.8833,
+         *           "link": 3911085965.397742,
+         *           "dot": 8028144848.205925,
+         *           "yfi": 8271476.183867172,
+         *           "usd": 69327091133.54892,
+         *           "aed": 254603742187.9583,
+         *           "ars": 59660021021604.7,
+         *           "aud": 105345981331.98444,
+         *           "bdt": 7598215425943.58,
+         *           "bhd": 26102689718.14816,
+         *           "bmd": 69327091133.54892,
+         *           "brl": 351217283120.7607,
+         *           "cad": 94218983205.04971,
+         *           "chf": 62524924932.79855,
+         *           "clp": 65153216175224.445,
+         *           "cny": 501401253914.27954,
+         *           "czk": 1619501647007.038,
+         *           "dkk": 477136772017.5372,
+         *           "eur": 63902315579.43983,
+         *           "gbp": 54856031438.69647,
+         *           "gel": 185796604237.91116,
+         *           "hkd": 542827657221.1319,
+         *           "huf": 24962090950805.31,
+         *           "idr": 1101451492157040.8,
+         *           "ils": 259902273109.11288,
+         *           "inr": 5774743147085.059,
+         *           "jpy": 10510333651301.709,
+         *           "krw": 93679615385638.72,
+         *           "kwd": 21303868469.883915,
+         *           "lkr": 20701955274048.176,
+         *           "mmk": 145382556642718.72,
+         *           "mxn": 1140680226674.9573,
+         *           "myr": 329130365156.52313,
+         *           "ngn": 89753343519839.38,
+         *           "nok": 743838091608.2996,
+         *           "nzd": 115276185884.68079,
+         *           "php": 3923220156574.6226,
+         *           "pkr": 19241094948336.27,
+         *           "pln": 273799512470.6537,
+         *           "rub": 6413236921211.558,
+         *           "sar": 260047790673.40265,
+         *           "sek": 740204312126.5353,
+         *           "sgd": 93550808700.7045,
+         *           "thb": 2538702546310.5654,
+         *           "try": 2223423872616.704,
+         *           "twd": 2227215995174.6167,
+         *           "uah": 2688628550997.977,
+         *           "vef": 6941721635.202251,
+         *           "vnd": 1730798106094996.5,
+         *           "zar": 1296208622923.966,
+         *           "xdr": 52288433291.474365,
+         *           "xag": 2522224952.6170354,
+         *           "xau": 29755187.514519222,
+         *           "bits": 993675225562.481,
+         *           "sats": 99367522556248.1
+         *         },
+         *         "market_cap_percentage": {
+         *           "btc": 50.446526323358434,
+         *           "eth": 14.922806691821144,
+         *           "usdt": 3.9290064119981887,
+         *           "bnb": 3.2939520356345176,
+         *           "sol": 2.9507480132815944,
+         *           "usdc": 1.2092204926353505,
+         *           "xrp": 1.2052348104116084,
+         *           "steth": 1.1830926679376446,
+         *           "doge": 1.0577856035454278,
+         *           "ada": 0.7659872946940993
+         *         },
+         *         "market_cap_change_percentage_24h_usd": 1.721795060602718,
+         *         "updated_at": 1712512855
+         *       }
+         *     } */
+        Global: {
+            data?: {
+                /** @description number of active cryptocurrencies */
+                active_cryptocurrencies?: number;
+                /** @description number of upcoming icos */
+                upcoming_icos?: number;
+                /** @description number of ongoing icos */
+                ongoing_icos?: number;
+                /** @description number of ended icos */
+                ended_icos?: number;
+                /** @description number of exchanges */
+                markets?: number;
+                /** @description cryptocurrencies total market cap */
+                total_market_cap?: {
+                    btc?: number;
+                    eth?: number;
+                };
+                /** @description cryptocurrencies total volume */
+                total_volume?: {
+                    btc?: number;
+                    eth?: number;
+                };
+                /** @description cryptocurrencies market cap percentage */
+                market_cap_percentage?: {
+                    btc?: number;
+                    eth?: number;
+                };
+            };
+            /** @description cryptocurrencies market cap change percentage in 24 hours in usd */
+            market_cap_change_percentage_24h_usd?: number;
+            updated_at?: number;
+        };
+        /** @example {
+         *       "data": {
+         *         "defi_market_cap": "105273842288.229620442228701667",
+         *         "eth_market_cap": "406184911478.5772415794509920285",
+         *         "defi_to_eth_ratio": "25.9177136602677348904422532573101031788841174510865443130135278",
+         *         "trading_volume_24h": "5046503746.288261648853195485635",
+         *         "defi_dominance": "3.8676503084614763642371703099489945457095080090859886",
+         *         "top_coin_name": "Lido Staked Ether",
+         *         "top_coin_defi_dominance": 30.589442518868005
+         *       }
+         *     } */
+        GlobalDeFi: {
+            data?: {
+                /** @description defi market cap */
+                defi_market_cap?: string;
+                /** @description eth market cap */
+                eth_market_cap?: string;
+                /** @description defi to eth ratio */
+                defi_to_eth_ratio?: string;
+                /** @description defi trading volume in 24 hours */
+                trading_volume_24h?: string;
+                /** @description defi dominance */
+                defi_dominance?: string;
+                /** @description defi top coin name */
+                top_coin_name?: string;
+                /** @description defi top coin dominance */
+                top_coin_defi_dominance?: number;
+            };
+        };
+        /** @example {
+         *       "market_cap_chart": {
+         *         "market_cap": [
+         *           [
+         *             1367193600000,
+         *             1661441770
+         *           ],
+         *           [
+         *             1367280000000,
+         *             1592765051
+         *           ],
+         *           [
+         *             1367366400000,
+         *             1378705103
+         *           ]
+         *         ]
+         *       }
+         *     } */
+        GlobalMarketCapChart: {
+            market_cap_chart?: {
+                market_cap?: number[][];
+            };
+        };
+        /** @example {
+         *       "total_holdings": 264136,
+         *       "total_value_usd": 18403306939.1513,
+         *       "market_cap_dominance": 1.34,
+         *       "companies": [
+         *         {
+         *           "name": "MicroStrategy Inc.",
+         *           "symbol": "NASDAQ:MSTR",
+         *           "country": "US",
+         *           "total_holdings": 174530,
+         *           "total_entry_value_usd": 4680000000,
+         *           "total_current_value_usd": 12160134022,
+         *           "percentage_of_total_supply": 0.831
+         *         },
+         *         {
+         *           "name": "Galaxy Digital Holdings",
+         *           "symbol": "TSE: GLXY",
+         *           "country": "US",
+         *           "total_holdings": 17518,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 1220542186,
+         *           "percentage_of_total_supply": 0.083
+         *         },
+         *         {
+         *           "name": "Marathon Digital Holdings",
+         *           "symbol": "NASDAQ:MARA",
+         *           "country": "US",
+         *           "total_holdings": 13716,
+         *           "total_entry_value_usd": 189087000,
+         *           "total_current_value_usd": 955643145,
+         *           "percentage_of_total_supply": 0.065
+         *         },
+         *         {
+         *           "name": "Tesla, Inc.",
+         *           "symbol": "NASDAQ:TSLA",
+         *           "country": "US",
+         *           "total_holdings": 10500,
+         *           "total_entry_value_usd": 336000000,
+         *           "total_current_value_usd": 731572836,
+         *           "percentage_of_total_supply": 0.05
+         *         },
+         *         {
+         *           "name": "Hut 8 Mining Corp",
+         *           "symbol": "NASDAQ:HUT",
+         *           "country": "CA",
+         *           "total_holdings": 9366,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 652562970,
+         *           "percentage_of_total_supply": 0.045
+         *         },
+         *         {
+         *           "name": "Coinbase Global, Inc",
+         *           "symbol": "NASDAQ:COIN",
+         *           "country": "US",
+         *           "total_holdings": 9181,
+         *           "total_entry_value_usd": 207783800,
+         *           "total_current_value_usd": 639673353,
+         *           "percentage_of_total_supply": 0.044
+         *         },
+         *         {
+         *           "name": "Block Inc.",
+         *           "symbol": "NYSE:SQ",
+         *           "country": "US",
+         *           "total_holdings": 8027,
+         *           "total_entry_value_usd": 220000000,
+         *           "total_current_value_usd": 559270015,
+         *           "percentage_of_total_supply": 0.038
+         *         },
+         *         {
+         *           "name": "Riot Platforms, Inc",
+         *           "symbol": "NASDAQ:RIOT",
+         *           "country": "US",
+         *           "total_holdings": 7327,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 510498492,
+         *           "percentage_of_total_supply": 0.035
+         *         },
+         *         {
+         *           "name": "Hive Blockchain",
+         *           "symbol": "NASDAQ:HIVE",
+         *           "country": "CA",
+         *           "total_holdings": 2596,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 180872674,
+         *           "percentage_of_total_supply": 0.012
+         *         },
+         *         {
+         *           "name": "CleanSpark Inc.",
+         *           "symbol": "NASDAQ:CLSK",
+         *           "country": "US",
+         *           "total_holdings": 2575,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 179409529,
+         *           "percentage_of_total_supply": 0.012
+         *         },
+         *         {
+         *           "name": "NEXON Co Ltd",
+         *           "symbol": "TYO:3659",
+         *           "country": "JP",
+         *           "total_holdings": 1717,
+         *           "total_entry_value_usd": 99974042,
+         *           "total_current_value_usd": 119629577,
+         *           "percentage_of_total_supply": 0.008
+         *         },
+         *         {
+         *           "name": "Exodus Movement Inc",
+         *           "symbol": "EXOD:OTCMKTS",
+         *           "country": "US",
+         *           "total_holdings": 1651,
+         *           "total_entry_value_usd": 23163000,
+         *           "total_current_value_usd": 115031119,
+         *           "percentage_of_total_supply": 0.008
+         *         },
+         *         {
+         *           "name": "Meitu Inc",
+         *           "symbol": "HKG:1357",
+         *           "country": "HK",
+         *           "total_holdings": 940,
+         *           "total_entry_value_usd": 49500000,
+         *           "total_current_value_usd": 65493187,
+         *           "percentage_of_total_supply": 0.004
+         *         },
+         *         {
+         *           "name": "Bit Digital, Inc",
+         *           "symbol": "NASDAQ:BTBT",
+         *           "country": "US",
+         *           "total_holdings": 821,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 57202028,
+         *           "percentage_of_total_supply": 0.004
+         *         },
+         *         {
+         *           "name": "Bitfarms Limited",
+         *           "symbol": "NASDAQ:BITF",
+         *           "country": "US",
+         *           "total_holdings": 760,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 52951938,
+         *           "percentage_of_total_supply": 0.004
+         *         },
+         *         {
+         *           "name": "NFT Investments PLC",
+         *           "symbol": "AQSE:NFT",
+         *           "country": "GB",
+         *           "total_holdings": 517,
+         *           "total_entry_value_usd": 8505363,
+         *           "total_current_value_usd": 36021253,
+         *           "percentage_of_total_supply": 0.002
+         *         },
+         *         {
+         *           "name": "Cipher Mining",
+         *           "symbol": "NASDAQ:CIFR",
+         *           "country": "US",
+         *           "total_holdings": 507,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 35324516,
+         *           "percentage_of_total_supply": 0.002
+         *         },
+         *         {
+         *           "name": "DMG Blockchain Solutions Inc.",
+         *           "symbol": "OTCMKTS:DMGGF",
+         *           "country": "CA",
+         *           "total_holdings": 462,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 32189204,
+         *           "percentage_of_total_supply": 0.002
+         *         },
+         *         {
+         *           "name": "Neptune Digital Assets Corp.",
+         *           "symbol": "TSXV: DASH",
+         *           "country": "CA",
+         *           "total_holdings": 313,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 21807837,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "BIGG Digital Assets Inc.",
+         *           "symbol": "CNSX:BIGG",
+         *           "country": "CA",
+         *           "total_holdings": 283,
+         *           "total_entry_value_usd": 2690387,
+         *           "total_current_value_usd": 19717629,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "Advanced Bitcoin Technologies AG",
+         *           "symbol": "ABT:GR",
+         *           "country": "DE",
+         *           "total_holdings": 228,
+         *           "total_entry_value_usd": 2117978,
+         *           "total_current_value_usd": 15885581,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "FRMO Corp.",
+         *           "symbol": "OTCMKTS:FRMO",
+         *           "country": "US",
+         *           "total_holdings": 143,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 9963325,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "The Brooker Group",
+         *           "symbol": "BKK:BROOK",
+         *           "country": "TH",
+         *           "total_holdings": 122,
+         *           "total_entry_value_usd": 6600000,
+         *           "total_current_value_usd": 8500179,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "DigitalX",
+         *           "symbol": "ASX:DCC",
+         *           "country": "AU",
+         *           "total_holdings": 115,
+         *           "total_entry_value_usd": 610350,
+         *           "total_current_value_usd": 8012464,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "LQwD Technologies Corp",
+         *           "symbol": "TSXV:LQWD",
+         *           "country": "CA",
+         *           "total_holdings": 113,
+         *           "total_entry_value_usd": 4360275,
+         *           "total_current_value_usd": 7873117,
+         *           "percentage_of_total_supply": 0.001
+         *         },
+         *         {
+         *           "name": "Cypherpunk Holdings Inc",
+         *           "symbol": "CSE:HODL",
+         *           "country": "CA",
+         *           "total_holdings": 69,
+         *           "total_entry_value_usd": 1910000,
+         *           "total_current_value_usd": 4807478,
+         *           "percentage_of_total_supply": 0
+         *         },
+         *         {
+         *           "name": "Core Scientific",
+         *           "symbol": "CORZ:NASDAQ",
+         *           "country": "US",
+         *           "total_holdings": 21,
+         *           "total_entry_value_usd": 0,
+         *           "total_current_value_usd": 1463145,
+         *           "percentage_of_total_supply": 0
+         *         },
+         *         {
+         *           "name": "Mogo Inc.",
+         *           "symbol": "NASDAQ:MOGO",
+         *           "country": "CA",
+         *           "total_holdings": 18,
+         *           "total_entry_value_usd": 595494,
+         *           "total_current_value_usd": 1254124,
+         *           "percentage_of_total_supply": 0
+         *         }
+         *       ]
+         *     } */
+        CompaniesTreasury: {
+            /** @description total btc/eth holdings of companies */
+            total_holdings?: number;
+            /** @description total btc/eth holdings value in usd */
+            total_value_usd?: number;
+            /** @description market cap dominance */
+            market_cap_dominance?: number;
+            companies?: {
+                /** @description company name */
+                name?: string;
+                /** @description company symbol */
+                symbol?: string;
+                /** @description company incorporated country */
+                country?: string;
+                /** @description total btc/eth holdings of company */
+                total_holdings?: number;
+                /** @description total entry value in usd */
+                total_entry_value_usd?: number;
+                /** @description total current value of btc/eth holdings in usd */
+                total_current_value_usd?: number;
+                /** @description percentage of total btc/eth supply */
+                percentage_of_total_supply?: number;
+            }[];
+        };
     };
-    /** @example {
-     *       "data": {
-     *         "defi_market_cap": "105273842288.229620442228701667",
-     *         "eth_market_cap": "406184911478.5772415794509920285",
-     *         "defi_to_eth_ratio": "25.9177136602677348904422532573101031788841174510865443130135278",
-     *         "trading_volume_24h": "5046503746.288261648853195485635",
-     *         "defi_dominance": "3.8676503084614763642371703099489945457095080090859886",
-     *         "top_coin_name": "Lido Staked Ether",
-     *         "top_coin_defi_dominance": 30.589442518868005
-     *       }
-     *     } */
-    GlobalDeFi: {
-      data?: {
-        /** @description defi market cap */
-        defi_market_cap?: string;
-        /** @description eth market cap */
-        eth_market_cap?: string;
-        /** @description defi to eth ratio */
-        defi_to_eth_ratio?: string;
-        /** @description defi trading volume in 24 hours */
-        trading_volume_24h?: string;
-        /** @description defi dominance */
-        defi_dominance?: string;
-        /** @description defi top coin name */
-        top_coin_name?: string;
-        /** @description defi top coin dominance */
-        top_coin_defi_dominance?: number;
-      };
-    };
-    /** @example {
-     *       "market_cap_chart": {
-     *         "market_cap": [
-     *           [
-     *             1367193600000,
-     *             1661441770
-     *           ],
-     *           [
-     *             1367280000000,
-     *             1592765051
-     *           ],
-     *           [
-     *             1367366400000,
-     *             1378705103
-     *           ]
-     *         ]
-     *       }
-     *     } */
-    GlobalMarketCapChart: {
-      market_cap_chart?: {
-        market_cap?: number[][];
-      };
-    };
-    /** @example {
-     *       "total_holdings": 264136,
-     *       "total_value_usd": 18403306939.1513,
-     *       "market_cap_dominance": 1.34,
-     *       "companies": [
-     *         {
-     *           "name": "MicroStrategy Inc.",
-     *           "symbol": "NASDAQ:MSTR",
-     *           "country": "US",
-     *           "total_holdings": 174530,
-     *           "total_entry_value_usd": 4680000000,
-     *           "total_current_value_usd": 12160134022,
-     *           "percentage_of_total_supply": 0.831
-     *         },
-     *         {
-     *           "name": "Galaxy Digital Holdings",
-     *           "symbol": "TSE: GLXY",
-     *           "country": "US",
-     *           "total_holdings": 17518,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 1220542186,
-     *           "percentage_of_total_supply": 0.083
-     *         },
-     *         {
-     *           "name": "Marathon Digital Holdings",
-     *           "symbol": "NASDAQ:MARA",
-     *           "country": "US",
-     *           "total_holdings": 13716,
-     *           "total_entry_value_usd": 189087000,
-     *           "total_current_value_usd": 955643145,
-     *           "percentage_of_total_supply": 0.065
-     *         },
-     *         {
-     *           "name": "Tesla, Inc.",
-     *           "symbol": "NASDAQ:TSLA",
-     *           "country": "US",
-     *           "total_holdings": 10500,
-     *           "total_entry_value_usd": 336000000,
-     *           "total_current_value_usd": 731572836,
-     *           "percentage_of_total_supply": 0.05
-     *         },
-     *         {
-     *           "name": "Hut 8 Mining Corp",
-     *           "symbol": "NASDAQ:HUT",
-     *           "country": "CA",
-     *           "total_holdings": 9366,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 652562970,
-     *           "percentage_of_total_supply": 0.045
-     *         },
-     *         {
-     *           "name": "Coinbase Global, Inc",
-     *           "symbol": "NASDAQ:COIN",
-     *           "country": "US",
-     *           "total_holdings": 9181,
-     *           "total_entry_value_usd": 207783800,
-     *           "total_current_value_usd": 639673353,
-     *           "percentage_of_total_supply": 0.044
-     *         },
-     *         {
-     *           "name": "Block Inc.",
-     *           "symbol": "NYSE:SQ",
-     *           "country": "US",
-     *           "total_holdings": 8027,
-     *           "total_entry_value_usd": 220000000,
-     *           "total_current_value_usd": 559270015,
-     *           "percentage_of_total_supply": 0.038
-     *         },
-     *         {
-     *           "name": "Riot Platforms, Inc",
-     *           "symbol": "NASDAQ:RIOT",
-     *           "country": "US",
-     *           "total_holdings": 7327,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 510498492,
-     *           "percentage_of_total_supply": 0.035
-     *         },
-     *         {
-     *           "name": "Hive Blockchain",
-     *           "symbol": "NASDAQ:HIVE",
-     *           "country": "CA",
-     *           "total_holdings": 2596,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 180872674,
-     *           "percentage_of_total_supply": 0.012
-     *         },
-     *         {
-     *           "name": "CleanSpark Inc.",
-     *           "symbol": "NASDAQ:CLSK",
-     *           "country": "US",
-     *           "total_holdings": 2575,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 179409529,
-     *           "percentage_of_total_supply": 0.012
-     *         },
-     *         {
-     *           "name": "NEXON Co Ltd",
-     *           "symbol": "TYO:3659",
-     *           "country": "JP",
-     *           "total_holdings": 1717,
-     *           "total_entry_value_usd": 99974042,
-     *           "total_current_value_usd": 119629577,
-     *           "percentage_of_total_supply": 0.008
-     *         },
-     *         {
-     *           "name": "Exodus Movement Inc",
-     *           "symbol": "EXOD:OTCMKTS",
-     *           "country": "US",
-     *           "total_holdings": 1651,
-     *           "total_entry_value_usd": 23163000,
-     *           "total_current_value_usd": 115031119,
-     *           "percentage_of_total_supply": 0.008
-     *         },
-     *         {
-     *           "name": "Meitu Inc",
-     *           "symbol": "HKG:1357",
-     *           "country": "HK",
-     *           "total_holdings": 940,
-     *           "total_entry_value_usd": 49500000,
-     *           "total_current_value_usd": 65493187,
-     *           "percentage_of_total_supply": 0.004
-     *         },
-     *         {
-     *           "name": "Bit Digital, Inc",
-     *           "symbol": "NASDAQ:BTBT",
-     *           "country": "US",
-     *           "total_holdings": 821,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 57202028,
-     *           "percentage_of_total_supply": 0.004
-     *         },
-     *         {
-     *           "name": "Bitfarms Limited",
-     *           "symbol": "NASDAQ:BITF",
-     *           "country": "US",
-     *           "total_holdings": 760,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 52951938,
-     *           "percentage_of_total_supply": 0.004
-     *         },
-     *         {
-     *           "name": "NFT Investments PLC",
-     *           "symbol": "AQSE:NFT",
-     *           "country": "GB",
-     *           "total_holdings": 517,
-     *           "total_entry_value_usd": 8505363,
-     *           "total_current_value_usd": 36021253,
-     *           "percentage_of_total_supply": 0.002
-     *         },
-     *         {
-     *           "name": "Cipher Mining",
-     *           "symbol": "NASDAQ:CIFR",
-     *           "country": "US",
-     *           "total_holdings": 507,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 35324516,
-     *           "percentage_of_total_supply": 0.002
-     *         },
-     *         {
-     *           "name": "DMG Blockchain Solutions Inc.",
-     *           "symbol": "OTCMKTS:DMGGF",
-     *           "country": "CA",
-     *           "total_holdings": 462,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 32189204,
-     *           "percentage_of_total_supply": 0.002
-     *         },
-     *         {
-     *           "name": "Neptune Digital Assets Corp.",
-     *           "symbol": "TSXV: DASH",
-     *           "country": "CA",
-     *           "total_holdings": 313,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 21807837,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "BIGG Digital Assets Inc.",
-     *           "symbol": "CNSX:BIGG",
-     *           "country": "CA",
-     *           "total_holdings": 283,
-     *           "total_entry_value_usd": 2690387,
-     *           "total_current_value_usd": 19717629,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "Advanced Bitcoin Technologies AG",
-     *           "symbol": "ABT:GR",
-     *           "country": "DE",
-     *           "total_holdings": 228,
-     *           "total_entry_value_usd": 2117978,
-     *           "total_current_value_usd": 15885581,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "FRMO Corp.",
-     *           "symbol": "OTCMKTS:FRMO",
-     *           "country": "US",
-     *           "total_holdings": 143,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 9963325,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "The Brooker Group",
-     *           "symbol": "BKK:BROOK",
-     *           "country": "TH",
-     *           "total_holdings": 122,
-     *           "total_entry_value_usd": 6600000,
-     *           "total_current_value_usd": 8500179,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "DigitalX",
-     *           "symbol": "ASX:DCC",
-     *           "country": "AU",
-     *           "total_holdings": 115,
-     *           "total_entry_value_usd": 610350,
-     *           "total_current_value_usd": 8012464,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "LQwD Technologies Corp",
-     *           "symbol": "TSXV:LQWD",
-     *           "country": "CA",
-     *           "total_holdings": 113,
-     *           "total_entry_value_usd": 4360275,
-     *           "total_current_value_usd": 7873117,
-     *           "percentage_of_total_supply": 0.001
-     *         },
-     *         {
-     *           "name": "Cypherpunk Holdings Inc",
-     *           "symbol": "CSE:HODL",
-     *           "country": "CA",
-     *           "total_holdings": 69,
-     *           "total_entry_value_usd": 1910000,
-     *           "total_current_value_usd": 4807478,
-     *           "percentage_of_total_supply": 0
-     *         },
-     *         {
-     *           "name": "Core Scientific",
-     *           "symbol": "CORZ:NASDAQ",
-     *           "country": "US",
-     *           "total_holdings": 21,
-     *           "total_entry_value_usd": 0,
-     *           "total_current_value_usd": 1463145,
-     *           "percentage_of_total_supply": 0
-     *         },
-     *         {
-     *           "name": "Mogo Inc.",
-     *           "symbol": "NASDAQ:MOGO",
-     *           "country": "CA",
-     *           "total_holdings": 18,
-     *           "total_entry_value_usd": 595494,
-     *           "total_current_value_usd": 1254124,
-     *           "percentage_of_total_supply": 0
-     *         }
-     *       ]
-     *     } */
-    CompaniesTreasury: {
-      /** @description total btc/eth holdings of companies */
-      total_holdings?: number;
-      /** @description total btc/eth holdings value in usd */
-      total_value_usd?: number;
-      /** @description market cap dominance */
-      market_cap_dominance?: number;
-      companies?: {
-        /** @description company name */
-        name?: string;
-        /** @description company symbol */
-        symbol?: string;
-        /** @description company incorporated country */
-        country?: string;
-        /** @description total btc/eth holdings of company */
-        total_holdings?: number;
-        /** @description total entry value in usd */
-        total_entry_value_usd?: number;
-        /** @description total current value of btc/eth holdings in usd */
-        total_current_value_usd?: number;
-        /** @description percentage of total btc/eth supply */
-        percentage_of_total_supply?: number;
-      }[];
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  'ping-server': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Status OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Ping'];
-        };
-      };
-    };
-  };
-  'api-usage': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description API Usage */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Key'];
-        };
-      };
-    };
-  };
-  'simple-price': {
-    parameters: {
-      query: {
-        /** @description coins' ids, comma-separated if querying more than 1 coin.  <br>*refers to [`/coins/list`](/reference/coins-list). */
-        ids: string;
-        /** @description target currency of coins, comma-separated if querying more than 1 currency.  <br>*refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currencies: string;
-        /** @description include market cap, default: false  */
-        include_market_cap?: boolean;
-        /** @description include 24hr volume, default: false */
-        include_24hr_vol?: boolean;
-        /** @description include 24hr change, default: false */
-        include_24hr_change?: boolean;
-        /** @description include last updated price time in UNIX, default: false */
-        include_last_updated_at?: boolean;
-        /** @description decimal place for currency price value  */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description price(s) of cryptocurrency */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            bitcoin?: components['schemas']['SimplePrice'];
-          };
-        };
-      };
-    };
-  };
-  'simple-token-price': {
-    parameters: {
-      query: {
-        /** @description the contract addresses of tokens, comma-separated if querying more than 1 token's contract address */
-        contract_addresses: string;
-        /** @description target currency of coins, comma-separated if querying more than 1 currency.  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currencies: string;
-        /** @description include market capitalization, default: false */
-        include_market_cap?: boolean;
-        /** @description include 24hr volume, default: false */
-        include_24hr_vol?: boolean;
-        /** @description include 24hr change  default: false */
-        include_24hr_change?: boolean;
-        /** @description include last updated price time in UNIX , default: false */
-        include_last_updated_at?: boolean;
-        /** @description decimal place for currency price value  */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description asset platform's id  <br>*refers to [`/asset_platforms`](/reference/asset-platforms-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description price(s) of cryptocurrency */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [name: string]: components['schemas']['SimplePrice'];
-          };
-        };
-      };
-    };
-  };
-  'simple-supported-currencies': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description list of supported currencies */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CurrencyList'];
-        };
-      };
-    };
-  };
-  'coins-list': {
-    parameters: {
-      query?: {
-        /** @description include platform and token's contract addresses, default: false */
-        include_platform?: boolean;
-        /** @description filter by status of coins, default: active */
-        status?: 'active' | 'inactive';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all coins with id, name, and symbol */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsList'];
-        };
-      };
-    };
-  };
-  'coins-top-gainers-losers': {
-    parameters: {
-      query: {
-        /** @description target currency of coins  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description filter result by time range <br> Default value: `24h` */
-        duration?: '1h' | '24h' | '7d' | '14d' | '30d' | '60d' | '1y';
-        /** @description filter result by market cap ranking (top 300 to 1000) or all coins (including coins that do not have market cap)  <br> Default value: `1000` */
-        top_coins?: 300 | 500 | 1000 | 'all';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List top 30 gainers and losers */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TopGainersLosers'];
-        };
-      };
-    };
-  };
-  'coins-list-new': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List latest 200 coins */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsListNew'];
-        };
-      };
-    };
-  };
-  'coins-markets': {
-    parameters: {
-      query: {
-        /** @description target currency of coins and market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description coins' ids, comma-separated if querying more than 1 coin.  <br> *refers to [`/coins/list`](/reference/coins-list). */
-        ids?: string;
-        /** @description filter based on coins' category <br> *refers to [`/coins/categories/list`](/reference/coins-categories-list). */
-        category?: string;
-        /** @description sort result by field, default: market_cap_desc */
-        order?:
-          | 'market_cap_asc'
-          | 'market_cap_desc'
-          | 'volume_asc'
-          | 'volume_desc'
-          | 'id_asc'
-          | 'id_desc';
-        /** @description total results per page, default: 100 <br> Valid values: 1...250 */
-        per_page?: number;
-        /** @description page through results, default: 1 */
-        page?: number;
-        /** @description include sparkline 7 days data, default: false */
-        sparkline?: boolean;
-        /** @description include price change percentage timeframe, comma-separated if query more than 1 price change percentage timeframe <br> Valid values: 1h, 24h, 7d, 14d, 30d, 200d, 1y */
-        price_change_percentage?: string;
-        /** @description language background, default: en */
-        locale?:
-          | 'ar'
-          | 'bg'
-          | 'cs'
-          | 'da'
-          | 'de'
-          | 'el'
-          | 'en'
-          | 'es'
-          | 'fi'
-          | 'fr'
-          | 'he'
-          | 'hi'
-          | 'hr'
-          | 'hu'
-          | 'id'
-          | 'it'
-          | 'ja'
-          | 'ko'
-          | 'lt'
-          | 'nl'
-          | 'no'
-          | 'pl'
-          | 'pt'
-          | 'ro'
-          | 'ru'
-          | 'sk'
-          | 'sl'
-          | 'sv'
-          | 'th'
-          | 'tr'
-          | 'uk'
-          | 'vi'
-          | 'zh'
-          | 'zh-tw';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all coins with market data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsMarkets'];
-        };
-      };
-    };
-  };
-  'coins-id': {
-    parameters: {
-      query?: {
-        /** @description include all the localized languages in the response, default: true */
-        localization?: boolean;
-        /** @description include tickers data, default: true */
-        tickers?: boolean;
-        /** @description include market data, default: true */
-        market_data?: boolean;
-        /** @description include community data, default: true */
-        community_data?: boolean;
-        /** @description include developer data, default: true */
-        developer_data?: boolean;
-        /** @description include sparkline 7 days data, default: false */
-        sparkline?: boolean;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get current data for a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsID'];
-        };
-      };
-    };
-  };
-  'coins-id-tickers': {
-    parameters: {
-      query?: {
-        /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
-        exchange_ids?: string;
-        /** @description include exchange logo, default: false */
-        include_exchange_logo?: boolean;
-        /** @description page through results */
-        page?: number;
-        /** @description use this to sort the order of responses, default: trust_score_desc */
-        order?:
-          | 'trust_score_desc'
-          | 'trust_score_asc'
-          | 'volume_desc'
-          | 'volume_asc';
-        /** @description include 2% orderbook depth, ie. `cost_to_move_up_usd` and `cost_to_move_down_usd` <br> default: false */
-        depth?: boolean;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get coin tickers */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsTickers'];
-        };
-      };
-    };
-  };
-  'coins-id-history': {
-    parameters: {
-      query: {
-        /** @description the date of data snapshot <br> Format: `dd-mm-yyyy` */
-        date: string;
-        /** @description include all the localized languages in response, default: true */
-        localization?: boolean;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical data (name, price, market, stats) at a given date for a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsHistoricalData'];
-        };
-      };
-    };
-  };
-  'coins-id-market-chart': {
-    parameters: {
-      query: {
-        /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description data up to number of days ago <br> you may use any integer or `max` for number of days */
-        days: string;
-        /** @description data interval, leave empty for auto granularity */
-        interval?: '5m' | 'hourly' | 'daily';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsMarketChart'];
-        };
-      };
-    };
-  };
-  'coins-id-market-chart-range': {
-    parameters: {
-      query: {
-        /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description starting date in UNIX timestamp  */
-        from: number;
-        /** @description ending date in UNIX timestamp */
-        to: number;
-        /** @description data interval, leave empty for auto granularity  */
-        interval?: '5m' | 'hourly' | 'daily';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsMarketChartRange'];
-        };
-      };
-    };
-  };
-  'coins-id-ohlc': {
-    parameters: {
-      query: {
-        /** @description target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description data up to number of days ago  */
-        days: 1 | 7 | 14 | 30 | 90 | 180 | 365 | 'max';
-        /** @description data interval, leave empty for auto granularity */
-        interval?: 'daily' | 'hourly';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get coin's OHLC */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsOHLC'];
-        };
-      };
-    };
-  };
-  'coins-id-ohlc-range': {
-    parameters: {
-      query: {
-        /** @description target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description starting date in UNIX timestamp */
-        from: number;
-        /** @description ending date in UNIX timestamp */
-        to: number;
-        /** @description data interval */
-        interval: 'daily' | 'hourly';
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get coin's OHLC within time range */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsOHLC'];
-        };
-      };
-    };
-  };
-  'coins-contract-address': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list). */
-        id: string;
-        /** @description the contract address of token */
-        contract_address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get current data for a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsContractAddress'];
-        };
-      };
-    };
-  };
-  'contract-address-market-chart': {
-    parameters: {
-      query: {
-        /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description data up to number of days ago <br> you may use any integer or `max` for number of days */
-        days: string;
-        /** @description data interval, leave empty for auto granularity */
-        interval?: '5m' | 'hourly' | 'daily';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list). */
-        id: string;
-        /** @description the contract address of token */
-        contract_address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsMarketChart'];
-        };
-      };
-    };
-  };
-  'contract-address-market-chart-range': {
-    parameters: {
-      query: {
-        /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
-        vs_currency: string;
-        /** @description starting date in UNIX timestamp */
-        from: number;
-        /** @description ending date in UNIX timestamp */
-        to: number;
-        /** @description data interval, leave empty for auto granularity */
-        interval?: '5m' | 'hourly' | 'daily';
-        /** @description decimal place for currency price value */
-        precision?:
-          | 'full'
-          | 0
-          | 1
-          | 2
-          | 3
-          | 4
-          | 5
-          | 6
-          | 7
-          | 8
-          | 9
-          | 10
-          | 11
-          | 12
-          | 13
-          | 14
-          | 15
-          | 16
-          | 17
-          | 18;
-      };
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
-        id: string;
-        /** @description the contract address of token */
-        contract_address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CoinsMarketChartRange'];
-        };
-      };
-    };
-  };
-  'coins-id-circulating-supply-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days ago  <br> Valid values: any integer or `max` */
-        days: string;
-        /** @description data interval */
-        interval?: 'daily';
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical circulating supply chart of a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SupplyChartBase'];
-        };
-      };
-    };
-  };
-  'coins-id-circulating-supply-chart-range': {
-    parameters: {
-      query: {
-        /** @description starting date in UNIX timestamp  */
-        from: number;
-        /** @description ending date in UNIX timestamp  */
-        to: number;
-      };
-      header?: never;
-      path: {
-        /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical circulating supply chart of a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SupplyChartBase'];
-        };
-      };
-    };
-  };
-  'coins-id-total-supply-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days ago  <br> Valid values: any integer or `max` */
-        days: string;
-        /** @description data interval */
-        interval?: 'daily';
-      };
-      header?: never;
-      path: {
-        /** @description coin id  <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical total supply chart of a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SupplyChartBase'];
-        };
-      };
-    };
-  };
-  'coins-id-total-supply-chart-range': {
-    parameters: {
-      query: {
-        /** @description starting date in UNIX timestamp  */
-        from: number;
-        /** @description ending date in UNIX timestamp  */
-        to: number;
-      };
-      header?: never;
-      path: {
-        /** @description coin id  <br> *refers to [`/coins/list`](/reference/coins-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical total supply chart range of a coin */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SupplyChartBase'];
-        };
-      };
-    };
-  };
-  'asset-platforms-list': {
-    parameters: {
-      query?: {
-        /** @description apply relevant filters to results */
-        filter?: 'nft';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all asset platforms */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['AssetPlatforms'];
-        };
-      };
-    };
-  };
-  'token-lists': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
-        asset_platform_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all tokens on CoinGecko based on asset platform id */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TokenLists'];
-        };
-      };
-    };
-  };
-  'coins-categories-list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all categories */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CategoriesList'];
-        };
-      };
-    };
-  };
-  'coins-categories': {
-    parameters: {
-      query?: {
-        /** @description sort results by field, default: market_cap_desc */
-        order?:
-          | 'market_cap_desc'
-          | 'market_cap_asc'
-          | 'name_desc'
-          | 'name_asc'
-          | 'market_cap_change_24h_desc'
-          | 'market_cap_change_24h_asc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all categories with market data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Categories'];
-        };
-      };
-    };
-  };
-  exchanges: {
-    parameters: {
-      query?: {
-        /** @description total results per page, default: 100 <br> Valid values: 1...250 */
-        per_page?: number;
-        /** @description page through results, default: 1 */
-        page?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all exchanges */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Exchanges'];
-        };
-      };
-    };
-  };
-  'exchanges-list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all exchanges with id and name */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangesList'];
-        };
-      };
-    };
-  };
-  'exchanges-id': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get exchange volume in BTC and top 100 tickers only */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangeData'];
-        };
-      };
-    };
-  };
-  'exchanges-id-tickers': {
-    parameters: {
-      query?: {
-        /** @description filter tickers by coin_ids, comma-separated if querying more than 1 coin <br> *refers to [`/coins/list`](/reference/coins-list). */
-        coin_ids?: string;
-        /** @description include exchange logo, default: false */
-        include_exchange_logo?: boolean;
-        /** @description page through results */
-        page?: number;
-        /** @description include 2% orderbook depth (Example: cost_to_move_up_usd & cost_to_move_down_usd),default: false */
-        depth?: boolean;
-        /** @description use this to sort the order of responses, default: trust_score_desc */
-        order?:
-          | 'trust_score_desc'
-          | 'trust_score_asc'
-          | 'volume_desc'
-          | 'volume_asc';
-      };
-      header?: never;
-      path: {
-        /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get exchange tickers */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangeTickers'];
-        };
-      };
-    };
-  };
-  'exchanges-id-volume-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days ago */
-        days: 1 | 7 | 14 | 30 | 90 | 180 | 365;
-      };
-      header?: never;
-      path: {
-        /** @description exchange id or derivatives exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get exchange volume chart data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangeVolumeChart'];
-        };
-      };
-    };
-  };
-  'exchanges-id-volume-chart-range': {
-    parameters: {
-      query: {
-        /** @description starting date in UNIX timestamp  */
-        from: number;
-        /** @description ending date in UNIX timestamp */
-        to: number;
-      };
-      header?: never;
-      path: {
-        /** @description exchange id or derivative exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get exchange volume chart data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangeVolumeChart'];
-        };
-      };
-    };
-  };
-  'derivatives-tickers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all derivative tickers */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DerivativesTickersList'];
-        };
-      };
-    };
-  };
-  'derivatives-exchanges': {
-    parameters: {
-      query?: {
-        /** @description use this to sort the order of responses, default: open_interest_btc_desc */
-        order?:
-          | 'name_asc'
-          | 'name_desc'
-          | 'open_interest_btc_asc'
-          | 'open_interest_btc_desc'
-          | 'trade_volume_24h_btc_asc'
-          | 'trade_volume_24h_btc_desc';
-        /** @description total results per page */
-        per_page?: number;
-        /** @description page through results, default: 1 */
-        page?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all derivative exchanges */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DerivativesExchanges'];
-        };
-      };
-    };
-  };
-  'derivatives-exchanges-id': {
-    parameters: {
-      query?: {
-        /** @description include tickers data */
-        include_tickers?: 'all' | 'unexpired';
-      };
-      header?: never;
-      path: {
-        /** @description derivative exchange id <br> *refers to [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get derivative exchange data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DerivativesExchangesID'];
-        };
-      };
-    };
-  };
-  'derivatives-exchanges-list': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all derivative exchanges name and identifier */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DerivativesExchangesList'];
-        };
-      };
-    };
-  };
-  'nfts-list': {
-    parameters: {
-      query?: {
-        /** @description use this to sort the order of responses */
-        order?:
-          | 'h24_volume_usd_asc'
-          | 'h24_volume_usd_desc'
-          | 'h24_volume_native_asc'
-          | 'h24_volume_native_desc'
-          | 'floor_price_native_asc'
-          | 'floor_price_native_desc'
-          | 'market_cap_native_asc'
-          | 'market_cap_native_desc'
-          | 'market_cap_usd_asc'
-          | 'market_cap_usd_desc';
-        /** @description total results per page <br> Valid values: 1...250 */
-        per_page?: number;
-        /** @description page through results */
-        page?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all NFTs categories */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTList'];
-        };
-      };
-    };
-  };
-  'nfts-id': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get NFTs data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTData'];
-        };
-      };
-    };
-  };
-  'nfts-contract-address': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
-        asset_platform_id: string;
-        /** @description the contract address of token */
-        contract_address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get NFTs data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTData'];
-        };
-      };
-    };
-  };
-  'nfts-markets': {
-    parameters: {
-      query?: {
-        /** @description filter result by asset platform (blockchain network)  <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) filter=`nft`  */
-        asset_platform_id?: string;
-        /** @description sort results by field  <br> Default: `market_cap_usd_desc` */
-        order?:
-          | 'h24_volume_native_asc'
-          | 'h24_volume_native_desc'
-          | 'h24_volume_usd_asc'
-          | 'h24_volume_usd_desc'
-          | 'market_cap_usd_asc'
-          | 'market_cap_usd_desc';
-        /** @description total results per page  <br> Valid values: any integer between 1 and 250  <br> Default: `100` */
-        per_page?: number;
-        /** @description page through results  <br> Default: `1` */
-        page?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List all NFTs markets */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTsMarkets'];
-        };
-      };
-    };
-  };
-  'nfts-id-market-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days  <br> Valid values: any integer or max  */
-        days: string;
-      };
-      header?: never;
-      path: {
-        /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTMarketChart'];
-        };
-      };
-    };
-  };
-  'nfts-contract-address-market-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days ago <br> Valid values: any integer or max  */
-        days: string;
-      };
-      header?: never;
-      path: {
-        /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
-        asset_platform_id: string;
-        /** @description contract address of the nft collection */
-        contract_address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTMarketChart'];
-        };
-      };
-    };
-  };
-  'nfts-id-tickers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get NFTs tickers */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NFTTickers'];
-        };
-      };
-    };
-  };
-  'exchange-rates': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List rates */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ExchangeRates'];
-        };
-      };
-    };
-  };
-  'search-data': {
-    parameters: {
-      query: {
-        /** @description search query */
-        query: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of coins, categories and markets matching search term ordered by market cap */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Search'];
-        };
-      };
-    };
-  };
-  'trending-search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List trending coins by most popular first */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TrendingSearch'];
-        };
-      };
-    };
-  };
-  'crypto-global': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get cryptocurrency global data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Global'];
-        };
-      };
-    };
-  };
-  'global-DeFi': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get cryptocurrency global decentralized finance (defi) data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['GlobalDeFi'];
-        };
-      };
-    };
-  };
-  'global-market-cap-chart': {
-    parameters: {
-      query: {
-        /** @description data up to number of days ago  <br>Valid values: any integer  */
-        days: 1 | 7 | 14 | 30 | 90 | 180 | 365 | 'max';
-        /** @description target currency of market cap, default: usd <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)  */
-        vs_currency?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get cryptocurrency global market cap chart data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['GlobalMarketCapChart'];
-        };
-      };
-    };
-  };
-  'companies-public-treasury': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description coin id */
-        coin_id: 'bitcoin' | 'ethereum';
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Get public companies treasury data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['CompaniesTreasury'];
-        };
-      };
-    };
-  };
+    "ping-server": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ping"];
+                };
+            };
+        };
+    };
+    "api-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description API Usage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Key"];
+                };
+            };
+        };
+    };
+    "simple-price": {
+        parameters: {
+            query: {
+                /** @description coins' ids, comma-separated if querying more than 1 coin.  <br>*refers to [`/coins/list`](/reference/coins-list). */
+                ids: string;
+                /** @description target currency of coins, comma-separated if querying more than 1 currency.  <br>*refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currencies: string;
+                /** @description include market cap, default: false  */
+                include_market_cap?: boolean;
+                /** @description include 24hr volume, default: false */
+                include_24hr_vol?: boolean;
+                /** @description include 24hr change, default: false */
+                include_24hr_change?: boolean;
+                /** @description include last updated price time in UNIX, default: false */
+                include_last_updated_at?: boolean;
+                /** @description decimal place for currency price value  */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description price(s) of cryptocurrency */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bitcoin?: components["schemas"]["SimplePrice"];
+                    };
+                };
+            };
+        };
+    };
+    "simple-token-price": {
+        parameters: {
+            query: {
+                /** @description the contract addresses of tokens, comma-separated if querying more than 1 token's contract address */
+                contract_addresses: string;
+                /** @description target currency of coins, comma-separated if querying more than 1 currency.  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currencies: string;
+                /** @description include market capitalization, default: false */
+                include_market_cap?: boolean;
+                /** @description include 24hr volume, default: false */
+                include_24hr_vol?: boolean;
+                /** @description include 24hr change  default: false */
+                include_24hr_change?: boolean;
+                /** @description include last updated price time in UNIX , default: false */
+                include_last_updated_at?: boolean;
+                /** @description decimal place for currency price value  */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description asset platform's id  <br>*refers to [`/asset_platforms`](/reference/asset-platforms-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description price(s) of cryptocurrency */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"?: components["schemas"]["SimplePrice"];
+                    };
+                };
+            };
+        };
+    };
+    "simple-supported-currencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description list of supported currencies */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrencyList"];
+                };
+            };
+        };
+    };
+    "coins-list": {
+        parameters: {
+            query?: {
+                /** @description include platform and token's contract addresses, default: false */
+                include_platform?: boolean;
+                /** @description filter by status of coins, default: active */
+                status?: "active" | "inactive";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all coins with id, name, and symbol */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsList"];
+                };
+            };
+        };
+    };
+    "coins-top-gainers-losers": {
+        parameters: {
+            query: {
+                /** @description target currency of coins  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description filter result by time range <br> Default value: `24h` */
+                duration?: "1h" | "24h" | "7d" | "14d" | "30d" | "60d" | "1y";
+                /** @description filter result by market cap ranking (top 300 to 1000) or all coins (including coins that do not have market cap)  <br> Default value: `1000` */
+                top_coins?: 300 | 500 | 1000 | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List top 30 gainers and losers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopGainersLosers"];
+                };
+            };
+        };
+    };
+    "coins-list-new": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List latest 200 coins */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsListNew"];
+                };
+            };
+        };
+    };
+    "coins-markets": {
+        parameters: {
+            query: {
+                /** @description target currency of coins and market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description coins' ids, comma-separated if querying more than 1 coin.  <br> *refers to [`/coins/list`](/reference/coins-list). */
+                ids?: string;
+                /** @description filter based on coins' category <br> *refers to [`/coins/categories/list`](/reference/coins-categories-list). */
+                category?: string;
+                /** @description sort result by field, default: market_cap_desc */
+                order?: "market_cap_asc" | "market_cap_desc" | "volume_asc" | "volume_desc" | "id_asc" | "id_desc";
+                /** @description total results per page, default: 100 <br> Valid values: 1...250 */
+                per_page?: number;
+                /** @description page through results, default: 1 */
+                page?: number;
+                /** @description include sparkline 7 days data, default: false */
+                sparkline?: boolean;
+                /** @description include price change percentage timeframe, comma-separated if query more than 1 price change percentage timeframe <br> Valid values: 1h, 24h, 7d, 14d, 30d, 200d, 1y */
+                price_change_percentage?: string;
+                /** @description language background, default: en */
+                locale?: "ar" | "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "fi" | "fr" | "he" | "hi" | "hr" | "hu" | "id" | "it" | "ja" | "ko" | "lt" | "nl" | "no" | "pl" | "pt" | "ro" | "ru" | "sk" | "sl" | "sv" | "th" | "tr" | "uk" | "vi" | "zh" | "zh-tw";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all coins with market data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsMarkets"];
+                };
+            };
+        };
+    };
+    "coins-id": {
+        parameters: {
+            query?: {
+                /** @description include all the localized languages in the response, default: true */
+                localization?: boolean;
+                /** @description include tickers data, default: true */
+                tickers?: boolean;
+                /** @description include market data, default: true */
+                market_data?: boolean;
+                /** @description include community data, default: true */
+                community_data?: boolean;
+                /** @description include developer data, default: true */
+                developer_data?: boolean;
+                /** @description include sparkline 7 days data, default: false */
+                sparkline?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get current data for a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsID"];
+                };
+            };
+        };
+    };
+    "coins-id-tickers": {
+        parameters: {
+            query?: {
+                /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
+                exchange_ids?: string;
+                /** @description include exchange logo, default: false */
+                include_exchange_logo?: boolean;
+                /** @description page through results */
+                page?: number;
+                /** @description use this to sort the order of responses, default: trust_score_desc */
+                order?: "trust_score_desc" | "trust_score_asc" | "volume_desc" | "volume_asc";
+                /** @description include 2% orderbook depth, ie. `cost_to_move_up_usd` and `cost_to_move_down_usd` <br> default: false */
+                depth?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get coin tickers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsTickers"];
+                };
+            };
+        };
+    };
+    "coins-id-history": {
+        parameters: {
+            query: {
+                /** @description the date of data snapshot <br> Format: `dd-mm-yyyy` */
+                date: string;
+                /** @description include all the localized languages in response, default: true */
+                localization?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical data (name, price, market, stats) at a given date for a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsHistoricalData"];
+                };
+            };
+        };
+    };
+    "coins-id-market-chart": {
+        parameters: {
+            query: {
+                /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description data up to number of days ago <br> you may use any integer or `max` for number of days */
+                days: string;
+                /** @description data interval, leave empty for auto granularity */
+                interval?: "5m" | "hourly" | "daily";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsMarketChart"];
+                };
+            };
+        };
+    };
+    "coins-id-market-chart-range": {
+        parameters: {
+            query: {
+                /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description starting date in UNIX timestamp  */
+                from: number;
+                /** @description ending date in UNIX timestamp */
+                to: number;
+                /** @description data interval, leave empty for auto granularity  */
+                interval?: "5m" | "hourly" | "daily";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsMarketChartRange"];
+                };
+            };
+        };
+    };
+    "coins-id-ohlc": {
+        parameters: {
+            query: {
+                /** @description target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description data up to number of days ago  */
+                days: 1 | 7 | 14 | 30 | 90 | 180 | 365 | "max";
+                /** @description data interval, leave empty for auto granularity */
+                interval?: "daily" | "hourly";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get coin's OHLC */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsOHLC"];
+                };
+            };
+        };
+    };
+    "coins-id-ohlc-range": {
+        parameters: {
+            query: {
+                /** @description target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description starting date in UNIX timestamp */
+                from: number;
+                /** @description ending date in UNIX timestamp */
+                to: number;
+                /** @description data interval */
+                interval: "daily" | "hourly";
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get coin's OHLC within time range */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsOHLC"];
+                };
+            };
+        };
+    };
+    "coins-contract-address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list). */
+                id: string;
+                /** @description the contract address of token */
+                contract_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get current data for a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsContractAddress"];
+                };
+            };
+        };
+    };
+    "contract-address-market-chart": {
+        parameters: {
+            query: {
+                /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description data up to number of days ago <br> you may use any integer or `max` for number of days */
+                days: string;
+                /** @description data interval, leave empty for auto granularity */
+                interval?: "5m" | "hourly" | "daily";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list). */
+                id: string;
+                /** @description the contract address of token */
+                contract_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsMarketChart"];
+                };
+            };
+        };
+    };
+    "contract-address-market-chart-range": {
+        parameters: {
+            query: {
+                /** @description target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies). */
+                vs_currency: string;
+                /** @description starting date in UNIX timestamp */
+                from: number;
+                /** @description ending date in UNIX timestamp */
+                to: number;
+                /** @description data interval, leave empty for auto granularity */
+                interval?: "5m" | "hourly" | "daily";
+                /** @description decimal place for currency price value */
+                precision?: "full" | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
+            };
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
+                id: string;
+                /** @description the contract address of token */
+                contract_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoinsMarketChartRange"];
+                };
+            };
+        };
+    };
+    "coins-id-circulating-supply-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days ago  <br> Valid values: any integer or `max` */
+                days: string;
+                /** @description data interval */
+                interval?: "daily";
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical circulating supply chart of a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplyChartBase"];
+                };
+            };
+        };
+    };
+    "coins-id-circulating-supply-chart-range": {
+        parameters: {
+            query: {
+                /** @description starting date in UNIX timestamp  */
+                from: number;
+                /** @description ending date in UNIX timestamp  */
+                to: number;
+            };
+            header?: never;
+            path: {
+                /** @description coin id <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical circulating supply chart of a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplyChartBase"];
+                };
+            };
+        };
+    };
+    "coins-id-total-supply-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days ago  <br> Valid values: any integer or `max` */
+                days: string;
+                /** @description data interval */
+                interval?: "daily";
+            };
+            header?: never;
+            path: {
+                /** @description coin id  <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical total supply chart of a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplyChartBase"];
+                };
+            };
+        };
+    };
+    "coins-id-total-supply-chart-range": {
+        parameters: {
+            query: {
+                /** @description starting date in UNIX timestamp  */
+                from: number;
+                /** @description ending date in UNIX timestamp  */
+                to: number;
+            };
+            header?: never;
+            path: {
+                /** @description coin id  <br> *refers to [`/coins/list`](/reference/coins-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical total supply chart range of a coin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplyChartBase"];
+                };
+            };
+        };
+    };
+    "asset-platforms-list": {
+        parameters: {
+            query?: {
+                /** @description apply relevant filters to results */
+                filter?: "nft";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all asset platforms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetPlatforms"];
+                };
+            };
+        };
+    };
+    "token-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
+                asset_platform_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all tokens on CoinGecko based on asset platform id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenLists"];
+                };
+            };
+        };
+    };
+    "coins-categories-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoriesList"];
+                };
+            };
+        };
+    };
+    "coins-categories": {
+        parameters: {
+            query?: {
+                /** @description sort results by field, default: market_cap_desc */
+                order?: "market_cap_desc" | "market_cap_asc" | "name_desc" | "name_asc" | "market_cap_change_24h_desc" | "market_cap_change_24h_asc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all categories with market data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Categories"];
+                };
+            };
+        };
+    };
+    exchanges: {
+        parameters: {
+            query?: {
+                /** @description total results per page, default: 100 <br> Valid values: 1...250 */
+                per_page?: number;
+                /** @description page through results, default: 1 */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all exchanges */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Exchanges"];
+                };
+            };
+        };
+    };
+    "exchanges-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all exchanges with id and name */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangesList"];
+                };
+            };
+        };
+    };
+    "exchanges-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get exchange volume in BTC and top 100 tickers only */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeData"];
+                };
+            };
+        };
+    };
+    "exchanges-id-tickers": {
+        parameters: {
+            query?: {
+                /** @description filter tickers by coin_ids, comma-separated if querying more than 1 coin <br> *refers to [`/coins/list`](/reference/coins-list). */
+                coin_ids?: string;
+                /** @description include exchange logo, default: false */
+                include_exchange_logo?: boolean;
+                /** @description page through results */
+                page?: number;
+                /** @description include 2% orderbook depth (Example: cost_to_move_up_usd & cost_to_move_down_usd),default: false */
+                depth?: boolean;
+                /** @description use this to sort the order of responses, default: trust_score_desc */
+                order?: "trust_score_desc" | "trust_score_asc" | "volume_desc" | "volume_asc";
+            };
+            header?: never;
+            path: {
+                /** @description exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get exchange tickers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeTickers"];
+                };
+            };
+        };
+    };
+    "exchanges-id-volume-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days ago */
+                days: 1 | 7 | 14 | 30 | 90 | 180 | 365;
+            };
+            header?: never;
+            path: {
+                /** @description exchange id or derivatives exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get exchange volume chart data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeVolumeChart"];
+                };
+            };
+        };
+    };
+    "exchanges-id-volume-chart-range": {
+        parameters: {
+            query: {
+                /** @description starting date in UNIX timestamp  */
+                from: number;
+                /** @description ending date in UNIX timestamp */
+                to: number;
+            };
+            header?: never;
+            path: {
+                /** @description exchange id or derivative exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get exchange volume chart data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeVolumeChart"];
+                };
+            };
+        };
+    };
+    "derivatives-tickers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all derivative tickers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DerivativesTickersList"];
+                };
+            };
+        };
+    };
+    "derivatives-exchanges": {
+        parameters: {
+            query?: {
+                /** @description use this to sort the order of responses, default: open_interest_btc_desc */
+                order?: "name_asc" | "name_desc" | "open_interest_btc_asc" | "open_interest_btc_desc" | "trade_volume_24h_btc_asc" | "trade_volume_24h_btc_desc";
+                /** @description total results per page */
+                per_page?: number;
+                /** @description page through results, default: 1 */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all derivative exchanges */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DerivativesExchanges"];
+                };
+            };
+        };
+    };
+    "derivatives-exchanges-id": {
+        parameters: {
+            query?: {
+                /** @description include tickers data */
+                include_tickers?: "all" | "unexpired";
+            };
+            header?: never;
+            path: {
+                /** @description derivative exchange id <br> *refers to [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get derivative exchange data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DerivativesExchangesID"];
+                };
+            };
+        };
+    };
+    "derivatives-exchanges-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all derivative exchanges name and identifier */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DerivativesExchangesList"];
+                };
+            };
+        };
+    };
+    "nfts-list": {
+        parameters: {
+            query?: {
+                /** @description use this to sort the order of responses */
+                order?: "h24_volume_usd_asc" | "h24_volume_usd_desc" | "h24_volume_native_asc" | "h24_volume_native_desc" | "floor_price_native_asc" | "floor_price_native_desc" | "market_cap_native_asc" | "market_cap_native_desc" | "market_cap_usd_asc" | "market_cap_usd_desc";
+                /** @description total results per page <br> Valid values: 1...250 */
+                per_page?: number;
+                /** @description page through results */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all NFTs categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTList"];
+                };
+            };
+        };
+    };
+    "nfts-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get NFTs data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTData"];
+                };
+            };
+        };
+    };
+    "nfts-contract-address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
+                asset_platform_id: string;
+                /** @description the contract address of token */
+                contract_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get NFTs data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTData"];
+                };
+            };
+        };
+    };
+    "nfts-markets": {
+        parameters: {
+            query?: {
+                /** @description filter result by asset platform (blockchain network)  <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) filter=`nft`  */
+                asset_platform_id?: string;
+                /** @description sort results by field  <br> Default: `market_cap_usd_desc` */
+                order?: "h24_volume_native_asc" | "h24_volume_native_desc" | "h24_volume_usd_asc" | "h24_volume_usd_desc" | "market_cap_usd_asc" | "market_cap_usd_desc";
+                /** @description total results per page  <br> Valid values: any integer between 1 and 250  <br> Default: `100` */
+                per_page?: number;
+                /** @description page through results  <br> Default: `1` */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List all NFTs markets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTsMarkets"];
+                };
+            };
+        };
+    };
+    "nfts-id-market-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days  <br> Valid values: any integer or max  */
+                days: string;
+            };
+            header?: never;
+            path: {
+                /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTMarketChart"];
+                };
+            };
+        };
+    };
+    "nfts-contract-address-market-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days ago <br> Valid values: any integer or max  */
+                days: string;
+            };
+            header?: never;
+            path: {
+                /** @description asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) */
+                asset_platform_id: string;
+                /** @description contract address of the nft collection */
+                contract_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get historical market data include price, market cap, and 24h volume (granularity auto) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTMarketChart"];
+                };
+            };
+        };
+    };
+    "nfts-id-tickers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get NFTs tickers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NFTTickers"];
+                };
+            };
+        };
+    };
+    "exchange-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List rates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExchangeRates"];
+                };
+            };
+        };
+    };
+    "search-data": {
+        parameters: {
+            query: {
+                /** @description search query */
+                query: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of coins, categories and markets matching search term ordered by market cap */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Search"];
+                };
+            };
+        };
+    };
+    "trending-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List trending coins by most popular first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrendingSearch"];
+                };
+            };
+        };
+    };
+    "crypto-global": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get cryptocurrency global data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Global"];
+                };
+            };
+        };
+    };
+    "global-DeFi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get cryptocurrency global decentralized finance (defi) data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlobalDeFi"];
+                };
+            };
+        };
+    };
+    "global-market-cap-chart": {
+        parameters: {
+            query: {
+                /** @description data up to number of days ago  <br>Valid values: any integer  */
+                days: 1 | 7 | 14 | 30 | 90 | 180 | 365 | "max";
+                /** @description target currency of market cap, default: usd <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)  */
+                vs_currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get cryptocurrency global market cap chart data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlobalMarketCapChart"];
+                };
+            };
+        };
+    };
+    "companies-public-treasury": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description coin id */
+                coin_id: "bitcoin" | "ethereum";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Get public companies treasury data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompaniesTreasury"];
+                };
+            };
+        };
+    };
 }

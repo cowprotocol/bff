@@ -2,7 +2,7 @@ import { SupportedChainId } from '../types';
 
 import createClient from 'openapi-fetch';
 
-import type { paths } from '../gen/coingecko/coingecko-pro-types';
+import type { paths, components } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
@@ -20,3 +20,6 @@ export const coingeckoProClient = createClient<paths>({
     'x-cg-pro-api-key': process.env.COINGECKO_API_KEY,
   },
 });
+
+export type SimplePriceItem = components['schemas']['SimplePrice'];
+export type SimplePriceResponse = Record<string, SimplePriceItem>;

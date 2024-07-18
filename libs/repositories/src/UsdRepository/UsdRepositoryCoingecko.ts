@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import {
   COINGECKO_PLATFORMS,
+  SimplePriceResponse,
   coingeckoProClient,
 } from '../datasources/coingecko';
 import { SupportedChainId } from '../types';
@@ -36,7 +37,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const tokenAddressLower = tokenAddress.toLowerCase();
 
     // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    const { data: priceData, response } = await coingeckoProClient.GET(
+    const { data, response } = await coingeckoProClient.GET(
       `/simple/token_price/{id}`,
       {
         params: {
@@ -50,6 +51,9 @@ export class UsdRepositoryCoingecko implements UsdRepository {
         },
       }
     );
+
+    // FIXME: This is a workaround for the fact that Coingecko Open API has a hardcoded BTC address in the response (notified the Coingecko team about this issue, so remove when the issue is fixed)
+    const priceData = data as SimplePriceResponse;
 
     if (
       response.status === 404 ||

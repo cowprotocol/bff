@@ -24,6 +24,9 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       return null;
     }
     const tokenDecimals = this.getTokenDecimals(tokenAddress);
+    if (tokenDecimals === null) {
+      throw new Error('Token decimals not found for ' + tokenAddress);
+    }
 
     // Get native price for USDC (in ETH/xDAI)
     const { address: usdAddress, decimals: usdDecimals } = USDC[chainId];
