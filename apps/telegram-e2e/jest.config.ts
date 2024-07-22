@@ -14,4 +14,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../..//coverage/telegram-e2e',
+  setupFilesAfterEnv: ['../../jest.setup.ts'],
 };

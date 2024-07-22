@@ -1,8 +1,8 @@
-import 'reflect-metadata';
-
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
+import { SupportedChainId } from '../types';
+import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -22,7 +22,7 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<number | null> {
     const platform = COINGECKO_PLATFORMS[chainId];
@@ -32,9 +32,8 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const tokenAddressLower = tokenAddress.toLowerCase();
 
-    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    // Get prices. See https://docs.coingecko.com/reference/coins-id-market-chart
-    const fetchResponse = await coingeckoProClient.GET(
+    // Get USD price: https://docs.coingecko.com/reference/simple-token-price
+    const { data: priceData, response } = await coingeckoProClient.GET(
       `/simple/token_price/{id}`,
       {
         params: {
@@ -49,20 +48,23 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (fetchResponse.error) {
-      throw fetchResponse.error;
-    }
-    const priceData = fetchResponse.data;
-
-    if (!priceData[tokenAddressLower] || !priceData[tokenAddressLower].usd) {
+    if (
+      response.status === 404 ||
+      !priceData[tokenAddressLower] ||
+      !priceData[tokenAddressLower].usd
+    ) {
       return null;
     }
+    await throwIfUnsuccessful(
+      'Error getting USD price from Coingecko',
+      response
+    );
 
     return priceData[tokenAddressLower].usd;
   }
 
   async getUsdPrices(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
@@ -75,7 +77,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
 
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    const fetchResponses = await coingeckoProClient.GET(
+    const { data: priceData, response } = await coingeckoProClient.GET(
       `/coins/{id}/contract/{contract_address}/market_chart`,
       {
         params: {
@@ -92,17 +94,21 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (!fetchResponses.data) {
+    if (response.status === 404 || !priceData) {
       return null;
     }
+    await throwIfUnsuccessful(
+      'Error getting USD prices from Coingecko',
+      response
+    );
 
     const volumesMap =
-      fetchResponses.data.total_volumes?.reduce((acc, [timestamp, volume]) => {
+      priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {
         acc.set(timestamp, volume);
         return acc;
       }, new Map<number, number>()) || undefined;
 
-    const prices = fetchResponses.data.prices;
+    const prices = priceData.prices;
     const pricePoints = prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,

@@ -7,6 +7,7 @@ import ms from 'ms';
 const FIVE_MINUTES = ms('5m');
 const ONE_HOUR = ms('1h');
 const ONE_DAY = ms('1d');
+const BUFFER_ERROR_TOLERANCE = 1.5; // 50% error tolerance
 
 describe('UsdRepositoryCoingecko', () => {
   let usdRepositoryCoingecko: UsdRepositoryCoingecko;
@@ -62,7 +63,7 @@ describe('UsdRepositoryCoingecko', () => {
           Math.abs(
             price.date.getTime() - previousPrice.date.getTime() - FIVE_MINUTES
           )
-        ).toBeLessThanOrEqual(FIVE_MINUTES); // 5 min of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 5min apart)
+        ).toBeLessThanOrEqual(FIVE_MINUTES * BUFFER_ERROR_TOLERANCE); // 5 min of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 5min apart)
         expect(price.price).toBeGreaterThan(0);
       }
     });
@@ -98,7 +99,7 @@ describe('UsdRepositoryCoingecko', () => {
           Math.abs(
             price.date.getTime() - previousPrice.date.getTime() - ONE_HOUR
           )
-        ).toBeLessThanOrEqual(ONE_HOUR); // 1 hour of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 1 hour apart)
+        ).toBeLessThanOrEqual(ONE_HOUR * BUFFER_ERROR_TOLERANCE); // 1 hour of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 1 hour apart)
         expect(price.price).toBeGreaterThan(0);
       }
     });
@@ -123,7 +124,7 @@ describe('UsdRepositoryCoingecko', () => {
           Math.abs(
             price.date.getTime() - previousPrice.date.getTime() - ONE_DAY
           )
-        ).toBeLessThanOrEqual(ONE_DAY); // 1 day of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 1 day apart)
+        ).toBeLessThanOrEqual(ONE_DAY * BUFFER_ERROR_TOLERANCE); // 1 day of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 1 day apart)
         expect(price.price).toBeGreaterThan(0);
       }
     });

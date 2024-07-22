@@ -1,3 +1,5 @@
+import { SupportedChainId } from '../types';
+
 export const usdRepositorySymbol = Symbol.for('UsdRepository');
 
 export type PriceStrategy = '5m' | 'hourly' | 'daily';
@@ -20,11 +22,30 @@ export interface PricePoint {
 }
 
 export interface UsdRepository {
-  getUsdPrice(chainId: number, tokenAddress: string): Promise<number | null>;
+  getUsdPrice(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<number | null>;
 
   getUsdPrices(
-    chainId: number,
+    chainId: SupportedChainId,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null>;
+}
+
+export class UsdRepositoryNoop implements UsdRepository {
+  getUsdPrice(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<number> {
+    return null;
+  }
+  getUsdPrices(
+    chainId: SupportedChainId,
+    tokenAddress: string,
+    priceStrategy: PriceStrategy
+  ): Promise<PricePoint[] | null> {
+    return null;
+  }
 }
