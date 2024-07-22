@@ -55,12 +55,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     // FIXME: This is a workaround for the fact that Coingecko Open API has a hardcoded BTC address in the response (notified the Coingecko team about this issue, so remove when the issue is fixed)
     const priceData = data as SimplePriceResponse;
 
-    if (
-      response.status === 404 ||
-      !priceData ||
-      !priceData[tokenAddressLower] ||
-      !priceData[tokenAddressLower].usd
-    ) {
+    if (response.status === 404 || !priceData?.[tokenAddressLower]?.usd) {
       return null;
     }
     await throwIfUnsuccessful(
