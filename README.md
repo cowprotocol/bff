@@ -67,10 +67,10 @@ For more info, see:
  # Run all tests
  yarn test
 
- # Run test for repositories
+ # Run test for repositories (in watch mode)
  nx run repositories:test --watch
 
- # Run test on specific file
+ # Run test on specific file (in watch mode)
  nx run repositories:test --watch --testFile=libs/repositories/src/UsdRepository/UsdRepositoryRedis.spec.ts
  ```
 
