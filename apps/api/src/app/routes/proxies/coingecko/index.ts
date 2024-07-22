@@ -30,11 +30,9 @@ const coingeckoProxy: FastifyPluginAsync = async (
         'x-cg-pro-api-key': fastify.config.COINGECKO_API_KEY,
       }),
       // Response headers https://github.com/fastify/fastify-reply-from?tab=readme-ov-file#rewriteheadersheaders-request
-      rewriteHeaders: (headers, request) => {
+      rewriteHeaders: (headers, _request) => {
         // Drop some headers
-        const newHeaders = DROP_HEADERS.reduce<
-          IncomingHttpHeaders | IncomingHttpHeaders
-        >(
+        const newHeaders = DROP_HEADERS.reduce<IncomingHttpHeaders>(
           (acc, header) => {
             delete acc[header];
             return acc;
