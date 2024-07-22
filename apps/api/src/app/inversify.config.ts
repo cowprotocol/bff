@@ -1,9 +1,13 @@
 import {
+  CacheRepository,
+  CacheRepositoryMemory,
+  CacheRepositoryRedis,
   UsdRepository,
+  UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   UsdRepositoryFallback,
-  UsdRepositoryRedis,
+  cacheRepositorySymbol,
   redisClient,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
@@ -22,43 +26,51 @@ function getTokenDecimals(tokenAddress: string): number | null {
   return 18; // TODO: Implement!!!
 }
 
-function getUsdRepositoryCow(): UsdRepository {
-  const usdRepositoryCow = new UsdRepositoryCow(getTokenDecimals);
-
-  if (!redisClient) {
-    return usdRepositoryCow;
+function getCacheRepository(_apiContainer: Container): CacheRepository {
+  if (redisClient) {
+    return new CacheRepositoryRedis(redisClient);
   }
 
-  return new UsdRepositoryRedis(usdRepositoryCow, redisClient, 'usdCow');
+  return new CacheRepositoryMemory();
 }
 
-function getUsdRepositoryCoingecko(): UsdRepository {
-  const usdRepositoryCoingecko = new UsdRepositoryCow(getTokenDecimals);
+function getUsdRepositoryCow(cacheRepository: CacheRepository): UsdRepository {
+  return new UsdRepositoryCache(
+    new UsdRepositoryCow(getTokenDecimals),
+    cacheRepository,
+    'usdCow'
+  );
+}
 
-  if (!redisClient) {
-    return usdRepositoryCoingecko;
-  }
-
-  return new UsdRepositoryRedis(
-    usdRepositoryCoingecko,
-    redisClient,
+function getUsdRepositoryCoingecko(
+  cacheRepository: CacheRepository
+): UsdRepository {
+  return new UsdRepositoryCache(
+    new UsdRepositoryCoingecko(),
+    cacheRepository,
     'usdCoingecko'
   );
 }
 
-function getUsdRepository(): UsdRepository {
+function getUsdRepository(cacheRepository: CacheRepository): UsdRepository {
   return new UsdRepositoryFallback([
-    getUsdRepositoryCoingecko(),
-    getUsdRepositoryCow(),
+    getUsdRepositoryCoingecko(cacheRepository),
+    getUsdRepositoryCow(cacheRepository),
   ]);
 }
 
 function getApiContainer(): Container {
   const apiContainer = new Container();
+
   // Repositories
+  const cacheRepository = getCacheRepository(apiContainer);
+  apiContainer
+    .bind<CacheRepository>(cacheRepositorySymbol)
+    .toConstantValue(cacheRepository);
+
   apiContainer
     .bind<UsdRepository>(usdRepositorySymbol)
-    .toConstantValue(getUsdRepository());
+    .toConstantValue(getUsdRepository(cacheRepository));
 
   // Services
   apiContainer
