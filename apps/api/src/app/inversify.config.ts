@@ -7,7 +7,7 @@ import {
 import { Container } from 'inversify';
 import {
   SlippageService,
-  SlippageServiceMain,
+  SlippageServiceMock,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
@@ -24,6 +24,6 @@ apiContainer
 // Services
 apiContainer
   .bind<SlippageService>(slippageServiceSymbol)
-  .to(SlippageServiceMain);
+  .to(SlippageServiceMock);
 
 apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);

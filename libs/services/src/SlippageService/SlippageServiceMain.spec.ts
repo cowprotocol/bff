@@ -1,9 +1,6 @@
 import { Container, injectable } from 'inversify';
-import {
-  SlippageService,
-  SlippageServiceImpl,
-  slippageServiceSymbol,
-} from './SlippageService';
+import { SlippageService, slippageServiceSymbol } from './SlippageService';
+import { SlippageServiceMain } from './SlippageServiceMain';
 import {
   PricePoint,
   PriceStrategy,
@@ -29,7 +26,7 @@ class UsdRepositoryMock implements UsdRepository {
   }
 }
 
-describe('SlippageService', () => {
+describe('SlippageServiceMain', () => {
   let slippageService: SlippageService;
 
   beforeAll(() => {
@@ -37,7 +34,7 @@ describe('SlippageService', () => {
     container.bind<UsdRepository>(usdRepositorySymbol).to(UsdRepositoryMock);
     container
       .bind<SlippageService>(slippageServiceSymbol)
-      .to(SlippageServiceImpl);
+      .to(SlippageServiceMain);
 
     slippageService = container.get(slippageServiceSymbol);
   });
