@@ -5,7 +5,8 @@ import { SupportedChainId } from '../types';
 import { WETH } from '../../test/mock';
 import type { PricePoint } from './UsdRepository';
 
-const CACHE_TIME_SECONDS = 10;
+const CACHE_VALUE_SECONDS = 10;
+const CACHE_NULL_SECONDS = 20;
 
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
@@ -29,12 +30,13 @@ describe('UsdRepositoryRedis', () => {
       proxyMock,
       redisMock,
       'testCache',
-      CACHE_TIME_SECONDS
+      CACHE_VALUE_SECONDS,
+      CACHE_NULL_SECONDS
     );
   });
 
   describe('getUsdPrice', () => {
-    it('should return price from cache if available', async () => {
+    it('should return price from cache', async () => {
       // GIVEN: Cached value '100'
       redisMock.get.mockResolvedValue('100');
 
@@ -52,7 +54,7 @@ describe('UsdRepositoryRedis', () => {
       expect(proxyMock.getUsdPrice).not.toHaveBeenCalled();
     });
 
-    it('should return price from cache if available', async () => {
+    it('should return NULL from cache', async () => {
       // GIVEN: Cached value 'null'
       redisMock.get.mockResolvedValue('null');
 
@@ -70,7 +72,7 @@ describe('UsdRepositoryRedis', () => {
       expect(proxyMock.getUsdPrice).not.toHaveBeenCalled();
     });
 
-    it('should get from proxy if no cache, then cache for the specified number of seconds', async () => {
+    it('should call the proxy if no cache, then cache the value', async () => {
       // GIVEN: The value is not cached
       redisMock.get.mockResolvedValue(null);
 
@@ -97,7 +99,38 @@ describe('UsdRepositoryRedis', () => {
         `repos:testCache:usdPrice:${SupportedChainId.MAINNET}:${WETH}`,
         '200',
         'EX',
-        CACHE_TIME_SECONDS
+        CACHE_VALUE_SECONDS
+      );
+    });
+
+    it('should call the proxy if no cache, then cache the NULL', async () => {
+      // GIVEN: The value is not cached
+      redisMock.get.mockResolvedValue(null);
+
+      // GIVEN: proxy returns 200
+      proxyMock.getUsdPrice.mockResolvedValue(null);
+
+      // When: Get USD price
+      const price = await usdRepositoryRedis.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // THEN: The price matches the result from the proxy
+      expect(price).toEqual(null);
+
+      // THEN: The proxy has been called once
+      expect(proxyMock.getUsdPrice).toHaveBeenCalledWith(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // THEN: The value returned by the proxy is cached
+      expect(redisMock.set).toHaveBeenCalledWith(
+        `repos:testCache:usdPrice:${SupportedChainId.MAINNET}:${WETH}`,
+        'null',
+        'EX',
+        CACHE_NULL_SECONDS
       );
     });
 
@@ -163,7 +196,7 @@ describe('UsdRepositoryRedis', () => {
       pricePoints200String = JSON.stringify([pricePoint200]);
     });
 
-    it('should return prices from cache if available', async () => {
+    it('should return prices from cache', async () => {
       // GIVEN: cached prices
       redisMock.get.mockResolvedValue(pricePoints100String);
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
@@ -180,7 +213,7 @@ describe('UsdRepositoryRedis', () => {
       expect(proxyMock.getUsdPrices).not.toHaveBeenCalled();
     });
 
-    it('should return prices from cache if available', async () => {
+    it('should return prices from cache', async () => {
       // GIVEN: cached prices
       redisMock.get.mockResolvedValue(pricePoints100String);
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
@@ -197,7 +230,7 @@ describe('UsdRepositoryRedis', () => {
       expect(proxyMock.getUsdPrices).not.toHaveBeenCalled();
     });
 
-    it('should get from proxy if no cache, then cache for the specified number of seconds', async () => {
+    it('should call the proxy if no cache, then cache the value', async () => {
       // GIVEN: The value is not cached
       redisMock.get.mockResolvedValue(null);
 
@@ -226,7 +259,40 @@ describe('UsdRepositoryRedis', () => {
         `repos:testCache:usdPrices:${SupportedChainId.MAINNET}:${WETH}:5m`,
         pricePoints200String,
         'EX',
-        CACHE_TIME_SECONDS
+        CACHE_VALUE_SECONDS
+      );
+    });
+
+    it('should call the proxy if no cache, then cache the NULL', async () => {
+      // GIVEN: The value is not cached
+      redisMock.get.mockResolvedValue(null);
+
+      // GIVEN: proxy returns 200
+      proxyMock.getUsdPrices.mockResolvedValue(null);
+
+      // When: Get USD prices
+      const prices = await usdRepositoryRedis.getUsdPrices(
+        SupportedChainId.MAINNET,
+        WETH,
+        '5m'
+      );
+
+      // THEN: The price matches the result from the proxy
+      expect(prices).toEqual(null);
+
+      // THEN: The proxy has been called once
+      expect(proxyMock.getUsdPrices).toHaveBeenCalledWith(
+        SupportedChainId.MAINNET,
+        WETH,
+        '5m'
+      );
+
+      // THEN: The value returned by the proxy is cached
+      expect(redisMock.set).toHaveBeenCalledWith(
+        `repos:testCache:usdPrices:${SupportedChainId.MAINNET}:${WETH}:5m`,
+        'null',
+        'EX',
+        CACHE_NULL_SECONDS
       );
     });
 

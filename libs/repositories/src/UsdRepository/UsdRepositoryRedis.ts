@@ -8,8 +8,10 @@ import {
 } from './UsdRepository';
 import { SupportedChainId } from '../types';
 import IORedis from 'ioredis';
+import ms from 'ms';
 
-const DEFAULT_CACHE_TIME_SECONDS = 120; // 2min cache time by default for USD prices
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min'); // 2min cache time by default for values
+const DEFAULT_CACHE_NULL_SECONDS = ms('30min'); // 2min cache time by default for NULL values (when the repository don't know)
 const NULL_VALUE = 'null';
 
 @injectable()
@@ -20,7 +22,8 @@ export class UsdRepositoryRedis implements UsdRepository {
     private proxy: UsdRepository,
     private redisClient: IORedis,
     private cacheName: string,
-    private cacheTimeSeconds: number = DEFAULT_CACHE_TIME_SECONDS
+    private cacheTimeValueSeconds: number = DEFAULT_CACHE_VALUE_SECONDS,
+    private cacheTimeNullSeconds: number = DEFAULT_CACHE_NULL_SECONDS
   ) {
     this.baseCacheKey = `repos:${this.cacheName}`;
   }
@@ -109,11 +112,14 @@ export class UsdRepositoryRedis implements UsdRepository {
   }): Promise<void> {
     const { key, value } = props;
 
+    const cacheTimeSeconds =
+      value === null ? this.cacheTimeNullSeconds : this.cacheTimeValueSeconds;
+
     await this.redisClient.set(
       this.baseCacheKey + ':' + key,
       value === null ? NULL_VALUE : value,
       'EX',
-      this.cacheTimeSeconds
+      cacheTimeSeconds
     );
   }
 }
