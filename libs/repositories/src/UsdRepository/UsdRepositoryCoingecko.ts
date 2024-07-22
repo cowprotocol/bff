@@ -68,7 +68,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       response
     );
 
-    return priceData[tokenAddressLower].usd || null;
+    return priceData[tokenAddressLower].usd;
   }
 
   async getUsdPrices(
