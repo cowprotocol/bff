@@ -22,7 +22,7 @@ export interface SlippageService {
 export const slippageServiceSymbol = Symbol.for('SlippageService');
 
 @injectable()
-export class SlippageServiceImpl implements SlippageService {
+export class SlippageServiceMain implements SlippageService {
   constructor(
     @inject(usdRepositorySymbol)
     private usdRepository: UsdRepository

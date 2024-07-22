@@ -11,16 +11,15 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../../../utils/cache';
 
+const CACHE_SECONDS = 120;
+
 // TODO:  Add this in a follow up PR
 // import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
-
-interface Result {
-  slippageBps: number;
-}
 
 const routeSchema = {
   type: 'object',
   required: ['chainId', 'baseTokenAddress', 'quoteTokenAddress'],
+  additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
     baseTokenAddress: {
@@ -38,16 +37,17 @@ const routeSchema = {
   },
 } as const satisfies JSONSchema;
 
-const responseSchema = {
+const successSchema = {
   type: 'object',
   required: ['slippageBps'],
+  additionalProperties: false,
   properties: {
     slippageBps: {
       title: 'Slippage tolerance in basis points',
       description:
         'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
       type: 'number',
-      examples: [50, 100, 200], // [ALL_SUPPORTED_CHAIN_IDS],
+      examples: [50, 100, 200],
       minimum: 0,
       maximum: 10000,
     },
@@ -55,6 +55,7 @@ const responseSchema = {
 } as const satisfies JSONSchema;
 
 type RouteSchema = FromSchema<typeof routeSchema>;
+type SuccessSchema = FromSchema<typeof successSchema>;
 
 const slippageService: SlippageService = apiContainer.get(
   slippageServiceSymbol
@@ -64,14 +65,14 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/chains/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
   fastify.get<{
     Params: RouteSchema;
-    Reply: Result;
+    Reply: SuccessSchema;
   }>(
     '/slippageTolerance',
     {
       schema: {
         params: routeSchema,
         response: {
-          '2XX': responseSchema,
+          '2XX': successSchema,
         },
       },
     },
@@ -84,7 +85,10 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         baseTokenAddress,
         quoteTokenAddress
       );
-      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(120));
+      reply.header(
+        CACHE_CONTROL_HEADER,
+        getCacheControlHeaderValue(CACHE_SECONDS)
+      );
       reply.send({ slippageBps });
     }
   );

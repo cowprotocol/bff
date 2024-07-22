@@ -3,11 +3,15 @@ import {
   UsdRepositoryCoingecko,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
+
 import { Container } from 'inversify';
 import {
   SlippageService,
-  SlippageServiceImpl,
+  SlippageServiceMain,
+  UsdService,
+  UsdServiceMain,
   slippageServiceSymbol,
+  usdServiceSymbol,
 } from '@cowprotocol/services';
 
 export const apiContainer = new Container();
@@ -20,4 +24,6 @@ apiContainer
 // Services
 apiContainer
   .bind<SlippageService>(slippageServiceSymbol)
-  .to(SlippageServiceImpl);
+  .to(SlippageServiceMain);
+
+apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
