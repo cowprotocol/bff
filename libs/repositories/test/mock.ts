@@ -8,11 +8,36 @@ const MOCK_RESPONSE: Response = {
   status: 200,
   statusText: 'OK',
   ok: true,
-  headers: undefined,
+  headers: {
+    append: function (name: string, value: string): void {
+      throw new Error('Function not implemented.');
+    },
+    delete: function (name: string): void {
+      throw new Error('Function not implemented.');
+    },
+    get: function (name: string): string | null {
+      throw new Error('Function not implemented.');
+    },
+    getSetCookie: function (): string[] {
+      throw new Error('Function not implemented.');
+    },
+    has: function (name: string): boolean {
+      throw new Error('Function not implemented.');
+    },
+    set: function (name: string, value: string): void {
+      throw new Error('Function not implemented.');
+    },
+    forEach: function (
+      _callbackfn: (value: string, key: string, parent: Headers) => void,
+      _thisArg?: any
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+  },
   redirected: false,
   type: 'basic',
   url: 'http://mocked-url.mock',
-  body: undefined,
+  body: null,
   bodyUsed: false,
   async text() {
     return 'Mock response text';

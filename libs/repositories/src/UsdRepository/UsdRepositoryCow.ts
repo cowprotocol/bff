@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { UsdRepositoryNoop } from './UsdRepository';
-import { cowApiClientMainnet } from '../cowApi';
+import { cowApiClientMainnet } from '../datasources/cowApi';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';
@@ -24,6 +24,9 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       return null;
     }
     const tokenDecimals = this.getTokenDecimals(tokenAddress);
+    if (tokenDecimals === null) {
+      throw new Error('Token decimals not found for ' + tokenAddress);
+    }
 
     // Get native price for USDC (in ETH/xDAI)
     const { address: usdAddress, decimals: usdDecimals } = USDC[chainId];

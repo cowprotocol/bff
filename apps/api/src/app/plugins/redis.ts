@@ -1,14 +1,13 @@
 import fastifyRedis, { FastifyRedisPluginOptions } from '@fastify/redis';
 
-
-import fp from "fastify-plugin";
-import { redis } from '../connections/redis';
+import fp from 'fastify-plugin';
+import { redisClient } from '@cowprotocol/repositories';
 
 export default fp(async (fastify, opts) => {
-  if (redis) {
+  if (redisClient) {
     const options: FastifyRedisPluginOptions = {
       ...opts,
-      client: redis
+      client: redisClient,
     };
     fastify.register(fastifyRedis, options);
   }

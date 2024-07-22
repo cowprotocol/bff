@@ -48,6 +48,9 @@ describe('UsdRepositoryCoingecko', () => {
         WETH,
         '5m'
       );
+      if (prices === null) {
+        throw new Error('Prices should not be null');
+      }
 
       // We expect around 288 prices. We just assert we receive between 250 and 300 prices
       expect(prices.length).toBeGreaterThan(250);
@@ -86,6 +89,10 @@ describe('UsdRepositoryCoingecko', () => {
         'hourly'
       );
 
+      if (prices === null) {
+        throw new Error('Prices should not be null');
+      }
+
       // We expect around 120 prices. We just assert we receive between 100 and 150 prices
       expect(prices.length).toBeGreaterThan(100);
       expect(prices.length).toBeLessThan(150);
@@ -110,6 +117,9 @@ describe('UsdRepositoryCoingecko', () => {
         WETH,
         'daily'
       );
+      if (prices === null) {
+        throw new Error('Prices should not be null');
+      }
 
       // We expect around ~90 prices. We just assert we receive between 80 and 100 prices
       expect(prices.length).toBeGreaterThan(80);

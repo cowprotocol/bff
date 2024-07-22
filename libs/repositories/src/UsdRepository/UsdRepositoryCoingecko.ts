@@ -1,6 +1,10 @@
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
-import { COINGECKO_PLATFORMS, coingeckoProClient } from '../coingecko';
+import {
+  COINGECKO_PLATFORMS,
+  SimplePriceResponse,
+  coingeckoProClient,
+} from '../datasources/coingecko';
 import { SupportedChainId } from '../types';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 
@@ -33,7 +37,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const tokenAddressLower = tokenAddress.toLowerCase();
 
     // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    const { data: priceData, response } = await coingeckoProClient.GET(
+    const { data, response } = await coingeckoProClient.GET(
       `/simple/token_price/{id}`,
       {
         params: {
@@ -48,11 +52,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }
     );
 
-    if (
-      response.status === 404 ||
-      !priceData[tokenAddressLower] ||
-      !priceData[tokenAddressLower].usd
-    ) {
+    // FIXME: This is a workaround for the fact that Coingecko Open API has a hardcoded BTC address in the response (notified the Coingecko team about this issue, so remove when the issue is fixed)
+    const priceData = data as SimplePriceResponse;
+
+    if (response.status === 404 || !priceData?.[tokenAddressLower]?.usd) {
       return null;
     }
     await throwIfUnsuccessful(
@@ -109,6 +112,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       }, new Map<number, number>()) || undefined;
 
     const prices = priceData.prices;
+    if (!prices) {
+      return null;
+    }
+
     const pricePoints = prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,

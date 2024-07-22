@@ -15,8 +15,8 @@ import { Channel, ConsumeMessage } from 'amqplib';
 import assert from 'assert';
 import TelegramBot from 'node-telegram-bot-api';
 
-const WAIT_TIME = ms`10s`;
-const SUBSCRIPTION_CACHE_TiME = ms`5m`;
+const WAIT_TIME = ms(`10s`);
+const SUBSCRIPTION_CACHE_TiME = ms(`5m`);
 
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
@@ -102,7 +102,11 @@ async function connect() {
   );
   await channel.consume(
     NOTIFICATIONS_QUEUE,
-    async (msg) => onNewMessage(channel, msg),
+    async (msg) => {
+      if (msg !== null) {
+        onNewMessage(channel, msg);
+      }
+    },
     {
       noAck: false,
     }
