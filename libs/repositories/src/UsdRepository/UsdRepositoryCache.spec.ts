@@ -1,6 +1,7 @@
-import { UsdRepositoryRedis } from './UsdRepositoryRedis';
+import { UsdRepositoryCache } from './UsdRepositoryCache';
 import IORedis from 'ioredis';
 import { UsdRepository } from './UsdRepository';
+import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import { SupportedChainId } from '../types';
 import { WETH } from '../../test/mock';
 import type { PricePoint } from './UsdRepository';
@@ -15,8 +16,8 @@ jest.mock('ioredis', () => {
   }));
 });
 
-describe('UsdRepositoryRedis', () => {
-  let usdRepositoryRedis: UsdRepositoryRedis;
+describe('UsdRepositoryCache', () => {
+  let usdRepositoryCache: UsdRepositoryCache;
   let redisMock: jest.Mocked<IORedis>;
   let proxyMock: jest.Mocked<UsdRepository>;
 
@@ -26,9 +27,10 @@ describe('UsdRepositoryRedis', () => {
       getUsdPrice: jest.fn(),
       getUsdPrices: jest.fn(),
     };
-    usdRepositoryRedis = new UsdRepositoryRedis(
+    const cacheRepository = new CacheRepositoryRedis(redisMock);
+    usdRepositoryCache = new UsdRepositoryCache(
       proxyMock,
-      redisMock,
+      cacheRepository,
       'testCache',
       CACHE_VALUE_SECONDS,
       CACHE_NULL_SECONDS
@@ -44,7 +46,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // WHEN: Get USD price
-      const price = await usdRepositoryRedis.getUsdPrice(
+      const price = await usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -62,7 +64,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // WHEN: Get USD price
-      const price = await usdRepositoryRedis.getUsdPrice(
+      const price = await usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -80,7 +82,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // When: Get USD price
-      const price = await usdRepositoryRedis.getUsdPrice(
+      const price = await usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -111,7 +113,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrice.mockResolvedValue(null);
 
       // When: Get USD price
-      const price = await usdRepositoryRedis.getUsdPrice(
+      const price = await usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -144,7 +146,7 @@ describe('UsdRepositoryRedis', () => {
       });
 
       // When: Get USD price
-      const price = await usdRepositoryRedis.getUsdPrice(
+      const price = await usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -164,7 +166,7 @@ describe('UsdRepositoryRedis', () => {
       });
 
       // When: Get USD price
-      const pricePromise = usdRepositoryRedis.getUsdPrice(
+      const pricePromise = usdRepositoryCache.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -202,7 +204,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // WHEN: Get USD prices
-      const prices = await usdRepositoryRedis.getUsdPrices(
+      const prices = await usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
@@ -219,7 +221,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // WHEN: Get USD prices
-      const prices = await usdRepositoryRedis.getUsdPrices(
+      const prices = await usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
@@ -238,7 +240,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // When: Get USD prices
-      const prices = await usdRepositoryRedis.getUsdPrices(
+      const prices = await usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
@@ -271,7 +273,7 @@ describe('UsdRepositoryRedis', () => {
       proxyMock.getUsdPrices.mockResolvedValue(null);
 
       // When: Get USD prices
-      const prices = await usdRepositoryRedis.getUsdPrices(
+      const prices = await usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
@@ -306,7 +308,7 @@ describe('UsdRepositoryRedis', () => {
       });
 
       // When: Get USD price
-      const prices = await usdRepositoryRedis.getUsdPrices(
+      const prices = await usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
@@ -327,7 +329,7 @@ describe('UsdRepositoryRedis', () => {
       });
 
       // When: Get USD prices
-      const pricesPromise = usdRepositoryRedis.getUsdPrices(
+      const pricesPromise = usdRepositoryCache.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,
         '5m'
