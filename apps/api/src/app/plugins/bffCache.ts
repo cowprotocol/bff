@@ -17,7 +17,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
       return
     }
 
-    let key = getKey(request)
+    const key = getKey(request);
     // Remove it so we can cache it properly
     request.headers['accept-encoding'] = undefined;
 
@@ -59,7 +59,6 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
       contents += chunk.toString(); // Process each chunk of data
     }
 
-
     const key = getKey(req);
     setCache(key, contents, cacheTtl, fastify).catch((e) => {
       fastify.log.error(`Error setting key ${key} from cache`, e);
@@ -74,7 +73,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
 };
 
 function getKey(req: FastifyRequest) {
-  return `GET:${req.routerPath}`;
+  return `GET:${req.url}`;
 }
 
 function getTtlFromResponse(reply: FastifyReply, defaultTtl: number | undefined): number | undefined {
