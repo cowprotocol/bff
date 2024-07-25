@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "yarn start:api",
-    "start:api": "nx start",
+    "start:api": "nx start api",
     "twap:run-migrations": "nx run twap:run-migrations",
     "twap:generate-migrations": "nx run twap:generate-migrations",
     "producer": "nx run notification-producer:start",
