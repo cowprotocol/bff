@@ -3,6 +3,7 @@ import { CACHE_CONTROL_HEADER, getCache, getCacheControlHeaderValue, parseCacheC
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from "fastify";
 
 const HEADER_NAME = 'x-bff-cache'
+import { ReadableStream } from 'stream/web';
 
 interface BffCacheOptions {
   ttl?: number
@@ -17,6 +18,8 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
     }
 
     let key = getKey(request)
+    // Remove it so we can cache it properly
+    request.headers['accept-encoding'] = undefined;
 
     const cacheItem = await getCache(key, fastify).catch(e => {
       fastify.log.error(`Error getting key ${key} from cache`, e)
@@ -39,32 +42,36 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, 
     return
   })
 
-  fastify.addHook('onSend', function (req, reply, payload, next) {
-    const isCacheHit = reply.getHeader(HEADER_NAME) === 'HIT'
-    const cacheTtl: number | undefined = getTtlFromResponse(reply, ttl)
-    const isStatus200 = reply.statusCode >= 200 && reply.statusCode < 300
+  fastify.addHook('onSend', async function (req, reply, payload) {
+    const isCacheHit = reply.getHeader(HEADER_NAME) === 'HIT';
+    const cacheTtl: number | undefined = getTtlFromResponse(reply, ttl);
+    const isStatus200 = reply.statusCode >= 200 && reply.statusCode < 300;
 
     // If the cache is a hit, or is non-cacheable, we just proceed with the request
     if (isCacheHit || cacheTtl === undefined || !isStatus200) {
-      next();
       return;
     }
 
     // If there is no cached data, then its a cache-miss
-    reply.header(HEADER_NAME, 'MISS')
 
-    let key = getKey(req)
-    setCache(key, payload, cacheTtl, fastify).catch(e => {
-      fastify.log.error(`Error setting key ${key} from cache`, e)
-      return null
-    })
-    reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(cacheTtl))
-    next()
-  })
+    let contents = '';
+    for await (const chunk of payload as ReadableStream) {
+      contents += chunk.toString(); // Process each chunk of data
+    }
 
-  next()
-}
 
+    const key = getKey(req);
+    setCache(key, contents, cacheTtl, fastify).catch((e) => {
+      fastify.log.error(`Error setting key ${key} from cache`, e);
+      return null;
+    });
+    reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(cacheTtl));
+
+    return contents;
+  });
+
+  next();
+};
 
 function getKey(req: FastifyRequest) {
   return `GET:${req.routerPath}`;
