@@ -83,7 +83,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       fastify.log.info(
         `Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`
       );
-      if (!price) {
+      if (price === null) {
         reply.code(404).send({ message: 'Price not found' });
         return;
       }
