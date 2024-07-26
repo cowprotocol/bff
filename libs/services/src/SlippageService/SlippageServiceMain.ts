@@ -27,7 +27,7 @@ export class SlippageServiceMain implements SlippageService {
     return Math.max(slippageQuoteToken, slippageBaseToken);
   }
 
-  private async getSlippageForToken(tokenAddress: string): Promise<number> {
+  private async getSlippageForToken(tokenAddress: string): Promise<Bps> {
     const prices = await this.usdRepository.getUsdPrices(
       SupportedChainId.MAINNET,
       tokenAddress,
