@@ -10,30 +10,23 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
     "paths": {
-      "@cowprotocol/abis": [
-        "libs/abis/src/index.ts"
-      ],
-      "@cowprotocol/cms-api": [
-        "libs/cms-api/src/index.ts"
-      ],
-      "@cowprotocol/notifications": [
-        "libs/notifications/src/index.ts"
-      ]
+      "@cowprotocol/abis": ["libs/abis/src/index.ts"],
+      "@cowprotocol/cms-api": ["libs/cms-api/src/index.ts"],
+      "@cowprotocol/notifications": ["libs/notifications/src/index.ts"],
+      "@cowprotocol/repositories": ["libs/repositories/src/index.ts"],
+      "@cowprotocol/services": ["libs/services/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

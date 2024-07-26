@@ -61,6 +61,19 @@ For more info, see:
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/library): Generator for NodeJS Libraries
 - [@nx/node:setup-docker](https://nx.dev/nx-api/node/generators/setup-docker): Docker Generator
 
+## Test
+
+ ```
+ # Run all tests
+ yarn test
+
+ # Run test for repositories (in watch mode)
+ nx run repositories:test --watch
+
+ # Run test on specific file (in watch mode)
+ nx run repositories:test --watch --testFile=libs/repositories/src/UsdRepository/UsdRepositoryRedis.spec.ts
+ ```
+
 
 # Build
 ## Docker
@@ -71,3 +84,9 @@ Build docker containers and publish to a local registry:
 yarn docker-build:affected
 ```
 
+# Generate Types
+There's some API types that are generated automatically from their swagger definitions. To generate them, run:
+
+```bash
+yarn gen:types
+```

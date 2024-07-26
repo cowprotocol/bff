@@ -13,5 +13,6 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../..//coverage/notification-producer-e2e',
+  coverageDirectory: '../../coverage/notification-producer-e2e',
+  setupFilesAfterEnv: ['../../jest.setup.ts'],
 };

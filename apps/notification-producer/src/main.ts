@@ -91,7 +91,7 @@ function fromCmsToNotifications({
     title,
     message,
     account,
-    url,
+    url: url || undefined,
   };
 }
 
