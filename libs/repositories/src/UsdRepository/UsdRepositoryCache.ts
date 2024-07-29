@@ -47,10 +47,7 @@ export class UsdRepositoryCache implements UsdRepository {
 
     // Get the usd Price (delegate call)
     const usdPrice = await this.proxy.getUsdPrice(chainId, tokenAddress);
-    console.log(
-      'UsdRepositoryCache: not cached. Return FRESH 🥒',
-      usdPriceCached
-    );
+    console.log('UsdRepositoryCache: not cached. Return FRESH 🥒', usdPrice);
 
     // Cache price (or absence of it)
     this.cacheValue({
