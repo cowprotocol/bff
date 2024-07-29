@@ -5,12 +5,11 @@ import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
-  constructor(
-    private getTokenDecimals: (tokenAddress: string) => number | null
-  ) {
+  constructor(private erc20Repository: Erc20Repository) {
     super();
   }
 
@@ -23,7 +22,8 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     if (!tokenNativePrice) {
       return null;
     }
-    const tokenDecimals = this.getTokenDecimals(tokenAddress);
+    const erc20 = await this.erc20Repository.get(chainId, tokenAddress);
+    const tokenDecimals = erc20.decimals || 18;
     if (tokenDecimals === null) {
       throw new Error('Token decimals not found for ' + tokenAddress);
     }

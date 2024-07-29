@@ -2,18 +2,25 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  Erc20Repository,
+  Erc20RepositoryCache,
+  Erc20RepositoryViem,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   UsdRepositoryFallback,
   cacheRepositorySymbol,
+  erc20RepositorySymbol,
   redisClient,
   usdRepositorySymbol,
+  viemClients,
 } from '@cowprotocol/repositories';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_VALUE_SECONDS = ms('10s') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository don't know)
+
+const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 
 import { Container } from 'inversify';
 import {
@@ -26,8 +33,13 @@ import {
 } from '@cowprotocol/services';
 import ms from 'ms';
 
-function getTokenDecimals(tokenAddress: string): number | null {
-  return 18; // TODO: Implement!!!
+function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
+  return new Erc20RepositoryCache(
+    new Erc20RepositoryViem(viemClients),
+    cacheRepository,
+    'erc20',
+    CACHE_TOKEN_INFO_SECONDS
+  );
 }
 
 function getCacheRepository(_apiContainer: Container): CacheRepository {
@@ -38,9 +50,12 @@ function getCacheRepository(_apiContainer: Container): CacheRepository {
   return new CacheRepositoryMemory();
 }
 
-function getUsdRepositoryCow(cacheRepository: CacheRepository): UsdRepository {
+function getUsdRepositoryCow(
+  cacheRepository: CacheRepository,
+  erc20Repository: Erc20Repository
+): UsdRepository {
   return new UsdRepositoryCache(
-    new UsdRepositoryCow(getTokenDecimals),
+    new UsdRepositoryCow(erc20Repository),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
@@ -69,9 +84,14 @@ function getUsdRepository(cacheRepository: CacheRepository): UsdRepository {
 
 function getApiContainer(): Container {
   const apiContainer = new Container();
-
   // Repositories
   const cacheRepository = getCacheRepository(apiContainer);
+  const erc20Repository = getErc20Repository(cacheRepository);
+
+  apiContainer
+    .bind<Erc20Repository>(erc20RepositorySymbol)
+    .toConstantValue(erc20Repository);
+
   apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
     .toConstantValue(cacheRepository);
