@@ -12,6 +12,9 @@ import {
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
 
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository don't know)
+
 import { Container } from 'inversify';
 import {
   SlippageService,
@@ -21,6 +24,7 @@ import {
   slippageServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
+import ms from 'ms';
 
 function getTokenDecimals(tokenAddress: string): number | null {
   return 18; // TODO: Implement!!!
@@ -38,7 +42,9 @@ function getUsdRepositoryCow(cacheRepository: CacheRepository): UsdRepository {
   return new UsdRepositoryCache(
     new UsdRepositoryCow(getTokenDecimals),
     cacheRepository,
-    'usdCow'
+    'usdCow',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
   );
 }
 
@@ -48,7 +54,9 @@ function getUsdRepositoryCoingecko(
   return new UsdRepositoryCache(
     new UsdRepositoryCoingecko(),
     cacheRepository,
-    'usdCoingecko'
+    'usdCoingecko',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
   );
 }
 
