@@ -40,14 +40,12 @@ export class UsdRepositoryCache implements UsdRepository {
     });
 
     if (usdPriceCached !== undefined) {
-      console.log('UsdRepositoryCache: Return cached', usdPriceCached);
       // Return cached price (if available)
       return usdPriceCached;
     }
 
     // Get the usd Price (delegate call)
     const usdPrice = await this.proxy.getUsdPrice(chainId, tokenAddress);
-    console.log('UsdRepositoryCache: not cached. Return FRESH 🥒', usdPrice);
 
     // Cache price (or absence of it)
     this.cacheValue({
