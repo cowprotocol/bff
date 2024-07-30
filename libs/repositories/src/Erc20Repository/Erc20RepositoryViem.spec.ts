@@ -4,14 +4,6 @@ import { PublicClient } from 'viem';
 import { erc20Abi } from 'viem';
 import { Erc20 } from './Erc20Repository';
 
-jest.mock('viem', () => ({
-  ...jest.requireActual('viem'),
-  PublicClient: jest.fn().mockImplementation(() => ({
-    getCode: jest.fn(),
-    multicall: jest.fn(),
-  })),
-}));
-
 const multicallMock = jest.fn();
 
 // Mock implementation for PublicClient
@@ -24,7 +16,6 @@ const mockPublicClient: PublicClient = {
 export default mockPublicClient;
 
 describe('Erc20RepositoryViem', () => {
-  let viemClients: Record<SupportedChainId, PublicClient>;
   let erc20RepositoryViem: Erc20RepositoryViem;
 
   const chainId = SupportedChainId.MAINNET;
@@ -44,14 +35,14 @@ describe('Erc20RepositoryViem', () => {
       { address: tokenAddress, abi: erc20Abi, functionName: 'decimals' },
     ],
   };
+  const viemClients = {
+    [SupportedChainId.MAINNET]: mockPublicClient,
+    [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
+    [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
+    [SupportedChainId.SEPOLIA]: mockPublicClient,
+  };
 
   beforeEach(() => {
-    viemClients = {
-      [SupportedChainId.MAINNET]: mockPublicClient,
-      [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
-      [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
-      [SupportedChainId.SEPOLIA]: mockPublicClient,
-    };
     erc20RepositoryViem = new Erc20RepositoryViem(viemClients);
   });
 

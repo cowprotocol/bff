@@ -11,6 +11,7 @@ import {
   UsdRepositoryCow,
   UsdRepositoryFallback,
   cacheRepositorySymbol,
+  cowApiClients,
   erc20RepositorySymbol,
   redisClient,
   usdRepositorySymbol,
@@ -55,7 +56,7 @@ function getUsdRepositoryCow(
   erc20Repository: Erc20Repository
 ): UsdRepository {
   return new UsdRepositoryCache(
-    new UsdRepositoryCow(erc20Repository),
+    new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
