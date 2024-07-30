@@ -17,7 +17,7 @@ import {
   viemClients,
 } from '@cowprotocol/repositories';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('10s') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository don't know)
 
 const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
@@ -80,7 +80,7 @@ function getUsdRepository(
   erc20Repository: Erc20Repository
 ): UsdRepository {
   return new UsdRepositoryFallback([
-    // getUsdRepositoryCoingecko(cacheRepository),
+    getUsdRepositoryCoingecko(cacheRepository),
     getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }

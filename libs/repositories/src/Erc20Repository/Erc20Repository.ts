@@ -10,5 +10,10 @@ export interface Erc20 {
 }
 
 export interface Erc20Repository {
+  /**
+   * Return the ERC20 token information for the given address or null if the token address is not an ERC20 token for the given network.
+   * @param chainId
+   * @param tokenAddress
+   */
   get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20 | null>;
 }
