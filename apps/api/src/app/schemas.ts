@@ -1,9 +1,10 @@
+import { ALL_CHAIN_IDS } from '@cowprotocol/repositories';
 
 export const ChainIdSchema = {
   title: 'Chain ID',
   description: 'Chain ID',
-  enum: [1, 100, 42161, 11155111],
+  enum: ALL_CHAIN_IDS,
   type: 'integer',
-} as const
+} as const;
 
-export const ETHEREUM_ADDRESS_PATTERN = "^0x[a-fA-F0-9]{40}$"
+export const ETHEREUM_ADDRESS_PATTERN = '^0x[a-fA-F0-9]{40}$';

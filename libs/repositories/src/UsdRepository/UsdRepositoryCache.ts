@@ -19,7 +19,7 @@ export class UsdRepositoryCache implements UsdRepository {
 
   constructor(
     private proxy: UsdRepository,
-    @inject(usdRepositorySymbol) private cache: CacheRepository,
+    private cache: CacheRepository,
     private cacheName: string,
     private cacheTimeValueSeconds: number,
     private cacheTimeNullSeconds: number

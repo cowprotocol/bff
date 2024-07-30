@@ -9,6 +9,7 @@ import {
   okResponse,
 } from '../../test/mock';
 import { USDC } from '../const';
+import { Erc20Repository, Erc20 } from '../Erc20Repository/Erc20Repository';
 
 function getTokenDecimalsMock(tokenAddress: string) {
   return tokenAddress === WETH ? 18 : 6;
@@ -18,7 +19,20 @@ const NATIVE_PRICE_ENDPOINT = '/api/v1/token/{token}/native_price';
 const WETH_NATIVE_PRICE = 1; // See https://api.cow.fi/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
 const USDC_PRICE = 288778763.042292; // USD price: 3,462.8585200136 (calculated 1e12 / 288778763.042292). See https://api.cow.fi/mainnet/api/v1/token/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/native_price
 
-const usdRepositoryCow = new UsdRepositoryCow(getTokenDecimalsMock);
+const mockErc20Repository = {
+  async get(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<Erc20 | null> {
+    const decimals = tokenAddress === WETH ? 18 : 6;
+    return {
+      address: tokenAddress,
+      decimals,
+    };
+  },
+} as jest.Mocked<Erc20Repository>;
+
+const usdRepositoryCow = new UsdRepositoryCow(mockErc20Repository);
 
 const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
 
