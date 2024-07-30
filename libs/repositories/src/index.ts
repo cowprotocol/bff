@@ -1,6 +1,7 @@
 export * from './types';
 export * from './datasources/redis';
 export * from './datasources/viem';
+export * from './datasources/cowApi';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';

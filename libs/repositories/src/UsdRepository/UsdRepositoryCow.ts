@@ -1,15 +1,18 @@
 import { injectable } from 'inversify';
 import { UsdRepositoryNoop } from './UsdRepository';
-import { cowApiClientMainnet } from '../datasources/cowApi';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '../types';
 import { BigNumber } from 'bignumber.js';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
+import { CowApiClient } from '../datasources/cowApi';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
-  constructor(private erc20Repository: Erc20Repository) {
+  constructor(
+    private cowApiClients: Record<SupportedChainId, CowApiClient>,
+    private erc20Repository: Erc20Repository
+  ) {
     super();
   }
 
@@ -52,14 +55,15 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   }
 
   private async getNativePrice(
-    _chainId: SupportedChainId,
+    chainId: SupportedChainId,
     tokenAddress: string
   ) {
+    const cowApiClient = this.cowApiClients[chainId];
     const {
       data: priceResult = {},
       response,
       error,
-    } = await cowApiClientMainnet.GET('/api/v1/token/{token}/native_price', {
+    } = await cowApiClient.GET('/api/v1/token/{token}/native_price', {
       params: {
         path: {
           token: tokenAddress,

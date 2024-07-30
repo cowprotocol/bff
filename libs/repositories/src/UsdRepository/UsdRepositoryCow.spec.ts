@@ -1,6 +1,5 @@
 import { SupportedChainId } from '../types';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
-import { cowApiClientMainnet } from '../datasources/cowApi';
 
 import {
   DEFINITELY_NOT_A_TOKEN,
@@ -10,10 +9,15 @@ import {
 } from '../../test/mock';
 import { USDC } from '../const';
 import { Erc20Repository, Erc20 } from '../Erc20Repository/Erc20Repository';
+import { CowApiClient } from '../datasources/cowApi';
 
-function getTokenDecimalsMock(tokenAddress: string) {
-  return tokenAddress === WETH ? 18 : 6;
-}
+const mockApiGet = jest.fn();
+
+// Mock implementation for PublicClient
+const mockApi: CowApiClient = {
+  GET: mockApiGet,
+  // Add other methods of PublicClient if needed
+} as unknown as jest.Mocked<CowApiClient>;
 
 const NATIVE_PRICE_ENDPOINT = '/api/v1/token/{token}/native_price';
 const WETH_NATIVE_PRICE = 1; // See https://api.cow.fi/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
@@ -32,15 +36,24 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
-const usdRepositoryCow = new UsdRepositoryCow(mockErc20Repository);
+const cowApiClients = {
+  [SupportedChainId.MAINNET]: mockApi,
+  [SupportedChainId.GNOSIS_CHAIN]: mockApi,
+  [SupportedChainId.ARBITRUM_ONE]: mockApi,
+  [SupportedChainId.SEPOLIA]: mockApi,
+};
+const usdRepositoryCow = new UsdRepositoryCow(
+  cowApiClients,
+  mockErc20Repository
+);
 
-const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
+// const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
 
 describe('UsdRepositoryCow', () => {
   describe('getUsdPrice', () => {
     it('USD price calculation is correct', async () => {
       // Mock native price
-      cowApiMock.mockImplementation(async (url, params) => {
+      mockApiGet.mockImplementation(async (url, params) => {
         const token = (params as any).params.path.token || undefined;
         switch (token) {
           case WETH:
@@ -66,8 +79,8 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Assert that the implementation did the right calls to the API
-      expect(cowApiMock).toHaveBeenCalledTimes(2);
-      expect(cowApiMock.mock.calls).toEqual([
+      expect(mockApiGet).toHaveBeenCalledTimes(2);
+      expect(mockApiGet.mock.calls).toEqual([
         [NATIVE_PRICE_ENDPOINT, { params: { path: { token: WETH } } }],
         [
           NATIVE_PRICE_ENDPOINT,
@@ -82,8 +95,7 @@ describe('UsdRepositoryCow', () => {
     });
     it('Handles UnsupportedToken(400) errors', async () => {
       // Mock native price
-      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-      cowApiGet.mockReturnValue(
+      mockApiGet.mockReturnValue(
         errorResponse({
           status: 400,
           statusText: 'Bad Request',
@@ -106,8 +118,7 @@ describe('UsdRepositoryCow', () => {
 
     it('Handles NewErrorTypeWeDontHandleYet(400) errors', async () => {
       // Mock native price
-      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-      cowApiGet.mockReturnValue(
+      mockApiGet.mockReturnValue(
         errorResponse({
           status: 400,
           statusText: 'Bad Request',
@@ -133,8 +144,7 @@ describe('UsdRepositoryCow', () => {
 
     it('Handles NotFound(404) errors', async () => {
       // Mock native price
-      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-      cowApiGet.mockReturnValue(
+      mockApiGet.mockReturnValue(
         errorResponse({
           status: 404,
           statusText: 'Not Found',
@@ -154,8 +164,7 @@ describe('UsdRepositoryCow', () => {
 
     it('Handles un-expected errors (I_AM_A_TEA_POT)', async () => {
       // Mock native price
-      const cowApiGet = jest.spyOn(cowApiClientMainnet, 'GET');
-      cowApiGet.mockReturnValue(
+      mockApiGet.mockReturnValue(
         errorResponse({
           status: 418,
           statusText: "I'm a teapot",
