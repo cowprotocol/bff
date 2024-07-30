@@ -128,7 +128,7 @@ describe('Erc20RepositoryViem', () => {
     });
   });
 
-  it('should return symbol if its the only optional method implemented', async () => {
+  it('should return all ERC20 fields', async () => {
     // GIVEN: The address is a ERC20, but has no symbol or any other details
     multicallMock.mockResolvedValue([
       { result: 1234567, status: 'success' }, // totalSupply
