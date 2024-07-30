@@ -7,7 +7,6 @@ import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
-import { deprecate } from 'util';
 
 const CACHE_SECONDS = 120;
 
@@ -31,6 +30,7 @@ const routeSchema = {
     },
   },
 } as const satisfies JSONSchema;
+
 const successSchema = {
   type: 'object',
   required: ['slippageBps'],
