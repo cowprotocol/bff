@@ -75,10 +75,13 @@ function getUsdRepositoryCoingecko(
   );
 }
 
-function getUsdRepository(cacheRepository: CacheRepository): UsdRepository {
+function getUsdRepository(
+  cacheRepository: CacheRepository,
+  erc20Repository: Erc20Repository
+): UsdRepository {
   return new UsdRepositoryFallback([
-    getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository),
+    // getUsdRepositoryCoingecko(cacheRepository),
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -98,7 +101,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<UsdRepository>(usdRepositorySymbol)
-    .toConstantValue(getUsdRepository(cacheRepository));
+    .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
   // Services
   apiContainer
