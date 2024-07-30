@@ -9,6 +9,9 @@ import type { PricePoint } from './UsdRepository';
 const CACHE_VALUE_SECONDS = 10;
 const CACHE_NULL_SECONDS = 20;
 
+const wethLowercase = WETH.toLocaleLowerCase();
+const chainId = SupportedChainId.MAINNET;
+
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
     get: jest.fn(),
@@ -31,7 +34,7 @@ describe('UsdRepositoryCache', () => {
     usdRepositoryCache = new UsdRepositoryCache(
       proxyMock,
       cacheRepository,
-      'testCache',
+      'test-cache',
       CACHE_VALUE_SECONDS,
       CACHE_NULL_SECONDS
     );
@@ -46,10 +49,7 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // WHEN: Get USD price
-      const price = await usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: We get the cached value
       expect(price).toEqual(100);
@@ -64,10 +64,7 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // WHEN: Get USD price
-      const price = await usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: We get the cached value
       expect(price).toEqual(null);
@@ -82,23 +79,17 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrice.mockResolvedValue(200);
 
       // When: Get USD price
-      const price = await usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: The price matches the result from the proxy
       expect(price).toEqual(200);
 
       // THEN: The proxy has been called once
-      expect(proxyMock.getUsdPrice).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      expect(proxyMock.getUsdPrice).toHaveBeenCalledWith(chainId, WETH);
 
       // THEN: The value returned by the proxy is cached
       expect(redisMock.set).toHaveBeenCalledWith(
-        `repos:testCache:usdPrice:${SupportedChainId.MAINNET}:${WETH}`,
+        `repos:test-cache:usd-price:${chainId}:${wethLowercase}`,
         '200',
         'EX',
         CACHE_VALUE_SECONDS
@@ -113,23 +104,17 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrice.mockResolvedValue(null);
 
       // When: Get USD price
-      const price = await usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: The price matches the result from the proxy
       expect(price).toEqual(null);
 
       // THEN: The proxy has been called once
-      expect(proxyMock.getUsdPrice).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      expect(proxyMock.getUsdPrice).toHaveBeenCalledWith(chainId, WETH);
 
       // THEN: The value returned by the proxy is cached
       expect(redisMock.set).toHaveBeenCalledWith(
-        `repos:testCache:usdPrice:${SupportedChainId.MAINNET}:${WETH}`,
+        `repos:test-cache:usd-price:${chainId}:${wethLowercase}`,
         'null',
         'EX',
         CACHE_NULL_SECONDS
@@ -146,10 +131,7 @@ describe('UsdRepositoryCache', () => {
       });
 
       // When: Get USD price
-      const price = await usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: The price matches the result from the proxy
       expect(price).toEqual(100);
@@ -166,10 +148,7 @@ describe('UsdRepositoryCache', () => {
       });
 
       // When: Get USD price
-      const pricePromise = usdRepositoryCache.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const pricePromise = usdRepositoryCache.getUsdPrice(chainId, WETH);
 
       // THEN: The call throws an awful error
       expect(pricePromise).rejects.toThrow('💥 Booom!');
@@ -204,11 +183,7 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // WHEN: Get USD prices
-      const prices = await usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
 
       // THEN: We get the cached value
       expect(prices).toEqual([pricePoint100]);
@@ -221,11 +196,7 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // WHEN: Get USD prices
-      const prices = await usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
 
       // THEN: We get the cached value
       expect(prices).toEqual([pricePoint100]);
@@ -240,25 +211,17 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
 
       // When: Get USD prices
-      const prices = await usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
 
       // THEN: The price matches the result from the proxy
       expect(prices).toEqual([pricePoint200]);
 
       // THEN: The proxy has been called once
-      expect(proxyMock.getUsdPrices).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      expect(proxyMock.getUsdPrices).toHaveBeenCalledWith(chainId, WETH, '5m');
 
       // THEN: The value returned by the proxy is cached
       expect(redisMock.set).toHaveBeenCalledWith(
-        `repos:testCache:usdPrices:${SupportedChainId.MAINNET}:${WETH}:5m`,
+        `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:5m`,
         pricePoints200String,
         'EX',
         CACHE_VALUE_SECONDS
@@ -273,25 +236,17 @@ describe('UsdRepositoryCache', () => {
       proxyMock.getUsdPrices.mockResolvedValue(null);
 
       // When: Get USD prices
-      const prices = await usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
 
       // THEN: The price matches the result from the proxy
       expect(prices).toEqual(null);
 
       // THEN: The proxy has been called once
-      expect(proxyMock.getUsdPrices).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      expect(proxyMock.getUsdPrices).toHaveBeenCalledWith(chainId, WETH, '5m');
 
       // THEN: The value returned by the proxy is cached
       expect(redisMock.set).toHaveBeenCalledWith(
-        `repos:testCache:usdPrices:${SupportedChainId.MAINNET}:${WETH}:5m`,
+        `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:5m`,
         'null',
         'EX',
         CACHE_NULL_SECONDS
@@ -308,11 +263,7 @@ describe('UsdRepositoryCache', () => {
       });
 
       // When: Get USD price
-      const prices = await usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
 
       // THEN: The price matches the result from the proxy
       expect(prices).toEqual([pricePoint100]);
@@ -330,7 +281,7 @@ describe('UsdRepositoryCache', () => {
 
       // When: Get USD prices
       const pricesPromise = usdRepositoryCache.getUsdPrices(
-        SupportedChainId.MAINNET,
+        chainId,
         WETH,
         '5m'
       );

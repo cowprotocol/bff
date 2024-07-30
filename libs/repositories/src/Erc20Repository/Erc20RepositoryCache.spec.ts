@@ -12,7 +12,7 @@ describe('Erc20RepositoryCache', () => {
   const tokenAddress = '0xTokenAddress';
   const cacheName = 'erc20';
   const cacheTimeSeconds = 60;
-  const baseCacheKey = `repos:${cacheName}`;
+  const cacheKey = `repos:${cacheName}:get:${chainId}:${tokenAddress.toLocaleLowerCase()}`;
 
   const erc20Data: Erc20 = {
     address: '0x1111111111111111111111111111111111111111',
@@ -47,7 +47,6 @@ describe('Erc20RepositoryCache', () => {
     const result = await erc20RepositoryCache.get(chainId, tokenAddress);
 
     // THEN: The cache is called
-    const cacheKey = `${baseCacheKey}:get:${chainId}:${tokenAddress}`;
     expect(mockCache.get).toHaveBeenCalledWith(cacheKey);
 
     // THEN: The proxy is not called
@@ -65,7 +64,6 @@ describe('Erc20RepositoryCache', () => {
     const result = await erc20RepositoryCache.get(chainId, tokenAddress);
 
     // THEN: The cache is called
-    const cacheKey = `${baseCacheKey}:get:${chainId}:${tokenAddress}`;
     expect(mockCache.get).toHaveBeenCalledWith(cacheKey);
 
     // THEN: The proxy is not called
@@ -86,7 +84,6 @@ describe('Erc20RepositoryCache', () => {
     const result = await erc20RepositoryCache.get(chainId, tokenAddress);
 
     // THEN: The cache is called
-    const cacheKey = `${baseCacheKey}:get:${chainId}:${tokenAddress}`;
     expect(mockCache.get).toHaveBeenCalledWith(cacheKey);
 
     // THEN: The proxy is called
@@ -114,7 +111,6 @@ describe('Erc20RepositoryCache', () => {
     const result = await erc20RepositoryCache.get(chainId, tokenAddress);
 
     // THEN: The cache is called
-    const cacheKey = `${baseCacheKey}:get:${chainId}:${tokenAddress}`;
     expect(mockCache.get).toHaveBeenCalledWith(cacheKey);
 
     // THEN: The proxy is called
