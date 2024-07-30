@@ -14,20 +14,18 @@ export class Erc20RepositoryViem implements Erc20Repository {
     const viemClient = this.viemClients[chainId];
     const tokenAddressHex = getAddress(tokenAddress);
 
-    // If the address has no code, we return null
-    const code = await viemClient.getCode({ address: tokenAddressHex });
-    if (!code) {
-      return null;
-    }
-
     const ercTokenParams = {
       address: tokenAddressHex,
       abi: erc20Abi,
     };
 
-    const [nameResult, symbolResult, decimalsResult] =
+    const [totalSupplyResult, nameResult, symbolResult, decimalsResult] =
       await viemClient.multicall({
         contracts: [
+          {
+            ...ercTokenParams,
+            functionName: 'totalSupply',
+          },
           {
             ...ercTokenParams,
             functionName: 'name',
@@ -42,6 +40,11 @@ export class Erc20RepositoryViem implements Erc20Repository {
           },
         ],
       });
+
+    // If the total supply fails, the token is not an ERC20
+    if (totalSupplyResult.status === 'failure') {
+      return null;
+    }
 
     const name =
       nameResult.status === 'success' ? nameResult.result : undefined;
