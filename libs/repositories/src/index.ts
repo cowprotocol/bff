@@ -1,4 +1,9 @@
 export * from './types';
+
+// Utils
+export * from './utils/cache';
+
+// Data-sources
 export * from './datasources/redis';
 export * from './datasources/viem';
 export * from './datasources/cowApi';

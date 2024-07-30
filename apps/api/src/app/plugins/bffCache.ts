@@ -8,8 +8,9 @@ import {
 } from '../../utils/cache';
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify';
 
-const HEADER_NAME = 'x-bff-cache'
+const HEADER_NAME = 'x-bff-cache';
 import { ReadableStream } from 'stream/web';
+import { getCacheKey } from '@cowprotocol/repositories';
 
 interface BffCacheOptions {
   ttl?: number;
@@ -77,7 +78,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
     setCache(key, contents, cacheTtl, fastify).catch((e) => {
       fastify.log.error(`Error setting key ${key} from cache`, e);
       return null;
-    });    
+    });
     reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(cacheTtl));
 
     return contents;
@@ -87,7 +88,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
 };
 
 function getKey(req: FastifyRequest) {
-  return `GET:${req.url}`;
+  return getCacheKey('requests', ...req.url.split('/'));
 }
 
 function getTtlFromResponse(

@@ -5,17 +5,17 @@ import {
   UsdRepository,
   deserializePricePoints,
   serializePricePoints,
-  usdRepositorySymbol,
 } from './UsdRepository';
 import { SupportedChainId } from '../types';
 import ms from 'ms';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
+import { getCacheKey, PartialCacheKey } from '../utils/cache';
 
 const NULL_VALUE = 'null';
 
 @injectable()
 export class UsdRepositoryCache implements UsdRepository {
-  private baseCacheKey: string;
+  private baseCacheKey: PartialCacheKey[];
 
   constructor(
     private proxy: UsdRepository,
@@ -24,16 +24,20 @@ export class UsdRepositoryCache implements UsdRepository {
     private cacheTimeValueSeconds: number,
     private cacheTimeNullSeconds: number
   ) {
-    this.baseCacheKey = `repos:${this.cacheName}`;
+    this.baseCacheKey = ['repos', this.cacheName];
   }
 
   async getUsdPrice(
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<number | null> {
-    const key = `usdPrice:${chainId}:${tokenAddress}`;
-
     // Get price from cache
+    const key = getCacheKey(
+      ...this.baseCacheKey,
+      'usd-price',
+      chainId,
+      tokenAddress
+    );
     const usdPriceCached = await this.getValueFromCache({
       key,
       convertFn: parseFloat,
@@ -60,7 +64,13 @@ export class UsdRepositoryCache implements UsdRepository {
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const key = `usdPrices:${chainId}:${tokenAddress}:${priceStrategy}`;
+    const key = getCacheKey(
+      ...this.baseCacheKey,
+      'usd-prices',
+      chainId,
+      tokenAddress,
+      priceStrategy
+    );
 
     // Get price from cache
     const usdPriceCached = await this.getValueFromCache({
@@ -95,7 +105,7 @@ export class UsdRepositoryCache implements UsdRepository {
   }): Promise<T | null | undefined> {
     const { key, convertFn } = props;
 
-    const valueString = await this.cache.get(this.baseCacheKey + ':' + key);
+    const valueString = await this.cache.get(key);
     if (valueString) {
       return valueString === NULL_VALUE ? null : convertFn(valueString);
     }
@@ -113,7 +123,7 @@ export class UsdRepositoryCache implements UsdRepository {
       value === null ? this.cacheTimeNullSeconds : this.cacheTimeValueSeconds;
 
     await this.cache.set(
-      this.baseCacheKey + ':' + key,
+      key,
       value === null ? NULL_VALUE : value,
       cacheTimeSeconds
     );

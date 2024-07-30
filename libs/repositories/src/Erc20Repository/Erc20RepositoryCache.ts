@@ -3,29 +3,34 @@ import NodeCache from 'node-cache';
 import { Erc20, Erc20Repository } from './Erc20Repository';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { SupportedChainId } from '../types';
+import { getCacheKey, PartialCacheKey } from '../utils/cache';
 
 const NULL_VALUE = 'null';
 
 @injectable()
 export class Erc20RepositoryCache implements Erc20Repository {
-  private baseCacheKey: string;
+  private baseCacheKey: PartialCacheKey[];
 
   constructor(
     private proxy: Erc20Repository,
     private cache: CacheRepository,
-    private cacheName: string,
+    cacheName: string,
     private cacheTimeSeconds: number
   ) {
-    this.baseCacheKey = `repos:${this.cacheName}`;
+    this.baseCacheKey = ['repos', cacheName];
   }
 
   async get(
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<Erc20 | null> {
-    const cacheKey = `${this.baseCacheKey}:get:${chainId}:${tokenAddress}`;
-
     // Get cached value
+    const cacheKey = getCacheKey(
+      ...this.baseCacheKey,
+      'get',
+      chainId,
+      tokenAddress
+    );
     const valueString = await this.cache.get(cacheKey);
     if (valueString) {
       return valueString === NULL_VALUE ? null : JSON.parse(valueString);
