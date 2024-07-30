@@ -67,7 +67,7 @@ export async function getNotificationsByAccount({
     throw error;
   }
 
-  return data.data;
+  return data;
 }
 
 export async function getAllNotifications(): Promise<CmsNotification[]> {
