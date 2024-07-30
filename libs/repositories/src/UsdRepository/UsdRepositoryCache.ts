@@ -8,12 +8,9 @@ import {
   usdRepositorySymbol,
 } from './UsdRepository';
 import { SupportedChainId } from '../types';
-import IORedis from 'ioredis';
 import ms from 'ms';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('10s') / 1000; // 2min cache time by default for values
-const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 2min cache time by default for NULL values (when the repository don't know)
 const NULL_VALUE = 'null';
 
 @injectable()
@@ -24,8 +21,8 @@ export class UsdRepositoryCache implements UsdRepository {
     private proxy: UsdRepository,
     @inject(usdRepositorySymbol) private cache: CacheRepository,
     private cacheName: string,
-    private cacheTimeValueSeconds: number = DEFAULT_CACHE_VALUE_SECONDS,
-    private cacheTimeNullSeconds: number = DEFAULT_CACHE_NULL_SECONDS
+    private cacheTimeValueSeconds: number,
+    private cacheTimeNullSeconds: number
   ) {
     this.baseCacheKey = `repos:${this.cacheName}`;
   }
