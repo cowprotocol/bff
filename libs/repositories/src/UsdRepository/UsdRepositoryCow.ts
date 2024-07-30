@@ -23,7 +23,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       return null;
     }
     const erc20 = await this.erc20Repository.get(chainId, tokenAddress);
-    const tokenDecimals = erc20.decimals || 18;
+    const tokenDecimals = erc20?.decimals || 18;
     if (tokenDecimals === null) {
       throw new Error('Token decimals not found for ' + tokenAddress);
     }

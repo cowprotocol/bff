@@ -19,7 +19,10 @@ export class Erc20RepositoryCache implements Erc20Repository {
     this.baseCacheKey = `repos:${this.cacheName}`;
   }
 
-  async get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20> {
+  async get(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<Erc20 | null> {
     const cacheKey = `${this.baseCacheKey}:get:${chainId}:${tokenAddress}`;
 
     // Get cached value

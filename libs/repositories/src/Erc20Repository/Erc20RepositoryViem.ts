@@ -1,36 +1,32 @@
 import { injectable } from 'inversify';
-import NodeCache from 'node-cache';
 import { Erc20, Erc20Repository } from './Erc20Repository';
 import { SupportedChainId } from '../types';
-import {
-  Client,
-  createPublicClient,
-  erc20Abi,
-  getAddress,
-  http,
-  PublicClient,
-} from 'viem';
-import { mainnet } from 'viem/chains';
-
-export const publicClient = createPublicClient({
-  chain: mainnet,
-  transport: http(),
-});
+import { erc20Abi, getAddress, PublicClient } from 'viem';
 
 @injectable()
 export class Erc20RepositoryViem implements Erc20Repository {
   constructor(private viemClients: Record<SupportedChainId, PublicClient>) {}
 
-  async get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20> {
+  async get(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<Erc20 | null> {
     const viemClient = this.viemClients[chainId];
+    const tokenAddressHex = getAddress(tokenAddress);
+
+    // If the address has no code, we return null
+    const code = await viemClient.getCode({ address: tokenAddressHex });
+    if (!code) {
+      return null;
+    }
 
     const ercTokenParams = {
-      address: getAddress(tokenAddress),
+      address: tokenAddressHex,
       abi: erc20Abi,
     };
 
     const [nameResult, symbolResult, decimalsResult] =
-      await publicClient.multicall({
+      await viemClient.multicall({
         contracts: [
           {
             ...ercTokenParams,

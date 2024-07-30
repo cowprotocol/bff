@@ -10,5 +10,5 @@ export interface Erc20 {
 }
 
 export interface Erc20Repository {
-  get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20>;
+  get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20 | null>;
 }
