@@ -34,7 +34,7 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const account = request.params.account;
       const notifications = await getNotificationsByAccount({ account });
-      reply.send([]);
+      reply.send(notifications);
     }
   );
 };
