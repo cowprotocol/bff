@@ -17,8 +17,12 @@ const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
 export const cowApiClients = ALL_CHAIN_IDS.reduce<
   Record<SupportedChainId, CowApiClient>
 >((acc, chainId) => {
+  const cowApiUrl =
+    process.env[`COW_API_URL_${chainId}`] ||
+    COW_API_BASE_URL + '/' + COW_API_NETWORK_NAMES[chainId];
+
   acc[chainId] = createClient<paths>({
-    baseUrl: COW_API_BASE_URL + '/' + COW_API_NETWORK_NAMES[chainId],
+    baseUrl: cowApiUrl,
   });
 
   return acc;
