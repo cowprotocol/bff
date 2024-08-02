@@ -4849,6 +4849,11 @@ fast-copy@^3.0.0:
   resolved "https://registry.npmjs.org/fast-copy/-/fast-copy-3.0.1.tgz"
   integrity sha512-Knr7NOtK3HWRYGtHoJrjkaWepqT8thIVGAwt0p0aUs1zqkAzXZV4vo9fFNwyb5fcqK1GKYFYxldQdIDVKhUAfA==
 
+fast-copy@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/fast-copy/-/fast-copy-3.0.2.tgz#59c68f59ccbcac82050ba992e0d5c389097c9d35"
+  integrity sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==
+
 fast-decode-uri-component@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/fast-decode-uri-component/-/fast-decode-uri-component-1.0.1.tgz"
@@ -5497,6 +5502,11 @@ help-me@^4.0.1:
   dependencies:
     glob "^8.0.0"
     readable-stream "^3.6.0"
+
+help-me@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/help-me/-/help-me-5.0.0.tgz#b1ebe63b967b74060027c2ac61f9be12d354a6f6"
+  integrity sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==
 
 highlight.js@^10.7.1:
   version "10.7.3"
@@ -7236,6 +7246,26 @@ pino-abstract-transport@^1.0.0, pino-abstract-transport@v1.0.0:
     readable-stream "^4.0.0"
     split2 "^4.0.0"
 
+pino-pretty@^11.2.2:
+  version "11.2.2"
+  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-11.2.2.tgz#5e8ec69b31e90eb187715af07b1d29a544e60d39"
+  integrity sha512-2FnyGir8nAJAqD3srROdrF1J5BIcMT4nwj7hHSc60El6Uxlym00UbCCd8pYIterstVBFlMyF1yFV8XdGIPbj4A==
+  dependencies:
+    colorette "^2.0.7"
+    dateformat "^4.6.3"
+    fast-copy "^3.0.2"
+    fast-safe-stringify "^2.1.1"
+    help-me "^5.0.0"
+    joycon "^3.1.1"
+    minimist "^1.2.6"
+    on-exit-leak-free "^2.1.0"
+    pino-abstract-transport "^1.0.0"
+    pump "^3.0.0"
+    readable-stream "^4.0.0"
+    secure-json-parse "^2.4.0"
+    sonic-boom "^4.0.1"
+    strip-json-comments "^3.1.1"
+
 pino-pretty@^9.0.0:
   version "9.4.1"
   resolved "https://registry.npmjs.org/pino-pretty/-/pino-pretty-9.4.1.tgz"
@@ -7898,6 +7928,13 @@ sonic-boom@^3.0.0, sonic-boom@^3.1.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/sonic-boom/-/sonic-boom-3.3.0.tgz"
   integrity sha512-LYxp34KlZ1a2Jb8ZQgFCK3niIHzibdwtwNUWKg0qQRzsDoJ3Gfgkf8KdBTFU3SkejDEIlWwnSnpVdOZIhFMl/g==
+  dependencies:
+    atomic-sleep "^1.0.0"
+
+sonic-boom@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/sonic-boom/-/sonic-boom-4.0.1.tgz#515b7cef2c9290cb362c4536388ddeece07aed30"
+  integrity sha512-hTSD/6JMLyT4r9zeof6UtuBDpjJ9sO08/nmS5djaA9eozT9oOlNdpXSnzcgj4FTqpk3nkLrs61l4gip9r1HCrQ==
   dependencies:
     atomic-sleep "^1.0.0"
 
