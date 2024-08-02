@@ -237,6 +237,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orders/{UID}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the status of an order. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    UID: components["schemas"]["UID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The order status with a list of solvers that proposed solutions (if applicable). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompetitionOrderStatus"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/transactions/{txHash}/orders": {
         parameters: {
             query?: never;
@@ -1309,6 +1347,21 @@ export interface components {
             orders?: components["schemas"]["UID"][];
             prices?: components["schemas"]["AuctionPrices"];
         };
+        ExecutedAmounts: {
+            sell: components["schemas"]["BigUint"];
+            buy: components["schemas"]["BigUint"];
+        };
+        CompetitionOrderStatus: {
+            /** @enum {string} */
+            type: "Open" | "Scheduled" | "Active" | "Solved" | "Executing" | "Traded" | "Cancelled";
+            /** @description A list of solvers who participated in the latest competition. The presence of executed amounts defines whether the solver provided a solution for the desired order.
+             *      */
+            value?: {
+                /** @description Name of the solver. */
+                solver: string;
+                executedAmounts?: components["schemas"]["ExecutedAmounts"];
+            }[];
+        };
         /** @description The reference prices for all traded tokens in the auction as a mapping from token
          *     addresses to a price denominated in native token (i.e. 1e18 represents a token that
          *     trades one to one with the native token). These prices are used for solution competition
@@ -1568,6 +1621,16 @@ export interface components {
             /** @description The call data to be used for the interaction. */
             call_data?: components["schemas"]["CallData"][];
         };
+        /** @description A calculated order quote.
+         *      */
+        Quote: {
+            /** @description The amount of the sell token. */
+            sellAmount?: components["schemas"]["TokenAmount"];
+            /** @description The amount of the buy token. */
+            buyAmount?: components["schemas"]["TokenAmount"];
+            /** @description The amount that needs to be paid, denominated in the sell token. */
+            fee?: components["schemas"]["TokenAmount"];
+        };
         /** @description The protocol fee is taken as a percent of the surplus. */
         Surplus: {
             factor: number;
@@ -1581,6 +1644,8 @@ export interface components {
         PriceImprovement: {
             factor: number;
             maxVolumeFactor: number;
+            /** @description The best quote received. */
+            quote: components["schemas"]["Quote"];
         };
         /** @description Defines the ways to calculate the protocol fee. */
         FeePolicy: components["schemas"]["Surplus"] | components["schemas"]["Volume"] | components["schemas"]["PriceImprovement"];
