@@ -1,14 +1,27 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
+import pino from 'pino';
+
+const loggerConfigEnv =
+  process.env.NODE_ENV === 'production'
+    ? {}
+    : {
+        transport: {
+          target: 'pino-pretty',
+        },
+      };
+
+const logger = pino({
+  ...loggerConfigEnv,
+  level: process.env.LOG_LEVEL ?? 'info',
+});
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 // Instantiate Fastify with some config
 export const server = Fastify({
-  logger: {
-    level: process.env.LOG_LEVEL ?? 'info',
-  },
+  logger,
 });
 
 // Register your application as a normal plugin.
