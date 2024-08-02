@@ -5,6 +5,13 @@ import {
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { ETHEREUM_ADDRESS_PATTERN } from '../../../schemas';
+import {
+  CACHE_CONTROL_HEADER,
+  getCacheControlHeaderValue,
+} from 'apps/api/src/utils/cache';
+import ms from 'ms';
+
+const CACHE_SECONDS = ms('5m') / 1000;
 
 const routeSchema = {
   type: 'object',
@@ -32,6 +39,11 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/notifications',
     { schema: { params: routeSchema } },
     async function (request, reply) {
+      reply.header(
+        CACHE_CONTROL_HEADER,
+        getCacheControlHeaderValue(CACHE_SECONDS)
+      );
+
       const account = request.params.account;
       const notifications = await getNotificationsByAccount({ account });
       reply.send(notifications);
