@@ -3,7 +3,7 @@ import fp from 'fastify-plugin';
 
 const schema = {
   type: 'object',
-  required: ['PROXY_ORIGIN', 'PROXY_UPSTREAM', 'COINGECKO_API_KEY'],
+  required: [],
   properties: {
     LOG_LEVEL: {
       type: 'string',

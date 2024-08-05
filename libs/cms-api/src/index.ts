@@ -39,9 +39,13 @@ export interface NotificationModel {
 }
 
 const cmsBaseUrl = process.env.CMS_BASE_URL;
-assert(cmsBaseUrl, 'CMS_BASE_URL is required');
+
 const cmsApiKey = process.env.CMS_API_KEY;
-assert(cmsApiKey, 'CMS_API_KEY is required');
+if (!cmsApiKey) {
+  console.warn(
+    'CMS_API_KEY is not set. Some CMS integrations might not work for lack of permissions.'
+  );
+}
 
 const cmsClient = CmsClient({
   url: cmsBaseUrl,

@@ -17,10 +17,14 @@ const DROP_HEADERS: KeysOf<IncomingHttpHeaders>[] = [
 
 const CACHE_TTL = parseInt(process.env.COINGECKO_CACHING_TIME || '150'); // Defaults to 2.5 minutes (150 seconds)
 
-const coingeckoProxy: FastifyPluginAsync = async (
-  fastify,
-  opts
-): Promise<void> => {
+const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
+  const coingeckoApiKey = fastify.config.COINGECKO_API_KEY;
+
+  if (!coingeckoApiKey) {
+    fastify.log.warn('COINGECKO_API_KEY is not set. Skipping proxy.');
+    return;
+  }
+
   fastify.register(httpProxy, {
     upstream: COINGECKO_PRO_BASE_URL,
     rewritePrefix: '/api/v3/',
