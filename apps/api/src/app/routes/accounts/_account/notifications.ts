@@ -8,7 +8,7 @@ import { ETHEREUM_ADDRESS_PATTERN } from '../../../schemas';
 import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
-} from 'apps/api/src/utils/cache';
+} from '../../../../utils/cache';
 import ms from 'ms';
 
 const CACHE_SECONDS = ms('5m') / 1000;

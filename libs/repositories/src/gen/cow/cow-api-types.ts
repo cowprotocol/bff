@@ -1353,7 +1353,7 @@ export interface components {
         };
         CompetitionOrderStatus: {
             /** @enum {string} */
-            type: "Open" | "Scheduled" | "Active" | "Solved" | "Executing" | "Traded" | "Cancelled";
+            type: "open" | "scheduled" | "active" | "solved" | "executing" | "traded" | "cancelled";
             /** @description A list of solvers who participated in the latest competition. The presence of executed amounts defines whether the solver provided a solution for the desired order.
              *      */
             value?: {
