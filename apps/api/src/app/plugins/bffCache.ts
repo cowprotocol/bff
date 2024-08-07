@@ -35,6 +35,9 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
 
     let key = getKey(request);
 
+    // Remove it so we can cache it properly
+    request.headers['accept-encoding'] = undefined;
+
     const cacheItem = await getCache(key, fastify).catch((e) => {
       fastify.log.error(`Error getting key ${key} from cache`, e);
       return undefined;
