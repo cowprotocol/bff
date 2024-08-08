@@ -14,8 +14,17 @@ import {
 } from 'fastify';
 
 const HEADER_NAME = 'x-bff-cache';
-import { getCacheKey } from '@cowprotocol/repositories';
+import {
+  CacheRepository,
+  cacheRepositorySymbol,
+  getCacheKey,
+} from '@cowprotocol/repositories';
 import { Readable } from 'stream';
+import { apiContainer } from '../inversify.config';
+
+const cacheRepository: CacheRepository = apiContainer.get(
+  cacheRepositorySymbol
+);
 
 interface BffCacheOptions {
   ttl?: number;
@@ -38,16 +47,18 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
     // Remove it so we can cache it properly
     request.headers['accept-encoding'] = undefined;
 
-    const cacheItem = await getCache(key, fastify).catch((e) => {
+    const [item, ttl] = await Promise.all([
+      cacheRepository.get(key),
+      cacheRepository.getTtl(key),
+    ]).catch((e) => {
       fastify.log.error(`Error getting key ${key} from cache`, e);
-      return undefined;
+      return [null, null];
     });
 
-    if (cacheItem) {
-      const { item, ttl } = cacheItem;
-      fastify.log.debug(`Found cached item "${item}" with TTL`, ttl);
+    if (item !== null && ttl !== null) {
+      fastify.log.debug(`Found cached item "${item}" with TTL ${ttl}`);
 
-      const ttlInSeconds = isNaN(ttl) ? undefined : Math.floor(ttl / 1000);
+      const ttlInSeconds = isNaN(ttl) ? undefined : ttl;
 
       if (ttlInSeconds !== undefined) {
         reply.header(
@@ -91,7 +102,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
       if (content !== null) {
         // Cache (fire and forget)
         const key = getKey(req);
-        setCache(key, content, cacheTtl, fastify).catch((e) => {
+        cacheRepository.set(key, content, cacheTtl).catch((e) => {
           fastify.log.error(`Error setting key ${key} to cache`, e);
         });
         reply.header(
