@@ -1,17 +1,10 @@
 import fp from 'fastify-plugin';
 import {
   CACHE_CONTROL_HEADER,
-  getCache,
   getCacheControlHeaderValue,
   parseCacheControlHeaderValue,
-  setCache,
 } from '../../utils/cache';
-import {
-  FastifyInstance,
-  FastifyPluginCallback,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify';
 
 const HEADER_NAME = 'x-bff-cache';
 import {
