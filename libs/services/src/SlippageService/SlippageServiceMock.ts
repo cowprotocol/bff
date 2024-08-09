@@ -7,10 +7,7 @@ const DEFAULT_SLIPPAGE_BPS = 50;
 export class SlippageServiceMock implements SlippageService {
   constructor() {}
 
-  async getSlippageBps(
-    _quoteTokenAddress: string,
-    _baseTokenAddress: string
-  ): Promise<Bps> {
+  async getSlippageBps(): Promise<Bps> {
     return DEFAULT_SLIPPAGE_BPS;
   }
 }
