@@ -12,6 +12,16 @@ export class CacheRepositoryMemory implements CacheRepository {
     return value ?? null;
   }
 
+  async getTtl(key: string): Promise<number | null> {
+    const ttlEpoch = (await CacheRepositoryMemory.cache.getTtl(key)) || null;
+
+    if (ttlEpoch === null) {
+      return null;
+    }
+
+    return Math.floor((ttlEpoch - Date.now()) / 1000);
+  }
+
   async set(key: string, value: string, ttl: number): Promise<void> {
     await CacheRepositoryMemory.cache.set(key, value, ttl);
   }
