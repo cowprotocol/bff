@@ -12,8 +12,10 @@ export interface GetSlippageBpsParams {
   order?: OrderForSlippageCalculation;
 }
 
+export type OrderKind = 'buy' | 'sell';
+
 export interface OrderForSlippageCalculation {
-  orderKind: 'buy' | 'sell';
+  orderKind: OrderKind;
   partiallyFillable: boolean;
   sellAmount: string;
   buyAmount: string;

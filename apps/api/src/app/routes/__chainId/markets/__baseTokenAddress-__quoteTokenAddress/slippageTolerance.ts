@@ -31,6 +31,17 @@ const routeSchema = {
   },
 } as const satisfies JSONSchema;
 
+const queryStringSchema = {
+  type: 'object',
+  properties: {
+    orderKind: { type: 'string', enum: ['buy', 'sell'] },
+    partiallyFillable: { type: 'boolean' },
+    sellAmount: { type: 'string' },
+    buyAmount: { type: 'string' },
+    expirationTimeInSeconds: { type: 'number' },
+  },
+} as const satisfies JSONSchema;
+
 const successSchema = {
   type: 'object',
   required: ['slippageBps'],
@@ -56,7 +67,8 @@ const slippageService: SlippageService = apiContainer.get(
 );
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  // example: http://localhost:3010/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
+  // example (basic): http://localhost:3010/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
+  // example (with optional params): http://localhost:3010/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance?orderKind=sell&partiallyFillable=false&sellAmount=123456&expirationTimeInSeconds=1800
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema;
@@ -65,6 +77,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     {
       schema: {
         params: routeSchema,
+        querystring: queryStringSchema,
         response: {
           '2XX': successSchema,
         },
@@ -72,13 +85,16 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
+
       fastify.log.info(
-        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}`
+        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: %s'`,
+        JSON.stringify(request.query)
       );
-      const slippageBps = await slippageService.getSlippageBps(
+      const slippageBps = await slippageService.getSlippageBps({
+        chainId,
         baseTokenAddress,
-        quoteTokenAddress
-      );
+        quoteTokenAddress,
+      });
       reply.header(
         CACHE_CONTROL_HEADER,
         getCacheControlHeaderValue(CACHE_SECONDS)
