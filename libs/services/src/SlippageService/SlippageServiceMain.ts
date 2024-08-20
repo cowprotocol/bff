@@ -14,7 +14,7 @@ import ms from 'ms';
 
 const MIN_SLIPPAGE_BPS = 50;
 const MAX_SLIPPAGE_BPS = 200;
-const DEFAULT_EXPIRATION_TIME_IN_SECONDS = ms('30min') / 1000;
+const FAIR_TIME_TO_SETTLEMENT = ms('5min');
 
 @injectable()
 export class SlippageServiceMain implements SlippageService {
@@ -30,15 +30,17 @@ export class SlippageServiceMain implements SlippageService {
       params
     );
 
+    // If volatility is unknown, we take the worst case
     if (volatilityOnExpiration === null) {
       return MAX_SLIPPAGE_BPS;
     }
 
+    // Return the slippage based on the volatility
     return this.getSlippageBpsFromVolatility(volatilityOnExpiration);
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
-    const slippageBps = volatility * 10_000;
+    const slippageBps = Math.ceil(volatility * 10_000);
 
     if (slippageBps < MIN_SLIPPAGE_BPS) {
       return MIN_SLIPPAGE_BPS;
@@ -59,8 +61,8 @@ export class SlippageServiceMain implements SlippageService {
   }: GetSlippageBpsParams) {
     // Get the 5min standard deviation for the quote token (~288 points, 5min apart)
     const [volatilityQuote, volatilityBase] = await Promise.all([
-      this.getVolatilityOnExpiration(chainId, quoteTokenAddress, order),
-      this.getVolatilityOnExpiration(chainId, baseTokenAddress, order),
+      this.getVolatilityOnSettlement(chainId, quoteTokenAddress, order),
+      this.getVolatilityOnSettlement(chainId, baseTokenAddress, order),
     ]);
 
     if (volatilityQuote === null || volatilityBase === null) {
@@ -71,15 +73,14 @@ export class SlippageServiceMain implements SlippageService {
   }
 
   /**
-   * Get the volatility for the next 30min
-   *
-   *
+   * Get the volatility of the asset in some time (enough for a solver to execute a solvable order)
    *
    * @param chainId
    * @param tokenAddress
-   * @returns
+   *
+   * @returns volatility in decimal format
    */
-  private async getVolatilityOnExpiration(
+  private async getVolatilityOnSettlement(
     chainId: SupportedChainId,
     tokenAddress: string,
     order?: OrderForSlippageCalculation
@@ -124,13 +125,22 @@ export class SlippageServiceMain implements SlippageService {
     // Calculate the standard deviation
     const standardDeviation = Math.sqrt(variance);
 
-    // Predict the 30min standard deviation for the quote token
-    const expirationTimeInSeconds =
-      order?.expirationTimeInSeconds || DEFAULT_EXPIRATION_TIME_IN_SECONDS;
-    const dataPointsIn30min = expirationTimeInSeconds / 300; // 300 = 5min, which is the interval of the data points
-    const volatility30min = standardDeviation * Math.sqrt(dataPointsIn30min);
+    // Average time between each data point
+    const averageTimeBetweenDataPoints =
+      (prices[prices.length - 1].date.getTime() - prices[0].date.getTime()) /
+      (prices.length - 1);
 
-    // Return the normalized volatility (in token, denominated in the token, not in USD)
-    return volatility30min / usdPrice;
+    // Points in Time for Settlement
+    const pointsForFairSettlement =
+      FAIR_TIME_TO_SETTLEMENT / averageTimeBetweenDataPoints;
+
+    // Predict variance between now and a fair settlement
+    const volatilityForFairSettlement =
+      standardDeviation * Math.sqrt(pointsForFairSettlement);
+
+    // Return the normalized volatility (denominated in the token, not in USD)
+    const normalizedVolatility = volatilityForFairSettlement / usdPrice;
+
+    return normalizedVolatility;
   }
 }
