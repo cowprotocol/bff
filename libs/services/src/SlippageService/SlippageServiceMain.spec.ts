@@ -142,7 +142,7 @@ describe('SlippageServiceMain', () => {
     });
 
     it(`if the prices change a lot`, async () => {
-      // GIVEN: The prices don't change at all
+      // GIVEN: The prices have high volatility
       getUsdPrices.mockResolvedValue(POINTS_WITH_HIGH_VOLATILITY);
 
       // WHEN: Get slippage
