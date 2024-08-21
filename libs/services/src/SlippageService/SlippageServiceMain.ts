@@ -2,6 +2,7 @@ import {
   UsdRepository,
   usdRepositorySymbol,
   SupportedChainId,
+  PricePoint,
 } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 import {
@@ -9,6 +10,7 @@ import {
   GetSlippageBpsParams,
   OrderForSlippageCalculation,
   SlippageService,
+  VolatilityDetails,
 } from './SlippageService';
 import ms from 'ms';
 
@@ -24,9 +26,7 @@ export class SlippageServiceMain implements SlippageService {
   ) {}
 
   async getSlippageBps(params: GetSlippageBpsParams): Promise<Bps> {
-    // TODO: Implement slippage calculation for small orders
-
-    const volatilityOnExpiration = await this.getMaxVolatilityOnExpiration(
+    const volatilityOnExpiration = await this.getMaxVolatilityOnSettlement(
       params
     );
 
@@ -53,25 +53,6 @@ export class SlippageServiceMain implements SlippageService {
     return slippageBps;
   }
 
-  private async getMaxVolatilityOnExpiration({
-    order,
-    chainId,
-    baseTokenAddress,
-    quoteTokenAddress,
-  }: GetSlippageBpsParams) {
-    // Get the 5min standard deviation for the quote token (~288 points, 5min apart)
-    const [volatilityQuote, volatilityBase] = await Promise.all([
-      this.getVolatilityOnSettlement(chainId, quoteTokenAddress, order),
-      this.getVolatilityOnSettlement(chainId, baseTokenAddress, order),
-    ]);
-
-    if (volatilityQuote === null || volatilityBase === null) {
-      return null;
-    }
-
-    return Math.max(volatilityQuote, volatilityBase);
-  }
-
   /**
    * Get the volatility of the asset in some time (enough for a solver to execute a solvable order)
    *
@@ -80,11 +61,11 @@ export class SlippageServiceMain implements SlippageService {
    *
    * @returns volatility in decimal format
    */
-  private async getVolatilityOnSettlement(
+  async getVolatilityDetails(
     chainId: SupportedChainId,
     tokenAddress: string,
     order?: OrderForSlippageCalculation
-  ): Promise<number | null> {
+  ): Promise<VolatilityDetails | null> {
     const prices = await this.usdRepository.getUsdPrices(
       chainId,
       tokenAddress,
@@ -141,6 +122,33 @@ export class SlippageServiceMain implements SlippageService {
     // Return the normalized volatility (denominated in the token, not in USD)
     const normalizedVolatility = volatilityForFairSettlement / usdPrice;
 
-    return normalizedVolatility;
+    return {
+      prices,
+      usdPrice,
+      volatilityInUsd: volatilityForFairSettlement,
+      volatilityInTokens: normalizedVolatility,
+    };
+  }
+
+  private async getMaxVolatilityOnSettlement({
+    order,
+    chainId,
+    baseTokenAddress,
+    quoteTokenAddress,
+  }: GetSlippageBpsParams) {
+    // Get the 5min standard deviation for the quote token (~288 points, 5min apart)
+    const [volatilityQuote, volatilityBase] = await Promise.all([
+      this.getVolatilityDetails(chainId, quoteTokenAddress, order),
+      this.getVolatilityDetails(chainId, baseTokenAddress, order),
+    ]);
+
+    if (volatilityQuote === null || volatilityBase === null) {
+      return null;
+    }
+
+    return Math.max(
+      volatilityQuote.volatilityInTokens,
+      volatilityBase.volatilityInTokens
+    );
   }
 }

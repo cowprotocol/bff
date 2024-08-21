@@ -1,4 +1,8 @@
-import { SlippageService, slippageServiceSymbol } from '@cowprotocol/services';
+import {
+  SlippageService,
+  slippageServiceSymbol,
+  VolatilityDetails,
+} from '@cowprotocol/services';
 import { ChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../../schemas';
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
@@ -39,6 +43,7 @@ const queryStringSchema = {
     sellAmount: { type: 'string' },
     buyAmount: { type: 'string' },
     expirationTimeInSeconds: { type: 'number' },
+    feeAmount: { type: 'string' },
   },
 } as const satisfies JSONSchema;
 
@@ -77,10 +82,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     {
       schema: {
         params: routeSchema,
-        querystring: queryStringSchema,
-        response: {
-          '2XX': successSchema,
-        },
       },
     },
     async function (request, reply) {
@@ -100,6 +101,51 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         getCacheControlHeaderValue(CACHE_SECONDS)
       );
       reply.send({ slippageBps });
+    }
+  );
+
+  fastify.get<{
+    Params: RouteSchema;
+    Reply: {
+      baseToken: VolatilityDetails | null;
+      quoteToken: VolatilityDetails | null;
+    };
+  }>(
+    '/volatilityDetails',
+    {
+      schema: {
+        params: routeSchema,
+        querystring: queryStringSchema,
+        response: {
+          '2XX': successSchema,
+        },
+      },
+    },
+    async function (request, reply) {
+      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
+
+      fastify.log.info(
+        `Get volatility details for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: %s'`,
+        JSON.stringify(request.query)
+      );
+      const volatilityDetailsBase = await slippageService.getVolatilityDetails(
+        chainId,
+        baseTokenAddress
+      );
+
+      const volatilityDetailsQuote = await slippageService.getVolatilityDetails(
+        chainId,
+        quoteTokenAddress
+      );
+
+      reply.header(
+        CACHE_CONTROL_HEADER,
+        getCacheControlHeaderValue(CACHE_SECONDS)
+      );
+      reply.send({
+        baseToken: volatilityDetailsBase,
+        quoteToken: volatilityDetailsQuote,
+      });
     }
   );
 };

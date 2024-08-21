@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/repositories';
+import { PricePoint, SupportedChainId } from '@cowprotocol/repositories';
 
 /**
  * BPS (Basis Points)
@@ -22,8 +22,19 @@ export interface OrderForSlippageCalculation {
   expirationTimeInSeconds: number;
 }
 
+export interface VolatilityDetails {
+  usdPrice: number;
+  prices: PricePoint[] | null;
+  volatilityInUsd: number;
+  volatilityInTokens: number;
+}
+
 export interface SlippageService {
   getSlippageBps(params: GetSlippageBpsParams): Promise<Bps>;
+  getVolatilityDetails(
+    chainId: SupportedChainId,
+    tokenAddress: string
+  ): Promise<VolatilityDetails | null>;
 }
 
 export const slippageServiceSymbol = Symbol.for('SlippageService');
