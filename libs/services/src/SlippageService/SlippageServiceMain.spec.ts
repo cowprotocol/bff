@@ -17,7 +17,7 @@ const getUsdPrice = jest.fn();
 const getUsdPrices = jest.fn();
 
 const POINTS_VOLATILITY_ZERO = getPoints([100, 100, 100, 100]);
-const POINTS_WITH_HIGH_VOLATILITY = getPoints([100, 105, 110, 120]); // 10% each 5min
+const POINTS_WITH_HIGH_VOLATILITY = getPoints([100, 110, 120, 130]); // 10% each 5min
 const POINTS_WITH_LOW_VOLATILITY = getPoints([
   100.0001, 100.0002, 100.0003, 100.0004,
 ]); // 0.0001% each 5min
