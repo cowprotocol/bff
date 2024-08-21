@@ -90,18 +90,18 @@ export class SlippageServiceMain implements SlippageService {
     const averagePrice =
       prices.reduce((acc, price) => acc + price.price, 0) / prices.length;
 
-    // Calculate price differences between each price point and the average
-    const priceDifferences = prices.map((price) => price.price - averagePrice);
-
-    // Square the differences
-    const squaredDifferences = priceDifferences.map(
-      (difference) => difference ** 2
-    );
-
     // Calculate the variance
     const variance =
-      squaredDifferences.reduce((acc, difference) => acc + difference, 0) /
-      prices.length;
+      prices.reduce((acc, price) => {
+        // Calculate price differences between the price point and the average
+        const difference = price.price - averagePrice;
+
+        // Square the difference
+        const squaredDifference = difference ** 2;
+
+        // Sum squared differences
+        return acc + squaredDifference;
+      }, 0) / prices.length;
 
     // Calculate the standard deviation
     const standardDeviation = Math.sqrt(variance);
