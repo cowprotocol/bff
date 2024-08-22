@@ -180,7 +180,7 @@ describe('SlippageServiceMain', () => {
       //    Volatility Fair Settlement (Token) = 0.02236067977 / 1 = 0.02236067977
       //    Slippage BPS = ceil(0.02236067977 * 10000) = 224
       //    Adjusted Slippage = MAX = 200
-      expect(result).toBe(200);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
   });
 
@@ -423,7 +423,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the minimum slippage
-      expect(result).toBe(200);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
 
       // WHEN: Get slippage (inverting the tokens)
       const resultInverted = await slippageService.getSlippageBps({
@@ -433,7 +433,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: The result should be the same (worst of the two)
-      expect(resultInverted).toBe(200);
+      expect(resultInverted).toBe(MAX_SLIPPAGE_BPS);
     });
   });
 });
