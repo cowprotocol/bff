@@ -81,6 +81,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/slippageTolerance',
     {
       schema: {
+        description: 'Retrieve a default slippage tolerance for a given market',
+        tags: ['markets'],
         params: routeSchema,
         response: {
           '2XX': successSchema,
@@ -117,6 +119,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/volatilityDetails',
     {
       schema: {
+        hide: true,
         params: routeSchema,
         querystring: queryStringSchema,
       },
