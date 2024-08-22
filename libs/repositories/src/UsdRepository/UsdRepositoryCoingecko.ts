@@ -5,7 +5,7 @@ import {
   SimplePriceResponse,
   coingeckoProClient,
 } from '../datasources/coingecko';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 
 /**

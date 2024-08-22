@@ -1,4 +1,4 @@
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 
 export const usdRepositorySymbol = Symbol.for('UsdRepository');
 

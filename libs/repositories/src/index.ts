@@ -1,4 +1,4 @@
-export * from './types';
+export * from '../../shared/src/types';
 
 // Utils
 export * from './utils/cache';

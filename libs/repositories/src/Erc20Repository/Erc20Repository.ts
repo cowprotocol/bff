@@ -1,4 +1,4 @@
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 
 export const erc20RepositorySymbol = Symbol.for('Erc20Repository');
 

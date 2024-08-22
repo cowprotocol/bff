@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { Erc20, Erc20Repository } from './Erc20Repository';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { erc20Abi, getAddress, PublicClient } from 'viem';
 
 @injectable()

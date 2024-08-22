@@ -1,4 +1,5 @@
 import { PricePoint, SupportedChainId } from '@cowprotocol/repositories';
+import { Address } from 'viem';
 
 /**
  * BPS (Basis Points)
@@ -23,6 +24,7 @@ export interface OrderForSlippageCalculation {
 }
 
 export interface VolatilityDetails {
+  tokenAddress: string;
   usdPrice: number;
   prices: PricePoint[] | null;
   volatilityInUsd: number;

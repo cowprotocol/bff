@@ -2,7 +2,7 @@ import { UsdRepositoryCache } from './UsdRepositoryCache';
 import IORedis from 'ioredis';
 import { UsdRepository } from './UsdRepository';
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH } from '../../test/mock';
 import type { PricePoint } from './UsdRepository';
 

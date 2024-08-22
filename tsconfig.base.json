@@ -25,7 +25,8 @@
       "@cowprotocol/cms-api": ["libs/cms-api/src/index.ts"],
       "@cowprotocol/notifications": ["libs/notifications/src/index.ts"],
       "@cowprotocol/repositories": ["libs/repositories/src/index.ts"],
-      "@cowprotocol/services": ["libs/services/src/index.ts"]
+      "@cowprotocol/services": ["libs/services/src/index.ts"],
+      "@cowprotocol/shared": ["libs/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { UsdRepositoryNoop } from './UsdRepository';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';

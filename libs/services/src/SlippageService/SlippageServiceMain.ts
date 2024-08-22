@@ -12,6 +12,7 @@ import {
   VolatilityDetails,
 } from './SlippageService';
 import ms from 'ms';
+import { toTokenAddress } from '@cowprotocol/shared';
 
 export const MIN_SLIPPAGE_BPS = 50;
 export const MAX_SLIPPAGE_BPS = 200;
@@ -56,15 +57,16 @@ export class SlippageServiceMain implements SlippageService {
    * Get the volatility of the asset in some time (enough for a solver to execute a solvable order)
    *
    * @param chainId
-   * @param tokenAddress
+   * @param tokenAddressString
    *
    * @returns volatility in decimal format
    */
   async getVolatilityDetails(
     chainId: SupportedChainId,
-    tokenAddress: string,
+    tokenAddressString: string,
     order?: OrderForSlippageCalculation
   ): Promise<VolatilityDetails | null> {
+    const tokenAddress = toTokenAddress(tokenAddressString, chainId);
     const prices = await this.usdRepository.getUsdPrices(
       chainId,
       tokenAddress,
@@ -122,6 +124,7 @@ export class SlippageServiceMain implements SlippageService {
     const normalizedVolatility = volatilityForFairSettlement / usdPrice;
 
     return {
+      tokenAddress,
       prices,
       usdPrice,
       volatilityInUsd: volatilityForFairSettlement,

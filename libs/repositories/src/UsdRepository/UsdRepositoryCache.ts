@@ -6,7 +6,7 @@ import {
   deserializePricePoints,
   serializePricePoints,
 } from './UsdRepository';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import ms from 'ms';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { getCacheKey, PartialCacheKey } from '../utils/cache';

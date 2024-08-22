@@ -7,7 +7,7 @@ import {
   webSocket,
 } from 'viem';
 import { arbitrum, gnosis, mainnet, sepolia } from 'viem/chains';
-import { ALL_CHAIN_IDS, SupportedChainId } from '../types';
+import { ALL_CHAIN_IDS, SupportedChainId } from '@cowprotocol/shared';
 
 const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.MAINNET]: mainnet,

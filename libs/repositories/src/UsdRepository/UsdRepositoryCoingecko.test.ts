@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH, DEFINITELY_NOT_A_TOKEN } from '../../test/mock';
 import ms from 'ms';
 

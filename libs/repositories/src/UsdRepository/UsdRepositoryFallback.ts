@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
