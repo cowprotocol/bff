@@ -1,5 +1,9 @@
 import { Address, getAddress } from 'viem';
-import { NativeCurrencyAddress, WrappedNativeTokenAddress } from './const';
+import {
+  AllChainIds,
+  NativeCurrencyAddress,
+  WrappedNativeTokenAddress,
+} from './const';
 import { SupportedChainId } from './types';
 
 /**
@@ -16,4 +20,24 @@ export function toTokenAddress(
   }
 
   return getAddress(address.toLowerCase());
+}
+
+export function isSupportedChain(chain: number): chain is SupportedChainId {
+  return AllChainIds.includes(chain as SupportedChainId);
+}
+
+export function toSupportedChainId(chain: string | number): SupportedChainId {
+  if (typeof chain === 'string') {
+    chain = parseInt(chain);
+  }
+
+  if (!isSupportedChain(chain)) {
+    throw new Error(
+      `Unsupported chain ID: ${chain}. Supported chains are: ${AllChainIds.join(
+        ', '
+      )}`
+    );
+  }
+
+  return chain;
 }

@@ -3,7 +3,7 @@ import createClient from 'openapi-fetch';
 const COW_API_BASE_URL = process.env.COW_API_BASE_URL || 'https://api.cow.fi';
 
 import type { paths } from '../gen/cow/cow-api-types';
-import { ALL_CHAIN_IDS, SupportedChainId } from '@cowprotocol/shared';
+import { AllChainIds, SupportedChainId } from '@cowprotocol/shared';
 
 export type CowApiClient = ReturnType<typeof createClient<paths>>;
 
@@ -14,7 +14,7 @@ const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
 
-export const cowApiClients = ALL_CHAIN_IDS.reduce<
+export const cowApiClients = AllChainIds.reduce<
   Record<SupportedChainId, CowApiClient>
 >((acc, chainId) => {
   const cowApiUrl =
