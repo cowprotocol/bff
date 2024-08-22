@@ -174,6 +174,7 @@ describe('SlippageServiceMain', () => {
       //    AVG = (100 + 100.02 + 100.04 + 100.06)/4 = 100.03
       //    VARIANCE = ((100 - 100.03)**2 + (100.02 - 100.03)**2 + (100.04 - 100.03)**2 + (100.06 - 100.03)**2) / 4 = 0.0005
       //    STDDEV = sqrt(0.0005) = 0.02236067977
+      //    Number of points for Fair Settlement = 5min / 5min = 1
       //    Volatility Fair Settlement (USD) = 0.02236067977 * sqrt(1) = 0.02236067977
       //    Volatility Fair Settlement (Token) = 0.02236067977 / 1 = 0.02236067977
       //    Slippage BPS = ceil(0.02236067977 * 10000) = 224
@@ -233,6 +234,7 @@ describe('SlippageServiceMain', () => {
       //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
       //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
       //    STDDEV = sqrt(0.000125) = 0.01118033989
+      //    Number of points for Fair Settlement = 5min / 5min = 1
       //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1) = 0.01118033989
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 1 = 0.01118033989
       //    Slippage BPS = ceil(0.01118033989 * 10000) = 112
@@ -258,6 +260,7 @@ describe('SlippageServiceMain', () => {
       //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
       //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
       //    STDDEV = sqrt(0.000125) = 0.01118033989
+      //    Number of points for Fair Settlement = 5min / 5min = 1
       //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1) = 0.01118033989
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 1.1 = 0.01016394535
       //    Slippage BPS = ceil(0.01016394535 * 10000) = 102
@@ -283,6 +286,7 @@ describe('SlippageServiceMain', () => {
       //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
       //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
       //    STDDEV = sqrt(0.000125) = 0.01118033989
+      //    Number of points for Fair Settlement = 5min / 5min = 1
       //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1) = 0.01118033989
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 0.9 = 0.01242259988
       //    Slippage BPS = ceil(0.01242259988 * 10000) = 125
@@ -373,6 +377,7 @@ describe('SlippageServiceMain', () => {
       //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
       //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
       //    STDDEV = sqrt(0.000125) = 0.01118033989
+      //    Number of points for Fair Settlement = 5min / 5min = 1
       //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1) = 0.01118033989
 
       //    Volatility Fair Settlement for quote (Token) = 0.01118033989 / 1 = 0.01118033989
