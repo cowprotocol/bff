@@ -82,6 +82,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     {
       schema: {
         params: routeSchema,
+        response: {
+          '2XX': successSchema,
+        },
       },
     },
     async function (request, reply) {
@@ -116,9 +119,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       schema: {
         params: routeSchema,
         querystring: queryStringSchema,
-        response: {
-          '2XX': successSchema,
-        },
       },
     },
     async function (request, reply) {
