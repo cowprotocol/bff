@@ -1,13 +1,14 @@
-import { SlippageServiceMain } from './SlippageServiceMain';
+import {
+  MAX_SLIPPAGE_BPS,
+  MIN_SLIPPAGE_BPS,
+  SlippageServiceMain,
+} from './SlippageServiceMain';
 import {
   PricePoint,
   SupportedChainId,
   UsdRepository,
 } from '@cowprotocol/repositories';
 import ms from 'ms';
-
-const MIN_SLIPPAGE = 50;
-const MAX_SLIPPAGE = 200;
 
 const FIVE_MIN = ms('5min');
 const FOUR_MIN = ms('4min');
@@ -55,7 +56,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the max slippage
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
 
     it('no price points are available', async () => {
@@ -70,7 +71,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the max slippage
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
 
     it(`one of the tokens is volatile`, async () => {
@@ -94,7 +95,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the maximum slippage
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
 
       // WHEN: Get slippage (with the tokens inverted)
       result = await slippageService.getSlippageBps({
@@ -104,7 +105,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the maximum slippage too
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
 
     it(`one of the tokens has no prices available`, async () => {
@@ -128,7 +129,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the maximum slippage
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
 
       // WHEN: Get slippage (with the tokens inverted)
       result = await slippageService.getSlippageBps({
@@ -138,7 +139,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the maximum slippage too
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
 
     it(`if the prices change a lot`, async () => {
@@ -153,7 +154,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the maximum slippage
-      expect(result).toBe(MAX_SLIPPAGE);
+      expect(result).toBe(MAX_SLIPPAGE_BPS);
     });
 
     it(`if the asset is volatile`, async () => {
@@ -196,7 +197,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the minimum slippage
-      expect(result).toBe(MIN_SLIPPAGE);
+      expect(result).toBe(MIN_SLIPPAGE_BPS);
     });
 
     it(`if the prices change very little`, async () => {
@@ -211,7 +212,7 @@ describe('SlippageServiceMain', () => {
       });
 
       // THEN: We get the minimum slippage
-      expect(result).toBe(MIN_SLIPPAGE);
+      expect(result).toBe(MIN_SLIPPAGE_BPS);
     });
   });
 

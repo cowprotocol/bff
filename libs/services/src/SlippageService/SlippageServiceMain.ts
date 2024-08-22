@@ -2,7 +2,6 @@ import {
   UsdRepository,
   usdRepositorySymbol,
   SupportedChainId,
-  PricePoint,
 } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 import {
@@ -14,8 +13,8 @@ import {
 } from './SlippageService';
 import ms from 'ms';
 
-const MIN_SLIPPAGE_BPS = 50;
-const MAX_SLIPPAGE_BPS = 200;
+export const MIN_SLIPPAGE_BPS = 50;
+export const MAX_SLIPPAGE_BPS = 200;
 const FAIR_TIME_TO_SETTLEMENT = ms('5min');
 
 @injectable()
