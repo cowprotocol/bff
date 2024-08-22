@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const BASE_URL = 'http://localhost:3010/chains';
+const BASE_URL = 'http://localhost:3010';
 
 const NetworkToChainId = {
   Mainnet: 1,

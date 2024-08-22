@@ -69,6 +69,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/usdPrice',
     {
       schema: {
+        description: 'Get USD price for a given token',
+        tags: ['tokens'],
         params: paramsSchema,
         response: {
           '2XX': successSchema,
