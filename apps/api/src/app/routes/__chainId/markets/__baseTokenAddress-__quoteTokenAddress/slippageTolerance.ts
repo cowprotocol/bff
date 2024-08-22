@@ -4,7 +4,7 @@ import {
   VolatilityDetails,
 } from '@cowprotocol/services';
 import { ChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../../schemas';
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
 import {
