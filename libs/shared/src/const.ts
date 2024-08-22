@@ -17,7 +17,7 @@ export const WrappedNativeTokenAddress: Record<SupportedChainId, Address> = {
   [SupportedChainId.SEPOLIA]: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
 };
 
-export const ChainLabels: Record<SupportedChainId, string> = {
+export const ChainNames: Record<SupportedChainId, string> = {
   [SupportedChainId.MAINNET]: 'Mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'Gnosis Chain',
   [SupportedChainId.ARBITRUM_ONE]: 'Arbitrum',
