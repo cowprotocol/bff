@@ -1,5 +1,5 @@
 import { Erc20RepositoryViem } from './Erc20RepositoryViem';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { PublicClient } from 'viem';
 import { erc20Abi } from 'viem';
 import { Erc20 } from './Erc20Repository';

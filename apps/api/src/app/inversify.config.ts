@@ -26,7 +26,7 @@ const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 import { Container } from 'inversify';
 import {
   SlippageService,
-  SlippageServiceMock,
+  SlippageServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
@@ -107,7 +107,7 @@ function getApiContainer(): Container {
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
-    .to(SlippageServiceMock);
+    .to(SlippageServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
 

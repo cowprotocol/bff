@@ -1,4 +1,4 @@
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
 import {

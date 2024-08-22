@@ -7,7 +7,7 @@ import {
   webSocket,
 } from 'viem';
 import { arbitrum, gnosis, mainnet, sepolia } from 'viem/chains';
-import { ALL_CHAIN_IDS, SupportedChainId } from '../types';
+import { AllChainIds, SupportedChainId } from '@cowprotocol/shared';
 
 const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.MAINNET]: mainnet,
@@ -16,7 +16,7 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.SEPOLIA]: sepolia,
 };
 
-export const viemClients = ALL_CHAIN_IDS.reduce<
+export const viemClients = AllChainIds.reduce<
   Record<SupportedChainId, PublicClient>
 >((acc, chainId) => {
   const chain = NETWORKS[chainId];

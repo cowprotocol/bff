@@ -1,9 +1,9 @@
-import { ALL_CHAIN_IDS } from '@cowprotocol/repositories';
+import { AllChainIds } from '@cowprotocol/shared';
 
 export const ChainIdSchema = {
   title: 'Chain ID',
   description: 'Chain ID',
-  enum: ALL_CHAIN_IDS,
+  enum: AllChainIds,
   type: 'integer',
 } as const;
 

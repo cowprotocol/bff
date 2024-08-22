@@ -2,7 +2,7 @@ import { UsdRepositoryCache } from './UsdRepositoryCache';
 import IORedis from 'ioredis';
 import { UsdRepository } from './UsdRepository';
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH } from '../../test/mock';
 import type { PricePoint } from './UsdRepository';
 
@@ -175,19 +175,6 @@ describe('UsdRepositoryCache', () => {
       };
       pricePoints100String = JSON.stringify([pricePoint100]);
       pricePoints200String = JSON.stringify([pricePoint200]);
-    });
-
-    it('should return prices from cache', async () => {
-      // GIVEN: cached prices
-      redisMock.get.mockResolvedValue(pricePoints100String);
-      proxyMock.getUsdPrices.mockResolvedValue([pricePoint200]);
-
-      // WHEN: Get USD prices
-      const prices = await usdRepositoryCache.getUsdPrices(chainId, WETH, '5m');
-
-      // THEN: We get the cached value
-      expect(prices).toEqual([pricePoint100]);
-      expect(proxyMock.getUsdPrices).not.toHaveBeenCalled();
     });
 
     it('should return prices from cache', async () => {

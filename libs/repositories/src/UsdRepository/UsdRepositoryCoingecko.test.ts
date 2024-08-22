@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH, DEFINITELY_NOT_A_TOKEN } from '../../test/mock';
 import ms from 'ms';
 
@@ -111,7 +111,7 @@ describe('UsdRepositoryCoingecko', () => {
       }
     });
 
-    it('[daily] should return ~90 prices of WETH (~60min apart)', async () => {
+    it('[daily] should return ~90 prices of WETH (~24h apart)', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
         SupportedChainId.MAINNET,
         WETH,

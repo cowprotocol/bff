@@ -19,7 +19,8 @@
     "compose:up": "yarn docker-build:affected && docker-compose up",
     "swagger": "ts-node scripts/fetchCoingeckoSwagger",
     "gen:types": "npx openapi-typescript",
-    "postinstall": "yarn gen:types"
+    "postinstall": "yarn gen:types",
+    "test:api:slippage": "node apps/api/scripts/test-slippage.js"
   },
   "private": true,
   "dependencies": {
