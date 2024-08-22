@@ -291,7 +291,7 @@ describe('SlippageServiceMain', () => {
       //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1) = 0.01118033989
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 0.9 = 0.01242259988
       //    Slippage BPS = ceil(0.01242259988 * 10000) = 125
-      //    Adjusted Slippage = 102
+      //    Adjusted Slippage = 125
       expect(result).toBe(125);
     });
 
