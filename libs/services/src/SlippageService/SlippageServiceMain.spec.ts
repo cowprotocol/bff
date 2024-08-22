@@ -23,7 +23,10 @@ const POINTS_WITH_LOW_VOLATILITY = getPoints([
   100.0001, 100.0002, 100.0003, 100.0004,
 ]); // 0.0001% each 5min
 
-describe('SlippageServiceMain', () => {
+/**
+ * Test specification for the SlippageService main implementation
+ */
+describe('SlippageServiceMain Specification', () => {
   let slippageService: SlippageServiceMain;
   let usdRepositoryMock: UsdRepository;
 
