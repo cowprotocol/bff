@@ -25,6 +25,12 @@ interface AboutResponse {
 const about: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{ Reply: AboutResponse }>(
     '/about',
+    {
+      schema: {
+        description: 'About the BFF API',
+        tags: ['misc'],
+      },
+    },
     async function (_request, reply) {
       reply.header(
         CACHE_CONTROL_HEADER,

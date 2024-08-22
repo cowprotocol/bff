@@ -37,7 +37,13 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: NotificationModel[];
   }>(
     '/notifications',
-    { schema: { params: routeSchema } },
+    {
+      schema: {
+        description: 'Get notifications for an account',
+        tags: ['accounts'],
+        params: routeSchema,
+      },
+    },
     async function (request, reply) {
       reply.header(
         CACHE_CONTROL_HEADER,
