@@ -5,6 +5,9 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  TokenHolderRepository,
+  TokenHolderRepositoryCache,
+  TokenHolderRepositoryGoldRush,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -14,6 +17,7 @@ import {
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -27,9 +31,12 @@ import { Container } from 'inversify';
 import {
   SlippageService,
   SlippageServiceMain,
+  TokenHolderService,
+  TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
+  tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
@@ -86,6 +93,17 @@ function getUsdRepository(
   ]);
 }
 
+function getTokenHolderRepositoryGoldRush(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryGoldRush(),
+    cacheRepository,
+    'tokenHolderGoldRush',
+    CACHE_TOKEN_INFO_SECONDS
+  );
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
   // Repositories
@@ -104,10 +122,17 @@ function getApiContainer(): Container {
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
+  apiContainer
+    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
+    .toConstantValue(getTokenHolderRepositoryGoldRush(cacheRepository));
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
+  apiContainer
+    .bind<TokenHolderService>(tokenHolderServiceSymbol)
+    .to(TokenHolderServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
 

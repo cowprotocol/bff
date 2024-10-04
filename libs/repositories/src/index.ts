@@ -27,3 +27,8 @@ export * from './UsdRepository/UsdRepositoryCoingecko';
 export * from './UsdRepository/UsdRepositoryCow';
 export * from './UsdRepository/UsdRepositoryFallback';
 export * from './UsdRepository/UsdRepositoryCache';
+
+// Token holder repositories
+export * from './TokenHolderRepository/TokenHolderRepository';
+export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
+export * from './TokenHolderRepository/TokenHolderRepositoryCache';

@@ -1,19 +1,11 @@
-import { UsdService, usdServiceSymbol } from '@cowprotocol/services';
 import {
-  AddressSchema,
-  ChainIdSchema,
-  ETHEREUM_ADDRESS_PATTERN,
-} from '../../../../schemas';
+  TokenHolderService,
+  tokenHolderServiceSymbol,
+} from '@cowprotocol/services';
+import { AddressSchema, ChainIdSchema } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
-
-// TODO:  Add this in a follow up PR
-// import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
-
-interface Result {
-  price: number;
-}
 
 const paramsSchema = {
   type: 'object',
@@ -26,15 +18,22 @@ const paramsSchema = {
 } as const satisfies JSONSchema;
 
 const successSchema = {
-  type: 'object',
-  required: ['price'],
-  additionalProperties: false,
-  properties: {
-    price: {
-      title: 'Price',
-      description: 'Current price of the token in USD.',
-      type: 'number',
-      examples: [3561.1267842],
+  type: 'array',
+  items: {
+    type: 'object',
+    required: ['address', 'balance'],
+    additionalProperties: false,
+    properties: {
+      address: {
+        title: 'Address',
+        description: 'Address of the token holder.',
+        type: 'string',
+      },
+      balance: {
+        title: 'Balance',
+        description: 'Balance of the token holder.',
+        type: 'string',
+      },
     },
   },
 } as const satisfies JSONSchema;
@@ -48,7 +47,6 @@ const errorSchema = {
       title: 'Message',
       description: 'Message describing the error.',
       type: 'string',
-      examples: ['Price not found'],
     },
   },
 } as const satisfies JSONSchema;
@@ -57,15 +55,17 @@ type RouteSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof successSchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
-const usdService: UsdService = apiContainer.get(usdServiceSymbol);
+const tokenHolderService: TokenHolderService = apiContainer.get(
+  tokenHolderServiceSymbol
+);
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/usdPrice
+  // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/topHolders
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
   }>(
-    '/usdPrice',
+    '/topHolders',
     {
       schema: {
         params: paramsSchema,
@@ -78,16 +78,19 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, tokenAddress } = request.params;
 
-      const price = await usdService.getUsdPrice(chainId, tokenAddress);
-      fastify.log.info(
-        `Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`
+      const tokenHolders = await tokenHolderService.getTopTokenHolders(
+        chainId,
+        tokenAddress
       );
-      if (price === null) {
-        reply.code(404).send({ message: 'Price not found' });
+      fastify.log.info(
+        `Get token holders for ${tokenAddress} on chain ${chainId}: ${tokenHolders?.length} holder found`
+      );
+      if (tokenHolders === null) {
+        reply.code(404).send({ message: 'Token holders not found' });
         return;
       }
 
-      reply.send({ price });
+      reply.send(tokenHolders);
     }
   );
 };

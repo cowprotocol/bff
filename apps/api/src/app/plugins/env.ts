@@ -23,6 +23,9 @@ const schema = {
     COINGECKO_API_KEY: {
       type: 'string',
     },
+    GOLD_RUSH_API_KEY: {
+      type: 'string',
+    },
   },
 };
 
