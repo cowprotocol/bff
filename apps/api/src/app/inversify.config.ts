@@ -5,6 +5,10 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  TenderlyRepository,
+  TokenHolderRepository,
+  TokenHolderRepositoryCache,
+  TokenHolderRepositoryGoldRush,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -14,6 +18,8 @@ import {
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tenderlyRepositorySymbol,
+  tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -27,9 +33,14 @@ import { Container } from 'inversify';
 import {
   SlippageService,
   SlippageServiceMain,
+  TenderlyService,
+  TokenHolderService,
+  TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
+  tenderlyServiceSymbol,
+  tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
@@ -86,6 +97,17 @@ function getUsdRepository(
   ]);
 }
 
+function getTokenHolderRepositoryGoldRush(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryGoldRush(),
+    cacheRepository,
+    'tokenHolderGoldRush',
+    CACHE_TOKEN_INFO_SECONDS
+  );
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
   // Repositories
@@ -97,6 +119,10 @@ function getApiContainer(): Container {
     .toConstantValue(erc20Repository);
 
   apiContainer
+    .bind<TenderlyRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(new TenderlyRepository());
+
+  apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
     .toConstantValue(cacheRepository);
 
@@ -104,12 +130,22 @@ function getApiContainer(): Container {
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
+  apiContainer
+    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
+    .toConstantValue(getTokenHolderRepositoryGoldRush(cacheRepository));
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
 
+  apiContainer
+    .bind<TokenHolderService>(tokenHolderServiceSymbol)
+    .to(TokenHolderServiceMain);
+
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer.bind<TenderlyService>(tenderlyServiceSymbol).to(TenderlyService);
 
   return apiContainer;
 }

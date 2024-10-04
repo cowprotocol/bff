@@ -23,6 +23,18 @@ const schema = {
     COINGECKO_API_KEY: {
       type: 'string',
     },
+    GOLD_RUSH_API_KEY: {
+      type: 'string',
+    },
+    TENDERLY_API_KEY: {
+      type: 'string',
+    },
+    TENDERLY_PROJECT: {
+      type: 'string',
+    },
+    TENDERLY_ACCOUNT: {
+      type: 'string',
+    },
   },
 };
 

@@ -7,6 +7,7 @@ export * from './utils/cache';
 export * from './datasources/redis';
 export * from './datasources/viem';
 export * from './datasources/cowApi';
+export * from './datasources/tenderlyApi';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
@@ -27,3 +28,12 @@ export * from './UsdRepository/UsdRepositoryCoingecko';
 export * from './UsdRepository/UsdRepositoryCow';
 export * from './UsdRepository/UsdRepositoryFallback';
 export * from './UsdRepository/UsdRepositoryCache';
+
+// Token holder repositories
+export * from './TokenHolderRepository/TokenHolderRepository';
+export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
+export * from './TokenHolderRepository/TokenHolderRepositoryCache';
+
+// Tenderly repositories
+export * from './TenderlyRepository/TenderlyRepository';
+export * from './TenderlyRepository/types';

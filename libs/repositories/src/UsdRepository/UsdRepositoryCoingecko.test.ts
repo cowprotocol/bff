@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, DEFINITELY_NOT_A_TOKEN } from '../../test/mock';
+import { WETH, NULL_ADDRESS } from '../../test/mock';
 import ms from 'ms';
 
 const FIVE_MINUTES = ms('5m');
@@ -33,7 +33,7 @@ describe('UsdRepositoryCoingecko', () => {
     it('should return NULL for an unknown token', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
         SupportedChainId.MAINNET,
-        DEFINITELY_NOT_A_TOKEN
+        NULL_ADDRESS
       );
 
       // Price should be null (no data available)
@@ -74,7 +74,7 @@ describe('UsdRepositoryCoingecko', () => {
     it('[5m] should return NULL for an unknown token', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
         SupportedChainId.MAINNET,
-        DEFINITELY_NOT_A_TOKEN,
+        NULL_ADDRESS,
         '5m'
       );
 
