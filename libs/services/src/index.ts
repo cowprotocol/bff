@@ -5,3 +5,5 @@ export * from './SlippageService/SlippageServiceMock';
 export * from './UsdService/UsdService';
 
 export * from './TokenHolderService/TokenHolderService';
+
+export * from './TenderlyService/TenderlyService';

@@ -5,6 +5,7 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  TenderlyRepository,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryGoldRush,
@@ -17,6 +18,7 @@ import {
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tenderlyRepositorySymbol,
   tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
@@ -31,11 +33,13 @@ import { Container } from 'inversify';
 import {
   SlippageService,
   SlippageServiceMain,
+  TenderlyService,
   TokenHolderService,
   TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
+  tenderlyServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
@@ -115,6 +119,10 @@ function getApiContainer(): Container {
     .toConstantValue(erc20Repository);
 
   apiContainer
+    .bind<TenderlyRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(new TenderlyRepository());
+
+  apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
     .toConstantValue(cacheRepository);
 
@@ -130,11 +138,14 @@ function getApiContainer(): Container {
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
+
   apiContainer
     .bind<TokenHolderService>(tokenHolderServiceSymbol)
     .to(TokenHolderServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer.bind<TenderlyService>(tenderlyServiceSymbol).to(TenderlyService);
 
   return apiContainer;
 }

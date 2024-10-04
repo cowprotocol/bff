@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 import { TokenHolderRepositoryGoldRush } from './TokenHolderRepositoryGoldRush';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, DEFINITELY_NOT_A_TOKEN } from '../../test/mock';
+import { WETH, NULL_ADDRESS } from '../../test/mock';
 import { GOLD_RUSH_API_KEY } from '../datasources/goldRush';
 
 describe('TokenHolderRepositoryGoldRush', () => {
@@ -38,7 +38,7 @@ describe('TokenHolderRepositoryGoldRush', () => {
       const tokenHolders =
         await tokenHolderRepositoryGoldRush.getTopTokenHolders(
           SupportedChainId.MAINNET,
-          DEFINITELY_NOT_A_TOKEN
+          NULL_ADDRESS
         );
 
       expect(tokenHolders).toBeNull();

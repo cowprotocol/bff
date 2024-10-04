@@ -19,13 +19,13 @@ export const tokenHolderServiceSymbol = Symbol.for('TokenHolderService');
 export class TokenHolderServiceMain implements TokenHolderService {
   constructor(
     @inject(tokenHolderRepositorySymbol)
-    private usdRepository: TokenHolderRepository
+    private tokenHolderRepository: TokenHolderRepository
   ) {}
 
   async getTopTokenHolders(
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<TokenHolderPoint[] | null> {
-    return this.usdRepository.getTopTokenHolders(chainId, tokenAddress);
+    return this.tokenHolderRepository.getTopTokenHolders(chainId, tokenAddress);
   }
 }
