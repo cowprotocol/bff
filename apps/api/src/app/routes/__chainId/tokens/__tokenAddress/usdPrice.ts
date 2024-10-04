@@ -1,19 +1,8 @@
 import { UsdService, usdServiceSymbol } from '@cowprotocol/services';
-import {
-  AddressSchema,
-  ChainIdSchema,
-  ETHEREUM_ADDRESS_PATTERN,
-} from '../../../../schemas';
+import { AddressSchema, ChainIdSchema } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
-
-// TODO:  Add this in a follow up PR
-// import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
-
-interface Result {
-  price: number;
-}
 
 const paramsSchema = {
   type: 'object',
@@ -65,7 +54,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
   }>(
-    '/usdPrice',
+    '/simulateBundle',
     {
       schema: {
         params: paramsSchema,
