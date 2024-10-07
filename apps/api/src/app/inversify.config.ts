@@ -2,18 +2,23 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  CacheRepositoryFactory,
   Erc20Repository,
-  Erc20RepositoryCache,
   Erc20RepositoryViem,
+  FallbackRepositoryFactory,
+  TenderlyRepository,
+  TokenHolderRepository,
+  TokenHolderRepositoryEthplorer,
+  TokenHolderRepositoryGoldRush,
   UsdRepository,
-  UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
-  UsdRepositoryFallback,
   cacheRepositorySymbol,
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tenderlyRepositorySymbol,
+  tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -27,18 +32,24 @@ import { Container } from 'inversify';
 import {
   SlippageService,
   SlippageServiceMain,
+  TenderlyService,
+  TokenHolderService,
+  TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
+  tenderlyServiceSymbol,
+  tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
-  return new Erc20RepositoryCache(
+  return CacheRepositoryFactory.create<Erc20Repository>(
     new Erc20RepositoryViem(viemClients),
     cacheRepository,
     'erc20',
+    CACHE_TOKEN_INFO_SECONDS,
     CACHE_TOKEN_INFO_SECONDS
   );
 }
@@ -55,7 +66,7 @@ function getUsdRepositoryCow(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return new UsdRepositoryCache(
+  return CacheRepositoryFactory.create<UsdRepository>(
     new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
@@ -67,7 +78,7 @@ function getUsdRepositoryCow(
 function getUsdRepositoryCoingecko(
   cacheRepository: CacheRepository
 ): UsdRepository {
-  return new UsdRepositoryCache(
+  return CacheRepositoryFactory.create<UsdRepository>(
     new UsdRepositoryCoingecko(),
     cacheRepository,
     'usdCoingecko',
@@ -80,9 +91,40 @@ function getUsdRepository(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return new UsdRepositoryFallback([
+  return FallbackRepositoryFactory.create<UsdRepository>([
     getUsdRepositoryCoingecko(cacheRepository),
     getUsdRepositoryCow(cacheRepository, erc20Repository),
+  ]);
+}
+
+function getTokenHolderRepositoryGoldRush(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return CacheRepositoryFactory.create<TokenHolderRepository>(
+    new TokenHolderRepositoryGoldRush(),
+    cacheRepository,
+    'tokenHolderGoldRush',
+    CACHE_TOKEN_INFO_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepositoryEthplorer(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return CacheRepositoryFactory.create<TokenHolderRepository>(
+    new TokenHolderRepositoryEthplorer(),
+    cacheRepository,
+    'tokenHolderEthplorer',
+    CACHE_TOKEN_INFO_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepository(cacheRepository: CacheRepository) {
+  return FallbackRepositoryFactory.create<TokenHolderRepository>([
+    getTokenHolderRepositoryGoldRush(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
@@ -97,6 +139,10 @@ function getApiContainer(): Container {
     .toConstantValue(erc20Repository);
 
   apiContainer
+    .bind<TenderlyRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(new TenderlyRepository());
+
+  apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
     .toConstantValue(cacheRepository);
 
@@ -104,12 +150,22 @@ function getApiContainer(): Container {
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
+  apiContainer
+    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
+    .toConstantValue(getTokenHolderRepository(cacheRepository));
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
 
+  apiContainer
+    .bind<TokenHolderService>(tokenHolderServiceSymbol)
+    .to(TokenHolderServiceMain);
+
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer.bind<TenderlyService>(tenderlyServiceSymbol).to(TenderlyService);
 
   return apiContainer;
 }

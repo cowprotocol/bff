@@ -1,12 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
-import {
-  DEFINITELY_NOT_A_TOKEN,
-  WETH,
-  errorResponse,
-  okResponse,
-} from '../../test/mock';
+import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
 import { USDC } from '../const';
 import { Erc20Repository, Erc20 } from '../Erc20Repository/Erc20Repository';
 import { CowApiClient } from '../datasources/cowApi';
@@ -109,7 +104,7 @@ describe('UsdRepositoryCow', () => {
       // Get USD price for a not supported token
       let price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
-        DEFINITELY_NOT_A_TOKEN // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
+        NULL_ADDRESS // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
       );
 
       // USD calculation based on native price is correct
