@@ -8,6 +8,8 @@ import {
   TenderlyRepository,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
+  TokenHolderRepositoryEthplorer,
+  TokenHolderRepositoryFallback,
   TokenHolderRepositoryGoldRush,
   UsdRepository,
   UsdRepositoryCache,
@@ -104,8 +106,28 @@ function getTokenHolderRepositoryGoldRush(
     new TokenHolderRepositoryGoldRush(),
     cacheRepository,
     'tokenHolderGoldRush',
-    CACHE_TOKEN_INFO_SECONDS
+    CACHE_TOKEN_INFO_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
   );
+}
+
+function getTokenHolderRepositoryEthplorer(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryEthplorer(),
+    cacheRepository,
+    'tokenHolderEthplorer',
+    CACHE_TOKEN_INFO_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepository(cacheRepository: CacheRepository) {
+  return new TokenHolderRepositoryFallback([
+    getTokenHolderRepositoryGoldRush(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository),
+  ]);
 }
 
 function getApiContainer(): Container {
@@ -132,7 +154,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
-    .toConstantValue(getTokenHolderRepositoryGoldRush(cacheRepository));
+    .toConstantValue(getTokenHolderRepository(cacheRepository));
 
   // Services
   apiContainer

@@ -33,6 +33,8 @@ export * from './UsdRepository/UsdRepositoryCache';
 export * from './TokenHolderRepository/TokenHolderRepository';
 export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
 export * from './TokenHolderRepository/TokenHolderRepositoryCache';
+export * from './TokenHolderRepository/TokenHolderRepositoryEthPlorer';
+export * from './TokenHolderRepository/TokenHolderRepositoryFallback';
 
 // Tenderly repositories
 export * from './TenderlyRepository/TenderlyRepository';

@@ -35,6 +35,9 @@ const schema = {
     TENDERLY_ACCOUNT: {
       type: 'string',
     },
+    ETHPLORER_API_KEY: {
+      type: 'string',
+    },
   },
 };
 
