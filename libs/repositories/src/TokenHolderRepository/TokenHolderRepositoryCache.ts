@@ -17,7 +17,8 @@ export class TokenHolderRepositoryCache implements TokenHolderRepository {
     private proxy: TokenHolderRepository,
     private cache: CacheRepository,
     cacheName: string,
-    private cacheTimeSeconds: number
+    private cacheTimeValueSeconds: number,
+    private cacheTimeNullSeconds: number
   ) {
     this.baseCacheKey = ['repos', cacheName];
   }
@@ -26,25 +27,56 @@ export class TokenHolderRepositoryCache implements TokenHolderRepository {
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<TokenHolderPoint[] | null> {
-    // Get cached value
     const cacheKey = getCacheKey(
       ...this.baseCacheKey,
       'get',
       chainId,
       tokenAddress
     );
-    const valueString = await this.cache.get(cacheKey);
-    if (valueString) {
-      return valueString === NULL_VALUE ? null : JSON.parse(valueString);
+    const cachedValue = await this.getValueFromCache<TokenHolderPoint[]>({
+      key: cacheKey,
+      convertFn: JSON.parse,
+    });
+
+    if (cachedValue !== undefined) {
+      return cachedValue;
     }
 
-    // Get fresh value from proxy
     const value = await this.proxy.getTopTokenHolders(chainId, tokenAddress);
 
-    // Cache value
     const cacheValue = value === null ? NULL_VALUE : JSON.stringify(value);
-    await this.cache.set(cacheKey, cacheValue, this.cacheTimeSeconds);
+    await this.cacheValue({ key: cacheKey, value: cacheValue });
 
     return value;
+  }
+
+  private async getValueFromCache<T>(props: {
+    key: string;
+    convertFn: (value: string) => T;
+  }): Promise<T | null | undefined> {
+    const { key, convertFn } = props;
+
+    const valueString = await this.cache.get(key);
+    if (valueString) {
+      return valueString === NULL_VALUE ? null : convertFn(valueString);
+    }
+
+    return undefined;
+  }
+
+  private async cacheValue(props: {
+    key: string;
+    value: string | null;
+  }): Promise<void> {
+    const { key, value } = props;
+
+    const cacheTimeSeconds =
+      value === null ? this.cacheTimeNullSeconds : this.cacheTimeValueSeconds;
+
+    await this.cache.set(
+      key,
+      value === null ? NULL_VALUE : value,
+      cacheTimeSeconds
+    );
   }
 }
