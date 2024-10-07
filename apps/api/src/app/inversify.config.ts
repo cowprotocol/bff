@@ -5,17 +5,16 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  FallbackRepository,
   TenderlyRepository,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
-  TokenHolderRepositoryFallback,
   TokenHolderRepositoryGoldRush,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
-  UsdRepositoryFallback,
   cacheRepositorySymbol,
   cowApiClients,
   erc20RepositorySymbol,
@@ -93,7 +92,7 @@ function getUsdRepository(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return new UsdRepositoryFallback([
+  return FallbackRepository.create<UsdRepository>([
     getUsdRepositoryCoingecko(cacheRepository),
     getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
@@ -124,7 +123,7 @@ function getTokenHolderRepositoryEthplorer(
 }
 
 function getTokenHolderRepository(cacheRepository: CacheRepository) {
-  return new TokenHolderRepositoryFallback([
+  return FallbackRepository.create<TokenHolderRepository>([
     getTokenHolderRepositoryGoldRush(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);

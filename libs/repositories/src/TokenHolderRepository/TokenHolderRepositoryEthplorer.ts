@@ -7,7 +7,7 @@ import { SupportedChainId } from '@cowprotocol/shared';
 import {
   ETHPLORER_API_KEY,
   ETHPLORER_BASE_URL,
-} from '../datasources/ethPlorer';
+} from '../datasources/ethplorer';
 
 interface EthplorerSuccess {
   holders: {

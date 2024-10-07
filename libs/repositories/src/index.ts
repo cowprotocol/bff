@@ -26,16 +26,17 @@ export * from './Erc20Repository/Erc20RepositoryViem';
 export * from './UsdRepository/UsdRepository';
 export * from './UsdRepository/UsdRepositoryCoingecko';
 export * from './UsdRepository/UsdRepositoryCow';
-export * from './UsdRepository/UsdRepositoryFallback';
 export * from './UsdRepository/UsdRepositoryCache';
 
 // Token holder repositories
 export * from './TokenHolderRepository/TokenHolderRepository';
 export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
 export * from './TokenHolderRepository/TokenHolderRepositoryCache';
-export * from './TokenHolderRepository/TokenHolderRepositoryEthPlorer';
-export * from './TokenHolderRepository/TokenHolderRepositoryFallback';
+export * from './TokenHolderRepository/TokenHolderRepositoryEthplorer';
 
 // Tenderly repositories
 export * from './TenderlyRepository/TenderlyRepository';
 export * from './TenderlyRepository/types';
+
+// Fallback repositories
+export * from './FallbackRepository/FallbackRepository';
