@@ -2,17 +2,15 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  CacheRepositoryFactory,
   Erc20Repository,
-  Erc20RepositoryCache,
   Erc20RepositoryViem,
-  FallbackRepository,
+  FallbackRepositoryFactory,
   TenderlyRepository,
   TokenHolderRepository,
-  TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryGoldRush,
   UsdRepository,
-  UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   cacheRepositorySymbol,
@@ -47,10 +45,11 @@ import {
 import ms from 'ms';
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
-  return new Erc20RepositoryCache(
+  return CacheRepositoryFactory.create<Erc20Repository>(
     new Erc20RepositoryViem(viemClients),
     cacheRepository,
     'erc20',
+    CACHE_TOKEN_INFO_SECONDS,
     CACHE_TOKEN_INFO_SECONDS
   );
 }
@@ -67,7 +66,7 @@ function getUsdRepositoryCow(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return new UsdRepositoryCache(
+  return CacheRepositoryFactory.create<UsdRepository>(
     new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
@@ -79,7 +78,7 @@ function getUsdRepositoryCow(
 function getUsdRepositoryCoingecko(
   cacheRepository: CacheRepository
 ): UsdRepository {
-  return new UsdRepositoryCache(
+  return CacheRepositoryFactory.create<UsdRepository>(
     new UsdRepositoryCoingecko(),
     cacheRepository,
     'usdCoingecko',
@@ -92,7 +91,7 @@ function getUsdRepository(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return FallbackRepository.create<UsdRepository>([
+  return FallbackRepositoryFactory.create<UsdRepository>([
     getUsdRepositoryCoingecko(cacheRepository),
     getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
@@ -101,7 +100,7 @@ function getUsdRepository(
 function getTokenHolderRepositoryGoldRush(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
-  return new TokenHolderRepositoryCache(
+  return CacheRepositoryFactory.create<TokenHolderRepository>(
     new TokenHolderRepositoryGoldRush(),
     cacheRepository,
     'tokenHolderGoldRush',
@@ -113,7 +112,7 @@ function getTokenHolderRepositoryGoldRush(
 function getTokenHolderRepositoryEthplorer(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
-  return new TokenHolderRepositoryCache(
+  return CacheRepositoryFactory.create<TokenHolderRepository>(
     new TokenHolderRepositoryEthplorer(),
     cacheRepository,
     'tokenHolderEthplorer',
@@ -123,7 +122,7 @@ function getTokenHolderRepositoryEthplorer(
 }
 
 function getTokenHolderRepository(cacheRepository: CacheRepository) {
-  return FallbackRepository.create<TokenHolderRepository>([
+  return FallbackRepositoryFactory.create<TokenHolderRepository>([
     getTokenHolderRepositoryGoldRush(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);

@@ -1,4 +1,4 @@
-import { FallbackRepository } from './FallbackRepository';
+import { FallbackRepositoryFactory } from './FallbackRepositoryFactory';
 
 // Simple repository interface
 interface Repository {
@@ -52,10 +52,10 @@ class RepositoryMock_null_null implements Repository {
   }
 }
 
-describe('FallbackRepository', () => {
+describe('FallbackRepositoryFactory', () => {
   describe('getData', () => {
     it('Returns first repo data when it is not null', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_1_1(),
         new RepositoryMock_2_2(),
       ]);
@@ -65,7 +65,7 @@ describe('FallbackRepository', () => {
     });
 
     it('Returns second repo data when first is null', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_null_3(),
         new RepositoryMock_1_1(),
       ]);
@@ -75,13 +75,13 @@ describe('FallbackRepository', () => {
     });
 
     it('Returns null when configured with no repositories', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([]);
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([]);
       const data = await fallbackRepo.getData();
       expect(data).toEqual(null);
     });
 
     it('Returns null when no repo returns data', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_null_3(),
         new RepositoryMock_null_null(),
       ]);
@@ -92,7 +92,7 @@ describe('FallbackRepository', () => {
 
   describe('getMultipleData', () => {
     it('Returns first repo data when it is not null', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_1_1(),
         new RepositoryMock_2_2(),
       ]);
@@ -102,7 +102,7 @@ describe('FallbackRepository', () => {
     });
 
     it('Returns second repo data when first is null', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_3_null(),
         new RepositoryMock_1_1(),
       ]);
@@ -112,13 +112,13 @@ describe('FallbackRepository', () => {
     });
 
     it('Returns null when configured with no repositories', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([]);
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([]);
       const data = await fallbackRepo.getMultipleData();
       expect(data).toEqual(null);
     });
 
     it('Returns null when no repo returns data', async () => {
-      const fallbackRepo = FallbackRepository.create<Repository>([
+      const fallbackRepo = FallbackRepositoryFactory.create<Repository>([
         new RepositoryMock_3_null(),
         new RepositoryMock_null_null(),
       ]);

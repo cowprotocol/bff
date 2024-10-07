@@ -1,12 +1,14 @@
 import { injectable } from 'inversify';
 
 @injectable()
-export class FallbackRepository<T extends object> {
+export class FallbackRepositoryFactory {
   private static createProxy<T extends object>(instances: T[]): T {
     return new Proxy<T>({} as T, {
       get: (target, prop: string | symbol) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return async (...args: any[]) => {
           for (const instance of instances) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const method = (instance as any)[prop];
             if (typeof method === 'function') {
               try {
@@ -27,6 +29,6 @@ export class FallbackRepository<T extends object> {
   }
 
   static create<T extends object>(instances: T[]): T {
-    return FallbackRepository.createProxy(instances);
+    return FallbackRepositoryFactory.createProxy(instances);
   }
 }
