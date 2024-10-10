@@ -40,17 +40,7 @@ export class SlippageServiceMain implements SlippageService {
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
-    const slippageBps = Math.ceil(volatility * 10_000);
-
-    if (slippageBps < MIN_SLIPPAGE_BPS) {
-      return MIN_SLIPPAGE_BPS;
-    }
-
-    if (slippageBps > MAX_SLIPPAGE_BPS) {
-      return MAX_SLIPPAGE_BPS;
-    }
-
-    return slippageBps;
+    return Math.ceil(volatility * 10_000);
   }
 
   /**
