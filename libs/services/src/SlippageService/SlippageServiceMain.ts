@@ -28,17 +28,15 @@ export class SlippageServiceMain implements SlippageService {
   ) {}
 
   async getSlippageBps(params: GetSlippageBpsParams): Promise<Bps> {
-    const volatilityOnExpiration = await this.getMaxVolatilityOnSettlement(
-      params
-    );
+    const volatility = await this.getRelativeVolatilityOnSettlement(params);
 
     // If volatility is unknown, we take the worst case
-    if (volatilityOnExpiration === null) {
+    if (volatility === null) {
       return MAX_SLIPPAGE_BPS;
     }
 
     // Return the slippage based on the volatility
-    return this.getSlippageBpsFromVolatility(volatilityOnExpiration);
+    return this.getSlippageBpsFromVolatility(volatility);
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
