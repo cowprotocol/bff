@@ -1047,10 +1047,10 @@ export interface components {
             current_remaining_monthly_calls?: number;
         };
         /** @example {
-         *       "usd": 67187.33589365664,
-         *       "usd_market_cap": 1317802988326.2493,
-         *       "usd_24h_vol": 31260929299.52484,
-         *       "usd_24h_change": 3.637278946773539,
+         *       "usd": 67187.3358936566,
+         *       "usd_market_cap": 1317802988326.25,
+         *       "usd_24h_vol": 31260929299.5248,
+         *       "usd_24h_change": 3.63727894677354,
          *       "last_updated_at": 1711356300
          *     } */
         SimplePrice: {
@@ -1709,7 +1709,7 @@ export interface components {
          *           },
          *           "last": 69476,
          *           "volume": 20242.03975,
-         *           "cost_to_move_up_usd": 19320706.39585167,
+         *           "cost_to_move_up_usd": 19320706.3958517,
          *           "cost_to_move_down_usd": 16360235.3694131,
          *           "converted_last": {
          *             "btc": 1.000205,
@@ -1845,196 +1845,196 @@ export interface components {
          *       },
          *       "market_data": {
          *         "current_price": {
-         *           "aed": 154530.09108142683,
-         *           "ars": 33947900.26188303,
-         *           "aud": 61738.405695047535,
-         *           "bch": 165.38167494630605,
-         *           "bdt": 4617857.437514718,
-         *           "bhd": 15859.429741917913,
-         *           "bmd": 42074.70715618848,
-         *           "bnb": 134.15687497173963,
-         *           "brl": 204167.47440069792,
+         *           "aed": 154530.091081427,
+         *           "ars": 33947900.261883,
+         *           "aud": 61738.4056950475,
+         *           "bch": 165.381674946306,
+         *           "bdt": 4617857.43751472,
+         *           "bhd": 15859.4297419179,
+         *           "bmd": 42074.7071561885,
+         *           "bnb": 134.15687497174,
+         *           "brl": 204167.474400698,
          *           "btc": 1,
-         *           "cad": 55797.37289517942,
-         *           "chf": 35380.41087410315,
-         *           "clp": 37070945.97434911,
-         *           "cny": 297872.0967829519,
-         *           "czk": 941726.6142466004,
-         *           "dkk": 284202.0244279068,
-         *           "dot": 5078.184550422312,
-         *           "eos": 49611.91197615977,
-         *           "eth": 18.29654321540394,
-         *           "eur": 38057.70863986569,
-         *           "gbp": 33025.65781339986,
-         *           "gel": 113180.96225014742,
-         *           "hkd": 328622.3965080529,
-         *           "huf": 14607917.577557135,
-         *           "idr": 647533950.6044563,
-         *           "ils": 151504.70926336164,
-         *           "inr": 3501412.9510954972,
+         *           "cad": 55797.3728951794,
+         *           "chf": 35380.4108741032,
+         *           "clp": 37070945.9743491,
+         *           "cny": 297872.096782952,
+         *           "czk": 941726.6142466,
+         *           "dkk": 284202.024427907,
+         *           "dot": 5078.18455042231,
+         *           "eos": 49611.9119761598,
+         *           "eth": 18.2965432154039,
+         *           "eur": 38057.7086398657,
+         *           "gbp": 33025.6578133999,
+         *           "gel": 113180.962250147,
+         *           "hkd": 328622.396508053,
+         *           "huf": 14607917.5775571,
+         *           "idr": 647533950.604456,
+         *           "ils": 151504.709263362,
+         *           "inr": 3501412.9510955,
          *           "jpy": 5933586.69083973,
-         *           "krw": 54466970.65490067,
-         *           "kwd": 12928.716014953645,
-         *           "lkr": 13628686.368770933,
-         *           "ltc": 573.6621797872364,
-         *           "mmk": 88364275.74483082,
-         *           "mxn": 714058.2700891062,
-         *           "myr": 193333.27938268633,
-         *           "ngn": 37725865.42452484,
-         *           "nok": 429848.16731742636,
+         *           "krw": 54466970.6549007,
+         *           "kwd": 12928.7160149536,
+         *           "lkr": 13628686.3687709,
+         *           "ltc": 573.662179787236,
+         *           "mmk": 88364275.7448308,
+         *           "mxn": 714058.270089106,
+         *           "myr": 193333.279382686,
+         *           "ngn": 37725865.4245248,
+         *           "nok": 429848.167317426,
          *           "nzd": 66531.8087825235,
-         *           "php": 2330938.6923034303,
-         *           "pkr": 11705926.359806487,
-         *           "pln": 165640.54862662574,
-         *           "rub": 3755167.3612415865,
-         *           "sar": 157780.1518357064,
-         *           "sek": 423808.00650749775,
-         *           "sgd": 55568.065741178136,
-         *           "thb": 1438863.9771500682,
-         *           "try": 1240206.6063985475,
-         *           "twd": 1291001.3807622658,
-         *           "uah": 1599892.6750505993,
-         *           "usd": 42074.70715618848,
-         *           "vef": 4212.940427549151,
-         *           "vnd": 1021106970.8227047,
-         *           "xag": 1768.3279940253694,
-         *           "xau": 20.39613504103393,
-         *           "xdr": 31351.757663898043,
-         *           "xlm": 324963.64104682615,
-         *           "xrp": 67529.86361098202,
-         *           "yfi": 5.116942760598554,
-         *           "zar": 769994.6998914372,
-         *           "bits": 1000195.713931052,
-         *           "link": 2709.6608365050256,
-         *           "sats": 100019571.3931052
+         *           "php": 2330938.69230343,
+         *           "pkr": 11705926.3598065,
+         *           "pln": 165640.548626626,
+         *           "rub": 3755167.36124159,
+         *           "sar": 157780.151835706,
+         *           "sek": 423808.006507498,
+         *           "sgd": 55568.0657411781,
+         *           "thb": 1438863.97715007,
+         *           "try": 1240206.60639855,
+         *           "twd": 1291001.38076227,
+         *           "uah": 1599892.6750506,
+         *           "usd": 42074.7071561885,
+         *           "vef": 4212.94042754915,
+         *           "vnd": 1021106970.8227,
+         *           "xag": 1768.32799402537,
+         *           "xau": 20.3961350410339,
+         *           "xdr": 31351.757663898,
+         *           "xlm": 324963.641046826,
+         *           "xrp": 67529.863610982,
+         *           "yfi": 5.11694276059855,
+         *           "zar": 769994.699891437,
+         *           "bits": 1000195.71393105,
+         *           "link": 2709.66083650503,
+         *           "sats": 100019571.393105
          *         },
          *         "market_cap": {
          *           "aed": 3022434823129.84,
-         *           "ars": 663982757051427.4,
-         *           "aud": 1207533794818.6636,
-         *           "bch": 3239927812.6139565,
-         *           "bdt": 90320099015790.61,
-         *           "bhd": 310192612917.6729,
-         *           "bmd": 822933961870.5416,
-         *           "bnb": 2629923038.0492373,
-         *           "brl": 3993286227042.8438,
+         *           "ars": 663982757051427,
+         *           "aud": 1207533794818.66,
+         *           "bch": 3239927812.61396,
+         *           "bdt": 90320099015790.6,
+         *           "bhd": 310192612917.673,
+         *           "bmd": 822933961870.542,
+         *           "bnb": 2629923038.04924,
+         *           "brl": 3993286227042.84,
          *           "btc": 19584275,
-         *           "cad": 1091498460326.9937,
-         *           "chf": 692169755329.3134,
-         *           "clp": 725066019537891.1,
-         *           "cny": 5826043276458.686,
-         *           "czk": 18419113668076.95,
-         *           "dkk": 5558672032246.961,
-         *           "dot": 99489102293.36188,
-         *           "eos": 971966018054.8785,
-         *           "eth": 358260658.6305346,
-         *           "eur": 744365987728.8765,
-         *           "gbp": 645995753662.7186,
-         *           "gel": 2213692357431.7495,
-         *           "hkd": 6427484562491.774,
-         *           "huf": 285714442221834.44,
+         *           "cad": 1091498460326.99,
+         *           "chf": 692169755329.313,
+         *           "clp": 725066019537891,
+         *           "cny": 5826043276458.69,
+         *           "czk": 18419113668077,
+         *           "dkk": 5558672032246.96,
+         *           "dot": 99489102293.3619,
+         *           "eos": 971966018054.879,
+         *           "eth": 358260658.630535,
+         *           "eur": 744365987728.877,
+         *           "gbp": 645995753662.719,
+         *           "gel": 2213692357431.75,
+         *           "hkd": 6427484562491.77,
+         *           "huf": 285714442221834,
          *           "idr": 12665035966583838,
-         *           "ils": 2963261756601.5366,
-         *           "inr": 68483700226206.57,
-         *           "jpy": 116054283764084.62,
-         *           "krw": 1065312701660273.2,
-         *           "kwd": 252871147803.5803,
-         *           "lkr": 266561780855891.12,
-         *           "ltc": 11241964101.69766,
+         *           "ils": 2963261756601.54,
+         *           "inr": 68483700226206.6,
+         *           "jpy": 116054283764085,
+         *           "krw": 1065312701660270,
+         *           "kwd": 252871147803.58,
+         *           "lkr": 266561780855891,
+         *           "ltc": 11241964101.6977,
          *           "mmk": 1728305874039080,
-         *           "mxn": 13966176853697.344,
-         *           "myr": 3781381554795.1514,
-         *           "ngn": 737875507571602.2,
-         *           "nok": 8407346818129.712,
-         *           "nzd": 1301287369358.7278,
-         *           "php": 45590539841760.11,
-         *           "pkr": 228954757091481.3,
-         *           "pln": 3239742879771.195,
-         *           "rub": 73446851159342.03,
-         *           "sar": 3086002357014.532,
+         *           "mxn": 13966176853697.3,
+         *           "myr": 3781381554795.15,
+         *           "ngn": 737875507571602,
+         *           "nok": 8407346818129.71,
+         *           "nzd": 1301287369358.73,
+         *           "php": 45590539841760.1,
+         *           "pkr": 228954757091481,
+         *           "pln": 3239742879771.2,
+         *           "rub": 73446851159342,
+         *           "sar": 3086002357014.53,
          *           "sek": 8289208064431.51,
-         *           "sgd": 1086848883442.4248,
-         *           "thb": 28142561489813.086,
-         *           "try": 24257046694416.734,
-         *           "twd": 25250535365752.875,
+         *           "sgd": 1086848883442.42,
+         *           "thb": 28142561489813.1,
+         *           "try": 24257046694416.7,
+         *           "twd": 25250535365752.9,
          *           "uah": 31292101755089.6,
-         *           "usd": 822933961870.5416,
-         *           "vef": 82400377602.09746,
+         *           "usd": 822933961870.542,
+         *           "vef": 82400377602.0975,
          *           "vnd": 19971704184972804,
-         *           "xag": 34586507200.34415,
-         *           "xau": 398925467.35636365,
-         *           "xdr": 613205127018.0251,
-         *           "xlm": 6366989968394.301,
-         *           "xrp": 1322171541704.1318,
-         *           "yfi": 100197984.57701135,
-         *           "zar": 15060230523975.951,
-         *           "bits": 19587833186725.145,
-         *           "link": 53027090934.88813,
-         *           "sats": 1958783318672514.8
+         *           "xag": 34586507200.3442,
+         *           "xau": 398925467.356364,
+         *           "xdr": 613205127018.025,
+         *           "xlm": 6366989968394.3,
+         *           "xrp": 1322171541704.13,
+         *           "yfi": 100197984.577011,
+         *           "zar": 15060230523976,
+         *           "bits": 19587833186725.1,
+         *           "link": 53027090934.8881,
+         *           "sats": 1958783318672510
          *         },
          *         "total_volume": {
-         *           "aed": 91203312150.08063,
-         *           "ars": 20035974370796.53,
-         *           "aud": 36437868164.37399,
-         *           "bch": 97607892.53714487,
-         *           "bdt": 2725449072027.6714,
+         *           "aed": 91203312150.0806,
+         *           "ars": 20035974370796.5,
+         *           "aud": 36437868164.374,
+         *           "bch": 97607892.5371449,
+         *           "bdt": 2725449072027.67,
          *           "bhd": 9360199758.84335,
-         *           "bmd": 24832397519.050613,
-         *           "bnb": 79179085.83047172,
-         *           "brl": 120499184128.79588,
-         *           "btc": 590313.2604817993,
-         *           "cad": 32931483969.88901,
-         *           "chf": 20881438911.782093,
-         *           "clp": 21879188925189.88,
-         *           "cny": 175803441475.87073,
-         *           "czk": 555804929370.7711,
-         *           "dkk": 167735395521.93146,
-         *           "dot": 2997133098.5874844,
+         *           "bmd": 24832397519.0506,
+         *           "bnb": 79179085.8304717,
+         *           "brl": 120499184128.796,
+         *           "btc": 590313.260481799,
+         *           "cad": 32931483969.889,
+         *           "chf": 20881438911.7821,
+         *           "clp": 21879188925189.9,
+         *           "cny": 175803441475.871,
+         *           "czk": 555804929370.771,
+         *           "dkk": 167735395521.931,
+         *           "dot": 2997133098.58748,
          *           "eos": 29280838849.3072,
-         *           "eth": 10798578.648754122,
-         *           "eur": 22461574030.714294,
-         *           "gbp": 19491668952.230877,
+         *           "eth": 10798578.6487541,
+         *           "eur": 22461574030.7143,
+         *           "gbp": 19491668952.2309,
          *           "gel": 66799149326.2464,
-         *           "hkd": 193952199202.66922,
-         *           "huf": 8621560094639.218,
-         *           "idr": 382173081057940.94,
-         *           "ils": 89417738606.47363,
-         *           "inr": 2066526047518.001,
-         *           "jpy": 3501989517686.002,
-         *           "krw": 32146283560336.594,
-         *           "kwd": 7630499109.653902,
+         *           "hkd": 193952199202.669,
+         *           "huf": 8621560094639.22,
+         *           "idr": 382173081057941,
+         *           "ils": 89417738606.4736,
+         *           "inr": 2066526047518,
+         *           "jpy": 3501989517686,
+         *           "krw": 32146283560336.6,
+         *           "kwd": 7630499109.6539,
          *           "lkr": 8043620037935.51,
-         *           "ltc": 338574128.0917383,
-         *           "mmk": 52152396774457.34,
-         *           "mxn": 421435584775.31195,
-         *           "myr": 114104866600.03775,
-         *           "ngn": 22265720911481.547,
-         *           "nok": 253695421433.0574,
-         *           "nzd": 39266923884.12937,
-         *           "php": 1375714772890.6108,
-         *           "pkr": 6908811405778.086,
-         *           "pln": 97760679200.94873,
-         *           "rub": 2216291329580.8867,
-         *           "sar": 93121490696.43959,
-         *           "sek": 250130532110.01724,
-         *           "sgd": 32796147403.410156,
-         *           "thb": 849214282675.6979,
-         *           "try": 731967149325.9987,
-         *           "twd": 761946110895.6648,
-         *           "uah": 944253057952.1875,
-         *           "usd": 24832397519.050613,
-         *           "vef": 2486467963.582537,
-         *           "vnd": 602655037260633.8,
-         *           "xag": 1043663204.3259426,
-         *           "xau": 12037753.021334978,
-         *           "xdr": 18503736849.33296,
-         *           "xlm": 191792809959.6043,
-         *           "xrp": 39855973598.82108,
-         *           "yfi": 3020008.107049232,
-         *           "zar": 454449139819.0017,
-         *           "bits": 590313260481.7993,
-         *           "link": 1599235730.4856293,
-         *           "sats": 59031326048179.93
+         *           "ltc": 338574128.091738,
+         *           "mmk": 52152396774457.3,
+         *           "mxn": 421435584775.312,
+         *           "myr": 114104866600.038,
+         *           "ngn": 22265720911481.5,
+         *           "nok": 253695421433.057,
+         *           "nzd": 39266923884.1294,
+         *           "php": 1375714772890.61,
+         *           "pkr": 6908811405778.09,
+         *           "pln": 97760679200.9487,
+         *           "rub": 2216291329580.89,
+         *           "sar": 93121490696.4396,
+         *           "sek": 250130532110.017,
+         *           "sgd": 32796147403.4102,
+         *           "thb": 849214282675.698,
+         *           "try": 731967149325.999,
+         *           "twd": 761946110895.665,
+         *           "uah": 944253057952.188,
+         *           "usd": 24832397519.0506,
+         *           "vef": 2486467963.58254,
+         *           "vnd": 602655037260634,
+         *           "xag": 1043663204.32594,
+         *           "xau": 12037753.021335,
+         *           "xdr": 18503736849.333,
+         *           "xlm": 191792809959.604,
+         *           "xrp": 39855973598.8211,
+         *           "yfi": 3020008.10704923,
+         *           "zar": 454449139819.002,
+         *           "bits": 590313260481.799,
+         *           "link": 1599235730.48563,
+         *           "sats": 59031326048179.9
          *         }
          *       },
          *       "community_data": {
@@ -2156,41 +2156,41 @@ export interface components {
              *       ],
              *       [
              *         1711929600000,
-             *         71246.95144060145
+             *         71246.9514406015
              *       ],
              *       [
              *         1711983682000,
-             *         68887.74951585678
+             *         68887.7495158568
              *       ]
              *     ] */
             prices?: number[][];
             /** @example [
              *       [
              *         1711843200000,
-             *         1370247487960.0945
+             *         1370247487960.09
              *       ],
              *       [
              *         1711929600000,
-             *         1401370211582.3662
+             *         1401370211582.37
              *       ],
              *       [
              *         1711983682000,
-             *         1355701979725.1584
+             *         1355701979725.16
              *       ]
              *     ] */
             market_caps?: number[][];
             /** @example [
              *       [
              *         1711843200000,
-             *         16408802301.837431
+             *         16408802301.8374
              *       ],
              *       [
              *         1711929600000,
-             *         19723005998.21497
+             *         19723005998.215
              *       ],
              *       [
              *         1711983682000,
-             *         30137418199.643093
+             *         30137418199.6431
              *       ]
              *     ] */
             total_volumes?: number[][];
@@ -2199,45 +2199,45 @@ export interface components {
             /** @example [
              *       [
              *         1704067241331,
-             *         42261.04061756689
+             *         42261.0406175669
              *       ],
              *       [
              *         1704070847420,
-             *         42493.27640875459
+             *         42493.2764087546
              *       ],
              *       [
              *         1704074443652,
-             *         42654.07310665941
+             *         42654.0731066594
              *       ]
              *     ] */
             prices?: number[][];
             /** @example [
              *       [
              *         1704067241331,
-             *         827596236151.1959
+             *         827596236151.196
              *       ],
              *       [
              *         1704070847420,
-             *         831531023621.4114
+             *         831531023621.411
              *       ],
              *       [
              *         1704074443652,
-             *         835499399014.9323
+             *         835499399014.932
              *       ]
              *     ] */
             market_caps?: number[][];
             /** @example [
              *       [
              *         1704067241331,
-             *         14305769170.949772
+             *         14305769170.9498
              *       ],
              *       [
              *         1704070847420,
-             *         14130205376.17086
+             *         14130205376.1709
              *       ],
              *       [
              *         1704074443652,
-             *         13697382902.24235
+             *         13697382902.2424
              *       ]
              *     ] */
             total_volumes?: number[][];
@@ -2274,21 +2274,12 @@ export interface components {
          *         "chain_identifier": 137,
          *         "name": "Polygon POS",
          *         "shortname": "MATIC",
-         *         "native_coin_id": "matic-network"
-         *       },
-         *       {
-         *         "id": "ethereum",
-         *         "chain_identifier": 1,
-         *         "name": "Ethereum",
-         *         "shortname": "Ethereum",
-         *         "native_coin_id": "ethereum"
-         *       },
-         *       {
-         *         "id": "stargaze",
-         *         "chain_identifier": null,
-         *         "name": "Stargaze",
-         *         "shortname": "",
-         *         "native_coin_id": "stargaze"
+         *         "native_coin_id": "matic-network",
+         *         "image": {
+         *           "thumb": "https://coin-images.coingecko.com/asset_platforms/images/15/thumb/polygon_pos.png?1706606645",
+         *           "small": "https://coin-images.coingecko.com/asset_platforms/images/15/small/polygon_pos.png?1706606645",
+         *           "large": "https://coin-images.coingecko.com/asset_platforms/images/15/large/polygon_pos.png?1706606645"
+         *         }
          *       }
          *     ] */
         AssetPlatforms: {
@@ -2302,6 +2293,8 @@ export interface components {
             shortname?: string;
             /** @description chain native coin id */
             native_coin_id?: string;
+            /** @description image of the asset platform */
+            image?: string;
         };
         /** @example {
          *       "name": "CoinGecko",
@@ -2370,30 +2363,21 @@ export interface components {
          *       {
          *         "id": "layer-1",
          *         "name": "Layer 1 (L1)",
-         *         "market_cap": 2061406861196.135,
+         *         "market_cap": 2061406861196.14,
          *         "market_cap_change_24h": -0.66091235190398,
          *         "content": "",
+         *         "top_3_coins_id": [
+         *           "bitcoin",
+         *           "ethereum",
+         *           "binancecoin"
+         *         ],
          *         "top_3_coins": [
          *           "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
          *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
          *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970"
          *         ],
-         *         "volume_24h": 61146432400.17392,
+         *         "volume_24h": 61146432400.1739,
          *         "updated_at": "2024-04-06T08:25:46.402Z"
-         *       },
-         *       {
-         *         "id": "smart-contract-platform",
-         *         "name": "Smart Contract Platform",
-         *         "market_cap": 744929499224.6548,
-         *         "market_cap_change_24h": -0.584411329310148,
-         *         "content": "Smart contract platforms are usually blockchains that host smart contracts or decentralized applications...",
-         *         "top_3_coins": [
-         *           "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
-         *           "https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970",
-         *           "https://assets.coingecko.com/coins/images/4128/small/solana.png?1696504756"
-         *         ],
-         *         "volume_24h": 30987638383.630726,
-         *         "updated_at": "2024-04-06T08:25:33.203Z"
          *       }
          *     ] */
         Categories: {
@@ -2407,7 +2391,9 @@ export interface components {
             market_cap_change_24h?: number;
             /** @description category description */
             content?: string;
-            /** @description top 3 coins in the category */
+            /** @description ids of top 3 coins in the category */
+            top_3_coins_id?: string[];
+            /** @description images of top 3 coins in the category */
             top_3_coins?: string[];
             /** @description category volume in 24 hours */
             volume_24h?: number;
@@ -2426,8 +2412,8 @@ export interface components {
          *         "has_trading_incentive": false,
          *         "trust_score": 10,
          *         "trust_score_rank": 1,
-         *         "trade_volume_24h_btc": 51075.62712838519,
-         *         "trade_volume_24h_btc_normalized": 47765.58866374526
+         *         "trade_volume_24h_btc": 51075.6271283852,
+         *         "trade_volume_24h_btc_normalized": 47765.5886637453
          *       },
          *       {
          *         "id": "gdax",
@@ -2440,8 +2426,8 @@ export interface components {
          *         "has_trading_incentive": false,
          *         "trust_score": 10,
          *         "trust_score_rank": 2,
-         *         "trade_volume_24h_btc": 37443.72996076475,
-         *         "trade_volume_24h_btc_normalized": 37443.72996076475
+         *         "trade_volume_24h_btc": 37443.7299607648,
+         *         "trade_volume_24h_btc_normalized": 37443.7299607648
          *       }
          *     ] */
         Exchanges: {
@@ -2510,8 +2496,8 @@ export interface components {
          *       "alert_notice": "",
          *       "trust_score": 9,
          *       "trust_score_rank": 6,
-         *       "trade_volume_24h_btc": 207319.13377261316,
-         *       "trade_volume_24h_btc_normalized": 81673.29712441542,
+         *       "trade_volume_24h_btc": 207319.133772613,
+         *       "trade_volume_24h_btc_normalized": 81673.2971244154,
          *       "tickers": [
          *         {
          *           "base": "BTC",
@@ -2524,7 +2510,7 @@ export interface components {
          *           },
          *           "last": 69476,
          *           "volume": 20242.03975,
-         *           "cost_to_move_up_usd": 19320706.39585167,
+         *           "cost_to_move_up_usd": 19320706.3958517,
          *           "cost_to_move_down_usd": 16360235.3694131,
          *           "converted_last": {
          *             "btc": 1.000205,
@@ -2614,14 +2600,14 @@ export interface components {
          *         "symbol": "ETHUSDT",
          *         "index_id": "ETH",
          *         "price": "3395.91",
-         *         "price_percentage_change_24h": 1.5274069068216003,
+         *         "price_percentage_change_24h": 1.5274069068216,
          *         "contract_type": "perpetual",
          *         "index": 3393.5342,
          *         "basis": -0.0523015571479482,
          *         "spread": 0.01,
          *         "funding_rate": -0.007182,
          *         "open_interest": 9327998764.66,
-         *         "volume_24h": 392642535.23212117,
+         *         "volume_24h": 392642535.232121,
          *         "last_traded_at": 1712467658,
          *         "expired_at": null
          *       },
@@ -2630,14 +2616,14 @@ export interface components {
          *         "symbol": "BTC-PERPUSDT",
          *         "index_id": "BTC",
          *         "price": "69434.1",
-         *         "price_percentage_change_24h": 2.040579301057485,
+         *         "price_percentage_change_24h": 2.04057930105749,
          *         "contract_type": "perpetual",
          *         "index": 69407.5,
-         *         "basis": -0.0005763032738348229,
+         *         "basis": -0.000576303273834822,
          *         "spread": 0.01,
          *         "funding_rate": 0.012,
          *         "open_interest": 7690212057.6,
-         *         "volume_24h": 132888173.54699957,
+         *         "volume_24h": 132888173.547,
          *         "last_traded_at": 1712467920,
          *         "expired_at": null
          *       }
@@ -2748,7 +2734,7 @@ export interface components {
          *             "index_basis_percentage": -0.071,
          *             "bid_ask_spread": 0.000217533173808922,
          *             "funding_rate": 0.005,
-         *             "open_interest_usd": 28102263.99977152,
+         *             "open_interest_usd": 28102263.9997715,
          *             "h24_volume": 2679284723,
          *             "converted_volume": {
          *               "btc": "888.799603175094638929930629459045946",
@@ -2846,6 +2832,7 @@ export interface components {
          *       "image": {
          *         "small": "https://assets.coingecko.com/nft_contracts/images/38/small/da64989d9762c8a61b3c65917edfdf97.png?1707287183"
          *       },
+         *       "banner_image": "https://coin-images.coingecko.com/nft_contracts/images/20/bored-ape-yacht-club-banner.png?1708416120",
          *       "description": "Pudgy Penguins is a collection of 8,888 unique NFTs featuring cute cartoon penguins, which are generated from a collection of 150 different hand-drawn traits.",
          *       "native_currency": "ethereum",
          *       "native_currency_symbol": "ETH",
@@ -2863,16 +2850,16 @@ export interface components {
          *       },
          *       "floor_price_in_usd_24h_percentage_change": 1.07067,
          *       "floor_price_24h_percentage_change": {
-         *         "usd": 1.070670607177908,
-         *         "native_currency": 1.214574898785425
+         *         "usd": 1.07067060717791,
+         *         "native_currency": 1.21457489878543
          *       },
          *       "market_cap_24h_percentage_change": {
-         *         "usd": 1.0706706071776666,
-         *         "native_currency": -0.4048582995951417
+         *         "usd": 1.07067060717767,
+         *         "native_currency": -0.404858299595142
          *       },
          *       "volume_24h_percentage_change": {
-         *         "usd": -3.1983377669874073,
-         *         "native_currency": -1.801855313900942
+         *         "usd": -3.19833776698741,
+         *         "native_currency": -1.80185531390094
          *       },
          *       "number_of_unique_addresses": 4752,
          *       "number_of_unique_addresses_24h_percentage_change": 0.08425,
@@ -2880,7 +2867,7 @@ export interface components {
          *       "total_supply": 8888,
          *       "one_day_sales": 36,
          *       "one_day_sales_24h_percentage_change": -2.7027027027027,
-         *       "one_day_average_sale_price": 11.941194388888889,
+         *       "one_day_average_sale_price": 11.9411943888889,
          *       "one_day_average_sale_price_24h_percentage_change": 0.925870927379588,
          *       "links": {
          *         "homepage": "https://www.pudgypenguins.com/",
@@ -2888,24 +2875,24 @@ export interface components {
          *         "discord": "https://discord.gg/pudgypenguins"
          *       },
          *       "floor_price_7d_percentage_change": {
-         *         "usd": -18.00149482623651,
-         *         "native_currency": -13.793103448275861
+         *         "usd": -18.0014948262365,
+         *         "native_currency": -13.7931034482759
          *       },
          *       "floor_price_14d_percentage_change": {
-         *         "usd": -8.632353394310407,
-         *         "native_currency": -8.619051100226626
+         *         "usd": -8.63235339431041,
+         *         "native_currency": -8.61905110022663
          *       },
          *       "floor_price_30d_percentage_change": {
-         *         "usd": -14.376564931440935,
-         *         "native_currency": -0.7779012541673281
+         *         "usd": -14.3765649314409,
+         *         "native_currency": -0.777901254167328
          *       },
          *       "floor_price_60d_percentage_change": {
-         *         "usd": 15.27797587032817,
+         *         "usd": 15.2779758703282,
          *         "native_currency": -18.0327868852459
          *       },
          *       "floor_price_1y_percentage_change": {
          *         "usd": 429.5685372855,
-         *         "native_currency": 196.20853080568722
+         *         "native_currency": 196.208530805687
          *       },
          *       "explorers": [
          *         {
@@ -2916,7 +2903,20 @@ export interface components {
          *           "name": "Ethplorer",
          *           "link": "https://ethplorer.io/address/0xBd3531dA5CF5857e7CfAA92426877b022e612cf8"
          *         }
-         *       ]
+         *       ],
+         *       "user_favorites_count": 3660,
+         *       "ath": {
+         *         "native_currency": 22.9,
+         *         "usd": 67535
+         *       },
+         *       "ath_change_percentage": {
+         *         "native_currency": -59.825327510917,
+         *         "usd": -64.3396788440525
+         *       },
+         *       "ath_date": {
+         *         "native_currency": "2024-02-17T09:25:05.056Z",
+         *         "usd": "2024-02-29T11:45:08.150Z"
+         *       }
          *     } */
         NFTData: {
             /** @description nft collection id */
@@ -2931,6 +2931,10 @@ export interface components {
             symbol?: string;
             /** @description nft collection image url */
             image?: {
+                small?: string;
+            };
+            /** @description nft collection banner image url */
+            banner_image?: {
                 small?: string;
             };
             /** @description nft collection description */
@@ -3022,6 +3026,25 @@ export interface components {
                 name?: string;
                 link?: string;
             }[];
+            /** @description nft collection user favorites count */
+            user_favorites_count?: number;
+            /** @description nft collection all time highs */
+            ath?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection all time highs change percentage */
+            ath_change_percentage?: {
+                native_currency?: number;
+                usd?: number;
+            };
+            /** @description nft collection all time highs date */
+            ath_date?: {
+                /** Format: date-time */
+                native_currency?: string;
+                /** Format: date-time */
+                usd?: string;
+            };
         };
         /** @example [
          *       {
@@ -3050,16 +3073,16 @@ export interface components {
          *         },
          *         "floor_price_in_usd_24h_percentage_change": 8.27604,
          *         "floor_price_24h_percentage_change": {
-         *           "usd": 8.276036095552893,
-         *           "native_currency": 1.627709265442404
+         *           "usd": 8.27603609555289,
+         *           "native_currency": 1.6277092654424
          *         },
          *         "market_cap_24h_percentage_change": {
-         *           "usd": 8.276036095552811,
-         *           "native_currency": 1.627709265442404
+         *           "usd": 8.27603609555281,
+         *           "native_currency": 1.6277092654424
          *         },
          *         "volume_24h_percentage_change": {
-         *           "usd": 32.68767488214406,
-         *           "native_currency": 24.54043325089837
+         *           "usd": 32.6876748821441,
+         *           "native_currency": 24.5404332508984
          *         },
          *         "number_of_unique_addresses": 4756,
          *         "number_of_unique_addresses_24h_percentage_change": 0.10524,
@@ -3067,7 +3090,7 @@ export interface components {
          *         "total_supply": 8888,
          *         "one_day_sales": 33,
          *         "one_day_sales_24h_percentage_change": 22.2222222222222,
-         *         "one_day_average_sale_price": 12.19299902909091,
+         *         "one_day_average_sale_price": 12.1929990290909,
          *         "one_day_average_sale_price_24h_percentage_change": 1.8967181143714
          *       }
          *     ] */
@@ -3145,11 +3168,11 @@ export interface components {
          *       "floor_price_usd": [
          *         [
          *           1626912000000,
-         *           90.16757646534482
+         *           90.1675764653448
          *         ],
          *         [
          *           1626998400000,
-         *           97.32160550000182
+         *           97.3216055000018
          *         ],
          *         [
          *           1627084800000,
@@ -3173,7 +3196,7 @@ export interface components {
          *       "h24_volume_usd": [
          *         [
          *           1626912000000,
-         *           2860.115525480738
+         *           2860.11552548074
          *         ],
          *         [
          *           1626998400000,
@@ -3181,7 +3204,7 @@ export interface components {
          *         ],
          *         [
          *           1627084800000,
-         *           925.4082790669777
+         *           925.408279066978
          *         ]
          *       ],
          *       "h24_volume_native": [
@@ -3201,15 +3224,15 @@ export interface components {
          *       "market_cap_usd": [
          *         [
          *           1626912000000,
-         *           33281860.868135665
+         *           33281860.8681357
          *         ],
          *         [
          *           1626998400000,
-         *           38474832.81210672
+         *           38474832.8121067
          *         ],
          *         [
          *           1627084800000,
-         *           44827378.86746599
+         *           44827378.867466
          *         ]
          *       ],
          *       "market_cap_native": [
@@ -3514,74 +3537,74 @@ export interface components {
          *             "small": "https://assets.coingecko.com/coins/images/28470/small/MTLOGO.png?1696527464",
          *             "large": "https://assets.coingecko.com/coins/images/28470/large/MTLOGO.png?1696527464",
          *             "slug": "moon-tropica",
-         *             "price_btc": 0.0005301634743332989,
+         *             "price_btc": 0.000530163474333298,
          *             "score": 0,
          *             "data": {
-         *               "price": 36.97171180169754,
+         *               "price": 36.9717118016975,
          *               "price_btc": "0.000530163474333299",
          *               "price_change_percentage_24h": {
-         *                 "aed": -4.044674476087556,
-         *                 "ars": -4.049900089458546,
-         *                 "aud": -4.049900089458019,
-         *                 "bch": -2.3756796248748864,
-         *                 "bdt": -4.049900089458495,
-         *                 "bhd": -4.169270133964371,
-         *                 "bmd": -4.049900089458533,
-         *                 "bnb": -3.4734695990217044,
-         *                 "brl": -4.0499000894584745,
-         *                 "btc": -5.9858537505924625,
-         *                 "cad": -4.049900089458477,
+         *                 "aed": -4.04467447608756,
+         *                 "ars": -4.04990008945855,
+         *                 "aud": -4.04990008945802,
+         *                 "bch": -2.37567962487489,
+         *                 "bdt": -4.0499000894585,
+         *                 "bhd": -4.16927013396437,
+         *                 "bmd": -4.04990008945853,
+         *                 "bnb": -3.4734695990217,
+         *                 "brl": -4.04990008945847,
+         *                 "btc": -5.98585375059246,
+         *                 "cad": -4.04990008945848,
          *                 "chf": -4.04990008945855,
-         *                 "clp": -5.025675567567188,
-         *                 "cny": -4.049900089458403,
-         *                 "czk": -4.049900089458641,
-         *                 "dkk": -4.049900089458638,
-         *                 "dot": -5.982387795212445,
+         *                 "clp": -5.02567556756719,
+         *                 "cny": -4.0499000894584,
+         *                 "czk": -4.04990008945864,
+         *                 "dkk": -4.04990008945864,
+         *                 "dot": -5.98238779521245,
          *                 "eos": -5.74405098071799,
-         *                 "eth": -5.0568944511997085,
-         *                 "eur": -4.096616197526041,
-         *                 "gbp": -4.049900089458471,
-         *                 "gel": -4.049900089458967,
-         *                 "hkd": -4.0499000894585215,
-         *                 "huf": -4.053877164508182,
-         *                 "idr": -4.049900089458211,
-         *                 "ils": -4.4092202121097746,
-         *                 "inr": -4.049900089458557,
-         *                 "jpy": -4.049900089459048,
-         *                 "krw": -4.049900089458465,
-         *                 "kwd": -4.120414696850362,
-         *                 "lkr": -4.049900089458902,
-         *                 "ltc": -5.293413388383373,
-         *                 "mmk": -4.049900089458767,
-         *                 "mxn": -4.0499000894591966,
-         *                 "myr": -4.049900089458715,
-         *                 "ngn": -4.049900089458488,
-         *                 "nok": -4.0499000894585375,
-         *                 "nzd": -4.049900089458602,
-         *                 "php": -4.049900089458442,
-         *                 "pkr": -4.049900089458451,
-         *                 "pln": -4.049900089458555,
-         *                 "rub": -4.049900089458471,
-         *                 "sar": -4.049900089458411,
-         *                 "sek": -4.049900089458544,
-         *                 "sgd": -4.049900089458575,
-         *                 "thb": -4.041056870708535,
-         *                 "try": -4.049900089458374,
-         *                 "twd": -4.0499000894584665,
+         *                 "eth": -5.05689445119971,
+         *                 "eur": -4.09661619752604,
+         *                 "gbp": -4.04990008945847,
+         *                 "gel": -4.04990008945897,
+         *                 "hkd": -4.04990008945852,
+         *                 "huf": -4.05387716450818,
+         *                 "idr": -4.04990008945821,
+         *                 "ils": -4.40922021210977,
+         *                 "inr": -4.04990008945856,
+         *                 "jpy": -4.04990008945905,
+         *                 "krw": -4.04990008945847,
+         *                 "kwd": -4.12041469685036,
+         *                 "lkr": -4.0499000894589,
+         *                 "ltc": -5.29341338838337,
+         *                 "mmk": -4.04990008945877,
+         *                 "mxn": -4.0499000894592,
+         *                 "myr": -4.04990008945872,
+         *                 "ngn": -4.04990008945849,
+         *                 "nok": -4.04990008945854,
+         *                 "nzd": -4.0499000894586,
+         *                 "php": -4.04990008945844,
+         *                 "pkr": -4.04990008945845,
+         *                 "pln": -4.04990008945856,
+         *                 "rub": -4.04990008945847,
+         *                 "sar": -4.04990008945841,
+         *                 "sek": -4.04990008945854,
+         *                 "sgd": -4.04990008945858,
+         *                 "thb": -4.04105687070854,
+         *                 "try": -4.04990008945837,
+         *                 "twd": -4.04990008945847,
          *                 "uah": -4.17945939929411,
-         *                 "usd": -4.049900089458533,
-         *                 "vef": -4.049900089458404,
-         *                 "vnd": -4.049900089458679,
-         *                 "xag": -4.062083010251626,
-         *                 "xau": -4.049900089458423,
-         *                 "xdr": -4.049900089458524,
-         *                 "xlm": -4.124939249003918,
-         *                 "xrp": -4.481270699934758,
+         *                 "usd": -4.04990008945853,
+         *                 "vef": -4.0499000894584,
+         *                 "vnd": -4.04990008945868,
+         *                 "xag": -4.06208301025163,
+         *                 "xau": -4.04990008945842,
+         *                 "xdr": -4.04990008945852,
+         *                 "xlm": -4.12493924900392,
+         *                 "xrp": -4.48127069993476,
          *                 "yfi": -4.04427366181248,
          *                 "zar": -4.0499000894588,
-         *                 "bits": -5.9858537505924465,
-         *                 "link": -5.120058065995313,
-         *                 "sats": -5.9858537505924545
+         *                 "bits": -5.98585375059245,
+         *                 "link": -5.12005806599531,
+         *                 "sats": -5.98585375059245
          *               },
          *               "market_cap": "$99,703,583",
          *               "market_cap_btc": "1428.83459310001",
@@ -3603,73 +3626,73 @@ export interface components {
          *             "small": "https://assets.coingecko.com/coins/images/12493/small/GALA_token_image_-_200PNG.png?1709725869",
          *             "large": "https://assets.coingecko.com/coins/images/12493/large/GALA_token_image_-_200PNG.png?1709725869",
          *             "slug": "gala",
-         *             "price_btc": 8.995385509920279e-7,
+         *             "price_btc": 8.99538550992028e-7,
          *             "score": 1,
          *             "data": {
-         *               "price": 0.06273061361614252,
+         *               "price": 0.0627306136161425,
          *               "price_btc": "0.000000899538550992028",
          *               "price_change_percentage_24h": {
-         *                 "aed": 9.607800289428866,
-         *                 "ars": 9.601831178453207,
+         *                 "aed": 9.60780028942887,
+         *                 "ars": 9.60183117845321,
          *                 "aud": 9.60183117845384,
-         *                 "bch": 11.467421966306494,
-         *                 "bdt": 9.601831178453276,
-         *                 "bhd": 9.465477224909796,
-         *                 "bmd": 9.601831178453173,
-         *                 "bnb": 10.223428485128215,
-         *                 "brl": 9.601831178453361,
-         *                 "btc": 7.387458257241243,
-         *                 "cad": 9.601831178453283,
-         *                 "chf": 9.601831178453216,
-         *                 "clp": 8.487222863095175,
-         *                 "cny": 9.601831178453274,
-         *                 "czk": 9.601831178453118,
-         *                 "dkk": 9.601831178453255,
-         *                 "dot": 7.376880264270369,
-         *                 "eos": 7.628589329562328,
-         *                 "eth": 8.451082207534835,
-         *                 "eur": 9.548468326361439,
-         *                 "gbp": 9.601831178453317,
-         *                 "gel": 9.601831178452892,
-         *                 "hkd": 9.601831178453269,
-         *                 "huf": 9.597288247194557,
-         *                 "idr": 9.601831178452711,
-         *                 "ils": 9.191387172052512,
-         *                 "inr": 9.601831178453226,
-         *                 "jpy": 9.601831178453017,
-         *                 "krw": 9.601831178453276,
-         *                 "kwd": 9.521283788693184,
-         *                 "lkr": 9.601831178453256,
-         *                 "ltc": 8.065248250452148,
-         *                 "mmk": 9.601831178452926,
-         *                 "mxn": 9.601831178453205,
-         *                 "myr": 9.601831178453285,
-         *                 "ngn": 9.601831178453272,
-         *                 "nok": 9.601831178453201,
+         *                 "bch": 11.4674219663065,
+         *                 "bdt": 9.60183117845328,
+         *                 "bhd": 9.4654772249098,
+         *                 "bmd": 9.60183117845317,
+         *                 "bnb": 10.2234284851282,
+         *                 "brl": 9.60183117845336,
+         *                 "btc": 7.38745825724124,
+         *                 "cad": 9.60183117845328,
+         *                 "chf": 9.60183117845322,
+         *                 "clp": 8.48722286309518,
+         *                 "cny": 9.60183117845327,
+         *                 "czk": 9.60183117845312,
+         *                 "dkk": 9.60183117845326,
+         *                 "dot": 7.37688026427037,
+         *                 "eos": 7.62858932956233,
+         *                 "eth": 8.45108220753484,
+         *                 "eur": 9.54846832636144,
+         *                 "gbp": 9.60183117845332,
+         *                 "gel": 9.60183117845289,
+         *                 "hkd": 9.60183117845327,
+         *                 "huf": 9.59728824719456,
+         *                 "idr": 9.60183117845271,
+         *                 "ils": 9.19138717205251,
+         *                 "inr": 9.60183117845323,
+         *                 "jpy": 9.60183117845302,
+         *                 "krw": 9.60183117845328,
+         *                 "kwd": 9.52128378869318,
+         *                 "lkr": 9.60183117845326,
+         *                 "ltc": 8.06524825045215,
+         *                 "mmk": 9.60183117845293,
+         *                 "mxn": 9.60183117845321,
+         *                 "myr": 9.60183117845329,
+         *                 "ngn": 9.60183117845327,
+         *                 "nok": 9.6018311784532,
          *                 "nzd": 9.60183117845338,
-         *                 "php": 9.601831178453331,
-         *                 "pkr": 9.601831178452992,
-         *                 "pln": 9.601831178453399,
-         *                 "rub": 9.601831178453267,
-         *                 "sar": 9.601831178453297,
-         *                 "sek": 9.601831178453194,
-         *                 "sgd": 9.601831178453194,
+         *                 "php": 9.60183117845333,
+         *                 "pkr": 9.60183117845299,
+         *                 "pln": 9.6018311784534,
+         *                 "rub": 9.60183117845327,
+         *                 "sar": 9.6018311784533,
+         *                 "sek": 9.60183117845319,
+         *                 "sgd": 9.60183117845319,
          *                 "thb": 9.61193260585552,
          *                 "try": 9.60183117845312,
-         *                 "twd": 9.601831178452995,
-         *                 "uah": 9.453838236106627,
-         *                 "usd": 9.601831178453173,
-         *                 "vef": 9.601831178453372,
+         *                 "twd": 9.601831178453,
+         *                 "uah": 9.45383823610663,
+         *                 "usd": 9.60183117845317,
+         *                 "vef": 9.60183117845337,
          *                 "vnd": 9.60183117845306,
-         *                 "xag": 9.587914877904465,
-         *                 "xau": 9.601831178453322,
-         *                 "xdr": 9.601831178453349,
-         *                 "xlm": 9.491125969692098,
-         *                 "xrp": 8.997673436109869,
-         *                 "yfi": 9.544091113766347,
+         *                 "xag": 9.58791487790447,
+         *                 "xau": 9.60183117845332,
+         *                 "xdr": 9.60183117845335,
+         *                 "xlm": 9.4911259696921,
+         *                 "xrp": 8.99767343610987,
+         *                 "yfi": 9.54409111376635,
          *                 "zar": 9.6018311784527,
-         *                 "bits": 7.387458257241251,
-         *                 "link": 8.376626532676953,
+         *                 "bits": 7.38745825724125,
+         *                 "link": 8.37662653267695,
          *                 "sats": 7.38745825724125
          *               },
          *               "market_cap": "$2,365,621,969",
@@ -3679,7 +3702,7 @@ export interface components {
          *               "sparkline": "https://www.coingecko.com/coins/12493/sparkline.svg",
          *               "content": {
          *                 "title": "What is GALA?",
-         *                 "description": "Gala is a blockchain gaming ecosystem. Gamers can explore different type of games and have their experiences interact across each other on the Gala platform. The GALA token is the utility token and primary medium of exchange of the ecosystem. Game items are represented as NFTs on the Ethereum blockchain and users can trade them on all marketplaces."
+         *                 "description": "Gala is a blockchain gaming ecosystem. Gamers can explore different type of games and have their experiences interact across each other on the Gala platform. The GALA token is the utility token and primary medium of exchange of the ecosystem. Game items are represented as NFTs on the Ethereum blockchain and users can trade them on all marketplaces."
          *               }
          *             }
          *           }
@@ -3727,77 +3750,77 @@ export interface components {
          *         {
          *           "id": 251,
          *           "name": "Solana Meme Coins",
-         *           "market_cap_1h_change": 1.4453764946553134,
+         *           "market_cap_1h_change": 1.44537649465531,
          *           "slug": "solana-meme-coins",
          *           "coins_count": 79,
          *           "data": {
-         *             "market_cap": 8237562936.011124,
-         *             "market_cap_btc": 118852.27622489528,
-         *             "total_volume": 1207846273.3244412,
-         *             "total_volume_btc": 17426.911336459012,
+         *             "market_cap": 8237562936.01112,
+         *             "market_cap_btc": 118852.276224895,
+         *             "total_volume": 1207846273.32444,
+         *             "total_volume_btc": 17426.911336459,
          *             "market_cap_change_percentage_24h": {
-         *               "aed": 14.230396523539737,
-         *               "ars": 14.224569755904016,
-         *               "aud": 14.224175671448258,
-         *               "bch": 10.54444640788801,
-         *               "bdt": 14.22417567144842,
-         *               "bhd": 14.082071130168746,
-         *               "bmd": 14.224175671448535,
-         *               "bnb": 12.624477239332412,
-         *               "brl": 14.221695576046988,
-         *               "btc": 11.84681099262996,
-         *               "cad": 14.232580997300973,
-         *               "chf": 14.224175671448508,
-         *               "clp": 13.062559896881549,
-         *               "cny": 14.217858661401426,
-         *               "czk": 14.224175671448577,
-         *               "dkk": 14.224175671448444,
-         *               "dot": 10.696648493582588,
-         *               "eos": 10.12173144446242,
-         *               "eth": 11.884759639001178,
-         *               "eur": 14.168562295958932,
-         *               "gbp": 14.224175671448489,
-         *               "gel": 14.224175671449085,
-         *               "hkd": 14.224175671448705,
-         *               "huf": 14.21944114673665,
-         *               "idr": 14.224175671448897,
-         *               "ils": 13.796421611262415,
-         *               "inr": 14.224175671448592,
-         *               "jpy": 14.224175671448288,
-         *               "krw": 14.224175671448533,
-         *               "kwd": 14.140231278377183,
+         *               "aed": 14.2303965235397,
+         *               "ars": 14.224569755904,
+         *               "aud": 14.2241756714483,
+         *               "bch": 10.544446407888,
+         *               "bdt": 14.2241756714484,
+         *               "bhd": 14.0820711301687,
+         *               "bmd": 14.2241756714485,
+         *               "bnb": 12.6244772393324,
+         *               "brl": 14.221695576047,
+         *               "btc": 11.84681099263,
+         *               "cad": 14.232580997301,
+         *               "chf": 14.2241756714485,
+         *               "clp": 13.0625598968815,
+         *               "cny": 14.2178586614014,
+         *               "czk": 14.2241756714486,
+         *               "dkk": 14.2241756714484,
+         *               "dot": 10.6966484935826,
+         *               "eos": 10.1217314444624,
+         *               "eth": 11.8847596390012,
+         *               "eur": 14.1685622959589,
+         *               "gbp": 14.2241756714485,
+         *               "gel": 14.2241756714491,
+         *               "hkd": 14.2241756714487,
+         *               "huf": 14.2194411467367,
+         *               "idr": 14.2241756714489,
+         *               "ils": 13.7964216112624,
+         *               "inr": 14.2241756714486,
+         *               "jpy": 14.2241756714483,
+         *               "krw": 14.2241756714485,
+         *               "kwd": 14.1402312783772,
          *               "lkr": 14.2241756714485,
-         *               "ltc": 8.642866877624703,
-         *               "mmk": 14.224175671448963,
-         *               "mxn": 14.224175671448078,
-         *               "myr": 14.224175671448464,
-         *               "ngn": 14.224175671448572,
-         *               "nok": 14.224175671448524,
-         *               "nzd": 14.22417567144808,
-         *               "php": 14.224175671448599,
-         *               "pkr": 14.224175671448386,
-         *               "pln": 14.206825106648202,
-         *               "rub": 14.224175671448602,
-         *               "sar": 14.224175671448705,
-         *               "sek": 14.224175671448574,
-         *               "sgd": 14.224175671448508,
-         *               "thb": 14.234703116161398,
-         *               "try": 14.224175671448606,
-         *               "twd": 14.224175671448991,
-         *               "uah": 14.06994127898445,
-         *               "usd": 14.224175671448535,
-         *               "vef": 14.224175671448553,
-         *               "vnd": 14.224175671448933,
-         *               "xag": 14.209672465238517,
-         *               "xau": 14.224175671448783,
-         *               "xdr": 14.224175671448712,
-         *               "xlm": 11.83204356427227,
-         *               "xrp": 12.417240014724353,
-         *               "yfi": 12.795491855495357,
-         *               "zar": 14.224175671448144,
-         *               "bits": 11.846810992629957,
-         *               "link": 11.65665127230344,
-         *               "sats": 11.846810992629955
+         *               "ltc": 8.6428668776247,
+         *               "mmk": 14.224175671449,
+         *               "mxn": 14.2241756714481,
+         *               "myr": 14.2241756714485,
+         *               "ngn": 14.2241756714486,
+         *               "nok": 14.2241756714485,
+         *               "nzd": 14.2241756714481,
+         *               "php": 14.2241756714486,
+         *               "pkr": 14.2241756714484,
+         *               "pln": 14.2068251066482,
+         *               "rub": 14.2241756714486,
+         *               "sar": 14.2241756714487,
+         *               "sek": 14.2241756714486,
+         *               "sgd": 14.2241756714485,
+         *               "thb": 14.2347031161614,
+         *               "try": 14.2241756714486,
+         *               "twd": 14.224175671449,
+         *               "uah": 14.0699412789845,
+         *               "usd": 14.2241756714485,
+         *               "vef": 14.2241756714486,
+         *               "vnd": 14.2241756714489,
+         *               "xag": 14.2096724652385,
+         *               "xau": 14.2241756714488,
+         *               "xdr": 14.2241756714487,
+         *               "xlm": 11.8320435642723,
+         *               "xrp": 12.4172400147244,
+         *               "yfi": 12.7954918554954,
+         *               "zar": 14.2241756714481,
+         *               "bits": 11.84681099263,
+         *               "link": 11.6566512723034,
+         *               "sats": 11.84681099263
          *             },
          *             "sparkline": "https://www.coingecko.com/categories/25211443/sparkline.svg"
          *           }
@@ -3805,77 +3828,77 @@ export interface components {
          *         {
          *           "id": 327,
          *           "name": "Gaming Platform",
-         *           "market_cap_1h_change": 1.1050692959116248,
+         *           "market_cap_1h_change": 1.10506929591162,
          *           "slug": "gaming-platform",
          *           "coins_count": 20,
          *           "data": {
-         *             "market_cap": 3665275001.853747,
-         *             "market_cap_btc": 52882.90728027729,
+         *             "market_cap": 3665275001.85375,
+         *             "market_cap_btc": 52882.9072802773,
          *             "total_volume": 218189404.503211,
-         *             "total_volume_btc": 3148.0557508090187,
+         *             "total_volume_btc": 3148.05575080902,
          *             "market_cap_change_percentage_24h": {
-         *               "aed": 5.953195292443641,
-         *               "ars": 5.947790735793044,
-         *               "aud": 5.947425206927055,
+         *               "aed": 5.95319529244364,
+         *               "ars": 5.94779073579304,
+         *               "aud": 5.94742520692706,
          *               "bch": 2.53433127439418,
-         *               "bdt": 5.947425206927214,
-         *               "bhd": 5.815617643683333,
-         *               "bmd": 5.9474252069273215,
-         *               "bnb": 4.4636418572644425,
-         *               "brl": 5.945124820686694,
-         *               "btc": 3.742325760876501,
-         *               "cad": 5.955221477960618,
-         *               "chf": 5.947425206927288,
-         *               "clp": 4.869980789651604,
-         *               "cny": 5.941565931116702,
-         *               "czk": 5.947425206927346,
-         *               "dkk": 5.947425206927227,
-         *               "dot": 2.675504708088687,
-         *               "eos": 2.1422464840411943,
-         *               "eth": 3.7775246261734994,
-         *               "eur": 5.895841609098276,
+         *               "bdt": 5.94742520692721,
+         *               "bhd": 5.81561764368333,
+         *               "bmd": 5.94742520692732,
+         *               "bnb": 4.46364185726444,
+         *               "brl": 5.94512482068669,
+         *               "btc": 3.7423257608765,
+         *               "cad": 5.95522147796062,
+         *               "chf": 5.94742520692729,
+         *               "clp": 4.8699807896516,
+         *               "cny": 5.9415659311167,
+         *               "czk": 5.94742520692735,
+         *               "dkk": 5.94742520692723,
+         *               "dot": 2.67550470808869,
+         *               "eos": 2.14224648404119,
+         *               "eth": 3.7775246261735,
+         *               "eur": 5.89584160909828,
          *               "gbp": 5.94742520692727,
-         *               "gel": 5.947425206927817,
-         *               "hkd": 5.947425206927471,
-         *               "huf": 5.943033748640541,
-         *               "idr": 5.9474252069276545,
-         *               "ils": 5.550666455707389,
+         *               "gel": 5.94742520692782,
+         *               "hkd": 5.94742520692747,
+         *               "huf": 5.94303374864054,
+         *               "idr": 5.94742520692765,
+         *               "ils": 5.55066645570739,
          *               "inr": 5.94742520692736,
          *               "jpy": 5.94742520692707,
-         *               "krw": 5.947425206927302,
+         *               "krw": 5.9474252069273,
          *               "kwd": 5.86956347359295,
          *               "lkr": 5.94742520692729,
-         *               "ltc": 0.7705413072238989,
-         *               "mmk": 5.947425206927696,
-         *               "mxn": 5.947425206926885,
-         *               "myr": 5.947425206927239,
-         *               "ngn": 5.947425206927365,
-         *               "nok": 5.9474252069272895,
-         *               "nzd": 5.947425206926885,
-         *               "php": 5.947425206927361,
-         *               "pkr": 5.947425206927167,
-         *               "pln": 5.931331874183391,
+         *               "ltc": 0.770541307223899,
+         *               "mmk": 5.9474252069277,
+         *               "mxn": 5.94742520692689,
+         *               "myr": 5.94742520692724,
+         *               "ngn": 5.94742520692737,
+         *               "nok": 5.94742520692729,
+         *               "nzd": 5.94742520692689,
+         *               "php": 5.94742520692736,
+         *               "pkr": 5.94742520692717,
+         *               "pln": 5.93133187418339,
          *               "rub": 5.94742520692736,
-         *               "sar": 5.947425206927473,
-         *               "sek": 5.9474252069273605,
-         *               "sgd": 5.947425206927288,
-         *               "thb": 5.957189826849315,
-         *               "try": 5.947425206927379,
-         *               "twd": 5.947425206927743,
-         *               "uah": 5.804366728598461,
-         *               "usd": 5.9474252069273215,
+         *               "sar": 5.94742520692747,
+         *               "sek": 5.94742520692736,
+         *               "sgd": 5.94742520692729,
+         *               "thb": 5.95718982684932,
+         *               "try": 5.94742520692738,
+         *               "twd": 5.94742520692774,
+         *               "uah": 5.80436672859846,
+         *               "usd": 5.94742520692732,
          *               "vef": 5.94742520692733,
          *               "vnd": 5.94742520692767,
-         *               "xag": 5.933972911507694,
-         *               "xau": 5.947425206927534,
-         *               "xdr": 5.947425206927486,
-         *               "xlm": 3.7286283890002943,
-         *               "xrp": 4.2714211629570755,
-         *               "yfi": 4.622264654484985,
-         *               "zar": 5.9474252069269395,
-         *               "bits": 3.742325760876498,
-         *               "link": 3.5659451249189047,
-         *               "sats": 3.742325760876507
+         *               "xag": 5.93397291150769,
+         *               "xau": 5.94742520692753,
+         *               "xdr": 5.94742520692749,
+         *               "xlm": 3.72862838900029,
+         *               "xrp": 4.27142116295708,
+         *               "yfi": 4.62226465448499,
+         *               "zar": 5.94742520692694,
+         *               "bits": 3.7423257608765,
+         *               "link": 3.5659451249189,
+         *               "sats": 3.74232576087651
          *             },
          *             "sparkline": "https://www.coingecko.com/categories/25211410/sparkline.svg"
          *           }
@@ -3995,146 +4018,146 @@ export interface components {
          *         "ended_icos": 3376,
          *         "markets": 1046,
          *         "total_market_cap": {
-         *           "btc": 39003738.08471593,
-         *           "eth": 803832137.2075309,
-         *           "ltc": 26721173267.535767,
-         *           "bch": 3981159931.513415,
+         *           "btc": 39003738.0847159,
+         *           "eth": 803832137.207531,
+         *           "ltc": 26721173267.5358,
+         *           "bch": 3981159931.51342,
          *           "bnb": 4670513150.58714,
-         *           "eos": 2641998753398.4077,
-         *           "xrp": 4567762968374.063,
-         *           "xlm": 21049307801356.547,
-         *           "link": 153517938957.19897,
-         *           "dot": 315120726481.16595,
-         *           "yfi": 324671967.6108449,
-         *           "usd": 2721226850772.6313,
-         *           "aed": 9993705609462.484,
-         *           "ars": 2341775032921961.5,
-         *           "aud": 4135040261091.559,
-         *           "bdt": 298245137607204.1,
-         *           "bhd": 1024582727718.6569,
-         *           "bmd": 2721226850772.6313,
-         *           "brl": 13785980136430.713,
-         *           "cad": 3698283351542.5464,
-         *           "chf": 2454228235855.375,
-         *           "clp": 2557393918759367.5,
-         *           "cny": 19681001075527.992,
-         *           "czk": 63568675602103.72,
-         *           "dkk": 18728571677757.562,
-         *           "eur": 2508293570926.523,
-         *           "gbp": 2153208842849.7563,
-         *           "gel": 7292887960070.655,
-         *           "hkd": 21307070180207.188,
+         *           "eos": 2641998753398.41,
+         *           "xrp": 4567762968374.06,
+         *           "xlm": 21049307801356.5,
+         *           "link": 153517938957.199,
+         *           "dot": 315120726481.166,
+         *           "yfi": 324671967.610845,
+         *           "usd": 2721226850772.63,
+         *           "aed": 9993705609462.48,
+         *           "ars": 2341775032921960,
+         *           "aud": 4135040261091.56,
+         *           "bdt": 298245137607204,
+         *           "bhd": 1024582727718.66,
+         *           "bmd": 2721226850772.63,
+         *           "brl": 13785980136430.7,
+         *           "cad": 3698283351542.55,
+         *           "chf": 2454228235855.38,
+         *           "clp": 2557393918759370,
+         *           "cny": 19681001075528,
+         *           "czk": 63568675602103.7,
+         *           "dkk": 18728571677757.6,
+         *           "eur": 2508293570926.52,
+         *           "gbp": 2153208842849.76,
+         *           "gel": 7292887960070.66,
+         *           "hkd": 21307070180207.2,
          *           "huf": 979811947048335,
          *           "idr": 43234171898362830,
-         *           "ils": 10201683535213.324,
-         *           "inr": 226670207147326.38,
-         *           "jpy": 412551596711385.75,
+         *           "ils": 10201683535213.3,
+         *           "inr": 226670207147326,
+         *           "jpy": 412551596711386,
          *           "krw": 3677112086909555,
-         *           "kwd": 836219405108.1758,
-         *           "lkr": 812593109477405.5,
+         *           "kwd": 836219405108.176,
+         *           "lkr": 812593109477406,
          *           "mmk": 5706555839881336,
-         *           "mxn": 44773978111872.44,
-         *           "myr": 12919024474043.053,
+         *           "mxn": 44773978111872.4,
+         *           "myr": 12919024474043.1,
          *           "ngn": 3522998071018357,
-         *           "nok": 29197131372679.86,
-         *           "nzd": 4524820631515.687,
+         *           "nok": 29197131372679.9,
+         *           "nzd": 4524820631515.69,
          *           "php": 153994230206450,
-         *           "pkr": 755251422720380.5,
-         *           "pln": 10747177948492.383,
-         *           "rub": 251732363568358.97,
-         *           "sar": 10207395390373.113,
-         *           "sek": 29054498267296.645,
-         *           "sgd": 3672056167154.7974,
-         *           "thb": 99649147572586.36,
-         *           "try": 87273829665781.25,
-         *           "twd": 87422678053291.61,
-         *           "uah": 105534042826571.94,
-         *           "vef": 272476444567.86353,
+         *           "pkr": 755251422720381,
+         *           "pln": 10747177948492.4,
+         *           "rub": 251732363568359,
+         *           "sar": 10207395390373.1,
+         *           "sek": 29054498267296.6,
+         *           "sgd": 3672056167154.8,
+         *           "thb": 99649147572586.4,
+         *           "try": 87273829665781.3,
+         *           "twd": 87422678053291.6,
+         *           "uah": 105534042826572,
+         *           "vef": 272476444567.864,
          *           "vnd": 67937284004880150,
-         *           "zar": 50878778428895.97,
-         *           "xdr": 2052425485204.5413,
+         *           "zar": 50878778428896,
+         *           "xdr": 2052425485204.54,
          *           "xag": 99002369095.9216,
-         *           "xau": 1167950564.3516145,
-         *           "bits": 39003738084715.93,
-         *           "sats": 3900373808471593.5
+         *           "xau": 1167950564.35161,
+         *           "bits": 39003738084715.9,
+         *           "sats": 3900373808471590
          *         },
          *         "total_volume": {
          *           "btc": 993675.225562481,
-         *           "eth": 20478757.151921887,
-         *           "ltc": 680759567.6148158,
-         *           "bch": 101425662.95452334,
-         *           "bnb": 118987908.24412876,
-         *           "eos": 67308643636.075134,
-         *           "xrp": 116370202467.68745,
-         *           "xlm": 536260797157.8833,
-         *           "link": 3911085965.397742,
-         *           "dot": 8028144848.205925,
-         *           "yfi": 8271476.183867172,
-         *           "usd": 69327091133.54892,
-         *           "aed": 254603742187.9583,
+         *           "eth": 20478757.1519219,
+         *           "ltc": 680759567.614816,
+         *           "bch": 101425662.954523,
+         *           "bnb": 118987908.244129,
+         *           "eos": 67308643636.0751,
+         *           "xrp": 116370202467.687,
+         *           "xlm": 536260797157.883,
+         *           "link": 3911085965.39774,
+         *           "dot": 8028144848.20593,
+         *           "yfi": 8271476.18386717,
+         *           "usd": 69327091133.5489,
+         *           "aed": 254603742187.958,
          *           "ars": 59660021021604.7,
-         *           "aud": 105345981331.98444,
+         *           "aud": 105345981331.984,
          *           "bdt": 7598215425943.58,
-         *           "bhd": 26102689718.14816,
-         *           "bmd": 69327091133.54892,
-         *           "brl": 351217283120.7607,
-         *           "cad": 94218983205.04971,
-         *           "chf": 62524924932.79855,
-         *           "clp": 65153216175224.445,
-         *           "cny": 501401253914.27954,
-         *           "czk": 1619501647007.038,
-         *           "dkk": 477136772017.5372,
-         *           "eur": 63902315579.43983,
-         *           "gbp": 54856031438.69647,
-         *           "gel": 185796604237.91116,
-         *           "hkd": 542827657221.1319,
-         *           "huf": 24962090950805.31,
-         *           "idr": 1101451492157040.8,
-         *           "ils": 259902273109.11288,
-         *           "inr": 5774743147085.059,
-         *           "jpy": 10510333651301.709,
-         *           "krw": 93679615385638.72,
-         *           "kwd": 21303868469.883915,
-         *           "lkr": 20701955274048.176,
-         *           "mmk": 145382556642718.72,
-         *           "mxn": 1140680226674.9573,
-         *           "myr": 329130365156.52313,
-         *           "ngn": 89753343519839.38,
-         *           "nok": 743838091608.2996,
-         *           "nzd": 115276185884.68079,
-         *           "php": 3923220156574.6226,
-         *           "pkr": 19241094948336.27,
-         *           "pln": 273799512470.6537,
-         *           "rub": 6413236921211.558,
-         *           "sar": 260047790673.40265,
-         *           "sek": 740204312126.5353,
+         *           "bhd": 26102689718.1482,
+         *           "bmd": 69327091133.5489,
+         *           "brl": 351217283120.761,
+         *           "cad": 94218983205.0497,
+         *           "chf": 62524924932.7986,
+         *           "clp": 65153216175224.4,
+         *           "cny": 501401253914.28,
+         *           "czk": 1619501647007.04,
+         *           "dkk": 477136772017.537,
+         *           "eur": 63902315579.4398,
+         *           "gbp": 54856031438.6965,
+         *           "gel": 185796604237.911,
+         *           "hkd": 542827657221.132,
+         *           "huf": 24962090950805.3,
+         *           "idr": 1101451492157040,
+         *           "ils": 259902273109.113,
+         *           "inr": 5774743147085.06,
+         *           "jpy": 10510333651301.7,
+         *           "krw": 93679615385638.7,
+         *           "kwd": 21303868469.8839,
+         *           "lkr": 20701955274048.2,
+         *           "mmk": 145382556642719,
+         *           "mxn": 1140680226674.96,
+         *           "myr": 329130365156.523,
+         *           "ngn": 89753343519839.4,
+         *           "nok": 743838091608.3,
+         *           "nzd": 115276185884.681,
+         *           "php": 3923220156574.62,
+         *           "pkr": 19241094948336.3,
+         *           "pln": 273799512470.654,
+         *           "rub": 6413236921211.56,
+         *           "sar": 260047790673.403,
+         *           "sek": 740204312126.535,
          *           "sgd": 93550808700.7045,
-         *           "thb": 2538702546310.5654,
-         *           "try": 2223423872616.704,
-         *           "twd": 2227215995174.6167,
-         *           "uah": 2688628550997.977,
-         *           "vef": 6941721635.202251,
-         *           "vnd": 1730798106094996.5,
-         *           "zar": 1296208622923.966,
-         *           "xdr": 52288433291.474365,
-         *           "xag": 2522224952.6170354,
-         *           "xau": 29755187.514519222,
+         *           "thb": 2538702546310.57,
+         *           "try": 2223423872616.7,
+         *           "twd": 2227215995174.62,
+         *           "uah": 2688628550997.98,
+         *           "vef": 6941721635.20225,
+         *           "vnd": 1730798106095000,
+         *           "zar": 1296208622923.97,
+         *           "xdr": 52288433291.4744,
+         *           "xag": 2522224952.61704,
+         *           "xau": 29755187.5145192,
          *           "bits": 993675225562.481,
          *           "sats": 99367522556248.1
          *         },
          *         "market_cap_percentage": {
-         *           "btc": 50.446526323358434,
-         *           "eth": 14.922806691821144,
-         *           "usdt": 3.9290064119981887,
-         *           "bnb": 3.2939520356345176,
-         *           "sol": 2.9507480132815944,
-         *           "usdc": 1.2092204926353505,
-         *           "xrp": 1.2052348104116084,
-         *           "steth": 1.1830926679376446,
-         *           "doge": 1.0577856035454278,
-         *           "ada": 0.7659872946940993
+         *           "btc": 50.4465263233584,
+         *           "eth": 14.9228066918211,
+         *           "usdt": 3.92900641199819,
+         *           "bnb": 3.29395203563452,
+         *           "sol": 2.95074801328159,
+         *           "usdc": 1.20922049263535,
+         *           "xrp": 1.20523481041161,
+         *           "steth": 1.18309266793764,
+         *           "doge": 1.05778560354543,
+         *           "ada": 0.765987294694099
          *         },
-         *         "market_cap_change_percentage_24h_usd": 1.721795060602718,
+         *         "market_cap_change_percentage_24h_usd": 1.72179506060272,
          *         "updated_at": 1712512855
          *       }
          *     } */
@@ -4178,7 +4201,7 @@ export interface components {
          *         "trading_volume_24h": "5046503746.288261648853195485635",
          *         "defi_dominance": "3.8676503084614763642371703099489945457095080090859886",
          *         "top_coin_name": "Lido Staked Ether",
-         *         "top_coin_defi_dominance": 30.589442518868005
+         *         "top_coin_defi_dominance": 30.589442518868
          *       }
          *     } */
         GlobalDeFi: {
