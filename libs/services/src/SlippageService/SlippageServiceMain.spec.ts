@@ -1,14 +1,14 @@
 import {
-  MAX_SLIPPAGE_BPS,
-  MIN_SLIPPAGE_BPS,
-  SlippageServiceMain,
-} from './SlippageServiceMain';
-import {
   PricePoint,
   SupportedChainId,
   UsdRepository,
 } from '@cowprotocol/repositories';
 import ms from 'ms';
+import {
+  MAX_SLIPPAGE_BPS,
+  MIN_SLIPPAGE_BPS,
+  SlippageServiceMain,
+} from './SlippageServiceMain';
 
 const FIVE_MIN = ms('5min');
 const FOUR_MIN = ms('4min');
@@ -368,7 +368,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // WHEN: Get slippage
-      let result = await slippageService.getSlippageBps({
+      const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
         quoteTokenAddress,
