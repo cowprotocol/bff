@@ -1,4 +1,7 @@
-import { TenderlyService, tenderlyServiceSymbol } from '@cowprotocol/services';
+import {
+  SimulationService,
+  simulationServiceSymbol,
+} from '@cowprotocol/services';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { AddressSchema, ChainIdSchema } from '../../../schemas';
@@ -90,8 +93,8 @@ type SuccessSchema = FromSchema<typeof successSchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 type BodySchema = FromSchema<typeof bodySchema>;
 
-const tenderlyService: TenderlyService = apiContainer.get(
-  tenderlyServiceSymbol
+const tenderlyService: SimulationService = apiContainer.get(
+  simulationServiceSymbol
 );
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {

@@ -36,11 +36,17 @@ class MockCacheRepository implements CacheRepository {
     };
   }
 }
+// Mock Cache Repository
 
 // Mock Repository Interface
+
+interface Data {
+  data: string;
+  count: number;
+}
 interface MockRepository {
-  getData(id: number): Promise<string | null>;
-  getMultipleData(id: number, count: number): Promise<string[] | null>;
+  getData(id: number): Promise<Data | null>;
+  getFloat(id: number, id2: number): Promise<number | null>;
 }
 
 describe('GenericCacheRepository', () => {
@@ -51,7 +57,7 @@ describe('GenericCacheRepository', () => {
   beforeEach(() => {
     mockRepo = {
       getData: jest.fn(),
-      getMultipleData: jest.fn(),
+      getFloat: jest.fn(),
     };
     cacheRepo = new MockCacheRepository();
     cachedRepo = CacheRepositoryFactory.create<MockRepository>(
@@ -59,30 +65,48 @@ describe('GenericCacheRepository', () => {
       cacheRepo,
       'test-cache',
       60, // Cache for 1 minute
-      30 // Cache null for 30 seconds
+      30, // Cache null for 30 seconds
+      {
+        getData: {
+          serialize: (data) => JSON.stringify(data),
+          deserialize: (data) => JSON.parse(data),
+        },
+        getFloat: {
+          serialize: (data) => data.toString(),
+          deserialize: (data) => parseFloat(data),
+        },
+      }
     );
   });
 
+  const MOCK_DATA: Data = {
+    data: 'data',
+    count: 1,
+  };
+  const FLOAT_DATA = 1.234;
+
+  const CACHED_DATA = JSON.stringify(MOCK_DATA);
+  const FLOAT_CACHED_DATA = FLOAT_DATA.toString();
+
   describe('getData', () => {
     it('should return data from cache if available', async () => {
-      await cacheRepo.set('repos:test-cache:getData:123', '"cached-data"', 60);
-      mockRepo.getData.mockResolvedValue('fresh-data');
+      await cacheRepo.set('repos:test-cache:getData:123', CACHED_DATA, 60);
 
       const result = await cachedRepo.getData(123);
 
-      expect(result).toBe('cached-data');
+      expect(result).toStrictEqual(MOCK_DATA);
       expect(mockRepo.getData).not.toHaveBeenCalled();
     });
 
     it('should call the repository and cache the result if not in cache', async () => {
-      mockRepo.getData.mockResolvedValue('fresh-data');
+      mockRepo.getData.mockResolvedValue(Promise.resolve(MOCK_DATA));
 
       const result = await cachedRepo.getData(123);
 
-      expect(result).toBe('fresh-data');
       expect(mockRepo.getData).toHaveBeenCalledWith(123);
+      expect(result).toStrictEqual(MOCK_DATA);
       expect(await cacheRepo.get('repos:test-cache:getData:123')).toBe(
-        '"fresh-data"'
+        CACHED_DATA
       );
     });
 
@@ -97,7 +121,7 @@ describe('GenericCacheRepository', () => {
     });
 
     it('should set correct TTL for non-null values', async () => {
-      mockRepo.getData.mockResolvedValue('fresh-data');
+      mockRepo.getData.mockResolvedValue(MOCK_DATA);
 
       await cachedRepo.getData(123);
 
@@ -123,86 +147,41 @@ describe('GenericCacheRepository', () => {
     });
   });
 
-  describe('getMultipleData', () => {
+  describe('getFloat', () => {
     it('should return data from cache if available', async () => {
       await cacheRepo.set(
-        'repos:test-cache:getMultipleData:123:3',
-        '["cached1","cached2","cached3"]',
+        'repos:test-cache:getFloat:123:3',
+        FLOAT_CACHED_DATA,
         60
       );
-      mockRepo.getMultipleData.mockResolvedValue([
-        'fresh1',
-        'fresh2',
-        'fresh3',
-      ]);
 
-      const result = await cachedRepo.getMultipleData(123, 3);
+      const result = await cachedRepo.getFloat(123, 3);
 
-      expect(result).toEqual(['cached1', 'cached2', 'cached3']);
-      expect(mockRepo.getMultipleData).not.toHaveBeenCalled();
+      expect(result).toEqual(FLOAT_DATA);
+      expect(mockRepo.getFloat).not.toHaveBeenCalled();
     });
 
     it('should call the repository and cache the result if not in cache', async () => {
-      mockRepo.getMultipleData.mockResolvedValue([
-        'fresh1',
-        'fresh2',
-        'fresh3',
-      ]);
+      mockRepo.getFloat.mockResolvedValue(FLOAT_DATA);
 
-      const result = await cachedRepo.getMultipleData(123, 3);
+      const result = await cachedRepo.getFloat(123, 3);
 
-      expect(result).toEqual(['fresh1', 'fresh2', 'fresh3']);
-      expect(mockRepo.getMultipleData).toHaveBeenCalledWith(123, 3);
-      expect(
-        await cacheRepo.get('repos:test-cache:getMultipleData:123:3')
-      ).toBe('["fresh1","fresh2","fresh3"]');
+      expect(result).toEqual(FLOAT_DATA);
+      expect(mockRepo.getFloat).toHaveBeenCalledWith(123, 3);
+      expect(await cacheRepo.get('repos:test-cache:getFloat:123:3')).toBe(
+        FLOAT_CACHED_DATA
+      );
     });
 
     it('should cache null values', async () => {
-      mockRepo.getMultipleData.mockResolvedValue(null);
+      mockRepo.getFloat.mockResolvedValue(null);
 
-      const result = await cachedRepo.getMultipleData(123, 3);
+      const result = await cachedRepo.getFloat(123, 3);
 
       expect(result).toBeNull();
-      expect(mockRepo.getMultipleData).toHaveBeenCalledWith(123, 3);
-      expect(
-        await cacheRepo.get('repos:test-cache:getMultipleData:123:3')
-      ).toBe('null');
-    });
-
-    it('should set correct TTL for non-null values', async () => {
-      mockRepo.getMultipleData.mockResolvedValue([
-        'fresh1',
-        'fresh2',
-        'fresh3',
-      ]);
-
-      await cachedRepo.getMultipleData(123, 3);
-
-      const ttl = await cacheRepo.getTtl(
-        'repos:test-cache:getMultipleData:123:3'
-      );
-      expect(ttl).toBeGreaterThan(50); // Allow for some execution time
-      expect(ttl).toBeLessThanOrEqual(60);
-    });
-
-    it('should set correct TTL for null values', async () => {
-      mockRepo.getMultipleData.mockResolvedValue(null);
-
-      await cachedRepo.getMultipleData(123, 3);
-
-      const ttl = await cacheRepo.getTtl(
-        'repos:test-cache:getMultipleData:123:3'
-      );
-      expect(ttl).toBeGreaterThan(20); // Allow for some execution time
-      expect(ttl).toBeLessThanOrEqual(30);
-    });
-
-    it('should throw if the repository throws and there is no cache', async () => {
-      mockRepo.getMultipleData.mockRejectedValue(new Error('Repository error'));
-
-      await expect(cachedRepo.getMultipleData(123, 3)).rejects.toThrow(
-        'Repository error'
+      expect(mockRepo.getFloat).toHaveBeenCalledWith(123, 3);
+      expect(await cacheRepo.get('repos:test-cache:getFloat:123:3')).toBe(
+        'null'
       );
     });
   });

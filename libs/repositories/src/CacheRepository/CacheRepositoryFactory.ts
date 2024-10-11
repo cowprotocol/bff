@@ -1,6 +1,17 @@
 import { injectable } from 'inversify';
 import { CacheRepository } from './CacheRepository';
 
+type SerializeFunction = (value: any) => string;
+type DeserializeFunction = (value: string) => any;
+
+type MethodConfig = {
+  serialize: SerializeFunction;
+  deserialize: DeserializeFunction;
+};
+
+type ConvertFns<T> = {
+  [K in keyof T]?: MethodConfig;
+};
 @injectable()
 export class CacheRepositoryFactory {
   private static createProxy<T extends object>(
@@ -8,7 +19,8 @@ export class CacheRepositoryFactory {
     cache: CacheRepository,
     cacheName: string,
     cacheTimeValueSeconds: number,
-    cacheTimeNullSeconds: number
+    cacheTimeNullSeconds: number,
+    convertFns: ConvertFns<T>
   ): T {
     const baseCacheKey = ['repos', cacheName];
 
@@ -16,6 +28,7 @@ export class CacheRepositoryFactory {
       get: (target, prop: string | symbol) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return async (...args: any[]) => {
+          const method = prop as keyof T;
           const cacheKey = CacheRepositoryFactory.getCacheKey(
             baseCacheKey,
             prop.toString(),
@@ -26,20 +39,31 @@ export class CacheRepositoryFactory {
             cacheKey
           );
 
-          if (cachedValue !== undefined) {
-            return cachedValue;
+          const methodConvertFn = convertFns?.[method];
+
+          if (!methodConvertFn) {
+            console.error('No convert function found for method', method);
           }
 
-          const method = (target as any)[prop];
-          if (typeof method === 'function') {
-            const value = await method.apply(target, args);
-            await CacheRepositoryFactory.cacheValue(
-              cache,
-              cacheKey,
-              value,
-              cacheTimeValueSeconds,
-              cacheTimeNullSeconds
-            );
+          if (cachedValue !== undefined && methodConvertFn) {
+            return cachedValue === null
+              ? cachedValue
+              : methodConvertFn.deserialize(cachedValue);
+          }
+
+          const originalMethod = (target as any)[method];
+          if (typeof originalMethod == 'function') {
+            const value = await originalMethod.apply(target, args);
+            if (methodConvertFn) {
+              await CacheRepositoryFactory.cacheValue(
+                cache,
+                cacheKey,
+                value,
+                cacheTimeValueSeconds,
+                cacheTimeNullSeconds,
+                methodConvertFn.serialize
+              );
+            }
             return value;
           }
 
@@ -54,14 +78,16 @@ export class CacheRepositoryFactory {
     cache: CacheRepository,
     cacheName: string,
     cacheTimeValueSeconds: number,
-    cacheTimeNullSeconds: number
+    cacheTimeNullSeconds: number,
+    convertFns: ConvertFns<T>
   ): T {
     return CacheRepositoryFactory.createProxy(
       repository,
       cache,
       cacheName,
       cacheTimeValueSeconds,
-      cacheTimeNullSeconds
+      cacheTimeNullSeconds,
+      convertFns
     );
   }
   private static getCacheKey(
@@ -77,10 +103,10 @@ export class CacheRepositoryFactory {
     cache: CacheRepository,
     key: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any | undefined> {
+  ): Promise<string | null | undefined> {
     const valueString = await cache.get(key);
     if (valueString) {
-      return valueString === 'null' ? null : JSON.parse(valueString);
+      return valueString === 'null' ? null : valueString;
     }
     return undefined;
   }
@@ -88,16 +114,16 @@ export class CacheRepositoryFactory {
   private static async cacheValue(
     cache: CacheRepository,
     key: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any,
     cacheTimeValueSeconds: number,
-    cacheTimeNullSeconds: number
+    cacheTimeNullSeconds: number,
+    serialize: SerializeFunction
   ): Promise<void> {
     const cacheTimeSeconds =
       value === null ? cacheTimeNullSeconds : cacheTimeValueSeconds;
     await cache.set(
       key,
-      value === null ? 'null' : JSON.stringify(value),
+      value === null ? 'null' : serialize(value),
       cacheTimeSeconds
     );
   }

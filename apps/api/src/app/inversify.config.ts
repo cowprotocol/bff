@@ -6,7 +6,7 @@ import {
   Erc20Repository,
   Erc20RepositoryViem,
   FallbackRepositoryFactory,
-  TenderlyRepository,
+  SimulationRepositoryTenderly,
   TokenHolderRepository,
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryGoldRush,
@@ -21,6 +21,10 @@ import {
   tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
+  serializePricePoints,
+  deserializePricePoints,
+  TokenHolderPoint,
+  SimulationRepository,
 } from '@cowprotocol/repositories';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
@@ -32,13 +36,13 @@ import { Container } from 'inversify';
 import {
   SlippageService,
   SlippageServiceMain,
-  TenderlyService,
+  SimulationService,
   TokenHolderService,
   TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
   slippageServiceSymbol,
-  tenderlyServiceSymbol,
+  simulationServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
@@ -50,7 +54,13 @@ function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
     cacheRepository,
     'erc20',
     CACHE_TOKEN_INFO_SECONDS,
-    CACHE_TOKEN_INFO_SECONDS
+    CACHE_TOKEN_INFO_SECONDS,
+    {
+      get: {
+        serialize: (data) => JSON.stringify(data),
+        deserialize: (data) => JSON.parse(data),
+      },
+    }
   );
 }
 
@@ -62,6 +72,17 @@ function getCacheRepository(_apiContainer: Container): CacheRepository {
   return new CacheRepositoryMemory();
 }
 
+const usdPriceConvertFns = {
+  getUsdPrice: {
+    serialize: (data: number) => data.toString(),
+    deserialize: parseFloat,
+  },
+  getUsdPrices: {
+    serialize: serializePricePoints,
+    deserialize: deserializePricePoints,
+  },
+};
+
 function getUsdRepositoryCow(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
@@ -71,7 +92,8 @@ function getUsdRepositoryCow(
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
+    DEFAULT_CACHE_NULL_SECONDS,
+    usdPriceConvertFns
   );
 }
 
@@ -83,7 +105,8 @@ function getUsdRepositoryCoingecko(
     cacheRepository,
     'usdCoingecko',
     DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
+    DEFAULT_CACHE_NULL_SECONDS,
+    usdPriceConvertFns
   );
 }
 
@@ -97,6 +120,13 @@ function getUsdRepository(
   ]);
 }
 
+const tokenHolderConvertFns = {
+  getTopTokenHolders: {
+    serialize: (data: TokenHolderPoint[]) => JSON.stringify(data),
+    deserialize: (data: string) => JSON.parse(data),
+  },
+};
+
 function getTokenHolderRepositoryGoldRush(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
@@ -105,7 +135,8 @@ function getTokenHolderRepositoryGoldRush(
     cacheRepository,
     'tokenHolderGoldRush',
     CACHE_TOKEN_INFO_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
+    DEFAULT_CACHE_NULL_SECONDS,
+    tokenHolderConvertFns
   );
 }
 
@@ -117,7 +148,8 @@ function getTokenHolderRepositoryEthplorer(
     cacheRepository,
     'tokenHolderEthplorer',
     CACHE_TOKEN_INFO_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
+    DEFAULT_CACHE_NULL_SECONDS,
+    tokenHolderConvertFns
   );
 }
 
@@ -139,8 +171,8 @@ function getApiContainer(): Container {
     .toConstantValue(erc20Repository);
 
   apiContainer
-    .bind<TenderlyRepository>(tenderlyRepositorySymbol)
-    .toConstantValue(new TenderlyRepository());
+    .bind<SimulationRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(new SimulationRepositoryTenderly());
 
   apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
@@ -165,7 +197,9 @@ function getApiContainer(): Container {
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
 
-  apiContainer.bind<TenderlyService>(tenderlyServiceSymbol).to(TenderlyService);
+  apiContainer
+    .bind<SimulationService>(simulationServiceSymbol)
+    .to(SimulationService);
 
   return apiContainer;
 }
