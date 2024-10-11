@@ -54,7 +54,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
   }>(
-    '/simulateBundle',
+    '/usdPrice',
     {
       schema: {
         params: paramsSchema,
