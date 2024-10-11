@@ -2,7 +2,7 @@ import { Container } from 'inversify';
 import { TokenHolderRepositoryEthplorer } from './TokenHolderRepositoryEthplorer';
 import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH, NULL_ADDRESS } from '../../test/mock';
-import { ETHPLORER_API_KEY } from '../datasources/ethPlorer';
+import { ETHPLORER_API_KEY } from '../datasources/ethplorer';
 
 describe('TokenHolderRepositoryEthplorer', () => {
   let tokenHolderRepositoryEthplorer: TokenHolderRepositoryEthplorer;
