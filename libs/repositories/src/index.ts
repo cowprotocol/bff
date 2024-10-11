@@ -33,8 +33,9 @@ export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
 export * from './TokenHolderRepository/TokenHolderRepositoryEthplorer';
 
 // Tenderly repositories
-export * from './TenderlyRepository/TenderlyRepository';
-export * from './TenderlyRepository/types';
+export * from './SimulationRepository/SimulationRepository';
+export * from './SimulationRepository/SimulationRepositoryTenderly';
+export * from './SimulationRepository/tenderlyTypes';
 
 // Fallback repositories
 export * from './FallbackRepository/FallbackRepositoryFactory';

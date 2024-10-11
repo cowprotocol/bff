@@ -1,5 +1,5 @@
 import { Container } from 'inversify';
-import { TenderlyRepository } from './TenderlyRepository';
+import { SimulationRepositoryTenderly } from './SimulationRepositoryTenderly';
 import { SupportedChainId } from '@cowprotocol/shared';
 import { WETH, NULL_ADDRESS } from '../../test/mock';
 import {
@@ -31,15 +31,15 @@ const FAILED_TENDERLY_SIMULATION = {
     '0x23b872dd000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000a',
 };
 
-describe('TenderlyRepository', () => {
-  let tenderlyRepository: TenderlyRepository;
+describe('SimulationRepositoryTenderly', () => {
+  let tenderlyRepository: SimulationRepositoryTenderly;
 
   beforeAll(() => {
     const container = new Container();
     container
-      .bind<TenderlyRepository>(TenderlyRepository)
-      .to(TenderlyRepository);
-    tenderlyRepository = container.get(TenderlyRepository);
+      .bind<SimulationRepositoryTenderly>(SimulationRepositoryTenderly)
+      .to(SimulationRepositoryTenderly);
+    tenderlyRepository = container.get(SimulationRepositoryTenderly);
     expect(TENDERLY_API_KEY).toBeDefined();
     expect(TENDERLY_ORG_NAME).toBeDefined();
     expect(TENDERLY_PROJECT_NAME).toBeDefined();
@@ -48,7 +48,7 @@ describe('TenderlyRepository', () => {
   describe('getTopTokenHolders', () => {
     it('should return simulation data for success simulation', async () => {
       const tenderlySimulationResult =
-        await tenderlyRepository.postTenderlyBundleSimulation(
+        await tenderlyRepository.postBundleSimulation(
           SupportedChainId.MAINNET,
           [TENDERLY_SIMULATION]
         );
@@ -60,7 +60,7 @@ describe('TenderlyRepository', () => {
 
     it('should return null for invalid simulation', async () => {
       const tenderlySimulationResult =
-        await tenderlyRepository.postTenderlyBundleSimulation(
+        await tenderlyRepository.postBundleSimulation(
           SupportedChainId.MAINNET,
           [INVALID_TENDERLY_SIMULATION]
         );
@@ -70,7 +70,7 @@ describe('TenderlyRepository', () => {
 
     it('should return simulation data for failed simulation', async () => {
       const tenderlySimulationResult =
-        await tenderlyRepository.postTenderlyBundleSimulation(
+        await tenderlyRepository.postBundleSimulation(
           SupportedChainId.MAINNET,
           [FAILED_TENDERLY_SIMULATION]
         );

@@ -6,4 +6,4 @@ export * from './UsdService/UsdService';
 
 export * from './TokenHolderService/TokenHolderService';
 
-export * from './TenderlyService/TenderlyService';
+export * from './SimulationService/SimulationService';

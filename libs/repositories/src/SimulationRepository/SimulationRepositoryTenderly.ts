@@ -1,23 +1,26 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import {
-  SimulationData,
   SimulationError,
-  SimulationInput,
   TenderlyBundleSimulationResponse,
   TenderlySimulatePayload,
-} from './types';
+} from './tenderlyTypes';
 import {
   getTenderlySimulationLink,
   TENDERLY_API_BASE_ENDPOINT,
   TENDERLY_API_KEY,
 } from '../datasources/tenderlyApi';
 import { injectable } from 'inversify';
+import {
+  SimulationData,
+  SimulationInput,
+  SimulationRepository,
+} from './SimulationRepository';
 
 export const tenderlyRepositorySymbol = Symbol.for('TenderlyRepository');
 
 @injectable()
-export class TenderlyRepository {
-  async postTenderlyBundleSimulation(
+export class SimulationRepositoryTenderly implements SimulationRepository {
+  async postBundleSimulation(
     chainId: SupportedChainId,
     simulationsInput: SimulationInput[]
   ): Promise<SimulationData[] | null> {

@@ -1,26 +1,26 @@
 import {
   SupportedChainId,
   tenderlyRepositorySymbol,
-  TenderlyRepository,
+  SimulationRepository,
   SimulationInput,
   SimulationData,
 } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 
-export const tenderlyServiceSymbol = Symbol.for('TenderlyServiceSymbol');
+export const simulationServiceSymbol = Symbol.for('SimulationServiceSymbol');
 
 @injectable()
-export class TenderlyService {
+export class SimulationService {
   constructor(
     @inject(tenderlyRepositorySymbol)
-    private tenderlyRepository: TenderlyRepository
+    private simulationRepository: SimulationRepository
   ) {}
 
   async postTenderlyBundleSimulation(
     chainId: SupportedChainId,
     simulationInput: SimulationInput[]
   ): Promise<SimulationData[] | null> {
-    return this.tenderlyRepository.postTenderlyBundleSimulation(
+    return this.simulationRepository.postBundleSimulation(
       chainId,
       simulationInput
     );
