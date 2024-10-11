@@ -2,17 +2,21 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
-  CacheRepositoryFactory,
   Erc20Repository,
+  Erc20RepositoryCache,
   Erc20RepositoryViem,
-  FallbackRepositoryFactory,
+  SimulationRepository,
   SimulationRepositoryTenderly,
   TokenHolderRepository,
+  TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
+  TokenHolderRepositoryFallback,
   TokenHolderRepositoryGoldRush,
   UsdRepository,
+  UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
+  UsdRepositoryFallback,
   cacheRepositorySymbol,
   cowApiClients,
   erc20RepositorySymbol,
@@ -21,10 +25,6 @@ import {
   tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
-  serializePricePoints,
-  deserializePricePoints,
-  TokenHolderPoint,
-  SimulationRepository,
 } from '@cowprotocol/repositories';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
@@ -34,33 +34,26 @@ const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 
 import { Container } from 'inversify';
 import {
+  SimulationService,
   SlippageService,
   SlippageServiceMain,
-  SimulationService,
   TokenHolderService,
   TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
-  slippageServiceSymbol,
   simulationServiceSymbol,
+  slippageServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
-  return CacheRepositoryFactory.create<Erc20Repository>(
+  return new Erc20RepositoryCache(
     new Erc20RepositoryViem(viemClients),
     cacheRepository,
     'erc20',
-    CACHE_TOKEN_INFO_SECONDS,
-    CACHE_TOKEN_INFO_SECONDS,
-    {
-      get: {
-        serialize: (data) => JSON.stringify(data),
-        deserialize: (data) => JSON.parse(data),
-      },
-    }
+    CACHE_TOKEN_INFO_SECONDS
   );
 }
 
@@ -72,41 +65,28 @@ function getCacheRepository(_apiContainer: Container): CacheRepository {
   return new CacheRepositoryMemory();
 }
 
-const usdPriceConvertFns = {
-  getUsdPrice: {
-    serialize: (data: number) => data.toString(),
-    deserialize: parseFloat,
-  },
-  getUsdPrices: {
-    serialize: serializePricePoints,
-    deserialize: deserializePricePoints,
-  },
-};
-
 function getUsdRepositoryCow(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return CacheRepositoryFactory.create<UsdRepository>(
+  return new UsdRepositoryCache(
     new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS,
-    usdPriceConvertFns
+    DEFAULT_CACHE_NULL_SECONDS
   );
 }
 
 function getUsdRepositoryCoingecko(
   cacheRepository: CacheRepository
 ): UsdRepository {
-  return CacheRepositoryFactory.create<UsdRepository>(
+  return new UsdRepositoryCache(
     new UsdRepositoryCoingecko(),
     cacheRepository,
     'usdCoingecko',
     DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS,
-    usdPriceConvertFns
+    DEFAULT_CACHE_NULL_SECONDS
   );
 }
 
@@ -114,47 +94,40 @@ function getUsdRepository(
   cacheRepository: CacheRepository,
   erc20Repository: Erc20Repository
 ): UsdRepository {
-  return FallbackRepositoryFactory.create<UsdRepository>([
+  return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
     getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
-const tokenHolderConvertFns = {
-  getTopTokenHolders: {
-    serialize: (data: TokenHolderPoint[]) => JSON.stringify(data),
-    deserialize: (data: string) => JSON.parse(data),
-  },
-};
+function getTokenHolderRepositoryEthplorer(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryEthplorer(),
+    cacheRepository,
+    'tokenHolderEthplorer',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
 
 function getTokenHolderRepositoryGoldRush(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
-  return CacheRepositoryFactory.create<TokenHolderRepository>(
+  return new TokenHolderRepositoryCache(
     new TokenHolderRepositoryGoldRush(),
     cacheRepository,
     'tokenHolderGoldRush',
-    CACHE_TOKEN_INFO_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS,
-    tokenHolderConvertFns
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
   );
 }
 
-function getTokenHolderRepositoryEthplorer(
+function getTokenHolderRepository(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
-  return CacheRepositoryFactory.create<TokenHolderRepository>(
-    new TokenHolderRepositoryEthplorer(),
-    cacheRepository,
-    'tokenHolderEthplorer',
-    CACHE_TOKEN_INFO_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS,
-    tokenHolderConvertFns
-  );
-}
-
-function getTokenHolderRepository(cacheRepository: CacheRepository) {
-  return FallbackRepositoryFactory.create<TokenHolderRepository>([
+  return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryGoldRush(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
@@ -165,6 +138,8 @@ function getApiContainer(): Container {
   // Repositories
   const cacheRepository = getCacheRepository(apiContainer);
   const erc20Repository = getErc20Repository(cacheRepository);
+  const simulationRepository = new SimulationRepositoryTenderly();
+  const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -172,7 +147,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<SimulationRepository>(tenderlyRepositorySymbol)
-    .toConstantValue(new SimulationRepositoryTenderly());
+    .toConstantValue(simulationRepository);
 
   apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
@@ -184,7 +159,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
-    .toConstantValue(getTokenHolderRepository(cacheRepository));
+    .toConstantValue(tokenHolderRepository);
 
   // Services
   apiContainer
