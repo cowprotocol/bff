@@ -20,7 +20,7 @@ const successSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['status', 'id', 'link'],
+    required: ['status', 'id', 'link', 'balancesDiff'],
     additionalProperties: false,
     properties: {
       status: {
@@ -37,6 +37,17 @@ const successSchema = {
         title: 'Link',
         description: 'Link to the transaction on Tenderly.',
         type: 'string',
+      },
+      balancesDiff: {
+        title: 'Balances Diff',
+        description: 'Changes in balances of the token holders.',
+        type: 'object',
+        additionalProperties: {
+          type: 'object',
+          additionalProperties: {
+            type: 'string',
+          },
+        },
       },
     },
   },

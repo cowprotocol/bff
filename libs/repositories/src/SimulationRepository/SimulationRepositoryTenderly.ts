@@ -1,5 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import {
+  AssetChange,
   SimulationError,
   TenderlyBundleSimulationResponse,
   TenderlySimulatePayload,
@@ -15,6 +16,7 @@ import {
   SimulationInput,
   SimulationRepository,
 } from './SimulationRepository';
+import { BigNumber } from 'ethers';
 
 export const tenderlyRepositorySymbol = Symbol.for('TenderlyRepository');
 
@@ -48,17 +50,71 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       return null;
     }
 
-    // TODO: Add ERC20 state diffs
-    return response.simulation_results.map(({ simulation }) => ({
-      status: simulation.status,
-      id: simulation.id,
-      link: getTenderlySimulationLink(simulation.id),
-    }));
+    const balancesDiff = this.buildBalancesDiff(
+      response.simulation_results.map(
+        (result) => result.transaction.transaction_info.asset_changes || []
+      )
+    );
+
+    return response.simulation_results.map((simulation_result, i) => {
+      return {
+        status: simulation_result.simulation.status,
+        id: simulation_result.simulation.id,
+        link: getTenderlySimulationLink(simulation_result.simulation.id),
+        balancesDiff: balancesDiff[i],
+      };
+    });
   }
 
   checkBundleSimulationError(
     response: TenderlyBundleSimulationResponse | SimulationError
   ): response is SimulationError {
     return (response as SimulationError).error !== undefined;
+  }
+
+  buildBalancesDiff(
+    assetChangesList: AssetChange[][]
+  ): Record<string, Record<string, string>>[] {
+    const cumulativeBalancesDiff: Record<string, Record<string, string>> = {};
+
+    return assetChangesList.map((assetChanges) => {
+      assetChanges.forEach((change) => {
+        const { token_info, from, to, raw_amount } = change;
+        const { contract_address } = token_info;
+
+        // Helper function to update balance
+        const updateBalance = (
+          address: string,
+          tokenSymbol: string,
+          changeAmount: string
+        ) => {
+          if (!cumulativeBalancesDiff[address]) {
+            cumulativeBalancesDiff[address] = {};
+          }
+          if (!cumulativeBalancesDiff[address][tokenSymbol]) {
+            cumulativeBalancesDiff[address][tokenSymbol] = '0';
+          }
+
+          const currentBalance = BigNumber.from(
+            cumulativeBalancesDiff[address][tokenSymbol]
+          );
+          const changeValue = BigNumber.from(changeAmount);
+          const newBalance = currentBalance.add(changeValue);
+
+          cumulativeBalancesDiff[address][tokenSymbol] = newBalance.toString();
+        };
+
+        if (from) {
+          updateBalance(from, contract_address, `-${raw_amount}`);
+        }
+
+        if (to) {
+          updateBalance(to, contract_address, raw_amount);
+        }
+      });
+
+      // Return a deep copy of the current state of cumulativeBalancesDiff
+      return JSON.parse(JSON.stringify(cumulativeBalancesDiff));
+    });
   }
 }
