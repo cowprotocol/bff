@@ -15,7 +15,7 @@ export interface SimulationData {
   id: string;
   // { [address: string]: { [token: string]: balanceDiff: string } }
   // example: { '0x123': { '0x456': '100', '0xabc': '-100' } }
-  balancesDiff: Record<string, Record<string, string>>;
+  cumulativeBalancesDiff: Record<string, Record<string, string>>;
 }
 
 export const simulationRepositorySymbol = Symbol.for('SimulationRepository');
