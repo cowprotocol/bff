@@ -187,6 +187,13 @@ export class SlippageServiceMain implements SlippageService {
       return null;
     }
 
+    const { prices: _, ...base } = volatilityBase;
+    const { prices: __, ...quote } = volatilityQuote;
+    console.log(`getMaxVolatilityOnSettlement`, {
+      base,
+      quote,
+    });
+
     return Math.max(
       volatilityQuote.volatilityInTokens,
       volatilityBase.volatilityInTokens
@@ -209,6 +216,9 @@ export class SlippageServiceMain implements SlippageService {
     if (!volatility) {
       return null;
     }
+
+    const { prices: _, ...vol } = volatility;
+    console.log(`getRelativeVolatilityOnSettlement`, vol);
 
     return volatility.volatilityInTokens;
   }
