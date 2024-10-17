@@ -5,6 +5,13 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  SimulationRepository,
+  SimulationRepositoryTenderly,
+  TokenHolderRepository,
+  TokenHolderRepositoryCache,
+  TokenHolderRepositoryEthplorer,
+  TokenHolderRepositoryFallback,
+  TokenHolderRepositoryGoldRush,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -14,6 +21,8 @@ import {
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tenderlyRepositorySymbol,
+  tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -25,11 +34,16 @@ const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 
 import { Container } from 'inversify';
 import {
+  SimulationService,
   SlippageService,
   SlippageServiceMain,
+  TokenHolderService,
+  TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
+  simulationServiceSymbol,
   slippageServiceSymbol,
+  tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
@@ -86,15 +100,54 @@ function getUsdRepository(
   ]);
 }
 
+function getTokenHolderRepositoryEthplorer(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryEthplorer(),
+    cacheRepository,
+    'tokenHolderEthplorer',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepositoryGoldRush(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryGoldRush(),
+    cacheRepository,
+    'tokenHolderGoldRush',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepository(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryFallback([
+    getTokenHolderRepositoryGoldRush(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository),
+  ]);
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
   // Repositories
   const cacheRepository = getCacheRepository(apiContainer);
   const erc20Repository = getErc20Repository(cacheRepository);
+  const simulationRepository = new SimulationRepositoryTenderly();
+  const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
     .toConstantValue(erc20Repository);
+
+  apiContainer
+    .bind<SimulationRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(simulationRepository);
 
   apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
@@ -104,12 +157,24 @@ function getApiContainer(): Container {
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
+  apiContainer
+    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
+    .toConstantValue(tokenHolderRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
 
+  apiContainer
+    .bind<TokenHolderService>(tokenHolderServiceSymbol)
+    .to(TokenHolderServiceMain);
+
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer
+    .bind<SimulationService>(simulationServiceSymbol)
+    .to(SimulationService);
 
   return apiContainer;
 }
