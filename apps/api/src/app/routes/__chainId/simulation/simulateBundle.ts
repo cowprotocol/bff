@@ -123,7 +123,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         );
 
       if (simulationResult === null) {
-        reply.code(404).send({ message: 'Token holders not found' });
+        reply.code(404).send({ message: 'Build simulation error' });
         return;
       }
       fastify.log.info(
