@@ -284,6 +284,27 @@ interface TransactionInfo {
   raw_state_diff: null;
   console_logs: null;
   created_at: Date;
+  // Note: manually added
+  asset_changes?: AssetChange[];
+}
+
+// Note: manually added
+export interface AssetChange {
+  token_info: {
+    standard: string;
+    type: string;
+    contract_address: string;
+    symbol: string;
+    name: string;
+    logo: string;
+    decimals: number;
+    dollar_value: string;
+  };
+  type: string;
+  from?: string;
+  to?: string;
+  amount: string;
+  raw_amount: string;
 }
 
 interface StackTrace {
