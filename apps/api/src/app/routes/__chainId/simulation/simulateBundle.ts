@@ -109,7 +109,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         params: paramsSchema,
         response: {
           '2XX': successSchema,
-          '404': errorSchema,
+          '400': errorSchema,
         },
       },
     },
@@ -123,7 +123,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         );
 
       if (simulationResult === null) {
-        reply.code(404).send({ message: 'Build simulation error' });
+        reply.code(400).send({ message: 'Build simulation error' });
         return;
       }
       fastify.log.info(
