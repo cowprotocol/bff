@@ -29,10 +29,10 @@ const schema = {
     TENDERLY_API_KEY: {
       type: 'string',
     },
-    TENDERLY_PROJECT: {
+    TENDERLY_PROJECT_NAME: {
       type: 'string',
     },
-    TENDERLY_ACCOUNT: {
+    TENDERLY_ORG_NAME: {
       type: 'string',
     },
     ETHPLORER_API_KEY: {
