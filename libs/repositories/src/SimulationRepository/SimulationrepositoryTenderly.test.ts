@@ -57,6 +57,7 @@ describe('SimulationRepositoryTenderly', () => {
       expect(tenderlySimulationResult).toBeDefined();
       expect(tenderlySimulationResult?.length).toBe(1);
       expect(tenderlySimulationResult?.[0].status).toBeTruthy();
+      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0);
     }, 100000);
 
     it('should return null for invalid simulation', async () => {
@@ -79,6 +80,7 @@ describe('SimulationRepositoryTenderly', () => {
       expect(tenderlySimulationResult).toBeDefined();
       expect(tenderlySimulationResult?.length).toBe(1);
       expect(tenderlySimulationResult?.[0].status).toBeFalsy();
+      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0);
     }, 100000);
   });
   describe('buildBalancesDiff', () => {

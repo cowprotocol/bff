@@ -20,7 +20,7 @@ const successSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['status', 'id', 'link', 'cumulativeBalancesDiff'],
+    required: ['status', 'id', 'link', 'cumulativeBalancesDiff', 'gasUsed'],
     additionalProperties: false,
     properties: {
       status: {
@@ -48,6 +48,11 @@ const successSchema = {
             type: 'string',
           },
         },
+      },
+      gasUsed: {
+        title: 'Gas Used',
+        description: 'Amount of gas used in the transaction with decimals.',
+        type: 'string',
       },
     },
   },
