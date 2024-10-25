@@ -62,6 +62,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         id: simulation_result.simulation.id,
         link: getTenderlySimulationLink(simulation_result.simulation.id),
         cumulativeBalancesDiff: balancesDiff[i],
+        gasUsed: simulation_result.transaction.gas_used.toString(),
       };
     });
   }
