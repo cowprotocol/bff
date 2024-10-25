@@ -113,7 +113,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         }
       });
 
-      return { ...cumulativeBalancesDiff };
+      return JSON.parse(JSON.stringify(cumulativeBalancesDiff));
     });
   }
 }
