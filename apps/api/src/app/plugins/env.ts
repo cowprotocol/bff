@@ -38,6 +38,9 @@ const schema = {
     ETHPLORER_API_KEY: {
       type: 'string',
     },
+    MORALIS_API_KEY: {
+      type: 'string',
+    },
   },
 };
 

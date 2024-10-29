@@ -11,7 +11,7 @@ import {
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
-  TokenHolderRepositoryGoldRush,
+  TokenHolderRepositoryMoralis,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -112,13 +112,13 @@ function getTokenHolderRepositoryEthplorer(
   );
 }
 
-function getTokenHolderRepositoryGoldRush(
+function getTokenHolderRepositoryMoralis(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
   return new TokenHolderRepositoryCache(
-    new TokenHolderRepositoryGoldRush(),
+    new TokenHolderRepositoryMoralis(),
     cacheRepository,
-    'tokenHolderGoldRush',
+    'tokenHolderMoralis',
     DEFAULT_CACHE_VALUE_SECONDS,
     DEFAULT_CACHE_NULL_SECONDS
   );
@@ -128,7 +128,7 @@ function getTokenHolderRepository(
   cacheRepository: CacheRepository
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
-    getTokenHolderRepositoryGoldRush(cacheRepository),
+    getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
