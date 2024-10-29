@@ -34,6 +34,7 @@ export * from './TokenHolderRepository/TokenHolderRepositoryGoldRush';
 export * from './TokenHolderRepository/TokenHolderRepositoryEthplorer';
 export * from './TokenHolderRepository/TokenHolderRepositoryCache';
 export * from './TokenHolderRepository/TokenHolderRepositoryFallback';
+export * from './TokenHolderRepository/TokenHolderRepositoryMoralis';
 
 // Simulation repositories
 export * from './SimulationRepository/SimulationRepository';
