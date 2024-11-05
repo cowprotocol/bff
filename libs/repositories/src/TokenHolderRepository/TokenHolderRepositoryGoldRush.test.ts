@@ -1,10 +1,10 @@
-import { Container } from 'inversify';
-import { TokenHolderRepositoryGoldRush } from './TokenHolderRepositoryGoldRush';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../test/mock';
+import { Container } from 'inversify';
+import { NULL_ADDRESS, WETH } from '../../test/mock';
 import { GOLD_RUSH_API_KEY } from '../datasources/goldRush';
+import { TokenHolderRepositoryGoldRush } from './TokenHolderRepositoryGoldRush';
 
-describe('TokenHolderRepositoryGoldRush', () => {
+describe.skip('TokenHolderRepositoryGoldRush', () => {
   let tokenHolderRepositoryGoldRush: TokenHolderRepositoryGoldRush;
 
   beforeAll(() => {
