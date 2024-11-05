@@ -1,8 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
-import { hexZeroPad } from '@ethersproject/bytes';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { keccak256 } from '@ethersproject/keccak256';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 
 interface ConditionalOrderParams {
   staticInput: string;
@@ -42,9 +41,11 @@ export const TWAP_ORDER_STRUCT =
 
 const twapHandlerAddress = '0x910d00a310f7Dc5B29FE73458F47f519be547D3d';
 export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
-  1: twapHandlerAddress,
-  100: twapHandlerAddress,
-  '11155111': twapHandlerAddress,
+  [SupportedChainId.MAINNET]: twapHandlerAddress,
+  [SupportedChainId.GNOSIS_CHAIN]: twapHandlerAddress,
+  [SupportedChainId.ARBITRUM_ONE]: twapHandlerAddress,
+  [SupportedChainId.BASE]: twapHandlerAddress,
+  [SupportedChainId.SEPOLIA]: twapHandlerAddress,
 };
 
 export function twapOrderToStruct(order: TWAPOrder): TWAPOrderStruct {

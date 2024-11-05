@@ -1,18 +1,12 @@
-import {
-  createPublicClient,
-  http,
-  Client,
-  Chain,
-  PublicClient,
-  webSocket,
-} from 'viem';
-import { arbitrum, gnosis, mainnet, sepolia } from 'viem/chains';
 import { AllChainIds, SupportedChainId } from '@cowprotocol/shared';
+import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem';
+import { arbitrum, base, gnosis, mainnet, sepolia } from 'viem/chains';
 
 const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.MAINNET]: mainnet,
   [SupportedChainId.GNOSIS_CHAIN]: gnosis,
   [SupportedChainId.ARBITRUM_ONE]: arbitrum,
+  [SupportedChainId.BASE]: base,
   [SupportedChainId.SEPOLIA]: sepolia,
 };
 

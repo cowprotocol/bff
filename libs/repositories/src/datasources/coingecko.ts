@@ -2,7 +2,7 @@ import { SupportedChainId } from '@cowprotocol/shared';
 
 import createClient from 'openapi-fetch';
 
-import type { paths, components } from '../gen/coingecko/coingecko-pro-types';
+import type { components, paths } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
@@ -11,6 +11,7 @@ export const COINGECKO_PLATFORMS: Record<SupportedChainId, string | undefined> =
     [SupportedChainId.MAINNET]: 'ethereum',
     [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
     [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
+    [SupportedChainId.BASE]: 'base',
     [SupportedChainId.SEPOLIA]: undefined,
   };
 
