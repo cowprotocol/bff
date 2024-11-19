@@ -39,12 +39,14 @@ import {
   SlippageServiceMain,
   TokenHolderService,
   TokenHolderServiceMain,
+  TradingService,
   UsdService,
   UsdServiceMain,
   simulationServiceSymbol,
   slippageServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
+  tradingServiceSymbol
 } from '@cowprotocol/services';
 import ms from 'ms';
 
@@ -175,6 +177,10 @@ function getApiContainer(): Container {
   apiContainer
     .bind<SimulationService>(simulationServiceSymbol)
     .to(SimulationService);
+
+  apiContainer
+    .bind<TradingService>(tradingServiceSymbol)
+    .to(TradingService);
 
   return apiContainer;
 }

@@ -3,7 +3,7 @@ import {
   slippageServiceSymbol,
   VolatilityDetails,
 } from '@cowprotocol/services';
-import { ChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../../schemas';
+import { ChainIdSchema, ETHEREUM_ADDRESS_PATTERN, SlippageSchema } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
@@ -52,15 +52,7 @@ const successSchema = {
   required: ['slippageBps'],
   additionalProperties: false,
   properties: {
-    slippageBps: {
-      title: 'Slippage tolerance in basis points',
-      description:
-        'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
-      type: 'number',
-      examples: [50, 100, 200],
-      minimum: 0,
-      maximum: 10000,
-    },
+    slippageBps: SlippageSchema,
   },
 } as const satisfies JSONSchema;
 
