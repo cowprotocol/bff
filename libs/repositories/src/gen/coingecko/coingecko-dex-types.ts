@@ -353,7 +353,7 @@ export interface paths {
         };
         /**
          * Most Recently Updated Tokens List
-         * @description This endpoint allows you to **query 100 most recently updated tokens info across all networks on GeckoTerminal**
+         * @description This endpoint allows you to **query 100 most recently updated tokens info of a specific network or across all networks on GeckoTerminal**
          */
         get: operations["tokens-info-recent-updated"];
         put?: never;
@@ -954,7 +954,7 @@ export interface components {
          *             "https://tether.to/"
          *           ],
          *           "description": "Tether (USDT) is a cryptocurrency with a value meant to mirror the value of the U.S. dollar...",
-         *           "gt_score": 92.66055045871559,
+         *           "gt_score": 92.6605504587156,
          *           "discord_url": null,
          *           "telegram_handle": null,
          *           "twitter_handle": "Tether_to"
@@ -995,7 +995,7 @@ export interface components {
          *               "https://weth.io/"
          *             ],
          *             "description": "WETH is the tokenized/packaged form of ETH that you use to pay for items when you interact with Ethereum dApps...",
-         *             "gt_score": 92.66055045871559,
+         *             "gt_score": 92.6605504587156,
          *             "discord_url": null,
          *             "telegram_handle": null,
          *             "twitter_handle": null
@@ -1014,7 +1014,7 @@ export interface components {
          *               "https://tether.to/"
          *             ],
          *             "description": "Tether (USDT) is a cryptocurrency with a value meant to mirror the value of the U.S. dollar. ...",
-         *             "gt_score": 92.66055045871559,
+         *             "gt_score": 92.6605504587156,
          *             "discord_url": null,
          *             "telegram_handle": null,
          *             "twitter_handle": "Tether_to"
@@ -1036,7 +1036,7 @@ export interface components {
          *             "coingecko_coin_id": "tensor",
          *             "websites": [],
          *             "description": "TNSR is the native token for the Tensor NFT marketplace on Solana.",
-         *             "gt_score": 41.284403669724774,
+         *             "gt_score": 41.2844036697248,
          *             "metadata_updated_at": "2024-04-08T15:59:04Z",
          *             "discord_url": null,
          *             "telegram_handle": null,
@@ -1066,7 +1066,7 @@ export interface components {
          *               3660.85954963415,
          *               3417.91885296256,
          *               3660.85954963415,
-         *               306823.2770311613
+         *               306823.277031161
          *             ],
          *             [
          *               1712448000,
@@ -1074,7 +1074,7 @@ export interface components {
          *               3455.28884490954,
          *               3352.95305060685,
          *               3454.61590249189,
-         *               242144.86478418365
+         *               242144.864784184
          *             ],
          *             [
          *               1712361600,
@@ -1082,7 +1082,7 @@ export interface components {
          *               3391.19811016133,
          *               3317.73497182435,
          *               3362.60273217873,
-         *               273323.66168293066
+         *               273323.661682931
          *             ]
          *           ]
          *         }
@@ -1187,7 +1187,7 @@ export interface operations {
             path: {
                 /** @description network id  <br> *refers to [/networks](/reference/networks-list) */
                 network: string;
-                /** @description token contract address, comma-separated if more than one token contract address, max 30 addresses */
+                /** @description token contract address, comma-separated if more than one token contract address,100 addresses */
                 addresses: string;
             };
             cookie?: never;
@@ -1648,8 +1648,10 @@ export interface operations {
     "tokens-info-recent-updated": {
         parameters: {
             query?: {
-                /** @description attributes to include */
+                /** @description Attributes for related resources to include, which will be returned under the top-level 'included' key */
                 include?: "network";
+                /** @description Filter tokens by provided network  <br> *refers to [/networks](/reference/networks-list)  */
+                network?: string;
             };
             header?: never;
             path?: never;
