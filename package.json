@@ -19,7 +19,7 @@
     "compose:up": "yarn docker-build:affected && docker-compose up",
     "swagger": "ts-node scripts/fetchCoingeckoSwagger",
     "gen:types": "npx openapi-typescript",
-    "postinstall": "yarn gen:types && yarn trading:generateSchemas",
+    "postinstall": "yarn gen:types",
     "test:api:slippage": "node apps/api/scripts/test-slippage.js",
     "trading:generateSchemas": "cp -R node_modules/@cowprotocol/cow-sdk/dist/schemas/trading apps/api/src/tradingSchemas"
   },
