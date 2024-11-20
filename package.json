@@ -19,8 +19,9 @@
     "compose:up": "yarn docker-build:affected && docker-compose up",
     "swagger": "ts-node scripts/fetchCoingeckoSwagger",
     "gen:types": "npx openapi-typescript",
-    "postinstall": "yarn gen:types",
-    "test:api:slippage": "node apps/api/scripts/test-slippage.js"
+    "postinstall": "yarn gen:types && yarn trading:generateSchemas",
+    "test:api:slippage": "node apps/api/scripts/test-slippage.js",
+    "trading:generateSchemas": "cp -R node_modules/@cowprotocol/cow-sdk/dist/schemas/trading apps/api/src/tradingSchemas"
   },
   "private": true,
   "dependencies": {
@@ -94,6 +95,7 @@
     "pino-pretty": "^11.2.2",
     "prettier": "^2.6.2",
     "ts-jest": "^29.1.0",
+    "ts-json-schema-generator": "^2.3.0",
     "ts-node": "10.9.1",
     "typechain": "^8.2.0",
     "typescript": "^5.5.3",

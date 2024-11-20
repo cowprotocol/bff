@@ -1,9 +1,9 @@
 import { ChainIdSchema } from '../../../schemas';
 import { JSONSchema } from 'json-schema-to-ts';
 
-import QuoterParametersSchema from './tradingSchemas/QuoterParameters';
-import TradeParametersSchema from './tradingSchemas/TradeParameters';
-import QuoteResultsSchema from './tradingSchemas/QuoteResultsSerialized';
+import QuoterParametersSchema from '../../../../tradingSchemas/QuoterParameters';
+import TradeParametersSchema from '../../../../tradingSchemas/TradeParameters';
+import QuoteResultsSchema from '../../../../tradingSchemas/QuoteResultsSerialized';
 
 export const routeSchema = {
   type: 'object',
