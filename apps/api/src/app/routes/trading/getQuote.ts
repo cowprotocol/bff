@@ -1,17 +1,15 @@
 import { FastifyPluginAsync } from 'fastify';
 
 import { FromSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../inversify.config';
+import { apiContainer } from '../../inversify.config';
 import {
   TradingService,
   tradingServiceSymbol
 } from '@cowprotocol/services';
 
 import { serializeQuoteAmountsAndCosts } from './serializeQuoteAmountsAndCosts';
-import { bodySchema, errorSchema, routeSchema, successSchema } from './schemas';
+import { bodySchema, errorSchema, successSchema } from './schemas';
 
-
-type RouteSchema = FromSchema<typeof routeSchema>;
 type SuccessSchema = FromSchema<typeof successSchema>;
 type BodySchema = FromSchema<typeof bodySchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
@@ -22,7 +20,6 @@ const tradingService: TradingService = apiContainer.get(
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.post<{
-    Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
@@ -37,16 +34,11 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId } = request.params;
-
       const { trader, params } = request.body
 
       try {
         const result = await tradingService.getQuote(
-          {
-            ...trader as Parameters<typeof tradingService.getQuote>[0],
-            chainId
-          },
+          trader as Parameters<typeof tradingService.getQuote>[0],
           params as Parameters<typeof tradingService.getQuote>[1]
         );
 

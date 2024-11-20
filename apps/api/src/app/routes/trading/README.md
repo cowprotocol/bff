@@ -1,7 +1,7 @@
 # Example
 
 ```ts
-fetch('http://127.0.0.1:8080/1/trade/getQuote', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
     trader: {
         account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
         appCode: 'test1',
