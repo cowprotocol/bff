@@ -9,10 +9,21 @@ import {
 
 import { serializeQuoteAmountsAndCosts } from './serializeQuoteAmountsAndCosts';
 import { bodySchema, errorSchema, successSchema } from './schemas';
+import type { OrderPostError } from '@cowprotocol/cow-sdk';
 
 type SuccessSchema = FromSchema<typeof successSchema>;
 type BodySchema = FromSchema<typeof bodySchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
+
+const isOrderPostError = (e: any): e is OrderPostError => e.errorType && e.description;
+
+const getErrorMessage = (e: any): string => {
+  if (e.body && isOrderPostError(e.body)) {
+    return e.body.description;
+  }
+
+  return e.message || JSON.stringify(e);
+}
 
 const tradingService: TradingService = apiContainer.get(
   tradingServiceSymbol
@@ -47,7 +58,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           amountsAndCosts: serializeQuoteAmountsAndCosts(result.amountsAndCosts)
         });
       } catch (e) {
-        reply.code(500).send({ message: (e as Error).message });
+        const errorMessage = getErrorMessage(e)
+        console.error('[Trading API] getQuote error', errorMessage)
+        reply.code(500).send({ message: errorMessage });
       }
     }
   );
