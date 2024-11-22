@@ -580,31 +580,25 @@ export default {
         },
         "types": {
           "type": "object",
-          "properties": {
-            "Order": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  }
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
                 },
-                "required": [
-                  "name",
-                  "type"
-                ],
-                "additionalProperties": false
-              }
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "type"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "Order"
-          ],
-          "additionalProperties": false
+          }
         },
         "message": {
           "type": "object",

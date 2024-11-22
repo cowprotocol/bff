@@ -7,12 +7,11 @@ import {
   tradingServiceSymbol
 } from '@cowprotocol/services';
 
-import { serializeQuoteAmountsAndCosts } from './serializeQuoteAmountsAndCosts';
-import { errorSchema, getQuoteBodySchema, getQuoteSuccessSchema } from './schemas';
+import { errorSchema, postOrderBodySchema, postOrderSuccessSchema } from './schemas';
 import { getErrorMessage } from './utils';
 
-type SuccessSchema = FromSchema<typeof getQuoteSuccessSchema>;
-type BodySchema = FromSchema<typeof getQuoteBodySchema>;
+type SuccessSchema = FromSchema<typeof postOrderSuccessSchema>;
+type BodySchema = FromSchema<typeof postOrderBodySchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
 const tradingService: TradingService = apiContainer.get(
@@ -24,32 +23,32 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/getQuote',
+    '/postOrder',
     {
       schema: {
-        body: getQuoteBodySchema,
+        body: postOrderBodySchema,
         response: {
-          '2XX': getQuoteSuccessSchema,
+          '2XX': postOrderSuccessSchema,
           '400': errorSchema,
         },
       },
     },
     async function (request, reply) {
-      const { trader, params } = request.body
+      const { trader, quoteResponse, orderTypedData, appDataInfo, signature } = request.body
 
       try {
-        const result = await tradingService.getQuote(
-          trader as Parameters<typeof tradingService.getQuote>[0],
-          params as Parameters<typeof tradingService.getQuote>[1]
+        const orderId = await tradingService.postOrder(
+          trader,
+          quoteResponse as Parameters<typeof tradingService.postOrder>[1],
+          orderTypedData as Parameters<typeof tradingService.postOrder>[2],
+          appDataInfo,
+          signature
         );
 
-        reply.send({
-          ...result,
-          amountsAndCosts: serializeQuoteAmountsAndCosts(result.amountsAndCosts)
-        });
+        reply.send({ orderId });
       } catch (e) {
         const errorMessage = getErrorMessage(e)
-        console.error('[Trading API] getQuote error', errorMessage)
+        console.error('[Trading API] postOrder error', errorMessage)
         reply.code(500).send({ message: errorMessage });
       }
     }
