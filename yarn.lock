@@ -1083,10 +1083,10 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@cowprotocol/app-data@^2.1.0":
-  version "2.3.0"
-  resolved "https://registry.npmjs.org/@cowprotocol/app-data/-/app-data-2.3.0.tgz"
-  integrity sha512-wClmhKUAEVEgt9o7+ZLvV5AT/LP2ySMfPwveyy1Nwd762m8djaIddZ5cbex6iBROyOHEmk+9x9rcn8sUHXQ4Ww==
+"@cowprotocol/app-data@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@cowprotocol/app-data/-/app-data-2.4.0.tgz#326e20065161e06308cf0ff429fe9dd2908c1c30"
+  integrity sha512-aG3CicUdR7jpY5/linxXmpL4axmiUvEwiHlOM0qKO/QdbNSntKNXjSu3r4QtHZ7BUiF1VUkcDVvvFW4D2MA0Rw==
   dependencies:
     ajv "^8.11.0"
     cross-fetch "^3.1.5"
@@ -1106,12 +1106,12 @@
   resolved "https://registry.npmjs.org/@cowprotocol/contracts/-/contracts-1.6.0.tgz"
   integrity sha512-+UKhYRzkvnqqviBru5D3btTLYc743n0O5YTG+wpYwGl4fb7VNKBkFHe28C5Mf1DF/kOfmqfu+0IAvX9Vuq5Dqw==
 
-"@cowprotocol/cow-sdk@5.8.0-RC.2":
-  version "5.8.0-RC.2"
-  resolved "https://registry.yarnpkg.com/@cowprotocol/cow-sdk/-/cow-sdk-5.8.0-RC.2.tgz#c9fac6f0ebade01cff06a84c68aee27c35bd6b8e"
-  integrity sha512-Eqpg+H1GnHVwPNLvtX5JxnzM/3vLetdn7m2G5o6bCNFqPnBMbMne+NrEQ4voRTn4v5Y/FS0WD7d+q+CCeQU2dA==
+"@cowprotocol/cow-sdk@5.8.0-RC.3":
+  version "5.8.0-RC.3"
+  resolved "https://registry.yarnpkg.com/@cowprotocol/cow-sdk/-/cow-sdk-5.8.0-RC.3.tgz#80b4651026f5b79c306ffa59cd330b481b63d677"
+  integrity sha512-N3jmQqB1exPaKeJE99xYzdK99XB96/QUfEVsfNW3rGFBBI5qDOl82naaxSOQPxikKRTt/CN3nRhHAYs4MgmZ7g==
   dependencies:
-    "@cowprotocol/app-data" "^2.1.0"
+    "@cowprotocol/app-data" "^2.4.0"
     "@cowprotocol/contracts" "^1.6.0"
     "@ethersproject/abstract-signer" "^5.7.0"
     "@openzeppelin/merkle-tree" "^1.0.5"
