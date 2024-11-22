@@ -79,130 +79,6 @@ export default {
         "sellTokenDecimals"
       ]
     },
-    "amountsAndCosts": {
-      "type": "object",
-      "properties": {
-        "isSell": {
-          "type": "boolean"
-        },
-        "costs": {
-          "type": "object",
-          "properties": {
-            "networkFee": {
-              "type": "object",
-              "properties": {
-                "amountInSellCurrency": {
-                  "type": "string"
-                },
-                "amountInBuyCurrency": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "amountInSellCurrency",
-                "amountInBuyCurrency"
-              ],
-              "additionalProperties": false
-            },
-            "partnerFee": {
-              "type": "object",
-              "properties": {
-                "amount": {
-                  "type": "string"
-                },
-                "bps": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "amount",
-                "bps"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "required": [
-            "networkFee",
-            "partnerFee"
-          ],
-          "additionalProperties": false
-        },
-        "beforeNetworkCosts": {
-          "type": "object",
-          "properties": {
-            "sellAmount": {
-              "type": "string"
-            },
-            "buyAmount": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "sellAmount",
-            "buyAmount"
-          ],
-          "additionalProperties": false
-        },
-        "afterNetworkCosts": {
-          "type": "object",
-          "properties": {
-            "sellAmount": {
-              "type": "string"
-            },
-            "buyAmount": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "sellAmount",
-            "buyAmount"
-          ],
-          "additionalProperties": false
-        },
-        "afterPartnerFees": {
-          "type": "object",
-          "properties": {
-            "sellAmount": {
-              "type": "string"
-            },
-            "buyAmount": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "sellAmount",
-            "buyAmount"
-          ],
-          "additionalProperties": false
-        },
-        "afterSlippage": {
-          "type": "object",
-          "properties": {
-            "sellAmount": {
-              "type": "string"
-            },
-            "buyAmount": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "sellAmount",
-            "buyAmount"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "isSell",
-        "costs",
-        "beforeNetworkCosts",
-        "afterNetworkCosts",
-        "afterPartnerFees",
-        "afterSlippage"
-      ],
-      "additionalProperties": false,
-      "description": "CoW Protocol quote has amounts (sell/buy) and costs (network fee), there is also partner fees. Besides that, CoW Protocol supports both sell and buy orders and the fees and costs are calculated differently.\n\nThe order of adding fees and costs is as follows: 1. Network fee is always added to the sell amount 2. Partner fee is added to the surplus amount (sell amount for sell-orders, buy amount for buy-orders)\n\nFor sell-orders the partner fee is subtracted from the buy amount after network costs. For buy-orders the partner fee is added on top of the sell amount after network costs."
-    },
     "orderToSign": {
       "type": "object",
       "additionalProperties": false,
@@ -670,14 +546,296 @@ export default {
         "appDataKeccak256"
       ],
       "additionalProperties": false
+    },
+    "orderTypedData": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "chainId": {
+              "type": "number"
+            },
+            "verifyingContract": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "version",
+            "chainId",
+            "verifyingContract"
+          ],
+          "additionalProperties": false
+        },
+        "primaryType": {
+          "type": "string",
+          "const": "Order"
+        },
+        "types": {
+          "type": "object",
+          "properties": {
+            "Order": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "Order"
+          ],
+          "additionalProperties": false
+        },
+        "message": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "receiver": {
+              "type": "string"
+            },
+            "sellToken": {
+              "type": "string",
+              "description": "ERC-20 token to be sold."
+            },
+            "buyToken": {
+              "type": "string",
+              "description": "ERC-20 token to be bought."
+            },
+            "sellAmount": {
+              "type": "string",
+              "description": "Amount of `sellToken` to be sold in atoms."
+            },
+            "buyAmount": {
+              "type": "string",
+              "description": "Amount of `buyToken` to be bought in atoms."
+            },
+            "validTo": {
+              "type": "number",
+              "description": "Unix timestamp (`uint32`) until which the order is valid."
+            },
+            "appData": {
+              "type": "string",
+              "description": "32 bytes encoded as hex with `0x` prefix. It's expected to be the hash of the stringified JSON object representing the `appData`."
+            },
+            "feeAmount": {
+              "type": "string",
+              "description": "feeRatio * sellAmount + minimal_fee in atoms."
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "buy",
+                "sell"
+              ],
+              "description": "The kind is either a buy or sell order."
+            },
+            "partiallyFillable": {
+              "type": "boolean",
+              "description": "Is the order fill-or-kill or partially fillable?"
+            },
+            "sellTokenBalance": {
+              "type": "string",
+              "enum": [
+                "erc20",
+                "internal",
+                "external"
+              ],
+              "description": "Where should the `sellToken` be drawn from?"
+            },
+            "buyTokenBalance": {
+              "type": "string",
+              "enum": [
+                "erc20",
+                "internal"
+              ],
+              "description": "Where should the `buyToken` be transferred to?"
+            },
+            "signingScheme": {
+              "type": "string",
+              "enum": [
+                "eip712",
+                "ethsign",
+                "presign",
+                "eip1271"
+              ],
+              "description": "How was the order signed?"
+            }
+          },
+          "required": [
+            "appData",
+            "buyAmount",
+            "buyToken",
+            "feeAmount",
+            "kind",
+            "partiallyFillable",
+            "receiver",
+            "sellAmount",
+            "sellToken",
+            "validTo"
+          ],
+          "description": "Unsigned order intent to be placed."
+        }
+      },
+      "required": [
+        "domain",
+        "primaryType",
+        "types",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "amountsAndCosts": {
+      "type": "object",
+      "properties": {
+        "isSell": {
+          "type": "boolean"
+        },
+        "costs": {
+          "type": "object",
+          "properties": {
+            "networkFee": {
+              "type": "object",
+              "properties": {
+                "amountInSellCurrency": {
+                  "type": "string"
+                },
+                "amountInBuyCurrency": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "amountInSellCurrency",
+                "amountInBuyCurrency"
+              ],
+              "additionalProperties": false
+            },
+            "partnerFee": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string"
+                },
+                "bps": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "amount",
+                "bps"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "networkFee",
+            "partnerFee"
+          ],
+          "additionalProperties": false
+        },
+        "beforeNetworkCosts": {
+          "type": "object",
+          "properties": {
+            "sellAmount": {
+              "type": "string"
+            },
+            "buyAmount": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sellAmount",
+            "buyAmount"
+          ],
+          "additionalProperties": false
+        },
+        "afterNetworkCosts": {
+          "type": "object",
+          "properties": {
+            "sellAmount": {
+              "type": "string"
+            },
+            "buyAmount": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sellAmount",
+            "buyAmount"
+          ],
+          "additionalProperties": false
+        },
+        "afterPartnerFees": {
+          "type": "object",
+          "properties": {
+            "sellAmount": {
+              "type": "string"
+            },
+            "buyAmount": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sellAmount",
+            "buyAmount"
+          ],
+          "additionalProperties": false
+        },
+        "afterSlippage": {
+          "type": "object",
+          "properties": {
+            "sellAmount": {
+              "type": "string"
+            },
+            "buyAmount": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sellAmount",
+            "buyAmount"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "isSell",
+        "costs",
+        "beforeNetworkCosts",
+        "afterNetworkCosts",
+        "afterPartnerFees",
+        "afterSlippage"
+      ],
+      "additionalProperties": false,
+      "description": "CoW Protocol quote has amounts (sell/buy) and costs (network fee), there is also partner fees. Besides that, CoW Protocol supports both sell and buy orders and the fees and costs are calculated differently.\n\nThe order of adding fees and costs is as follows: 1. Network fee is always added to the sell amount 2. Partner fee is added to the surplus amount (sell amount for sell-orders, buy amount for buy-orders)\n\nFor sell-orders the partner fee is subtracted from the buy amount after network costs. For buy-orders the partner fee is added on top of the sell amount after network costs."
     }
   },
   "required": [
-    "tradeParameters",
     "amountsAndCosts",
+    "appDataInfo",
     "orderToSign",
+    "orderTypedData",
     "quoteResponse",
-    "appDataInfo"
+    "tradeParameters"
   ],
   "additionalProperties": false,
   "definitions": {}

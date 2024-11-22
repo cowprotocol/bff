@@ -21,12 +21,12 @@
     "gen:types": "npx openapi-typescript",
     "postinstall": "yarn gen:types && yarn run trading:generateSchemas",
     "test:api:slippage": "node apps/api/scripts/test-slippage.js",
-    "trading:generateSchemas": "cp -R node_modules/@cowprotocol/cow-sdk/dist/schemas/trading apps/api/src/tradingSchemas"
+    "trading:generateSchemas": "cp -R node_modules/@cowprotocol/cow-sdk/dist/schemas/trading/* apps/api/src/tradingSchemas"
   },
   "private": true,
   "dependencies": {
     "@cowprotocol/cms": "^0.3.0-RC.4",
-    "@cowprotocol/cow-sdk": "5.8.0-RC.3",
+    "@cowprotocol/cow-sdk": "5.8.0-RC.4",
     "@fastify/autoload": "~5.7.1",
     "@fastify/caching": "^8.3.0",
     "@fastify/cors": "^8.2.1",
