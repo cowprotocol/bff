@@ -7,12 +7,12 @@ import {
   tradingServiceSymbol
 } from '@cowprotocol/services';
 
-import { serializeQuoteAmountsAndCosts } from './mapQuoteAmountsAndCosts';
-import { errorSchema, getQuoteBodySchema, getQuoteSuccessSchema } from './schemas';
+import { errorSchema, ethFlowTxBodySchema, ethFlowTxSuccessSchema } from './schemas';
 import { getErrorMessage } from './utils';
+import { deserializeQuoteAmountsAndCosts } from './mapQuoteAmountsAndCosts';
 
-type SuccessSchema = FromSchema<typeof getQuoteSuccessSchema>;
-type BodySchema = FromSchema<typeof getQuoteBodySchema>;
+type SuccessSchema = FromSchema<typeof ethFlowTxSuccessSchema>;
+type BodySchema = FromSchema<typeof ethFlowTxBodySchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
 const tradingService: TradingService = apiContainer.get(
@@ -24,32 +24,32 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/getQuote',
+    '/getEthFlowTransaction',
     {
       schema: {
-        body: getQuoteBodySchema,
+        body: ethFlowTxBodySchema,
         response: {
-          '2XX': getQuoteSuccessSchema,
+          '2XX': ethFlowTxSuccessSchema,
           '400': errorSchema,
         },
       },
     },
     async function (request, reply) {
-      const { trader, params } = request.body
+      const { trader, amountsAndCosts, quoteId, params, appDataInfo } = request.body
 
       try {
-        const result = await tradingService.getQuote(
-          trader as Parameters<typeof tradingService.getQuote>[0],
-          params as Parameters<typeof tradingService.getQuote>[1]
+        const result = await tradingService.getEthFlowTransaction(
+          trader,
+          quoteId,
+          params as Parameters<typeof tradingService.getEthFlowTransaction>[2],
+          deserializeQuoteAmountsAndCosts(amountsAndCosts),
+          appDataInfo,
         );
 
-        reply.send({
-          ...result,
-          amountsAndCosts: serializeQuoteAmountsAndCosts(result.amountsAndCosts)
-        });
+        reply.send(result);
       } catch (e) {
         const errorMessage = getErrorMessage(e)
-        console.error('[Trading API] getQuote error', errorMessage)
+        console.error('[Trading API] getEthFlowTransaction error', errorMessage)
         reply.code(500).send({ message: errorMessage });
       }
     }

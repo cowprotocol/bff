@@ -6,6 +6,44 @@ import QuoterParametersSchema from '../../../tradingSchemas/QuoterParameters';
 import TradeParametersSchema from '../../../tradingSchemas/TradeParameters';
 import QuoteResultsSchema from '../../../tradingSchemas/QuoteResultsSerialized';
 
+const TraderParametersSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    env: TradeParametersSchema.properties.env,
+    chainId: QuoterParametersSchema.properties.chainId,
+    account: QuoterParametersSchema.properties.account,
+  },
+  required: [
+    'chainId',
+    'account'
+  ]
+} as const
+
+const TransactionSchema = {
+  type: 'object',
+  required: ['callData', 'gasLimit', 'to', 'value'],
+  additionalProperties: false,
+  properties: {
+    callData: {
+      title: 'Call data',
+      type: 'string'
+    },
+    gasLimit: {
+      title: 'Gas limit',
+      type: 'string'
+    },
+    to: {
+      title: 'CoW Protocol Settlement contract address',
+      type: 'string'
+    },
+    value: {
+      title: 'Native token value to send',
+      type: 'string'
+    },
+  }
+} as const
+
 export const getQuoteBodySchema = {
   type: 'object',
   required: ['trader', 'params'],
@@ -45,19 +83,7 @@ export const postOrderBodySchema = {
   required: ['trader', 'quoteResponse', 'orderTypedData', 'appDataInfo', 'signature'],
   additionalProperties: false,
   properties: {
-    trader: {
-      type: 'object',
-      additionalProperties: false,
-      properties: {
-        env: TradeParametersSchema.properties.env,
-        chainId: QuoterParametersSchema.properties.chainId,
-        account: QuoterParametersSchema.properties.account,
-      },
-      required: [
-        'chainId',
-        'account'
-      ]
-    },
+    trader: TraderParametersSchema,
     quoteResponse: QuoteResultsSchema.properties.quoteResponse,
     orderTypedData: QuoteResultsSchema.properties.orderTypedData,
     appDataInfo: QuoteResultsSchema.properties.appDataInfo,
@@ -80,29 +106,50 @@ export const postOrderSuccessSchema = {
       type: 'string'
     },
     preSignTransaction: {
-      type: 'object',
-      description: 'For smart-contracts, the transaction to be sent to the CoW Protocol Settlement contract to confirm the order.',
-      required: ['callData', 'gasLimit', 'to', 'value'],
-      additionalProperties: false,
+      ...TransactionSchema,
       properties: {
-        callData: {
-          title: 'Call data',
-          type: 'string'
-        },
-        gasLimit: {
-          title: 'Gas limit',
-          type: 'string'
-        },
-        to: {
-          title: 'CoW Protocol Settlement contract address',
-          type: 'string'
-        },
+        ...TransactionSchema.properties,
         value: {
-          title: 'Native token value to send',
-          type: 'string',
+          ...TransactionSchema.properties.value,
           const: '0'
-        },
-      }
+        }
+      },
+      description: 'For smart-contracts, the transaction to be sent to the CoW Protocol Settlement contract to confirm the order.',
+    }
+  }
+} as const satisfies JSONSchema;
+
+
+export const ethFlowTxBodySchema = {
+  type: 'object',
+  required: ['trader', 'params', 'quoteId', 'amountsAndCosts', 'appDataInfo'],
+  additionalProperties: false,
+  properties: {
+    trader: TraderParametersSchema,
+    params: TradeParametersSchema,
+    quoteId: {
+      title: 'Quote ID',
+      description: 'Unique identifier of the quote.',
+      type: 'number'
+    },
+    amountsAndCosts: QuoteResultsSchema.properties.amountsAndCosts,
+    appDataInfo: QuoteResultsSchema.properties.appDataInfo,
+  }
+} as const satisfies JSONSchema;
+
+export const ethFlowTxSuccessSchema = {
+  type: 'object',
+  required: ['orderId'],
+  additionalProperties: false,
+  properties: {
+    orderId: {
+      title: 'Order ID',
+      description: 'Unique identifier for the order, you can search for details of the order in https://explorer.cow.fi using the ID.',
+      type: 'string'
+    },
+    transaction: {
+      ...TransactionSchema,
+      description: 'Transaction to be sent to the CoW Protocol Eth-flow contract to create the order.',
     }
   }
 } as const satisfies JSONSchema;

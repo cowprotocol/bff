@@ -88,3 +88,41 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   console.log('preSignTransaction:', preSignTransaction)
 })()
 ```
+
+### Eth-flow
+
+```ts
+(async function() {
+  const trader = {
+    account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
+    appCode: 'test1',
+    chainId: 11155111
+  }
+  const params = {
+    kind: 'sell',
+    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    buyToken: '0x0625afb445c3b6b7b929342a04a22599fd5dbb59',
+    amount: '100000000000000000'
+  }
+
+  const callApi = (method, body) => fetch('http://127.0.0.1:8080/trading/' + method, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  }).then(res => res.json())
+
+  // Get quote
+  const { quoteResponse, orderTypedData, appDataInfo, amountsAndCosts, tradeParameters } = await callApi('getQuote', { trader, params })
+  // Get transaction
+  const { orderId, transaction } = await callApi('getEthFlowTransaction', { trader, quoteId: quoteResponse.id, amountsAndCosts, appDataInfo, params: tradeParameters })
+  // Connect wallet
+  const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' })
+  // Send transaction
+  const { callData, gasLimit, to, value } = transaction
+  const txHash = await window.ethereum.request({
+    method: 'eth_sendTransaction',
+    params: [{ from: account, data: callData, gas: gasLimit, to, value }]
+  })
+
+  console.log('txHash:', txHash)
+  console.log('orderId:', orderId)
+})()
+```

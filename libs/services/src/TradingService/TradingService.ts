@@ -1,16 +1,18 @@
 import { injectable } from 'inversify';
-import { parseAbi, PublicClient } from 'viem';
+import { Chain, Client, PublicClient, Transport } from 'viem';
+import { Web3Provider } from '@ethersproject/providers'
 
 import {
   getQuote,
-  TradeParameters,
   SwapAdvancedSettings,
   QuoteResults,
   OrderBookApi,
   SigningScheme,
   CowEnv,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
-  SupportedChainId
+  SupportedChainId,
+  getEthFlowTransaction,
+  swapParamsToLimitOrderParams
 } from '@cowprotocol/cow-sdk';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { ETHEREUM_ADDRESS_LENGTH, NativeCurrencyAddress, NativeCurrencyDecimals } from '@cowprotocol/shared';
@@ -36,7 +38,6 @@ export interface PostOrderResult {
 
 const GAS_LIMIT_MARGIN = 20 // 20%
 const DEFAULT_GAS_LIMIT = BigInt(150000)
-const SettlementInterface = GPv2Settlement__factory.createInterface()
 
 @injectable()
 export class TradingService {
@@ -48,7 +49,7 @@ export class TradingService {
 
   async getQuote(
     trader: Parameters<typeof getQuote>[1],
-    params: Omit<TradeParameters, 'sellTokenDecimals' | 'buyTokenDecimals'>,
+    params: Omit<QuoteResults['tradeParameters'], 'sellTokenDecimals' | 'buyTokenDecimals'>,
     advancedSettings?: SwapAdvancedSettings
   ): Promise<QuoteResults> {
     const chainId = trader.chainId as number
@@ -104,6 +105,51 @@ export class TradingService {
     }
   }
 
+  async getEthFlowTransaction(
+    trader: TraderParams,
+    quoteId: number,
+    params: QuoteResults['tradeParameters'],
+    amountsAndCosts: QuoteResults['amountsAndCosts'],
+    appDataInfo: QuoteResults['appDataInfo'],
+  ): Promise<ReturnType<typeof getEthFlowTransaction>> {
+    const viemClient = this.viemClients[trader.chainId as SupportedChainId] as Client<Transport, Chain>
+    const provider = this.viemClientToEthersProvider(viemClient)
+
+    return getEthFlowTransaction(
+      provider.getSigner(trader.account),
+      appDataInfo.appDataKeccak256,
+      swapParamsToLimitOrderParams(params, quoteId, amountsAndCosts),
+    )
+  }
+
+  private async getPreSignTransaction(
+    chainId: SupportedChainId,
+    account: string,
+    orderId: string
+  ): Promise<PostOrderResult['preSignTransaction']> {
+    const viemClient = this.viemClients[chainId] as Client<Transport, Chain>
+    const provider = this.viemClientToEthersProvider(viemClient)
+    const contract = GPv2Settlement__factory.connect(account, provider)
+
+    const settlementContractAddress = COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId] as `0x${string}`
+    const preSignatureCall = contract.interface.encodeFunctionData('setPreSignature', [orderId, true])
+
+    const gas = await contract.estimateGas.setPreSignature(orderId, true)
+      .then((res) => BigInt(res.toHexString()))
+      .catch((error) => {
+        console.error(error)
+
+        return DEFAULT_GAS_LIMIT
+      })
+
+    return {
+      callData: preSignatureCall,
+      gasLimit: '0x' + this.addGasLimitMargin(gas).toString(16),
+      to: settlementContractAddress,
+      value: '0'
+    }
+  }
+
   private async getTokenDecimals(chainId: number, tokenAddress: string): Promise<number> {
     if (tokenAddress.toLowerCase() === NativeCurrencyAddress.toLowerCase()) {
       return NativeCurrencyDecimals
@@ -118,42 +164,6 @@ export class TradingService {
     }
   }
 
-  private async getPreSignTransaction(
-    chainId: SupportedChainId,
-    account: string,
-    orderId: string
-  ): Promise<PostOrderResult['preSignTransaction']> {
-    const viemClient = this.viemClients[chainId]
-
-    const method = 'setPreSignature'
-
-    const settlementContractAddress = COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId] as `0x${string}`
-    const preSignatureCall = SettlementInterface.encodeFunctionData(method, [orderId, true])
-
-    const gas = await (async () => {
-      try {
-        return viemClient.estimateContractGas({
-          address: settlementContractAddress,
-          abi: parseAbi([
-            SettlementInterface.getFunction(method).format('full')
-          ]),
-          functionName: method,
-          account: account as `0x${string}`,
-          args: [orderId, true]
-        })
-      } catch (e) {
-        return DEFAULT_GAS_LIMIT
-      }
-    })()
-
-    return {
-      callData: preSignatureCall,
-      gasLimit: this.addGasLimitMargin(gas).toString(),
-      to: settlementContractAddress,
-      value: '0'
-    }
-  }
-
   /**
    * Returns the gas value plus a margin for unexpected or variable gas costs
    * @param value the gas value to pad
@@ -161,5 +171,16 @@ export class TradingService {
   private addGasLimitMargin(value: bigint): bigint {
     const twentyPercent = value * BigInt(GAS_LIMIT_MARGIN) / BigInt(100);
     return value + twentyPercent;
+  }
+
+  private viemClientToEthersProvider(client: Client<Transport, Chain>): Web3Provider {
+    const { chain, transport } = client
+    const network = {
+      chainId: chain.id,
+      name: chain.name,
+      ensAddress: chain.contracts?.ensRegistry?.address,
+    }
+
+    return new Web3Provider(transport, network)
   }
 }
