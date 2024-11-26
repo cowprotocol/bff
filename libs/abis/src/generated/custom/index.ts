@@ -3,8 +3,10 @@
 /* eslint-disable */
 export type { ComposableCoW } from "./ComposableCoW";
 export type { ExtensibleFallbackHandler } from "./ExtensibleFallbackHandler";
+export type { GPv2Settlement } from "./GPv2Settlement";
 export type { SignatureVerifierMuxer } from "./SignatureVerifierMuxer";
 export * as factories from "./factories";
 export { ComposableCoW__factory } from "./factories/ComposableCoW__factory";
 export { ExtensibleFallbackHandler__factory } from "./factories/ExtensibleFallbackHandler__factory";
+export { GPv2Settlement__factory } from "./factories/GPv2Settlement__factory";
 export { SignatureVerifierMuxer__factory } from "./factories/SignatureVerifierMuxer__factory";

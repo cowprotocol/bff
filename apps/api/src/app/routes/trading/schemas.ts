@@ -62,8 +62,8 @@ export const postOrderBodySchema = {
     orderTypedData: QuoteResultsSchema.properties.orderTypedData,
     appDataInfo: QuoteResultsSchema.properties.appDataInfo,
     signature: {
-      title: 'ECDSA signature of the order',
-      description: 'Result of eth_signTypedData_v4 with the orderTypedData',
+      title: 'ECDSA signature of the order OR account address for smart-contracts',
+      description: 'Result of eth_signTypedData_v4 with the orderTypedData OR the account address for smart-contracts (pre-sign)',
       type: 'string'
     }
   }
@@ -78,6 +78,31 @@ export const postOrderSuccessSchema = {
       title: 'Order ID',
       description: 'Unique identifier for the order, you can search for details of the order in https://explorer.cow.fi using the ID.',
       type: 'string'
+    },
+    preSignTransaction: {
+      type: 'object',
+      description: 'For smart-contracts, the transaction to be sent to the CoW Protocol Settlement contract to confirm the order.',
+      required: ['callData', 'gasLimit', 'to', 'value'],
+      additionalProperties: false,
+      properties: {
+        callData: {
+          title: 'Call data',
+          type: 'string'
+        },
+        gasLimit: {
+          title: 'Gas limit',
+          type: 'string'
+        },
+        to: {
+          title: 'CoW Protocol Settlement contract address',
+          type: 'string'
+        },
+        value: {
+          title: 'Native token value to send',
+          type: 'string',
+          const: '0'
+        },
+      }
     }
   }
 } as const satisfies JSONSchema;

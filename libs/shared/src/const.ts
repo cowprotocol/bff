@@ -27,3 +27,5 @@ export const ChainNames: Record<SupportedChainId, string> = {
 export const AllChainIds: SupportedChainId[] = Object.values(SupportedChainId)
   .filter((value) => typeof value === 'number') // Filter out non-numeric values
   .map((value) => value as number); // Map to number
+
+export const ETHEREUM_ADDRESS_LENGTH = 42

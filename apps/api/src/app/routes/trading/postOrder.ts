@@ -37,7 +37,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const { trader, quoteResponse, orderTypedData, appDataInfo, signature } = request.body
 
       try {
-        const orderId = await tradingService.postOrder(
+        const result = await tradingService.postOrder(
           trader,
           quoteResponse as Parameters<typeof tradingService.postOrder>[1],
           orderTypedData as Parameters<typeof tradingService.postOrder>[2],
@@ -45,7 +45,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           signature
         );
 
-        reply.send({ orderId });
+        reply.send(result);
       } catch (e) {
         const errorMessage = getErrorMessage(e)
         console.error('[Trading API] postOrder error', errorMessage)

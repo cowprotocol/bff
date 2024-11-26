@@ -52,3 +52,39 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   console.log('Order Id:', orderId)
 })()
 ```
+
+### Smart-contract wallet (pre-sign)
+
+```ts
+(async function() {
+  const trader = {
+    account: '0xF568A3a2dfFd73C000E8E475B2D335A4A3818EBa',
+    appCode: 'test1',
+    chainId: 11155111
+  }
+  const params = {
+    kind: 'sell',
+    sellToken: '0xfff9976782d46cc05630d1f6ebab18b2324d6b14',
+    buyToken: '0x0625afb445c3b6b7b929342a04a22599fd5dbb59',
+    amount: '100000000000000000'
+  }
+
+  const callApi = (method, body) => fetch('http://127.0.0.1:8080/trading/' + method, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  }).then(res => res.json())
+
+  // Get quote
+  const { quoteResponse, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
+  // Connect wallet
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+  // Sign order
+  const signature = trader.account
+  // Send order
+  const { orderId, preSignTransaction } = await callApi('postOrder', { trader, signature, quoteResponse, orderTypedData, appDataInfo })
+
+  // ACTION NEEDED: Send <preSignTransaction> from smart-contract wallet
+
+  console.log('Order Id:', orderId)
+  console.log('preSignTransaction:', preSignTransaction)
+})()
+```

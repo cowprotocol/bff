@@ -1,3 +1,7 @@
+import ms from 'ms';
+import { PublicClient } from 'viem';
+import { Container } from 'inversify';
+
 import {
   CacheRepository,
   CacheRepositoryMemory,
@@ -27,12 +31,6 @@ import {
   viemClients,
 } from '@cowprotocol/repositories';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
-const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
-
-const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
-
-import { Container } from 'inversify';
 import {
   SimulationService,
   SlippageService,
@@ -48,7 +46,12 @@ import {
   usdServiceSymbol,
   tradingServiceSymbol
 } from '@cowprotocol/services';
-import ms from 'ms';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
+
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
+
+const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
   return new Erc20RepositoryCache(
@@ -135,6 +138,12 @@ function getTokenHolderRepository(
   ]);
 }
 
+function getTradingService(
+  erc20Repository: Erc20Repository
+): TradingService {
+  return new TradingService(erc20Repository, viemClients as Record<SupportedChainId, PublicClient>);
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
   // Repositories
@@ -142,6 +151,7 @@ function getApiContainer(): Container {
   const erc20Repository = getErc20Repository(cacheRepository);
   const simulationRepository = new SimulationRepositoryTenderly();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
+  const tradingService = getTradingService(erc20Repository)
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -180,7 +190,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<TradingService>(tradingServiceSymbol)
-    .to(TradingService);
+    .toConstantValue(tradingService);
 
   return apiContainer;
 }

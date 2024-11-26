@@ -1,7 +1,6 @@
 import {
   createPublicClient,
   http,
-  Client,
   Chain,
   PublicClient,
   webSocket,
