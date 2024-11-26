@@ -1,14 +1,14 @@
-import { injectable } from 'inversify';
-import {
-  TokenHolderPoint,
-  TokenHolderRepository,
-} from './TokenHolderRepository';
 import { SupportedChainId } from '@cowprotocol/shared';
+import { injectable } from 'inversify';
 import {
   MORALIS_API_BASE_URL,
   MORALIS_API_KEY,
   MORALIS_CLIENT_NETWORK_MAPPING,
 } from '../datasources/moralis';
+import {
+  TokenHolderPoint,
+  TokenHolderRepository,
+} from './TokenHolderRepository';
 
 interface MoralisTokenHolderItem {
   balance: string;
@@ -36,7 +36,7 @@ export class TokenHolderRepositoryMoralis implements TokenHolderRepository {
     tokenAddress: string
   ): Promise<TokenHolderPoint[] | null> {
     const response = (await fetch(
-      `${MORALIS_API_BASE_URL}/v2.2/erc20/${tokenAddress}/owners?chain=${MORALIS_CLIENT_NETWORK_MAPPING[chainId]}&order=DESC`,
+      `${MORALIS_API_BASE_URL}/v2.2/erc20/${tokenAddress}/owners?chain=${MORALIS_CLIENT_NETWORK_MAPPING[chainId]}&order=DESC&limit=2`,
       {
         method: 'GET',
         headers: {

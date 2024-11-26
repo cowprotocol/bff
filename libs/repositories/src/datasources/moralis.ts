@@ -9,4 +9,5 @@ export const MORALIS_CLIENT_NETWORK_MAPPING: Record<SupportedChainId, string> =
     [SupportedChainId.SEPOLIA]: 'sepolia',
     [SupportedChainId.GNOSIS_CHAIN]: 'gnosis',
     [SupportedChainId.ARBITRUM_ONE]: 'arbitrum',
+    [SupportedChainId.BASE]: 'base',
   };
