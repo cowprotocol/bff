@@ -379,6 +379,8 @@ export interface paths {
          *     * The block on which the batch was created.
          *     * Prices for all tokens being traded (used for objective value computation).
          *
+         *     **Note: This endpoint is currently permissioned. Reach out in discord if you need access.**
+         *
          */
         get: {
             parameters: {
