@@ -13,7 +13,7 @@ import {
   SupportedChainId
 } from '@cowprotocol/cow-sdk';
 import { Erc20Repository } from '@cowprotocol/repositories';
-import { ETHEREUM_ADDRESS_LENGTH } from '@cowprotocol/shared';
+import { ETHEREUM_ADDRESS_LENGTH, NativeCurrencyAddress, NativeCurrencyDecimals } from '@cowprotocol/shared';
 import { GPv2Settlement__factory } from '@cowprotocol/abis';
 
 export const tradingServiceSymbol = Symbol.for('TradingServiceSymbol');
@@ -52,15 +52,9 @@ export class TradingService {
     advancedSettings?: SwapAdvancedSettings
   ): Promise<QuoteResults> {
     const chainId = trader.chainId as number
-    const sellToken = await this.erc20Repository.get(chainId, params.sellToken);
-    const buyToken = await this.erc20Repository.get(chainId, params.buyToken);
 
-    if (typeof sellToken?.decimals !== 'number' || typeof buyToken?.decimals !== 'number') {
-      throw new Error('[TradingService.getQuote] Cannot find tokens decimals')
-    }
-
-    const sellTokenDecimals = sellToken.decimals
-    const buyTokenDecimals = buyToken.decimals
+    const sellTokenDecimals = await this.getTokenDecimals(chainId, params.sellToken)
+    const buyTokenDecimals = await this.getTokenDecimals(chainId, params.buyToken)
 
     return getQuote({ ...params, sellTokenDecimals, buyTokenDecimals }, trader, advancedSettings)
       .then(({result}) => result);
@@ -107,6 +101,20 @@ export class TradingService {
       }
     } else {
       return { orderId }
+    }
+  }
+
+  private async getTokenDecimals(chainId: number, tokenAddress: string): Promise<number> {
+    if (tokenAddress.toLowerCase() === NativeCurrencyAddress.toLowerCase()) {
+      return NativeCurrencyDecimals
+    } else {
+      const token = await this.erc20Repository.get(chainId, tokenAddress)
+
+      if (typeof token?.decimals !== 'number') {
+        throw new Error('[TradingService.getQuote] Cannot find tokens decimals, token: ' + tokenAddress)
+      }
+
+      return token.decimals
     }
   }
 
