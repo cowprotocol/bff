@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { SupportedChainId } from '../../shared/src/types';
+import { SupportedChainId } from '@cowprotocol/shared';
 
 interface TokenAddressAndDecimals {
   address: string;

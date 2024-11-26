@@ -12,8 +12,6 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
         kind: 'sell',
         sellToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         buyToken: "0xdef1ca1fb7fbcdc777520aa7f396b4e015f497ab",
-        sellTokenDecimals: 18,
-        buyTokenDecimals: 18,
         amount: '12000000000000000'
     }
 })})
@@ -32,8 +30,6 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
     kind: 'sell',
     sellToken: '0xfff9976782d46cc05630d1f6ebab18b2324d6b14',
     buyToken: '0x0625afb445c3b6b7b929342a04a22599fd5dbb59',
-    sellTokenDecimals: 18,
-    buyTokenDecimals: 18,
     amount: '100000000000000000'
   }
 

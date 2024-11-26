@@ -1,5 +1,7 @@
 import { JSONSchema } from 'json-schema-to-ts';
 
+import { omit } from '@cowprotocol/shared';
+
 import QuoterParametersSchema from '../../../tradingSchemas/QuoterParameters';
 import TradeParametersSchema from '../../../tradingSchemas/TradeParameters';
 import QuoteResultsSchema from '../../../tradingSchemas/QuoteResultsSerialized';
@@ -10,7 +12,16 @@ export const getQuoteBodySchema = {
   additionalProperties: false,
   properties: {
     trader: QuoterParametersSchema,
-    params: TradeParametersSchema
+    params: {
+      ...TradeParametersSchema,
+      properties: omit(TradeParametersSchema.properties, ['sellTokenDecimals', 'buyTokenDecimals']),
+      required: [
+        'amount',
+        'kind',
+        'sellToken',
+        'buyToken',
+      ]
+    }
   }
 } as const satisfies JSONSchema;
 

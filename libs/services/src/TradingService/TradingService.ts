@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import {
   getQuote,
   TradeParameters,
@@ -8,6 +8,7 @@ import {
   SupportedChainId,
   CowEnv
 } from '@cowprotocol/cow-sdk';
+import { Erc20Repository, erc20RepositorySymbol } from '@cowprotocol/repositories';
 
 export const tradingServiceSymbol = Symbol.for('TradingServiceSymbol');
 
@@ -19,13 +20,30 @@ interface TraderParams {
 
 @injectable()
 export class TradingService {
+  constructor(
+    @inject(erc20RepositorySymbol)
+    private erc20Repository: Erc20Repository
+  ) {
+  }
 
   async getQuote(
     trader: Parameters<typeof getQuote>[1],
-    params: TradeParameters,
+    params: Omit<TradeParameters, 'sellTokenDecimals' | 'buyTokenDecimals'>,
     advancedSettings?: SwapAdvancedSettings
   ): Promise<QuoteResults> {
-    return getQuote(params, trader, advancedSettings).then(({result}) => result);
+    const chainId = trader.chainId as number
+    const sellToken = await this.erc20Repository.get(chainId, params.sellToken);
+    const buyToken = await this.erc20Repository.get(chainId, params.buyToken);
+
+    if (typeof sellToken?.decimals !== 'number' || typeof buyToken?.decimals !== 'number') {
+      throw new Error('[TradingService.getQuote] Cannot find tokens decimals')
+    }
+
+    const sellTokenDecimals = sellToken.decimals
+    const buyTokenDecimals = buyToken.decimals
+
+    return getQuote({ ...params, sellTokenDecimals, buyTokenDecimals }, trader, advancedSettings)
+      .then(({result}) => result);
   }
 
   async postOrder(
