@@ -77,10 +77,14 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   const { quoteResponse, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
   // Connect wallet
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-  // Sign order
-  const signature = trader.account
   // Send order
-  const { orderId, preSignTransaction } = await callApi('postOrder', { trader, signature, quoteResponse, orderTypedData, appDataInfo })
+  const { orderId, preSignTransaction } = await callApi('postOrder', {
+    signingScheme: 'presign', // Signal to use pre-signing (smart-contract wallet)
+    trader,
+    quoteResponse,
+    orderTypedData,
+    appDataInfo
+  })
 
   // ACTION NEEDED: Send <preSignTransaction> from smart-contract wallet
 

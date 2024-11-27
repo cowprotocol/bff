@@ -15,7 +15,7 @@ import {
   getPreSignTransaction
 } from '@cowprotocol/cow-sdk';
 import { Erc20Repository } from '@cowprotocol/repositories';
-import { ETHEREUM_ADDRESS_LENGTH, NativeCurrencyAddress, NativeCurrencyDecimals } from '@cowprotocol/shared';
+import { NativeCurrencyAddress, NativeCurrencyDecimals } from '@cowprotocol/shared';
 
 export const tradingServiceSymbol = Symbol.for('TradingServiceSymbol');
 
@@ -62,7 +62,8 @@ export class TradingService {
     quoteResponse: QuoteResults['quoteResponse'],
     orderTypedData: QuoteResults['orderTypedData'],
     appDataInfo: QuoteResults['appDataInfo'],
-    signature: string
+    signingScheme: SigningScheme = SigningScheme.EIP712,
+    _signature?: string
   ): Promise<PostOrderResult> {
     if (!quoteResponse.id) throw new Error('Quote id is required to post order')
     if (!quoteResponse.quote.signingScheme) throw new Error('Quote signing scheme is required to post order')
@@ -70,11 +71,8 @@ export class TradingService {
     const { chainId, account, env } = trader
 
     const orderBookApi = new OrderBookApi({ chainId, env })
-    const isPreSign = signature.length === ETHEREUM_ADDRESS_LENGTH
-
-    const signingScheme = isPreSign
-        ? SigningScheme.PRESIGN
-        : quoteResponse.quote.signingScheme
+    const signature = _signature || account
+    const isPreSign = signingScheme === SigningScheme.PRESIGN
 
     const orderId = await orderBookApi.sendOrder({
       ...orderTypedData.message,

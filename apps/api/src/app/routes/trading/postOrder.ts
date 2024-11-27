@@ -34,7 +34,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { trader, quoteResponse, orderTypedData, appDataInfo, signature } = request.body
+      const { trader, quoteResponse, orderTypedData, appDataInfo, signature, signingScheme } = request.body
 
       try {
         const result = await tradingService.postOrder(
@@ -42,6 +42,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           quoteResponse as Parameters<typeof tradingService.postOrder>[1],
           orderTypedData as Parameters<typeof tradingService.postOrder>[2],
           appDataInfo,
+          signingScheme,
           signature
         );
 

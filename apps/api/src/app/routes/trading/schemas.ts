@@ -5,6 +5,7 @@ import { omit } from '@cowprotocol/shared';
 import QuoterParametersSchema from '../../../tradingSchemas/QuoterParameters';
 import TradeParametersSchema from '../../../tradingSchemas/TradeParameters';
 import QuoteResultsSchema from '../../../tradingSchemas/QuoteResultsSerialized';
+import { SigningScheme } from '@cowprotocol/cow-sdk';
 
 const TraderParametersSchema = {
   type: 'object',
@@ -80,13 +81,20 @@ export const errorSchema = {
 
 export const postOrderBodySchema = {
   type: 'object',
-  required: ['trader', 'quoteResponse', 'orderTypedData', 'appDataInfo', 'signature'],
+  required: ['trader', 'quoteResponse', 'orderTypedData', 'appDataInfo', 'signingScheme'],
   additionalProperties: false,
   properties: {
     trader: TraderParametersSchema,
     quoteResponse: QuoteResultsSchema.properties.quoteResponse,
     orderTypedData: QuoteResultsSchema.properties.orderTypedData,
     appDataInfo: QuoteResultsSchema.properties.appDataInfo,
+    signingScheme: {
+      type: 'string',
+      enum: Object.values(SigningScheme),
+      title: 'Signing scheme',
+      description: 'Signing scheme used to sign the order.',
+      default: SigningScheme.EIP712,
+    },
     signature: {
       title: 'ECDSA signature of the order OR account address for smart-contracts',
       description: 'Result of eth_signTypedData_v4 with the orderTypedData OR the account address for smart-contracts (pre-sign)',
