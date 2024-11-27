@@ -7,7 +7,12 @@ import { SupportedChainId } from './types';
 export const NativeCurrencyAddress =
   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
-export const NativeCurrencyDecimals = 18;
+export const NativeCurrencyDecimals: Record<SupportedChainId, number> = {
+  [SupportedChainId.MAINNET]: 18,
+  [SupportedChainId.GNOSIS_CHAIN]: 18,
+  [SupportedChainId.ARBITRUM_ONE]: 18,
+  [SupportedChainId.SEPOLIA]: 18,
+};
 
 /**
  * Wrapped native token address. For example, represents WETH in Mainnet and Arbitrum, and wxDAI in Gnosis chain.

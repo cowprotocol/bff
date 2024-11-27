@@ -11,7 +11,8 @@ import {
   CowEnv,
   SupportedChainId,
   getEthFlowTransaction,
-  swapParamsToLimitOrderParams, getPreSignTransaction
+  swapParamsToLimitOrderParams,
+  getPreSignTransaction
 } from '@cowprotocol/cow-sdk';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { ETHEREUM_ADDRESS_LENGTH, NativeCurrencyAddress, NativeCurrencyDecimals } from '@cowprotocol/shared';
@@ -125,7 +126,7 @@ export class TradingService {
 
   private async getTokenDecimals(chainId: number, tokenAddress: string): Promise<number> {
     if (tokenAddress.toLowerCase() === NativeCurrencyAddress.toLowerCase()) {
-      return NativeCurrencyDecimals
+      return NativeCurrencyDecimals[chainId as keyof typeof NativeCurrencyDecimals]
     } else {
       const token = await this.erc20Repository.get(chainId, tokenAddress)
 
