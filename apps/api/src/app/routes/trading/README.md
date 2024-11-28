@@ -1,8 +1,33 @@
-# Example
+# CoW Trading API
 
-### Get quote
-```ts
-fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+
+The **CoW Protocol** offers powerful and highly flexible trading capabilities, designed to facilitate complex decentralized finance (DeFi) interactions. However, its flexibility can also make it challenging for developers to interact directly with the protocol.
+
+This **CoW Trading API** aims to simplify the interaction by abstracting the complexities. It automatically handles critical aspects such as parameter configuration, accurate calculations for token amounts, and signing orders.
+
+This API functions as a wrapper around the [`@cowprotocol/cow-sdk`](https://github.com/cowprotocol/cow-sdk/blob/feat/swap-for-people/src/trading/README.md), making it easy to integrate CoW trading into your applications.
+
+---
+
+## Core Features
+- **Simplified Order Management:** Abstracts the complexity of preparing, signing, and submitting orders.
+- **Native Token Support:** Allows trading Ethereum and other native tokens seamlessly.
+- **Smart-Contract Wallet Compatibility:** Includes support for wallets using EIP-1271 presigning.
+- **Robust Transaction Handling:** Automatically computes necessary amounts and costs for trades.
+
+---
+
+## 1. **Get Quote**
+
+The `getQuote` method provides a price quote for your desired trade. This includes information necessary to prepare, sign, and submit the order.
+
+### API Endpoint
+**POST** `https://bff.cow.fi/trading/getQuote`
+
+### Request Example
+
+```js
+fetch('https://bff.cow.fi/trading/getQuote', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
     trader: {
         account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
         appCode: 'test1',
@@ -17,9 +42,18 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
 })})
 ```
 
-### EOA Get quote -> sign -> send
+## 2. Full Trading Flow
 
-```ts
+This section demonstrates the complete trading flow, from retrieving a quote to signing and sending an order to the order book.
+
+### Steps
+1. **Get Quote**: Use the getQuote endpoint to retrieve the trade details.
+2. **Sign Order**: Connect your wallet and sign the order using EIP-712 typed data.
+3. **Submit Order**: Send the signed order to the order book.
+
+### Code Example
+
+```js
 (async function() {
   const trader = {
     account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
@@ -33,7 +67,7 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
     amount: '100000000000000000'
   }
 
-  const callApi = (method, body) => fetch('http://127.0.0.1:8080/trading/' + method, {
+  const callApi = (method, body) => fetch('https://bff.cow.fi/trading/' + method, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   }).then(res => res.json())
 
@@ -59,9 +93,13 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
 })()
 ```
 
-### Smart-contract wallet (pre-sign)
+## 3. Smart-Contract Wallet (EIP-1271 Pre-signing)
 
-```ts
+For smart-contract wallets, orders are signed using the [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271) standard. This involves presigning the order and sending a transaction.
+
+### Code Example
+
+```js
 (async function() {
   const trader = {
     account: '0xF568A3a2dfFd73C000E8E475B2D335A4A3818EBa',
@@ -75,7 +113,7 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
     amount: '100000000000000000'
   }
 
-  const callApi = (method, body) => fetch('http://127.0.0.1:8080/trading/' + method, {
+  const callApi = (method, body) => fetch('https://bff.cow.fi/trading/' + method, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   }).then(res => res.json())
 
@@ -99,9 +137,13 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
 })()
 ```
 
-### Eth-flow
+## 4. Trading Native Tokens (ETH Flow)
 
-```ts
+To trade Ethereum (native token), use the `getEthFlowTransaction` method, which generates a transaction object for direct submission to the network.
+
+### Code Example
+
+```js
 (async function() {
   const trader = {
     account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
@@ -115,7 +157,7 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
     amount: '100000000000000000'
   }
 
-  const callApi = (method, body) => fetch('http://127.0.0.1:8080/trading/' + method, {
+  const callApi = (method, body) => fetch('https://bff.cow.fi/trading/' + method, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   }).then(res => res.json())
 
