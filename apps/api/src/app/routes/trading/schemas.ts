@@ -8,6 +8,12 @@ import QuoteResultsSchema from '../../../tradingSchemas/QuoteResultsSerialized';
 import SwapAdvancedSettings from '../../../tradingSchemas/SwapAdvancedSettings';
 import { SigningScheme } from '@cowprotocol/cow-sdk';
 
+const QuoteIdSchema = {
+  title: 'Quote ID',
+  description: 'Unique identifier of the quote.',
+  type: 'number'
+} as const
+
 const TraderParametersSchema = {
   type: 'object',
   additionalProperties: false,
@@ -89,12 +95,12 @@ export const errorSchema = {
 
 export const postOrderBodySchema = {
   type: 'object',
-  required: ['trader', 'quoteResponse', 'orderTypedData', 'appDataInfo', 'signingScheme'],
+  required: ['trader', 'quoteId', 'orderToSign', 'appDataInfo', 'signingScheme'],
   additionalProperties: false,
   properties: {
     trader: TraderParametersSchema,
-    quoteResponse: QuoteResultsSchema.properties.quoteResponse,
-    orderTypedData: QuoteResultsSchema.properties.orderTypedData,
+    quoteId: QuoteIdSchema,
+    orderToSign: QuoteResultsSchema.properties.orderToSign,
     appDataInfo: QuoteResultsSchema.properties.appDataInfo,
     signingScheme: {
       type: 'string',
@@ -143,11 +149,7 @@ export const ethFlowTxBodySchema = {
   properties: {
     trader: TraderParametersSchema,
     tradeParameters: TradeParametersSchema,
-    quoteId: {
-      title: 'Quote ID',
-      description: 'Unique identifier of the quote.',
-      type: 'number'
-    },
+    quoteId: QuoteIdSchema,
     amountsAndCosts: QuoteResultsSchema.properties.amountsAndCosts,
     appDataInfo: QuoteResultsSchema.properties.appDataInfo,
   }

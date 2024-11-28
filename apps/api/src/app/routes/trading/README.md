@@ -38,7 +38,7 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   }).then(res => res.json())
 
   // Get quote
-  const { quoteResponse, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
+  const { quoteResponse, orderToSign, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
   // Connect wallet
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
   // Sign order
@@ -48,10 +48,10 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   })
   // Send order
   const orderId = await callApi('postOrder', {
-    signature,
     trader,
-    quoteResponse,
-    orderTypedData,
+    quoteId: quoteResponse.id,
+    signature, // Add order typed data signature (EIP-712)
+    orderToSign,
     appDataInfo
   })
 
@@ -80,15 +80,15 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   }).then(res => res.json())
 
   // Get quote
-  const { quoteResponse, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
+  const { quoteResponse, orderToSign, appDataInfo } = await callApi('getQuote', { trader, params })
   // Connect wallet
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
   // Send order
   const { orderId, preSignTransaction } = await callApi('postOrder', {
-    signingScheme: 'presign', // Signal to use pre-signing (smart-contract wallet)
     trader,
-    quoteResponse,
-    orderTypedData,
+    quoteId: quoteResponse.id,
+    signingScheme: 'presign', // Signal to use pre-signing (smart-contract wallet)
+    orderToSign,
     appDataInfo
   })
 
@@ -123,8 +123,8 @@ fetch('http://127.0.0.1:8080/trading/getQuote', {method: 'POST', headers: {'Cont
   const { quoteResponse, orderTypedData, appDataInfo, amountsAndCosts, tradeParameters } = await callApi('getQuote', { trader, params })
   // Get transaction
   const { orderId, transaction } = await callApi('getEthFlowTransaction', {
-    quoteId: quoteResponse.id,
     trader,
+    quoteId: quoteResponse.id,
     tradeParameters,
     amountsAndCosts,
     appDataInfo,

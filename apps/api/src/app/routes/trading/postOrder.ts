@@ -34,13 +34,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { trader, quoteResponse, orderTypedData, appDataInfo, signature, signingScheme } = request.body
+      const { trader, quoteId, orderToSign, appDataInfo, signature, signingScheme } = request.body
 
       try {
         const result = await tradingService.postOrder(
           trader,
-          quoteResponse as Parameters<typeof tradingService.postOrder>[1],
-          orderTypedData as Parameters<typeof tradingService.postOrder>[2],
+          quoteId,
+          orderToSign as Parameters<typeof tradingService.postOrder>[2],
           appDataInfo,
           signingScheme,
           signature

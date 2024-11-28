@@ -59,15 +59,12 @@ export class TradingService {
 
   async postOrder(
     trader: TraderParams,
-    quoteResponse: QuoteResults['quoteResponse'],
-    orderTypedData: QuoteResults['orderTypedData'],
+    quoteId: number,
+    orderToSign: QuoteResults['orderToSign'],
     appDataInfo: QuoteResults['appDataInfo'],
     signingScheme: SigningScheme = SigningScheme.EIP712,
     _signature?: string
   ): Promise<PostOrderResult> {
-    if (!quoteResponse.id) throw new Error('Quote id is required to post order')
-    if (!quoteResponse.quote.signingScheme) throw new Error('Quote signing scheme is required to post order')
-
     const { chainId, account, env } = trader
 
     const orderBookApi = new OrderBookApi({ chainId, env })
@@ -75,11 +72,11 @@ export class TradingService {
     const isPreSign = signingScheme === SigningScheme.PRESIGN
 
     const orderId = await orderBookApi.sendOrder({
-      ...orderTypedData.message,
+      ...orderToSign,
+      quoteId,
       from: account.toLowerCase(),
       signature,
       signingScheme,
-      quoteId: quoteResponse.id,
       appData: appDataInfo.fullAppData,
       appDataHash: appDataInfo.appDataKeccak256
     })
