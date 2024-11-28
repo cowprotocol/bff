@@ -157,7 +157,7 @@ export const ethFlowTxBodySchema = {
 
 export const ethFlowTxSuccessSchema = {
   type: 'object',
-  required: ['orderId'],
+  required: ['orderId', 'transaction'],
   additionalProperties: false,
   properties: {
     orderId: {
