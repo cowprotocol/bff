@@ -72,6 +72,13 @@ export const poolsInfoBodySchema = {
   maxItems: POOLS_RESULT_LIMIT
 } as const satisfies JSONSchema;
 
+export const poolsAverageAprBodySchema = {
+  type: 'object',
+  title: 'Liquidity provider - apr',
+  additionalProperties: true
+} as const satisfies JSONSchema;
+
+
 export const errorSchema = {
   type: 'object',
   required: ['message'],

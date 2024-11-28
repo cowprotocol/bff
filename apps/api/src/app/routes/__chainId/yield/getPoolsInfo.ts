@@ -4,6 +4,7 @@ import { PoolInfo } from '../../../data/poolInfo';
 import { In } from 'typeorm';
 import { poolsInfoBodySchema, errorSchema, paramsSchema, poolsInfoSuccessSchema } from './schemas';
 import { POOLS_QUERY_CACHE, POOLS_RESULT_LIMIT } from './const';
+import { trimDoubleQuotes } from './utils';
 
 type RouteSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof poolsInfoSuccessSchema>;
@@ -42,7 +43,14 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         cache: POOLS_QUERY_CACHE
       })
 
-      reply.status(200).send(results);
+      const mappedResults = results.map(res => {
+        return {
+          ...res,
+          project: trimDoubleQuotes(res.project)
+        }
+      })
+
+      reply.status(200).send(mappedResults);
     }
   );
 };
