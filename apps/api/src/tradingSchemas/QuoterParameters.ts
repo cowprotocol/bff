@@ -18,7 +18,8 @@ export default {
       "description": "Supported chains and their `chainId` for the SDK."
     },
     "appCode": {
-      "type": "string"
+      "type": "string",
+      "description": "The code identifying the CLI, UI, service generating the order."
     }
   },
   "required": [

@@ -28,8 +28,8 @@ interface TraderParams {
 export interface PostOrderResult {
   orderId: string
   preSignTransaction?: {
-    callData: string
-    gasLimit: string
+    data: string
+    gas: string
     to: string
     value: '0'
   }

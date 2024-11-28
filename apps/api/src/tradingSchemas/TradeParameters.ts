@@ -12,16 +12,28 @@ export default {
       "description": "The environment to use for the Cow API."
     },
     "partiallyFillable": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Is the order fill-or-kill or partially fillable?"
     },
     "slippageBps": {
-      "type": "number"
+      "type": "number",
+      "description": "Slippage tolerance that was applied to the order to get the limit price. Expressed in Basis Points (BPS). One basis point is equivalent to 0.01% (1/100th of a percent)"
     },
     "receiver": {
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string",
+          "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "An optional Ethereum address to receive the proceeds of the trade instead of the owner (i.e. the order signer)."
     },
     "validFor": {
-      "type": "number"
+      "type": "number",
+      "description": "Unix timestamp (`uint32`) until which the order is valid."
     },
     "partnerFee": {
       "type": "object",
@@ -51,20 +63,21 @@ export default {
     },
     "sellToken": {
       "type": "string",
-      "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+      "description": "ERC-20 token to be sold."
     },
     "sellTokenDecimals": {
       "type": "number"
     },
     "buyToken": {
       "type": "string",
-      "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+      "description": "ERC-20 token to be bought."
     },
     "buyTokenDecimals": {
       "type": "number"
     },
     "amount": {
-      "type": "string"
+      "type": "string",
+      "description": "Amount of a token. `uint256` encoded in decimal."
     }
   },
   "required": [
@@ -75,5 +88,6 @@ export default {
     "sellToken",
     "sellTokenDecimals"
   ],
+  "description": "Trade type, assets, amounts, and optional parameters.",
   "definitions": {}
 } as const

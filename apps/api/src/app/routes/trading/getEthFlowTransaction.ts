@@ -35,13 +35,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { trader, amountsAndCosts, quoteId, params, appDataInfo } = request.body
+      const { trader, amountsAndCosts, quoteId, tradeParameters, appDataInfo } = request.body
 
       try {
         const result = await tradingService.getEthFlowTransaction(
           trader,
           quoteId,
-          params as Parameters<typeof tradingService.getEthFlowTransaction>[2],
+          tradeParameters as Parameters<typeof tradingService.getEthFlowTransaction>[2],
           deserializeQuoteAmountsAndCosts(amountsAndCosts),
           appDataInfo,
         );

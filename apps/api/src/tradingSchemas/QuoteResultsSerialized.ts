@@ -15,16 +15,28 @@ export default {
           "description": "The environment to use for the Cow API."
         },
         "partiallyFillable": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Is the order fill-or-kill or partially fillable?"
         },
         "slippageBps": {
-          "type": "number"
+          "type": "number",
+          "description": "Slippage tolerance that was applied to the order to get the limit price. Expressed in Basis Points (BPS). One basis point is equivalent to 0.01% (1/100th of a percent)"
         },
         "receiver": {
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "An optional Ethereum address to receive the proceeds of the trade instead of the owner (i.e. the order signer)."
         },
         "validFor": {
-          "type": "number"
+          "type": "number",
+          "description": "Unix timestamp (`uint32`) until which the order is valid."
         },
         "partnerFee": {
           "type": "object",
@@ -54,20 +66,21 @@ export default {
         },
         "sellToken": {
           "type": "string",
-          "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+          "description": "ERC-20 token to be sold."
         },
         "sellTokenDecimals": {
           "type": "number"
         },
         "buyToken": {
           "type": "string",
-          "description": "20 byte Ethereum address encoded as a hex with `0x` prefix."
+          "description": "ERC-20 token to be bought."
         },
         "buyTokenDecimals": {
           "type": "number"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "description": "Amount of a token. `uint256` encoded in decimal."
         }
       },
       "required": [
@@ -77,7 +90,8 @@ export default {
         "kind",
         "sellToken",
         "sellTokenDecimals"
-      ]
+      ],
+      "description": "Trade type, assets, amounts, and optional parameters."
     },
     "orderToSign": {
       "type": "object",
@@ -526,18 +540,12 @@ export default {
           "description": "Metadata JSON document for adding information to orders."
         },
         "fullAppData": {
-          "type": "string"
+          "type": "string",
+          "description": "The string encoding of a JSON object representing some `appData`. The format of the JSON expected in the `appData` field is defined [here](https://github.com/cowprotocol/app-data)."
         },
         "appDataKeccak256": {
-          "type": "string"
-        },
-        "env": {
           "type": "string",
-          "enum": [
-            "prod",
-            "staging"
-          ],
-          "description": "The environment to use for the Cow API."
+          "description": "32 bytes encoded as hex with `0x` prefix. It's expected to be the hash of the stringified JSON object representing the `appData`."
         }
       },
       "required": [
@@ -545,7 +553,8 @@ export default {
         "fullAppData",
         "appDataKeccak256"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "https://github.com/cowprotocol/app-data"
     },
     "orderTypedData": {
       "type": "object",
@@ -572,7 +581,8 @@ export default {
             "chainId",
             "verifyingContract"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "EIP-712 typed data domain."
         },
         "primaryType": {
           "type": "string",
@@ -596,7 +606,8 @@ export default {
                 "name",
                 "type"
               ],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "EIP-712 typed data field."
             }
           }
         },
@@ -696,7 +707,8 @@ export default {
         "types",
         "message"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "EIP-712 typed data for an order."
     },
     "amountsAndCosts": {
       "type": "object",

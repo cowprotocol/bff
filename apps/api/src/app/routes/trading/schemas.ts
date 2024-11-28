@@ -23,14 +23,14 @@ const TraderParametersSchema = {
 
 const TransactionSchema = {
   type: 'object',
-  required: ['callData', 'gasLimit', 'to', 'value'],
+  required: ['data', 'gas', 'to', 'value'],
   additionalProperties: false,
   properties: {
-    callData: {
-      title: 'Call data',
+    data: {
+      title: 'Smart-contract call data',
       type: 'string'
     },
-    gasLimit: {
+    gas: {
       title: 'Gas limit',
       type: 'string'
     },
@@ -50,7 +50,10 @@ export const getQuoteBodySchema = {
   required: ['trader', 'params'],
   additionalProperties: false,
   properties: {
-    trader: QuoterParametersSchema,
+    trader: {
+      ...QuoterParametersSchema,
+      title: 'Information about the trader',
+    },
     params: {
       ...TradeParametersSchema,
       properties: omit(TradeParametersSchema.properties, ['sellTokenDecimals', 'buyTokenDecimals']),
@@ -130,11 +133,11 @@ export const postOrderSuccessSchema = {
 
 export const ethFlowTxBodySchema = {
   type: 'object',
-  required: ['trader', 'params', 'quoteId', 'amountsAndCosts', 'appDataInfo'],
+  required: ['trader', 'tradeParameters', 'quoteId', 'amountsAndCosts', 'appDataInfo'],
   additionalProperties: false,
   properties: {
     trader: TraderParametersSchema,
-    params: TradeParametersSchema,
+    tradeParameters: TradeParametersSchema,
     quoteId: {
       title: 'Quote ID',
       description: 'Unique identifier of the quote.',
