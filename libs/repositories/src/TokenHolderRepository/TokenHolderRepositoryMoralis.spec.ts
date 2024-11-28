@@ -1,8 +1,8 @@
-import { Container } from 'inversify';
-import { TokenHolderRepositoryMoralis } from './TokenHolderRepositoryMoralis';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../test/mock';
+import { Container } from 'inversify';
+import { NULL_ADDRESS, WETH } from '../../test/mock';
 import { MORALIS_API_KEY } from '../datasources/moralis';
+import { TokenHolderRepositoryMoralis } from './TokenHolderRepositoryMoralis';
 
 describe('TokenHolderRepositoryMoralis', () => {
   let tokenHolderRepositoryMoralis: TokenHolderRepositoryMoralis;

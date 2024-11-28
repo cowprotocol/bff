@@ -7,4 +7,5 @@ export const ETHPLORER_BASE_URL: Record<SupportedChainId, string | null> = {
   [SupportedChainId.SEPOLIA]: 'https://sepolia-api.ethplorer.io',
   [SupportedChainId.GNOSIS_CHAIN]: null,
   [SupportedChainId.ARBITRUM_ONE]: null,
+  [SupportedChainId.BASE]: null,
 };

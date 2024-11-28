@@ -3,11 +3,11 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk';
 const COW_API_BASE_URL = 'https://api.cow.fi';
 
 const CHAIN_ID_TO_NAME: Record<SupportedChainId, string> = {
-  1: 'mainnet',
-  100: 'xdai',
-  11155111: 'sepolia',
-  8453: 'base', // TODO: check
-  42161: 'arbitrum', // TODO: check
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
+  [SupportedChainId.SEPOLIA]: 'sepolia',
+  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
+  [SupportedChainId.BASE]: 'base',
 };
 
 export function getApiBaseUrl(chainId: SupportedChainId): string {

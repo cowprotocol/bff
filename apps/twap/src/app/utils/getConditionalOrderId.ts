@@ -1,7 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { keccak256 } from '@ethersproject/keccak256';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 
 interface ConditionalOrderParams {
   staticInput: string;

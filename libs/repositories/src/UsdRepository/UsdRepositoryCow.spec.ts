@@ -3,8 +3,8 @@ import { UsdRepositoryCow } from './UsdRepositoryCow';
 
 import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
 import { USDC } from '../const';
-import { Erc20Repository, Erc20 } from '../Erc20Repository/Erc20Repository';
 import { CowApiClient } from '../datasources/cowApi';
+import { Erc20, Erc20Repository } from '../Erc20Repository/Erc20Repository';
 
 const mockApiGet = jest.fn();
 
@@ -35,6 +35,7 @@ const cowApiClients = {
   [SupportedChainId.MAINNET]: mockApi,
   [SupportedChainId.GNOSIS_CHAIN]: mockApi,
   [SupportedChainId.ARBITRUM_ONE]: mockApi,
+  [SupportedChainId.BASE]: mockApi,
   [SupportedChainId.SEPOLIA]: mockApi,
 };
 const usdRepositoryCow = new UsdRepositoryCow(
@@ -68,7 +69,7 @@ describe('UsdRepositoryCow', () => {
       });
 
       // Get USD price for WETH
-      let price = await usdRepositoryCow.getUsdPrice(
+      const price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -102,7 +103,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for a not supported token
-      let price = await usdRepositoryCow.getUsdPrice(
+      const price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         NULL_ADDRESS // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
       );
@@ -126,7 +127,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for a not supported token
-      let pricePromise = usdRepositoryCow.getUsdPrice(
+      const pricePromise = usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
@@ -148,7 +149,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for something is not even an address
-      let price = await usdRepositoryCow.getUsdPrice(
+      const price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         'this-is-not-a-token' // See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
       );
@@ -171,7 +172,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for something is not even an address
-      let priceResult = usdRepositoryCow.getUsdPrice(
+      const priceResult = usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         'this-is-not-a-token'
       );
