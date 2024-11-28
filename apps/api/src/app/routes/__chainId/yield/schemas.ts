@@ -68,7 +68,6 @@ export const poolsInfoBodySchema = {
     type: 'string',
     pattern: AddressSchema.pattern,
   },
-  minItems: 1,
   maxItems: POOLS_RESULT_LIMIT
 } as const satisfies JSONSchema;
 

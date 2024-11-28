@@ -37,7 +37,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const results = await poolInfoRepository.find({
         take: POOLS_RESULT_LIMIT,
         where: {
-          contract_address: In(poolsAddresses),
+          ...(poolsAddresses.length > 0 ? { contract_address: In(poolsAddresses) } : null),
           chain_id: chainId
         },
         cache: POOLS_QUERY_CACHE
