@@ -11,4 +11,5 @@ export const GOLD_RUSH_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.SEPOLIA]: 'eth-sepolia',
   [SupportedChainId.GNOSIS_CHAIN]: 'gnosis-mainnet',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-mainnet',
+  [SupportedChainId.BASE]: 'base-mainnet',
 };

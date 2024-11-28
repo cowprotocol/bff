@@ -379,6 +379,8 @@ export interface paths {
          *     * The block on which the batch was created.
          *     * Prices for all tokens being traded (used for objective value computation).
          *
+         *     **Note: This endpoint is currently permissioned. Reach out in discord if you need access.**
+         *
          */
         get: {
             parameters: {
@@ -1280,6 +1282,11 @@ export interface components {
             sellAmount: components["schemas"]["TokenAmount"];
             /** @description see `OrderParameters::buyAmount` */
             buyAmount: components["schemas"]["TokenAmount"];
+            /**
+             * @description Creation time of the order. Denominated in epoch seconds.
+             * @example 123456
+             */
+            created: string;
             /** @description see `OrderParameters::validTo` */
             validTo: number;
             /** @description see `OrderParameters::kind` */
@@ -1314,6 +1321,9 @@ export interface components {
             /** @description The fee policies that are used to compute the protocol fees for this order.
              *      */
             protocolFees: components["schemas"]["FeePolicy"][];
+            /** @description A winning quote.
+             *      */
+            quote?: components["schemas"]["Quote"];
         };
         /** @description A batch auction for solving.
          *      */
@@ -1354,7 +1364,8 @@ export interface components {
         CompetitionOrderStatus: {
             /** @enum {string} */
             type: "open" | "scheduled" | "active" | "solved" | "executing" | "traded" | "cancelled";
-            /** @description A list of solvers who participated in the latest competition. The presence of executed amounts defines whether the solver provided a solution for the desired order.
+            /** @description A list of solvers who participated in the latest competition, sorted by score in ascending order, where the last element is the winner.
+             *     The presence of executed amounts defines whether the solver provided a solution for the desired order.
              *      */
             value?: {
                 /** @description Name of the solver. */
@@ -1410,9 +1421,9 @@ export interface components {
             buyAmount: components["schemas"]["TokenAmount"];
             /** @description Transaction hash of the corresponding settlement transaction containing the trade (if available). */
             txHash: components["schemas"]["TransactionHash"] | null;
-            /** @description The fee policies that were used to compute the fees for this trade. Listed in the order they got applied.
+            /** @description Executed protocol fees for this trade, together with the fee policies used. Listed in the order they got applied.
              *      */
-            feePolicies?: components["schemas"]["FeePolicy"][];
+            executedProtocolFees?: components["schemas"]["ExecutedProtocolFee"][];
         };
         /**
          * @description Unique identifier for the order: 56 bytes encoded as hex with `0x` prefix.
@@ -1592,16 +1603,6 @@ export interface components {
                 id?: components["schemas"]["UID"];
                 executedAmount?: components["schemas"]["BigUint"];
             }[];
-            /** @description Transaction `calldata` that is executed on-chain if the settlement is executed. */
-            callData?: components["schemas"]["CallData"];
-            /** @description Full `calldata` as generated from the original solver output.
-             *
-             *     It can be different from the executed transaction if part of the settlements are internalised
-             *     (use internal liquidity in lieu of trading against on-chain liquidity).
-             *
-             *     This field is omitted in case it coincides with `callData`.
-             *      */
-            uninternalizedCallData?: components["schemas"]["CallData"];
         };
         /** @description The estimated native price for the token
          *      */
@@ -1649,6 +1650,13 @@ export interface components {
         };
         /** @description Defines the ways to calculate the protocol fee. */
         FeePolicy: components["schemas"]["Surplus"] | components["schemas"]["Volume"] | components["schemas"]["PriceImprovement"];
+        ExecutedProtocolFee: {
+            policy?: components["schemas"]["FeePolicy"];
+            /** @description Fee amount taken */
+            amount?: components["schemas"]["TokenAmount"];
+            /** @description The token in which the fee is taken */
+            token?: components["schemas"]["Address"];
+        };
     };
     responses: never;
     parameters: never;
