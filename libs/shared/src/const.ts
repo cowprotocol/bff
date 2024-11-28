@@ -12,6 +12,7 @@ export const NativeCurrencyDecimals: Record<SupportedChainId, number> = {
   [SupportedChainId.GNOSIS_CHAIN]: 18,
   [SupportedChainId.ARBITRUM_ONE]: 18,
   [SupportedChainId.SEPOLIA]: 18,
+  [SupportedChainId.BASE]: 18,
 };
 
 /**
