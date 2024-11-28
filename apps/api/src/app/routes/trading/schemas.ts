@@ -5,6 +5,7 @@ import { omit } from '@cowprotocol/shared';
 import QuoterParametersSchema from '../../../tradingSchemas/QuoterParameters';
 import TradeParametersSchema from '../../../tradingSchemas/TradeParameters';
 import QuoteResultsSchema from '../../../tradingSchemas/QuoteResultsSerialized';
+import SwapAdvancedSettings from '../../../tradingSchemas/SwapAdvancedSettings';
 import { SigningScheme } from '@cowprotocol/cow-sdk';
 
 const TraderParametersSchema = {
@@ -63,6 +64,10 @@ export const getQuoteBodySchema = {
         'sellToken',
         'buyToken',
       ]
+    },
+    advancedSettings: {
+      ...SwapAdvancedSettings,
+
     }
   }
 } as const satisfies JSONSchema;

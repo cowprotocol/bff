@@ -35,12 +35,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { trader, params } = request.body
+      const { trader, params, advancedSettings } = request.body
 
       try {
         const result = await tradingService.getQuote(
           trader as Parameters<typeof tradingService.getQuote>[0],
-          params as Parameters<typeof tradingService.getQuote>[1]
+          params as Parameters<typeof tradingService.getQuote>[1],
+          advancedSettings as Parameters<typeof tradingService.getQuote>[2]
         );
 
         reply.send({
