@@ -37,7 +37,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         take: POOLS_RESULT_LIMIT,
         where: {
           contract_address: In(poolsAddresses),
-          // TODO chainId
+          chain_id: chainId
         },
         cache: POOLS_QUERY_CACHE
       })

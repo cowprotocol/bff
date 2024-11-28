@@ -17,9 +17,8 @@ export const poolsInfoSuccessSchema = {
     type: 'object',
     required: [
       'contract_address',
-      // TODO
-      // 'chainId',
-      // 'provider',
+      'chain_id',
+      'project',
       'apr',
       'fee',
       'tvl',
@@ -32,11 +31,11 @@ export const poolsInfoSuccessSchema = {
         type: 'string',
         pattern: AddressSchema.pattern
       },
-      // chainId: ChainIdSchema,
-      // provider: {
-      //   title: 'Liquidity provider',
-      //   type: 'string',
-      // },
+      chain_id: ChainIdSchema,
+      project: {
+        title: 'Liquidity provider',
+        type: 'string',
+      },
       apr: {
         title: 'APR',
         description: 'Annual Percentage Rate',

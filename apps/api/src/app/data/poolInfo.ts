@@ -12,12 +12,11 @@ export class PoolInfo {
   })
   contract_address: string;
 
-  // TODO
-  // @Column('int')
-  // chainId: number;
-  //
-  // @Column('varchar')
-  // provider: string;
+  @Column('int')
+  chain_id: number;
+
+  @Column('varchar')
+  project: string;
 
   @Column('double precision')
   apr: number;
