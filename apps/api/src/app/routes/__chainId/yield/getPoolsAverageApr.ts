@@ -7,6 +7,7 @@ import {
   poolsAverageAprBodySchema
 } from './schemas';
 import { trimDoubleQuotes } from './utils';
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../utils/cache';
 
 type RouteSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof poolsAverageAprBodySchema>;
@@ -17,12 +18,14 @@ interface PoolInfoResult {
   average_apr: number;
 }
 
+const CACHE_SECONDS = 21600; // 6 hours
+
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
   }>(
-    '/getPoolsAverageApr',
+    '/pools-average-apr',
     {
       schema: {
         params: paramsSchema,
@@ -53,6 +56,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         return acc
       }, {})
 
+      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS));
       reply.status(200).send(averageApr);
     }
   );

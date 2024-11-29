@@ -17,7 +17,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/getPoolsInfo',
+    '/pools',
     {
       schema: {
         params: paramsSchema,
