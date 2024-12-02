@@ -23,7 +23,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/order',
+    '/orders',
     {
       schema: {
         body: postOrderBodySchema,

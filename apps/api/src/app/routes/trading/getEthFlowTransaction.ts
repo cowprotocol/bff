@@ -24,7 +24,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/eth-flow-transaction',
+    '/sell-native-currency-requests',
     {
       schema: {
         body: ethFlowTxBodySchema,
