@@ -24,7 +24,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
     Body: BodySchema;
   }>(
-    '/getQuote',
+    '/quote',
     {
       schema: {
         body: getQuoteBodySchema,
