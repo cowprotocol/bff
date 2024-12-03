@@ -1,7 +1,7 @@
 # CoW Trading API
 
 
-The **CoW Protocol** offers powerful and highly flexible trading capabilities, designed to facilitate complex decentralized finance (DeFi) interactions. However, its flexibility can also make it challenging for developers to interact directly with the protocol.
+The **CoW Protocol** offers powerful and highly flexible trading capabilities, designed to facilitate complex decentralized finance (DeFi) interactions. However, its flexibility can also make it challenging for developers to interact [directly with the protocol](https://api.cow.fi/docs/#/default/post_api_v1_orders).
 
 This **CoW Trading API** aims to simplify the interaction by abstracting the complexities. It automatically handles critical aspects such as parameter configuration, accurate calculations for token amounts, and signing orders.
 
