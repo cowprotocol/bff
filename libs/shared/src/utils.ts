@@ -41,3 +41,14 @@ export function toSupportedChainId(chain: string | number): SupportedChainId {
 
   return chain;
 }
+
+
+export function omit<T extends object, K extends keyof T>(object: T, omitKeys: K[]): Omit<T, K> {
+  const result = { ...object };
+
+  for (const key of omitKeys) {
+    delete result[key];
+  }
+
+  return result;
+}
