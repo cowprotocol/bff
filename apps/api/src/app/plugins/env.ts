@@ -41,6 +41,23 @@ const schema = {
     MORALIS_API_KEY: {
       type: 'string',
     },
+
+    // CoW Analytics DB
+    COW_ANALYTICS_DATABASE_NAME: {
+      type: 'string',
+    },
+    COW_ANALYTICS_DATABASE_HOST: {
+      type: 'string',
+    },
+    COW_ANALYTICS_DATABASE_PORT: {
+      type: 'number',
+    },
+    COW_ANALYTICS_DATABASE_USERNAME: {
+      type: 'string',
+    },
+    COW_ANALYTICS_DATABASE_PASSWORD: {
+      type: 'string',
+    },
   },
 };
 
