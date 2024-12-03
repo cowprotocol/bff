@@ -19,15 +19,15 @@ This API functions as a wrapper around the [`@cowprotocol/cow-sdk`](https://gith
 
 ## 1. **Get Quote**
 
-The `getQuote` method provides a price quote for your desired trade. This includes information necessary to prepare, sign, and submit the order.
+The `/quote-requests` method provides a price quote for your desired trade. This includes information necessary to prepare, sign, and submit the order.
 
 ### API Endpoint
-**POST** `https://bff.cow.fi/trading/getQuote`
+**POST** `https://bff.cow.fi/trading/quote-requests`
 
 ### Request Example
 
 ```js
-fetch('https://bff.cow.fi/trading/getQuote', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+fetch('https://bff.cow.fi/trading/quote-requests', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
     trader: {
         account: '0xfb3c7eb936cAA12B5A884d612393969A557d4307',
         appCode: 'test1',
@@ -47,7 +47,7 @@ fetch('https://bff.cow.fi/trading/getQuote', {method: 'POST', headers: {'Content
 This section demonstrates the complete trading flow, from retrieving a quote to signing and sending an order to the order book.
 
 ### Steps
-1. **Get Quote**: Use the getQuote endpoint to retrieve the trade details.
+1. **Get Quote**: Use the `/quote-requests` endpoint to retrieve the trade details.
 2. **Sign Order**: Connect your wallet and sign the order using EIP-712 typed data.
 3. **Submit Order**: Send the signed order to the order book.
 
@@ -72,7 +72,7 @@ This section demonstrates the complete trading flow, from retrieving a quote to 
   }).then(res => res.json())
 
   // Get quote
-  const { quoteResponse, orderToSign, orderTypedData, appDataInfo } = await callApi('getQuote', { trader, params })
+  const { quoteResponse, orderToSign, orderTypedData, appDataInfo } = await callApi('quote-requests', { trader, params })
   // Connect wallet
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
   // Sign order
@@ -81,7 +81,7 @@ This section demonstrates the complete trading flow, from retrieving a quote to 
     params: [accounts[0], JSON.stringify(orderTypedData)]
   })
   // Send order
-  const orderId = await callApi('postOrder', {
+  const orderId = await callApi('orders', {
     trader,
     quoteId: quoteResponse.id,
     signature, // Add order typed data signature (EIP-712)
@@ -118,11 +118,11 @@ For smart-contract wallets, orders are signed using the [EIP-1271](https://eips.
   }).then(res => res.json())
 
   // Get quote
-  const { quoteResponse, orderToSign, appDataInfo } = await callApi('getQuote', { trader, params })
+  const { quoteResponse, orderToSign, appDataInfo } = await callApi('quote-requests', { trader, params })
   // Connect wallet
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
   // Send order
-  const { orderId, preSignTransaction } = await callApi('postOrder', {
+  const { orderId, preSignTransaction } = await callApi('orders', {
     trader,
     quoteId: quoteResponse.id,
     signingScheme: 'presign', // Signal to use pre-signing (smart-contract wallet)
@@ -139,7 +139,7 @@ For smart-contract wallets, orders are signed using the [EIP-1271](https://eips.
 
 ## 4. Trading Native Tokens (ETH Flow)
 
-To trade Ethereum (native token), use the `getEthFlowTransaction` method, which generates a transaction object for direct submission to the network.
+To trade Ethereum (native token), use the `/sell-native-currency-requests` method, which generates a transaction object for direct submission to the network.
 
 ### Code Example
 
@@ -162,9 +162,9 @@ To trade Ethereum (native token), use the `getEthFlowTransaction` method, which 
   }).then(res => res.json())
 
   // Get quote
-  const { quoteResponse, orderTypedData, appDataInfo, amountsAndCosts, tradeParameters } = await callApi('getQuote', { trader, params })
+  const { quoteResponse, orderTypedData, appDataInfo, amountsAndCosts, tradeParameters } = await callApi('quote-requests', { trader, params })
   // Get transaction
-  const { orderId, transaction } = await callApi('getEthFlowTransaction', {
+  const { orderId, transaction } = await callApi('sell-native-currency-requests', {
     trader,
     quoteId: quoteResponse.id,
     tradeParameters,
