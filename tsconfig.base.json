@@ -20,7 +20,6 @@
     "strict": true,
     "strictNullChecks": true,
     "alwaysStrict": true,
-    "strictPropertyInitialization": false,
     "paths": {
       "@cowprotocol/abis": ["libs/abis/src/index.ts"],
       "@cowprotocol/cms-api": ["libs/cms-api/src/index.ts"],
