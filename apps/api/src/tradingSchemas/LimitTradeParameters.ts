@@ -96,7 +96,6 @@ export default {
     "buyToken",
     "buyTokenDecimals",
     "kind",
-    "quoteId",
     "sellAmount",
     "sellToken",
     "sellTokenDecimals"

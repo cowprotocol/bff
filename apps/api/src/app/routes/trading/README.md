@@ -119,8 +119,6 @@ For smart-contract wallets, orders are signed using the [EIP-1271](https://eips.
 
   // Get quote
   const { quoteResponse, orderToSign, appDataInfo } = await callApi('quote-requests', { trader, params })
-  // Connect wallet
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
   // Send order
   const { orderId, preSignTransaction } = await callApi('orders', {
     trader,
