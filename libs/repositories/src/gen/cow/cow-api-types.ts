@@ -13,7 +13,9 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a new order. In order to replace an existing order with a new one, the appData must contain a [valid replacement order UID](https://github.com/cowprotocol/app-data/blob/main/src/schemas/v1.1.0.json#L62), then the indicated order is cancelled, and a new one placed. This allows an old order to be cancelled AND a new order to be created in an atomic operation with a single signature. This may be useful for replacing orders when on-chain prices move outside of the original order's limit price. */
+        /** Create a new order. In order to replace an existing order with a new one, the appData must contain a [valid replacement order UID](https://github.com/cowprotocol/app-data/blob/main/src/schemas/v1.1.0.json#L62), then the indicated order is cancelled, and a new one placed.
+         *     This allows an old order to be cancelled AND a new order to be created in an atomic operation with a single signature.
+         *     This may be useful for replacing orders when on-chain prices move outside of the original order's limit price. */
         post: {
             parameters: {
                 query?: never;
@@ -78,11 +80,7 @@ export interface paths {
         };
         /**
          * Cancel multiple orders by marking them invalid with a timestamp.
-         * @description This is a *best effort* cancellation, and might not prevent solvers from
-         *     settling the orders (if the order is part of an in-flight settlement
-         *     transaction for example). Authentication must be provided by an
-         *     [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
-         *     signature of an `OrderCancellations(bytes[] orderUids)` message.
+         * @description This is a *best effort* cancellation, and might not prevent solvers from settling the orders (if the order is part of an in-flight settlement transaction for example). Authentication must be provided by an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an `OrderCancellations(bytes[] orderUids)` message.
          *
          */
         delete: {
@@ -178,11 +176,12 @@ export interface paths {
         /**
          * Cancel an order by marking it invalid with a timestamp.
          * @deprecated
-         * @description The successful deletion might not prevent solvers from settling the order.
+         * @description The successful deletion might not prevent solvers from settling the
+         *     order.
+         *
          *     Authentication must be provided by providing an
          *     [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an
          *     `OrderCancellation(bytes orderUid)` message.
-         *
          */
         delete: {
             parameters: {
@@ -343,9 +342,9 @@ export interface paths {
                  *
                  *     ### If `orderUid` is specified:
                  *
-                 *     Return all trades related to that `orderUid`. Given that an order may be partially
-                 *     fillable, it is possible that an individual order may have *multiple* trades.
-                 *      */
+                 *     Return all trades related to that `orderUid`. Given that an order
+                 *     may be partially fillable, it is possible that an individual order
+                 *     may have *multiple* trades. */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -373,14 +372,15 @@ export interface paths {
         };
         /**
          * Get the current batch auction.
-         * @description The current batch auction that solvers should be solving right now. This includes:
+         * @description The current batch auction that solvers should be solving right now. This
+         *     includes:
          *
-         *     * A list of solvable orders.
-         *     * The block on which the batch was created.
-         *     * Prices for all tokens being traded (used for objective value computation).
+         *     * A list of solvable orders. * The block on which the batch was created.
+         *     * Prices for all tokens being traded (used for objective value
+         *     computation).
          *
-         *     **Note: This endpoint is currently permissioned. Reach out in discord if you need access.**
-         *
+         *     **Note: This endpoint is currently permissioned. Reach out in discord if
+         *     you need access.**
          */
         get: {
             parameters: {
@@ -419,11 +419,12 @@ export interface paths {
         };
         /**
          * Get orders of one user paginated.
-         * @description The orders are sorted by their creation date descending (newest orders first).
-         *     To enumerate all orders start with `offset` 0 and keep increasing the `offset` by the total
-         *     number of returned results. When a response contains less than `limit` the last page has
-         *     been reached.
+         * @description The orders are sorted by their creation date descending (newest orders
+         *     first).
          *
+         *     To enumerate all orders start with `offset` 0 and keep increasing the
+         *     `offset` by the total number of returned results. When a response
+         *     contains less than `limit` the last page has been reached.
          */
         get: {
             parameters: {
@@ -478,9 +479,11 @@ export interface paths {
         };
         /**
          * Get native price for the given token.
-         * @description Price is the exchange rate between the specified token and the network's native currency.
-         *     It represents the amount of native token atoms needed to buy 1 atom of the specified token.
+         * @description Price is the exchange rate between the specified token and the network's
+         *     native currency.
          *
+         *     It represents the amount of native token atoms needed to buy 1 atom of
+         *     the specified token.
          */
         get: {
             parameters: {
@@ -544,9 +547,7 @@ export interface paths {
         put?: never;
         /**
          * Quote a price and fee for the specified order parameters.
-         * @description Given a partial order compute the minimum fee and a price estimate for the order. Return a
-         *     full order that can be used directly for signing, and with an included signature, passed
-         *     directly to the order creation endpoint.
+         * @description Given a partial order compute the minimum fee and a price estimate for the order. Return a full order that can be used directly for signing, and with an included signature, passed directly to the order creation endpoint.
          *
          */
         post: {
@@ -835,8 +836,7 @@ export interface paths {
         };
         /**
          * Registers a full `appData` so it can be referenced by `appDataHash`.
-         * @description Uploads a full `appData` to orderbook so that orders created with the
-         *     corresponding `appDataHash` can be linked to the original full `appData`.
+         * @description Uploads a full `appData` to orderbook so that orders created with the corresponding `appDataHash` can be linked to the original full `appData`.
          *
          */
         put: {
@@ -975,8 +975,8 @@ export interface paths {
          * Get the total surplus earned by the user. [UNSTABLE]
          * @description ### Caution
          *
-         *     This endpoint is under active development and should NOT be considered stable.
-         *
+         *     This endpoint is under active development and should NOT be considered
+         *     stable.
          */
         get: {
             parameters: {
@@ -1057,15 +1057,11 @@ export interface components {
          */
         TokenAmount: string;
         OnchainOrderData: {
-            /** @description If orders are placed as on-chain orders, the owner of the order might
-             *     be a smart contract, but not the user placing the order. The
-             *     actual user will be provided in this field.
+            /** @description If orders are placed as on-chain orders, the owner of the order might be a smart contract, but not the user placing the order. The actual user will be provided in this field.
              *      */
             sender: components["schemas"]["Address"];
             /**
-             * @description Describes the error, if the order placement was not successful. This could
-             *     happen, for example, if the `validTo` is too high, or no valid quote was
-             *     found or generated.
+             * @description Describes the error, if the order placement was not successful. This could happen, for example, if the `validTo` is too high, or no valid quote was found or generated.
              *
              * @enum {string}
              */
@@ -1109,10 +1105,11 @@ export interface components {
          *
          *     Fast: The price estimate is chosen among the fastest N price estimates.
          *     Optimal: The price estimate is chosen among all price estimates.
-         *     Verified: The price estimate is chosen among all verified/simulated price estimates.
+         *     Verified: The price estimate is chosen among all verified/simulated
+         *     price estimates.
          *
-         *     **NOTE**: Orders are supposed to be created from `verified` or `optimal` price estimates.
-         *
+         *     **NOTE**: Orders are supposed to be created from `verified` or `optimal`
+         *     price estimates.
          * @enum {string}
          */
         PriceQuality: "fast" | "optimal" | "verified";
@@ -1127,8 +1124,7 @@ export interface components {
             sellToken: components["schemas"]["Address"];
             /** @description ERC-20 token to be bought. */
             buyToken: components["schemas"]["Address"];
-            /** @description An optional Ethereum address to receive the proceeds of the trade instead
-             *     of the owner (i.e. the order signer).
+            /** @description An optional Ethereum address to receive the proceeds of the trade instead of the owner (i.e. the order signer).
              *      */
             receiver?: components["schemas"]["Address"] | null;
             /** @description Amount of `sellToken` to be sold in atoms. */
@@ -1183,30 +1179,20 @@ export interface components {
             buyTokenBalance: components["schemas"]["BuyTokenDestination"];
             signingScheme: components["schemas"]["SigningScheme"];
             signature: components["schemas"]["Signature"];
-            /** @description If set, the backend enforces that this address matches what is decoded as the *signer* of
-             *     the signature. This helps catch errors with invalid signature encodings as the backend
-             *     might otherwise silently work with an unexpected address that for example does not have
-             *     any balance.
+            /** @description If set, the backend enforces that this address matches what is decoded as the *signer* of the signature. This helps catch errors with invalid signature encodings as the backend might otherwise silently work with an unexpected address that for example does not have any balance.
              *      */
             from?: components["schemas"]["Address"] | null;
-            /** @description Orders can optionally include a quote ID. This way the order can be linked to a quote
-             *     and enable providing more metadata when analysing order slippage.
+            /** @description Orders can optionally include a quote ID. This way the order can be linked to a quote and enable providing more metadata when analysing order slippage.
              *      */
             quoteId?: number | null;
-            /** @description This field comes in two forms for backward compatibility. The hash form will eventually
-             *     stop being accepted.
+            /** @description This field comes in two forms for backward compatibility. The hash form will eventually stop being accepted.
              *      */
             appData: (string & components["schemas"]["AppData"]) | components["schemas"]["AppDataHash"];
-            /** @description May be set for debugging purposes. If set, this field is compared to what the backend
-             *     internally calculates as the app data hash based on the contents of `appData`. If the
-             *     hash does not match, an error is returned. If this field is set, then `appData` **MUST** be
-             *     a string encoding of a JSON object.
+            /** @description May be set for debugging purposes. If set, this field is compared to what the backend internally calculates as the app data hash based on the contents of `appData`. If the hash does not match, an error is returned. If this field is set, then `appData` **MUST** be a string encoding of a JSON object.
              *      */
             appDataHash?: components["schemas"]["AppDataHash"] | null;
         };
-        ProtocolAppData: Record<string, never>;
-        /** @description Extra order data that is returned to users when querying orders but not provided by users
-         *     when creating orders.
+        /** @description Extra order data that is returned to users when querying orders but not provided by users when creating orders.
          *      */
         OrderMetaData: {
             /**
@@ -1240,32 +1226,28 @@ export interface components {
             status: components["schemas"]["OrderStatus"];
             /** @description Amount that the signed fee would be without subsidies. */
             fullFeeAmount?: components["schemas"]["TokenAmount"];
-            /** @description Liquidity orders are functionally the same as normal smart contract orders but are not
-             *     placed with the intent of actively getting traded. Instead they facilitate the
-             *     trade of normal orders by allowing them to be matched against liquidity orders which
-             *     uses less gas and can have better prices than external liquidity.
+            /** @description Liquidity orders are functionally the same as normal smart contract
+             *     orders but are not placed with the intent of actively getting
+             *     traded. Instead they facilitate the trade of normal orders by
+             *     allowing them to be matched against liquidity orders which uses less
+             *     gas and can have better prices than external liquidity.
              *
-             *     As such liquidity orders will only be used in order to improve settlement of normal
-             *     orders. They should not be expected to be traded otherwise and should not expect to get
-             *     surplus.
-             *      */
+             *     As such liquidity orders will only be used in order to improve
+             *     settlement of normal orders. They should not be expected to be
+             *     traded otherwise and should not expect to get surplus. */
             isLiquidityOrder?: boolean;
             ethflowData?: components["schemas"]["EthflowData"];
             /** @description This represents the actual trader of an on-chain order.
-             *
              *     ### ethflow orders
-             *
              *     In this case, the `owner` would be the `EthFlow` contract and *not* the actual trader.
              *      */
             onchainUser?: components["schemas"]["Address"];
-            /** @description There is some data only available for orders that are placed on-chain. This data
-             *     can be found in this object.
+            /** @description There is some data only available for orders that are placed on-chain. This data can be found in this object.
              *      */
             onchainOrderData?: components["schemas"]["OnchainOrderData"];
             /** @description Surplus fee that the limit order was executed with. */
             executedSurplusFee?: components["schemas"]["BigUint"] | null;
-            /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation`
-             *     for more information.
+            /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
         };
@@ -1331,14 +1313,11 @@ export interface components {
             /** @description The unique identifier of the auction. Increment whenever the backend creates a new auction.
              *      */
             id?: number;
-            /** @description The block number for the auction. Orders and prices are guaranteed to be valid on this
-             *     block. Proposed settlements should be valid for this block as well.
+            /** @description The block number for the auction. Orders and prices are guaranteed to be valid on this block. Proposed settlements should be valid for this block as well.
              *      */
             block?: number;
             /** @description The latest block on which a settlement has been processed.
-             *
-             *     **NOTE**: Under certain conditions it is possible for a settlement to have been mined as
-             *     part of `block` but not have yet been processed.
+             *     **NOTE**: Under certain conditions it is possible for a settlement to have been mined as part of `block` but not have yet been processed.
              *      */
             latestSettlementBlock?: number;
             /** @description The solvable orders included in the auction.
@@ -1364,19 +1343,18 @@ export interface components {
         CompetitionOrderStatus: {
             /** @enum {string} */
             type: "open" | "scheduled" | "active" | "solved" | "executing" | "traded" | "cancelled";
-            /** @description A list of solvers who participated in the latest competition, sorted by score in ascending order, where the last element is the winner.
-             *     The presence of executed amounts defines whether the solver provided a solution for the desired order.
-             *      */
+            /** @description A list of solvers who participated in the latest competition, sorted
+             *     by score in ascending order, where the last element is the winner.
+             *
+             *     The presence of executed amounts defines whether the solver provided
+             *     a solution for the desired order. */
             value?: {
                 /** @description Name of the solver. */
                 solver: string;
                 executedAmounts?: components["schemas"]["ExecutedAmounts"];
             }[];
         };
-        /** @description The reference prices for all traded tokens in the auction as a mapping from token
-         *     addresses to a price denominated in native token (i.e. 1e18 represents a token that
-         *     trades one to one with the native token). These prices are used for solution competition
-         *     for computing surplus and converting fees to native token.
+        /** @description The reference prices for all traded tokens in the auction as a mapping from token addresses to a price denominated in native token (i.e. 1e18 represents a token that trades one to one with the native token). These prices are used for solution competition for computing surplus and converting fees to native token.
          *      */
         AuctionPrices: {
             [key: string]: components["schemas"]["BigUint"] | undefined;
@@ -1426,10 +1404,11 @@ export interface components {
             executedProtocolFees?: components["schemas"]["ExecutedProtocolFee"][];
         };
         /**
-         * @description Unique identifier for the order: 56 bytes encoded as hex with `0x` prefix.
-         *     Bytes 0..32 are the order digest, bytes 30..52 the owner address and bytes
-         *     52..56 the expiry (`validTo`) as a `uint32` unix epoch timestamp.
+         * @description Unique identifier for the order: 56 bytes encoded as hex with `0x`
+         *     prefix.
          *
+         *     Bytes 0..32 are the order digest, bytes 30..52 the owner address and
+         *     bytes 52..56 the expiry (`validTo`) as a `uint32` unix epoch timestamp.
          * @example 0xff2e2e54d178997f173266817c1e9ed6fee1a1aae4b43971c53b543cffcc2969845c6f5599fbb25dbdd1b9b013daf85c03f3c63763e4bc4a
          */
         UID: string;
@@ -1473,8 +1452,7 @@ export interface components {
         /** @description The buy or sell side when quoting an order. */
         OrderQuoteSide: {
             kind: components["schemas"]["OrderQuoteSideKindSell"];
-            /** @description The total amount that is available for the order. From this value, the fee
-             *     is deducted and the buy amount is calculated.
+            /** @description The total amount that is available for the order. From this value, the fee is deducted and the buy amount is calculated.
              *      */
             sellAmountBeforeFee: components["schemas"]["TokenAmount"];
         } | {
@@ -1509,15 +1487,20 @@ export interface components {
              *      */
             receiver?: components["schemas"]["Address"] | null;
             /** @description AppData which will be assigned to the order.
-             *     Expects either a string JSON doc as defined on [AppData](https://github.com/cowprotocol/app-data) or a
-             *     hex encoded string for backwards compatibility.
-             *     When the first format is used, it's possible to provide the derived appDataHash field.
-             *      */
+             *
+             *     Expects either a string JSON doc as defined on
+             *     [AppData](https://github.com/cowprotocol/app-data) or a hex
+             *     encoded string for backwards compatibility.
+             *
+             *     When the first format is used, it's possible to provide the
+             *     derived appDataHash field. */
             appData?: components["schemas"]["AppData"] | components["schemas"]["AppDataHash"];
             /** @description The hash of the stringified JSON appData doc.
-             *     If present, `appData` field must be set with the aforementioned data where this hash is derived from.
-             *     In case they differ, the call will fail.
-             *      */
+             *
+             *     If present, `appData` field must be set with the aforementioned
+             *     data where this hash is derived from.
+             *
+             *     In case they differ, the call will fail. */
             appDataHash?: components["schemas"]["AppDataHash"];
             /** @default erc20 */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
@@ -1529,8 +1512,7 @@ export interface components {
             /** @default eip712 */
             signingScheme: components["schemas"]["SigningScheme"];
             /**
-             * @description Flag to signal whether the order is intended for on-chain order placement. Only valid
-             *     for non ECDSA-signed orders."
+             * @description Flag to signal whether the order is intended for on-chain order placement. Only valid for non ECDSA-signed orders."
              *
              * @default false
              */
@@ -1549,8 +1531,7 @@ export interface components {
              * @example 1985-03-10T18:35:18.814523Z
              */
             expiration: string;
-            /** @description Quote ID linked to a quote to enable providing more metadata when analysing
-             *     order slippage.
+            /** @description Quote ID linked to a quote to enable providing more metadata when analysing order slippage.
              *      */
             id?: number;
             /** @description Whether it was possible to verify that the quoted amounts are accurate using a simulation.
@@ -1578,8 +1559,9 @@ export interface components {
             /** @description Name of the solver. */
             solver?: string;
             /** @description The address used by the solver to execute the settlement on-chain.
-             *     This field is missing for old settlements, the zero address has been used instead.
-             *      */
+             *
+             *     This field is missing for old settlements, the zero address has been
+             *     used instead. */
             solverAddress?: string;
             objective?: {
                 /** @description The total objective value used for ranking solutions. */
@@ -1603,6 +1585,8 @@ export interface components {
                 id?: components["schemas"]["UID"];
                 executedAmount?: components["schemas"]["BigUint"];
             }[];
+            /** @description whether the solution is a winner (received the right to get executed) or not */
+            isWinner?: boolean;
         };
         /** @description The estimated native price for the token
          *      */
@@ -1652,10 +1636,8 @@ export interface components {
         FeePolicy: components["schemas"]["Surplus"] | components["schemas"]["Volume"] | components["schemas"]["PriceImprovement"];
         ExecutedProtocolFee: {
             policy?: components["schemas"]["FeePolicy"];
-            /** @description Fee amount taken */
-            amount?: components["schemas"]["TokenAmount"];
-            /** @description The token in which the fee is taken */
-            token?: components["schemas"]["Address"];
+            amount?: unknown & components["schemas"]["TokenAmount"];
+            token?: unknown & components["schemas"]["Address"];
         };
     };
     responses: never;

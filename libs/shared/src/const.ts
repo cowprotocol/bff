@@ -7,6 +7,14 @@ import { SupportedChainId } from './types';
 export const NativeCurrencyAddress =
   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
+export const NativeCurrencyDecimals: Record<SupportedChainId, number> = {
+  [SupportedChainId.MAINNET]: 18,
+  [SupportedChainId.GNOSIS_CHAIN]: 18,
+  [SupportedChainId.ARBITRUM_ONE]: 18,
+  [SupportedChainId.SEPOLIA]: 18,
+  [SupportedChainId.BASE]: 18,
+};
+
 /**
  * Wrapped native token address. For example, represents WETH in Mainnet and Arbitrum, and wxDAI in Gnosis chain.
  */
@@ -29,3 +37,5 @@ export const ChainNames: Record<SupportedChainId, string> = {
 export const AllChainIds: SupportedChainId[] = Object.values(SupportedChainId)
   .filter((value) => typeof value === 'number') // Filter out non-numeric values
   .map((value) => value as number); // Map to number
+
+export const ETHEREUM_ADDRESS_LENGTH = 42
