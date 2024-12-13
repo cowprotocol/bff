@@ -4,7 +4,7 @@ import {
   bufferToString,
   stringToBigInt,
   stringToBuffer,
-} from '../utils/transformers';
+} from '@cowprotocol/shared';
 
 @Entity({ name: 'settlements' })
 export class Settlement {
