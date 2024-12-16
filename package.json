@@ -55,7 +55,7 @@
     "node-fetch": "^3.3.2",
     "node-telegram-bot-api": "^0.65.1",
     "openapi-fetch": "^0.10.2",
-    "pg": "^8.11.1",
+    "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "tslib": "^2.3.0",
     "typeorm": "^0.3.17",
