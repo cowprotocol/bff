@@ -90,3 +90,14 @@ There's some API types that are generated automatically from their swagger defin
 ```bash
 yarn gen:types
 ```
+
+# FAQ
+
+## Typeorm `DriverPackageNotInstalledError`
+
+```
+{"type":"DriverPackageNotInstalledError","message":"Postgres package has not been found installed. Try to install it: npm install pg --save","stack":"DriverPackageNotInstalledError: Postgres package has not been found installed. Try to install it: npm install pg
+```
+
+If you have faced the error above - check this fix and its description:
+https://github.com/cowprotocol/bff/pull/101
