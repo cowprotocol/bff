@@ -52,7 +52,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
 
     const balancesDiff = this.buildBalancesDiff(
       response.simulation_results.map(
-        (result) => result.transaction.transaction_info.asset_changes || []
+        (result) => result.transaction?.transaction_info.asset_changes || []
       )
     );
 
@@ -62,7 +62,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         id: simulation_result.simulation.id,
         link: getTenderlySimulationLink(simulation_result.simulation.id),
         cumulativeBalancesDiff: balancesDiff[i],
-        gasUsed: simulation_result.transaction.gas_used.toString(),
+        gasUsed: simulation_result.transaction?.gas_used.toString(),
       };
     });
   }

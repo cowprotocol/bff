@@ -57,7 +57,7 @@ export type TenderlySimulatePayload = {
 // certainly not entirely accurate (and they have some interesting type names)
 
 export interface TenderlySimulation {
-  transaction: Transaction;
+  transaction?: Transaction;
   simulation: Simulation;
   contracts: TenderlyContract[];
   generated_access_list: GeneratedAccessList[];
