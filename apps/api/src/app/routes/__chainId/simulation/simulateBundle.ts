@@ -20,7 +20,7 @@ const successSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['status', 'id', 'link', 'cumulativeBalancesDiff', 'gasUsed'],
+    required: ['status', 'id', 'link', 'cumulativeBalancesDiff'],
     additionalProperties: false,
     properties: {
       status: {
