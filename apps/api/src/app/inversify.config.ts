@@ -27,11 +27,6 @@ import {
   viemClients,
 } from '@cowprotocol/repositories';
 
-const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
-const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
-
-const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
-
 import { Container } from 'inversify';
 import {
   SimulationService,
@@ -47,6 +42,20 @@ import {
   usdServiceSymbol,
 } from '@cowprotocol/services';
 import ms from 'ms';
+import pino from 'pino';
+
+const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
+const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
+
+const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
+
+// Configure the logger
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
+});
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
   return new Erc20RepositoryCache(
@@ -133,12 +142,20 @@ function getTokenHolderRepository(
   ]);
 }
 
+function getSimulationRepository(): SimulationRepository {
+  return new SimulationRepositoryTenderly(logger.child({ module: 'tenderly' }));
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
+
+  // Bind logger
+  apiContainer.bind<pino.Logger>('Logger').toConstantValue(logger);
+
   // Repositories
   const cacheRepository = getCacheRepository(apiContainer);
   const erc20Repository = getErc20Repository(cacheRepository);
-  const simulationRepository = new SimulationRepositoryTenderly();
+  const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
 
   apiContainer
