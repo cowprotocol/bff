@@ -130,23 +130,32 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId } = request.params;
+      try {
+        const { chainId } = request.params;
 
-      const simulationResult =
-        await tenderlyService.postTenderlyBundleSimulation(
-          chainId,
-          request.body
+        fastify.log.info(
+          `Starting simulation of ${request.body.length} transactions on chain ${chainId}`
         );
 
-      if (simulationResult === null) {
-        reply.code(400).send({ message: 'Build simulation error' });
-        return;
-      }
-      fastify.log.info(
-        `Post Tenderly bundle of ${request.body.length} simulation on chain ${chainId}`
-      );
+        const simulationResult =
+          await tenderlyService.postTenderlyBundleSimulation(
+            chainId,
+            request.body
+          );
 
-      reply.send(simulationResult);
+        if (simulationResult === null) {
+          reply.code(400).send({ message: 'Build simulation error' });
+          return;
+        }
+        fastify.log.info(
+          `Post bundle of ${request.body.length} simulation on chain ${chainId}`
+        );
+
+        reply.send(simulationResult);
+      } catch (e) {
+        fastify.log.error('Error in /simulateBundle', e);
+        reply.code(500).send({ message: 'Error in /simulateBundle' });
+      }
     }
   );
 };
