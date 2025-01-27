@@ -1,18 +1,20 @@
 import {
+  PricePoint,
+  SupportedChainId,
   UsdRepository,
   usdRepositorySymbol,
-  SupportedChainId,
 } from '@cowprotocol/repositories';
-import { injectable, inject } from 'inversify';
+import { toTokenAddress } from '@cowprotocol/shared';
+import { inject, injectable } from 'inversify';
+import ms from 'ms';
 import {
   Bps,
   GetSlippageBpsParams,
   OrderForSlippageCalculation,
+  PairVolatility,
   SlippageService,
   VolatilityDetails,
 } from './SlippageService';
-import ms from 'ms';
-import { toTokenAddress } from '@cowprotocol/shared';
 
 export const MIN_SLIPPAGE_BPS = 50;
 export const MAX_SLIPPAGE_BPS = 200;
@@ -26,31 +28,19 @@ export class SlippageServiceMain implements SlippageService {
   ) {}
 
   async getSlippageBps(params: GetSlippageBpsParams): Promise<Bps> {
-    const volatilityOnExpiration = await this.getMaxVolatilityOnSettlement(
-      params
-    );
+    const volatility = await this.getRelativeVolatilityOnSettlement(params);
 
-    // If volatility is unknown, we take the worst case
-    if (volatilityOnExpiration === null) {
-      return MAX_SLIPPAGE_BPS;
+    // If volatility is unknown, we return 0
+    if (volatility === null) {
+      return 0;
     }
 
     // Return the slippage based on the volatility
-    return this.getSlippageBpsFromVolatility(volatilityOnExpiration);
+    return this.getSlippageBpsFromVolatility(volatility);
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
-    const slippageBps = Math.ceil(volatility * 10_000);
-
-    if (slippageBps < MIN_SLIPPAGE_BPS) {
-      return MIN_SLIPPAGE_BPS;
-    }
-
-    if (slippageBps > MAX_SLIPPAGE_BPS) {
-      return MAX_SLIPPAGE_BPS;
-    }
-
-    return slippageBps;
+    return Math.ceil(volatility * 10_000);
   }
 
   /**
@@ -87,6 +77,153 @@ export class SlippageServiceMain implements SlippageService {
       return null;
     }
 
+    // Predict variance between now and a fair settlement
+    const volatilityForFairSettlement = this.calculateVolatility(prices);
+
+    // Return the normalized volatility (denominated in the token, not in USD)
+    const normalizedVolatility = volatilityForFairSettlement / usdPrice;
+
+    return {
+      tokenAddress,
+      prices,
+      usdPrice,
+      volatilityInUsd: volatilityForFairSettlement,
+      volatilityInTokens: normalizedVolatility,
+    };
+  }
+
+  /**
+   * Gets the volatility of the pair in relation to each other, based on the historical USD price of each
+   * Returns `null` if either historical data is missing
+   *
+   * @param chainId
+   * @param baseTokenAddress
+   * @param quoteTokenAddress
+   */
+  async getVolatilityForPair(
+    chainId: SupportedChainId,
+    baseTokenAddress: string,
+    quoteTokenAddress: string,
+    order?: OrderForSlippageCalculation
+  ): Promise<PairVolatility | null> {
+    // Fetch USD prices for both tokens
+    const [basePrices, quotePrices] = await Promise.all([
+      this.usdRepository.getUsdPrices(chainId, baseTokenAddress, '5m'),
+      this.usdRepository.getUsdPrices(chainId, quoteTokenAddress, '5m'),
+    ]);
+
+    // Check if either price data is missing
+    if (!basePrices || !quotePrices) {
+      return null;
+    }
+
+    // Fetch USD prices for both tokens
+    const [baseUsdPrice, quoteUsdPrice] = await Promise.all([
+      this.usdRepository.getUsdPrice(chainId, baseTokenAddress),
+      this.usdRepository.getUsdPrice(chainId, quoteTokenAddress),
+    ]);
+
+    // Check if either USD price is missing
+    if (baseUsdPrice === null || quoteUsdPrice === null) {
+      return null;
+    }
+
+    const relativePrice = baseUsdPrice / quoteUsdPrice;
+
+    // Prices is an array. Build a map with timestamp as key using `basePrices` date, so we can match with the timestamp on `quotePrices`
+    const basePricesMap = new Map(
+      basePrices.map((price) => [roundDate(price.date).getTime(), price])
+    );
+
+    // Calculate price ratios for the token prices
+    const prices = quotePrices.reduce<PricePoint[]>((acc, quotePrice) => {
+      // Get the same timestamp
+      const roundedDate = roundDate(quotePrice.date);
+      const basePrice = basePricesMap.get(roundedDate.getTime());
+
+      if (quotePrice && basePrice) {
+        const price = basePrice.price / quotePrice.price; // Calculate the price ratio
+        acc.push({
+          ...basePrice,
+          price,
+          date: roundedDate,
+        } as PricePoint);
+      }
+      return acc;
+    }, []);
+
+    // Not enough data, data point don't align
+    if (prices.length < 2) {
+      return null;
+    }
+
+    // Predict variance between now and a fair settlement
+    const volatilityForFairSettlement = this.calculateVolatility(prices);
+
+    // Return the normalized volatility (denominated in the token, not in USD)
+    const normalizedVolatility = volatilityForFairSettlement / relativePrice;
+
+    return {
+      baseTokenAddress,
+      quoteTokenAddress,
+      prices,
+      volatilityInTokens: normalizedVolatility,
+    };
+  }
+
+  private async getMaxVolatilityOnSettlement({
+    order,
+    chainId,
+    baseTokenAddress,
+    quoteTokenAddress,
+  }: GetSlippageBpsParams) {
+    // Get the 5min standard deviation for the quote token (~288 points, 5min apart)
+    const [volatilityQuote, volatilityBase] = await Promise.all([
+      this.getVolatilityDetails(chainId, quoteTokenAddress, order),
+      this.getVolatilityDetails(chainId, baseTokenAddress, order),
+    ]);
+
+    if (volatilityQuote === null || volatilityBase === null) {
+      return null;
+    }
+
+    const { prices: _, ...base } = volatilityBase;
+    const { prices: __, ...quote } = volatilityQuote;
+    console.log(`getMaxVolatilityOnSettlement`, {
+      base,
+      quote,
+    });
+
+    return Math.max(
+      volatilityQuote.volatilityInTokens,
+      volatilityBase.volatilityInTokens
+    );
+  }
+
+  private async getRelativeVolatilityOnSettlement({
+    order,
+    chainId,
+    baseTokenAddress,
+    quoteTokenAddress,
+  }: GetSlippageBpsParams) {
+    const volatility = await this.getVolatilityForPair(
+      chainId,
+      baseTokenAddress,
+      quoteTokenAddress,
+      order
+    );
+
+    if (!volatility) {
+      return null;
+    }
+
+    const { prices: _, ...vol } = volatility;
+    console.log(`getRelativeVolatilityOnSettlement`, vol);
+
+    return volatility.volatilityInTokens;
+  }
+
+  private calculateVolatility(prices: PricePoint[]): number {
     // Calculate the average of the prices (in USD)
     const averagePrice =
       prices.reduce((acc, price) => acc + price.price, 0) / prices.length;
@@ -117,40 +254,13 @@ export class SlippageServiceMain implements SlippageService {
       FAIR_TIME_TO_SETTLEMENT / averageTimeBetweenDataPoints;
 
     // Predict variance between now and a fair settlement
-    const volatilityForFairSettlement =
-      standardDeviation * Math.sqrt(pointsForFairSettlement);
-
-    // Return the normalized volatility (denominated in the token, not in USD)
-    const normalizedVolatility = volatilityForFairSettlement / usdPrice;
-
-    return {
-      tokenAddress,
-      prices,
-      usdPrice,
-      volatilityInUsd: volatilityForFairSettlement,
-      volatilityInTokens: normalizedVolatility,
-    };
+    return standardDeviation * Math.sqrt(pointsForFairSettlement);
   }
+}
 
-  private async getMaxVolatilityOnSettlement({
-    order,
-    chainId,
-    baseTokenAddress,
-    quoteTokenAddress,
-  }: GetSlippageBpsParams) {
-    // Get the 5min standard deviation for the quote token (~288 points, 5min apart)
-    const [volatilityQuote, volatilityBase] = await Promise.all([
-      this.getVolatilityDetails(chainId, quoteTokenAddress, order),
-      this.getVolatilityDetails(chainId, baseTokenAddress, order),
-    ]);
-
-    if (volatilityQuote === null || volatilityBase === null) {
-      return null;
-    }
-
-    return Math.max(
-      volatilityQuote.volatilityInTokens,
-      volatilityBase.volatilityInTokens
-    );
-  }
+function roundDate(date: Date): Date {
+  return new Date(
+    Math.round(date.getTime() / FAIR_TIME_TO_SETTLEMENT) *
+      FAIR_TIME_TO_SETTLEMENT
+  );
 }

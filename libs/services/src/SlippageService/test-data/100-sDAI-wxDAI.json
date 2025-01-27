@@ -3,7 +3,7 @@
   "chainId": 100,
   "baseToken": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
   "quoteToken": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-  "slippageBps": 50,
+  "slippageBps": 33,
   "volatilityDetails": {
     "baseToken": {
       "tokenAddress": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",

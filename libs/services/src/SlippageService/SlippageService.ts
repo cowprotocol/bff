@@ -1,5 +1,4 @@
 import { PricePoint, SupportedChainId } from '@cowprotocol/repositories';
-import { Address } from 'viem';
 
 /**
  * BPS (Basis Points)
@@ -31,12 +30,26 @@ export interface VolatilityDetails {
   volatilityInTokens: number;
 }
 
+export interface PairVolatility
+  extends Omit<
+    VolatilityDetails,
+    'tokenAddress' | 'usdPrice' | 'volatilityInUsd'
+  > {
+  baseTokenAddress: string;
+  quoteTokenAddress: string;
+}
+
 export interface SlippageService {
   getSlippageBps(params: GetSlippageBpsParams): Promise<Bps>;
   getVolatilityDetails(
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<VolatilityDetails | null>;
+  getVolatilityForPair(
+    chainId: SupportedChainId,
+    baseTokenAddress: string,
+    quoteTokenAddress: string
+  ): Promise<PairVolatility | null>;
 }
 
 export const slippageServiceSymbol = Symbol.for('SlippageService');
