@@ -12,7 +12,6 @@ export default fp(async (fastify, opts) => {
 
       // do not include CORS headers for requests from localhost
       const origin = req.headers.origin;
-      console.log('delegator', origin);
       if (origin && /^http:\/\/localhost/.test(origin)) {
         corsOptions.origin = true;
       }
