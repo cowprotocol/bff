@@ -1,8 +1,7 @@
-import { Erc20RepositoryViem } from './Erc20RepositoryViem';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { PublicClient } from 'viem';
-import { erc20Abi } from 'viem';
+import { erc20Abi, PublicClient } from 'viem';
 import { Erc20 } from './Erc20Repository';
+import { Erc20RepositoryViem } from './Erc20RepositoryViem';
 
 const multicallMock = jest.fn();
 
@@ -39,6 +38,7 @@ describe('Erc20RepositoryViem', () => {
     [SupportedChainId.MAINNET]: mockPublicClient,
     [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
     [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
+    [SupportedChainId.BASE]: mockPublicClient,
     [SupportedChainId.SEPOLIA]: mockPublicClient,
   };
 

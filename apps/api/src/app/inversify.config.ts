@@ -5,6 +5,13 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  SimulationRepository,
+  SimulationRepositoryTenderly,
+  TokenHolderRepository,
+  TokenHolderRepositoryCache,
+  TokenHolderRepositoryEthplorer,
+  TokenHolderRepositoryFallback,
+  TokenHolderRepositoryMoralis,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -14,25 +21,33 @@ import {
   cowApiClients,
   erc20RepositorySymbol,
   redisClient,
+  tenderlyRepositorySymbol,
+  tokenHolderRepositorySymbol,
   usdRepositorySymbol,
   viemClients,
 } from '@cowprotocol/repositories';
+
+import { Container } from 'inversify';
+import {
+  SimulationService,
+  SlippageService,
+  SlippageServiceMain,
+  TokenHolderService,
+  TokenHolderServiceMain,
+  UsdService,
+  UsdServiceMain,
+  simulationServiceSymbol,
+  slippageServiceSymbol,
+  tokenHolderServiceSymbol,
+  usdServiceSymbol,
+} from '@cowprotocol/services';
+import ms from 'ms';
+import { Logger, logger } from '../logger';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
 
 const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
-
-import { Container } from 'inversify';
-import {
-  SlippageService,
-  SlippageServiceMain,
-  UsdService,
-  UsdServiceMain,
-  slippageServiceSymbol,
-  usdServiceSymbol,
-} from '@cowprotocol/services';
-import ms from 'ms';
 
 function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
   return new Erc20RepositoryCache(
@@ -43,7 +58,7 @@ function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
   );
 }
 
-function getCacheRepository(_apiContainer: Container): CacheRepository {
+function getCacheRepository(): CacheRepository {
   if (redisClient) {
     return new CacheRepositoryRedis(redisClient);
   }
@@ -86,15 +101,62 @@ function getUsdRepository(
   ]);
 }
 
+function getTokenHolderRepositoryEthplorer(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryEthplorer(),
+    cacheRepository,
+    'tokenHolderEthplorer',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepositoryMoralis(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryCache(
+    new TokenHolderRepositoryMoralis(),
+    cacheRepository,
+    'tokenHolderMoralis',
+    DEFAULT_CACHE_VALUE_SECONDS,
+    DEFAULT_CACHE_NULL_SECONDS
+  );
+}
+
+function getTokenHolderRepository(
+  cacheRepository: CacheRepository
+): TokenHolderRepository {
+  return new TokenHolderRepositoryFallback([
+    getTokenHolderRepositoryMoralis(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository),
+  ]);
+}
+
+function getSimulationRepository(): SimulationRepository {
+  return new SimulationRepositoryTenderly(logger.child({ module: 'tenderly' }));
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
+
+  // Bind logger
+  apiContainer.bind<Logger>('Logger').toConstantValue(logger);
+
   // Repositories
-  const cacheRepository = getCacheRepository(apiContainer);
+  const cacheRepository = getCacheRepository();
   const erc20Repository = getErc20Repository(cacheRepository);
+  const simulationRepository = getSimulationRepository();
+  const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
     .toConstantValue(erc20Repository);
+
+  apiContainer
+    .bind<SimulationRepository>(tenderlyRepositorySymbol)
+    .toConstantValue(simulationRepository);
 
   apiContainer
     .bind<CacheRepository>(cacheRepositorySymbol)
@@ -104,12 +166,24 @@ function getApiContainer(): Container {
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
 
+  apiContainer
+    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
+    .toConstantValue(tokenHolderRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
 
+  apiContainer
+    .bind<TokenHolderService>(tokenHolderServiceSymbol)
+    .to(TokenHolderServiceMain);
+
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer
+    .bind<SimulationService>(simulationServiceSymbol)
+    .to(SimulationService);
 
   return apiContainer;
 }
