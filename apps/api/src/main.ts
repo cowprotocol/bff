@@ -1,20 +1,6 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
-import pino from 'pino';
-
-const loggerConfigEnv =
-  process.env.NODE_ENV === 'production'
-    ? {}
-    : {
-        transport: {
-          target: 'pino-pretty',
-        },
-      };
-
-const logger = pino({
-  ...loggerConfigEnv,
-  level: process.env.LOG_LEVEL ?? 'info',
-});
+import { logger } from './logger';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
