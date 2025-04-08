@@ -15,10 +15,11 @@ const CACHE_SECONDS = 120;
 
 const routeSchema = {
   type: 'object',
-  required: ['chainId'],
+  required: ['chainId' /*'orderId'*/],
   additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
+    // orderId: OrderIdSchema,
   },
 } as const satisfies JSONSchema;
 

@@ -40,17 +40,15 @@ export interface OrderEvent {
 
 export async function getOrderEvents(
   chainId: SupportedChainId,
-  _orderId: string
+  orderId: string
 ): Promise<OrderEvent[]> {
-  if (chainId === SupportedChainId.MAINNET) {
-    throw new Error('Mainnet is not supported');
+  if (chainId !== SupportedChainId.MAINNET) {
+    throw new Error('Only Mainnet is supported');
   }
 
   // Check the connection to the DB works
-  const result = await executeQuery('SELECT 1', []);
-  if (result.length === 0) {
-    throw new Error('Failed to connect to the database');
-  }
-
-  return [];
+  return await executeQuery(
+    "SELECT timestamp as time, label as value FROM order_events WHERE order_uid = decode($1, 'hex')",
+    [orderId.substring(2)]
+  );
 }
