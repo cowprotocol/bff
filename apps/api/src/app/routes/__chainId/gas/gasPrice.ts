@@ -1,9 +1,4 @@
-import { log } from 'console';
 import { FastifyPluginAsync } from 'fastify';
-
-import { readFileSync } from 'fs';
-
-import { join } from 'path';
 import { server } from '../../../../main';
 import {
   CACHE_CONTROL_HEADER,
