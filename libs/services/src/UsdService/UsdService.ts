@@ -27,11 +27,4 @@ export class UsdServiceMain implements UsdService {
   ): Promise<number | null> {
     return this.usdRepository.getUsdPrice(chainId, tokenAddress);
   }
-
-  async getLast24hUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string,
-  ): Promise<PricePoint[] | null> {
-    return this.usdRepository.getUsdPrices(chainId, tokenAddress, '5m')
-  }
 }

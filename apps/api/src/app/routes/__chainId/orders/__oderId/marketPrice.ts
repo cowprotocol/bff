@@ -8,6 +8,9 @@ import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
+import { UsdRepositoryCoingecko } from '@cowprotocol/repositories';
+import { OrderBookApi } from '@cowprotocol/cow-sdk';
+import { Big, BigDecimal } from 'bigdecimal.js';
 
 const CACHE_SECONDS = 120;
 
@@ -17,13 +20,14 @@ const routeSchema = {
   additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
-    orderId: OrderIdSchema,
   },
 } as const satisfies JSONSchema;
 
 const gasCostQueryStringSchema = {
   type: 'object',
-  properties: {},
+  properties: {
+    orderId: OrderIdSchema,
+  },
 } as const satisfies JSONSchema;
 
 const gasCostSuccessSchema = {
@@ -66,21 +70,30 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       const { chainId } = request.params;
+      const orderId = request.query.orderId as string;
       fastify.log.info(
         `Get gas cost time series for chain ${chainId} in sell token`
       );
-
-      // TODO: Implement the actual buyToken market pricecalculation logic
-      //  Get sellToken prices in eth
-      //  Get buyToken prices in eth
-      //  market price is buyToken/SellToken
-
-      const now = Math.floor(Date.now() / 1000);
-      const fiveMinutes = 5 * 60;
-      const dataPoints = Array.from({ length: 288 }, (_, i) => ({
-        time: now - (287 - i) * fiveMinutes,
-        value: (BigInt(Math.floor(Math.random() * 1e15)) * 100n).toString(),
-      }));
+      const now = Math.round(Date.now() / 1000);
+      const startTimestamp = now - 24 * 60 * 60;
+      const orderBookApi = new OrderBookApi({chainId, env:'prod'})
+      const order = await orderBookApi.getOrder(orderId as string);
+      const usdRepository = new UsdRepositoryCoingecko();
+      const sellTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.sellToken, startTimestamp, now);
+      const buyTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.buyToken, startTimestamp, now);
+      const dataPoints = [];
+      if (sellTokenHistory && buyTokenHistory) {
+        const length = Math.min(sellTokenHistory.length, buyTokenHistory.length);
+        for (let i = 0; i < length; i++) {
+          const sellTokenPrice = new Big(sellTokenHistory[i].price);
+          const buyTokenPrice = new Big(buyTokenHistory[i].price);
+          const marketPrice = buyTokenPrice.divide(sellTokenPrice);
+          dataPoints.push({
+            value: marketPrice.toString(),
+            time: sellTokenHistory[i].date.getTime()
+          });
+        }
+      }
 
       reply.header(
         CACHE_CONTROL_HEADER,
