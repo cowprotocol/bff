@@ -84,6 +84,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const buyTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.buyToken, startTimestamp, now);
       const dataPoints = [];
       if (sellTokenHistory && buyTokenHistory) {
+        // TODO: use a wiser approach here
         const length = Math.min(sellTokenHistory.length, buyTokenHistory.length);
         for (let i = 0; i < length; i++) {
           const sellTokenPrice = new Big(sellTokenHistory[i].price.toString());
