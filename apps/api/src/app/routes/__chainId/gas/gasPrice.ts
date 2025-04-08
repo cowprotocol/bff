@@ -10,6 +10,7 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../utils/cache';
 import ms from 'ms';
+import { ValuePoint } from '../orders/types';
 
 const CACHE_SECONDS = ms('10m') / 1000;
 
@@ -23,7 +24,7 @@ const DEFAULT_RANGE = '24h'; // Default time range
 
 interface GasPriceDataPoint {
   time: number;
-  value: number;
+  value: string;
 }
 
 interface GasPriceResponse {
@@ -44,57 +45,67 @@ interface PrometheusResponse {
 /**
  * Fetches gas price data from Prometheus using query_range
  */
-async function fetchGasPriceFromPrometheus(
+export async function fetchGasPriceFromPrometheus(
   range: string = DEFAULT_RANGE,
   step: string = DEFAULT_STEP
-): Promise<GasPriceResponse | undefined> {
+): Promise<ValuePoint[] | undefined> {
   try {
     const query = encodeURIComponent(GAS_PRICE_QUERY);
-    const url = `${PROMETHEUS_URL}/api/v1/query_range?query=${query}&start=${getStartTime(range)}&end=${Math.floor(Date.now() / 1000)}&step=${step}`;
-    
+    const url = `${PROMETHEUS_URL}/api/v1/query_range?query=${query}&start=${getStartTime(
+      range
+    )}&end=${Math.floor(Date.now() / 1000)}&step=${step}`;
+
     server.log.debug(`Fetching gas price from Prometheus: ${url}`);
-    
+
     // Prepare fetch options with authentication if credentials are provided
     const fetchOptions: RequestInit = {};
-    
+
     if (PROMETHEUS_USERNAME && PROMETHEUS_PASSWORD) {
-      const authHeader = 'Basic ' + Buffer.from(`${PROMETHEUS_USERNAME}:${PROMETHEUS_PASSWORD}`).toString('base64');
+      const authHeader =
+        'Basic ' +
+        Buffer.from(`${PROMETHEUS_USERNAME}:${PROMETHEUS_PASSWORD}`).toString(
+          'base64'
+        );
       fetchOptions.headers = {
-        'Authorization': authHeader
+        Authorization: authHeader,
       };
     }
-    
+
     const response = await fetch(url, fetchOptions);
-    
+
     if (!response.ok) {
-      server.log.error(`Failed to fetch gas price from Prometheus: ${response.statusText}`);
+      server.log.error(
+        `Failed to fetch gas price from Prometheus: ${response.statusText}`
+      );
       return undefined;
     }
-    
-    const data = await response.json() as PrometheusResponse;
-    
+
+    const data = (await response.json()) as PrometheusResponse;
+
     if (data.status !== 'success' || !data.data.result.length) {
       return undefined;
     }
-    
+
     const result = data.data.result[0];
     const values = result.values;
-    
+
     if (!values || values.length === 0) {
       return undefined;
     }
-    
+
     // Format data points
     const dataPoints = values.map(([timestamp, value]) => ({
       time: Math.floor(timestamp),
-      value: parseFloat(value)
+      value,
     }));
-    
-    return {
-      data: dataPoints
-    };
+
+    return dataPoints;
   } catch (error) {
-    server.log.error(`Error fetching gas price from Prometheus: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    server.log.error(
+      `Error fetching gas price from Prometheus: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
     return undefined;
   }
 }
@@ -109,12 +120,12 @@ function getStartTime(range: string): number {
 }
 
 const gasPrice: FastifyPluginAsync = async (fastify): Promise<void> => {
-  fastify.get<{ 
-    Reply: GasPriceResponse,
+  fastify.get<{
+    Reply: GasPriceResponse;
     Querystring: {
       range?: string;
       step?: string;
-    }
+    };
   }>(
     '/gasPrice',
     {
@@ -124,17 +135,17 @@ const gasPrice: FastifyPluginAsync = async (fastify): Promise<void> => {
         querystring: {
           type: 'object',
           properties: {
-            range: { 
+            range: {
               type: 'string',
               description: 'Time range to fetch data for (e.g. 1h, 24h, 7d)',
-              default: DEFAULT_RANGE
+              default: DEFAULT_RANGE,
             },
-            step: { 
+            step: {
               type: 'string',
               description: 'Step interval (e.g. 1m, 5m, 1h)',
-              default: DEFAULT_STEP
-            }
-          }
+              default: DEFAULT_STEP,
+            },
+          },
         },
         response: {
           200: {
@@ -146,13 +157,13 @@ const gasPrice: FastifyPluginAsync = async (fastify): Promise<void> => {
                   type: 'object',
                   properties: {
                     time: { type: 'number' },
-                    value: { type: 'number' }
-                  }
-                }
-              }
-            }
-          }
-        }
+                    value: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     async function (request, reply) {
@@ -170,7 +181,9 @@ const gasPrice: FastifyPluginAsync = async (fastify): Promise<void> => {
         return reply.send({ data: [] });
       }
 
-      return reply.send(gasPriceData);
+      return reply.send({
+        data: gasPriceData,
+      });
     }
   );
 };

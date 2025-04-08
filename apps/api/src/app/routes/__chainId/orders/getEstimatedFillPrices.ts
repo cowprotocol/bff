@@ -1,11 +1,20 @@
+import {
+  Erc20Repository,
+  erc20RepositorySymbol,
+} from '@cowprotocol/repositories';
 import { ValuePoint } from './types';
 import BigNumber from 'bignumber.js';
+import { apiContainer } from '../../../inversify.config';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export type GetEstimatedFillPricesParams = {
+  chainId: SupportedChainId;
+  sellToken: string;
+  buyToken: string;
   orderGas: string; // We have: from API
-  gasPrices: ValuePoint[]; // We have (every 1min)
+  gasPricesGwei: ValuePoint[]; // We have (every 1min)
 
-  sellTokenPriceInEth: ValuePoint[]; // TODO: Multiply price of token by gasPrice --> we get gas cost at a moment in time
+  sellTokenPriceInEthWei: ValuePoint[]; // TODO: Multiply price of token by gasPrice --> we get gas cost at a moment in time
 
   limitPrice: {
     sellAmount: string;
@@ -16,19 +25,42 @@ export type GetEstimatedFillPricesParams = {
 export async function getEstimatedFillPrices(
   params: GetEstimatedFillPricesParams
 ): Promise<ValuePoint[]> {
+  // console.log('params', {
+  //   gasPricesGwei: params.gasPricesGwei[0],
+  //   sellTokenPriceInEthWei: params.sellTokenPriceInEthWei[0],
+  //   limitPrice: params.limitPrice,
+  //   orderGas: params.orderGas,
+  // });
   const {
+    chainId,
+    sellToken: sellTokenAddress,
+    buyToken: buyTokenAddress,
     limitPrice,
     orderGas: orderGasString,
-    gasPrices,
-    sellTokenPriceInEth,
+    gasPricesGwei,
+    sellTokenPriceInEthWei,
   } = params;
 
   // Match closest points first
-  const matchedPrices = matchClosestPrices(sellTokenPriceInEth, gasPrices);
+  const matchedPrices = matchClosestPrices(
+    sellTokenPriceInEthWei,
+    gasPricesGwei
+  );
+
+  // Calculate the decimal difference between the sell and buy token
+  const erc20Repository: Erc20Repository = apiContainer.get(
+    erc20RepositorySymbol
+  );
+  const sellToken = await erc20Repository.get(chainId, sellTokenAddress);
+  const buyToken = await erc20Repository.get(chainId, buyTokenAddress);
+
+  const sellTokenDecimals = sellToken?.decimals || 18;
+  const buyTokenDecimals = buyToken?.decimals || 18;
+  const tokenDecimalsDifference = sellTokenDecimals - buyTokenDecimals;
 
   // Process each matched point
   return matchedPrices.map((gasPrice, index) => {
-    const tokenPrice = sellTokenPriceInEth[index];
+    const tokenPriceInEthWei = sellTokenPriceInEthWei[index];
 
     // Gas price in weis per unit of gas
     // const gasPriceInWei = new BigNumber(gasPrice.value).multipliedBy(
@@ -47,7 +79,7 @@ export async function getEstimatedFillPrices(
     const gasCostInWei = gasPriceInWei.multipliedBy(orderGasString);
 
     // Calculate the costs in the sell token (weis)
-    const gasCostInSellToken = gasCostInWei.dividedBy(tokenPrice.value);
+    const gasCostInSellToken = gasCostInWei.dividedBy(tokenPriceInEthWei.value);
 
     // Add gas cost to sell amount
     const sellAmountIncludingCost = gasCostInSellToken.plus(
@@ -55,23 +87,26 @@ export async function getEstimatedFillPrices(
     );
 
     // Calculate the price (including costs)
-    const priceIncludingCosts = sellAmountIncludingCost.div(
-      limitPrice.buyAmount
-    );
+    const priceIncludingCosts = sellAmountIncludingCost
+      .dividedBy(10 ** tokenDecimalsDifference)
+      .div(limitPrice.buyAmount);
 
-    console.log('data', {
-      limitPrice,
-      tokenPrice,
-      gasPrice: gasPrice.value,
-      gasPriceInWei: gasPriceInWei.toString(),
-      gasCostInWei: gasCostInWei.toString(),
-      gasCostInSellToken: gasCostInSellToken.toString(),
-      sellAmountIncludingCost: sellAmountIncludingCost.toString(),
-      priceIncludingCosts: priceIncludingCosts.toString(),
-    });
+    // if (index === 0) {
+    //   console.log('data', {
+    //     limitPrice,
+    //     tokenPriceInEthWei,
+    //     orderGasString,
+    //     gasPrice: gasPrice.value,
+    //     gasPriceInWei: gasPriceInWei.toString(),
+    //     gasCostInWei: gasCostInWei.toString(),
+    //     gasCostInSellToken: gasCostInSellToken.toString(),
+    //     sellAmountIncludingCost: sellAmountIncludingCost.toString(),
+    //     priceIncludingCosts: priceIncludingCosts.toString(),
+    //   });
+    // }
 
     return {
-      time: tokenPrice.time,
+      time: tokenPriceInEthWei.time,
       value: priceIncludingCosts.toString(),
     };
   });

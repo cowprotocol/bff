@@ -2,17 +2,21 @@ import {
   getEstimatedFillPrices,
   GetEstimatedFillPricesParams,
 } from './getEstimatedFillPrices';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 describe('getEstimatedFillPrices', () => {
   it.only('should calculate estimated fill prices correctly for simple values', async () => {
     const params: GetEstimatedFillPricesParams = {
+      chainId: SupportedChainId.MAINNET,
+      sellToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
+      buyToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC
       orderGas: '100000', // 100k gas
-      gasPrices: [
+      gasPricesGwei: [
         { time: 100, value: '50' }, // 50 GWEI
         { time: 160, value: '60' }, // 60 GWEI
         { time: 220, value: '55' }, // 55 GWEI
       ],
-      sellTokenPriceInEth: [
+      sellTokenPriceInEthWei: [
         { time: 100, value: '0.0005' }, // 0.0005 DAI per ETH  --> 2000 DAI per WETH
         { time: 200, value: '0.001' }, // 0.001 DAI per ETH  --> 1000 DAI per WETH
       ],
@@ -47,9 +51,12 @@ describe('getEstimatedFillPrices', () => {
 
   it('should handle empty price arrays', async () => {
     const params: GetEstimatedFillPricesParams = {
+      chainId: SupportedChainId.MAINNET,
+      sellToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
+      buyToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC
       orderGas: '100000',
-      gasPrices: [],
-      sellTokenPriceInEth: [],
+      gasPricesGwei: [],
+      sellTokenPriceInEthWei: [],
       limitPrice: {
         sellAmount: '1000000000000000000',
         buyAmount: '2000000000000000000',
@@ -62,13 +69,16 @@ describe('getEstimatedFillPrices', () => {
 
   it('should match closest gas price points correctly', async () => {
     const params: GetEstimatedFillPricesParams = {
+      chainId: SupportedChainId.MAINNET,
+      sellToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
+      buyToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC
       orderGas: '100000',
-      gasPrices: [
+      gasPricesGwei: [
         { time: 90, value: '50000000000' }, // 50 GWEI
         { time: 150, value: '60000000000' }, // 60 GWEI
         { time: 210, value: '55000000000' }, // 55 GWEI
       ],
-      sellTokenPriceInEth: [
+      sellTokenPriceInEthWei: [
         { time: 100, value: '1000000000000000000' }, // Should match with 50 GWEI (closest to 90)
         { time: 200, value: '2000000000000000000' }, // Should match with 55 GWEI (closest to 210)
       ],
@@ -87,11 +97,14 @@ describe('getEstimatedFillPrices', () => {
 
   it('should handle edge case with single price point', async () => {
     const params: GetEstimatedFillPricesParams = {
+      chainId: SupportedChainId.MAINNET,
+      sellToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
+      buyToken: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC
       orderGas: '100000',
-      gasPrices: [
+      gasPricesGwei: [
         { time: 100, value: '50000000000' }, // 50 GWEI
       ],
-      sellTokenPriceInEth: [
+      sellTokenPriceInEthWei: [
         { time: 100, value: '1000000000000000000' }, // 1 ETH
       ],
       limitPrice: {

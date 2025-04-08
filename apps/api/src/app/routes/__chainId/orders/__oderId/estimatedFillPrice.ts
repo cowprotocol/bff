@@ -14,8 +14,14 @@ import { get24HourRange } from '../../../../../utils/date';
 import { Big, RoundingMode } from 'bigdecimal.js';
 import { getEstimatedFillPrices } from '../getEstimatedFillPrices';
 import { ValuePoint } from '../types';
+import { fetchGasPriceFromPrometheus } from '../../gas/gasPrice';
+import {
+  Erc20Repository,
+  erc20RepositorySymbol,
+} from '@cowprotocol/repositories';
 
 const CACHE_SECONDS = 120;
+const ETH_DECIMALS = 18;
 
 const routeSchema = {
   type: 'object',
@@ -85,8 +91,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const orderBookApi = new OrderBookApi({ chainId, env: 'prod' });
       const order = await orderBookApi.getOrder(orderId as string);
 
-      console.log({ order });
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const gasAmountString = (order as any).quote?.gasAmount as
         | string
@@ -106,7 +110,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const startTime = new Date(start * 1000);
       const endTime = new Date(end * 1000);
       const weth_address = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-      const eth_prices = await await fetchTokenHistory(
+      const ethPriceUsd = await await fetchTokenHistory(
         weth_address,
         startTime,
         endTime,
@@ -115,7 +119,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       );
 
       //  Get Token prices in USD
-      const sell_token_prices = await await fetchTokenHistory(
+      const sellTokenUsd = await await fetchTokenHistory(
         order.sellToken,
         startTime,
         endTime,
@@ -124,12 +128,12 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       );
 
       const sellTokenPriceInEth: ValuePoint[] = [];
-      if (eth_prices && sell_token_prices) {
+      if (ethPriceUsd && sellTokenUsd) {
         // TODO: use a wiser approach here
-        const length = Math.min(sell_token_prices.length, eth_prices.length);
+        const length = Math.min(sellTokenUsd.length, ethPriceUsd.length);
         for (let i = 0; i < length; i++) {
-          const sellTokenPrice = new Big(sell_token_prices[i].value.toString());
-          const ethPrice = new Big(eth_prices[i].value.toString());
+          const sellTokenPrice = new Big(sellTokenUsd[i].value.toString());
+          const ethPrice = new Big(ethPriceUsd[i].value.toString());
           const value = sellTokenPrice.divide(
             ethPrice,
             20,
@@ -137,15 +141,48 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           );
           sellTokenPriceInEth.push({
             value: value.toString(),
-            time: new Date(sell_token_prices[i].timestamp).getTime(),
+            time: new Date(sellTokenUsd[i].timestamp).getTime(),
           });
         }
       }
 
-      const prices = await getEstimatedFillPrices({
+      const erc20Repository: Erc20Repository = apiContainer.get(
+        erc20RepositorySymbol
+      );
+
+      const sellToken = await erc20Repository.get(chainId, order.sellToken);
+      // const buyToken = await erc20Repository.get(chainId, order.buyToken);
+
+      const sellTokenDecimals = sellToken?.decimals || 18;
+      // const buyTokenDecimals = buyToken?.decimals || 18;
+      const tokenDecimalDifference = sellTokenDecimals - ETH_DECIMALS;
+
+      const sellTokenPriceInWei = sellTokenPriceInEth.map(({ time, value }) => {
+        const newValue = new Big(value)
+          .divide(10 ** tokenDecimalDifference)
+          .toString();
+        return {
+          time,
+          value: newValue,
+        };
+      });
+
+      if (!sellToken) {
+        throw new Error('Sell token not found');
+      }
+
+      const gasPrices = await fetchGasPriceFromPrometheus();
+      if (!gasPrices) {
+        throw new Error('Gas prices not found');
+      }
+
+      const estimatedFillPrice = await getEstimatedFillPrices({
+        chainId,
+        sellToken: order.sellToken,
+        buyToken: order.buyToken,
         orderGas: gasAmountString,
-        gasPrices: [],
-        sellTokenPriceInEth: sell_token_prices,
+        gasPricesGwei: gasPrices,
+        sellTokenPriceInEthWei: sellTokenPriceInWei,
         limitPrice: {
           sellAmount: order.sellAmount,
           buyAmount: order.buyAmount,
@@ -157,7 +194,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         getCacheControlHeaderValue(CACHE_SECONDS)
       );
 
-      reply.send(prices);
+      reply.send(estimatedFillPrice);
     }
   );
 };
