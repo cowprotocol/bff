@@ -10,7 +10,7 @@ import {
 } from '../../../../../utils/cache';
 import { UsdRepositoryCoingecko } from '@cowprotocol/repositories';
 import { OrderBookApi } from '@cowprotocol/cow-sdk';
-import { Big, BigDecimal } from 'bigdecimal.js';
+import { Big, MathContext, RoundingMode } from 'bigdecimal.js';
 
 const CACHE_SECONDS = 120;
 
@@ -75,19 +75,20 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         `Get gas cost time series for chain ${chainId} in sell token`
       );
       const now = Math.round(Date.now() / 1000);
-      const startTimestamp = now - 24 * 60 * 60;
+      const startTimestamp = now - 3 * 24 * 60 * 60;
       const orderBookApi = new OrderBookApi({chainId, env:'prod'})
       const order = await orderBookApi.getOrder(orderId as string);
       const usdRepository = new UsdRepositoryCoingecko();
+
       const sellTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.sellToken, startTimestamp, now);
       const buyTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.buyToken, startTimestamp, now);
       const dataPoints = [];
       if (sellTokenHistory && buyTokenHistory) {
         const length = Math.min(sellTokenHistory.length, buyTokenHistory.length);
         for (let i = 0; i < length; i++) {
-          const sellTokenPrice = new Big(sellTokenHistory[i].price);
-          const buyTokenPrice = new Big(buyTokenHistory[i].price);
-          const marketPrice = buyTokenPrice.divide(sellTokenPrice);
+          const sellTokenPrice = new Big(sellTokenHistory[i].price.toString());
+          const buyTokenPrice = new Big(buyTokenHistory[i].price.toString());
+          const marketPrice = buyTokenPrice.divide(sellTokenPrice, 20, RoundingMode.HALF_UP);
           dataPoints.push({
             value: marketPrice.toString(),
             time: sellTokenHistory[i].date.getTime()

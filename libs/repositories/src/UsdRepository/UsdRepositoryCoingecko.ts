@@ -138,12 +138,15 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const tokenAddressLower = tokenAddress.toLowerCase();
     const daysInterval = Math.floor((endTimestamp - startTimestamp) / (1000 * 60 * 60 * 24));
-    let priceStrategy: PriceStrategy = '5m';
-    if (daysInterval > 90) {
-      priceStrategy = 'daily';
-    } else if (daysInterval > 5) {
-      priceStrategy = 'hourly';
-    }
+    // TODO: 5m strategy requires an Enterprise plan
+    // let priceStrategy: PriceStrategy = '5m';
+    // if (daysInterval > 90) {
+    //   priceStrategy = 'daily';
+    // } else if (daysInterval >= 2) {
+    //   priceStrategy = 'hourly';
+    // }
+    console.log(`daysInterval: ${daysInterval}`);
+    // console.log(`priceStrategy: ${priceStrategy}`);
 
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
     const { data: priceData, response } = await coingeckoProClient.GET(
@@ -158,7 +161,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
             vs_currency: 'usd',
             from: startTimestamp,
             to: endTimestamp,
-            interval: priceStrategy,
+            // interval: priceStrategy,
           },
         },
       }
