@@ -90,7 +90,7 @@ export async function fetchGasPriceFromPrometheus(
 
     // Format data points
     const dataPoints = values.map(([timestamp, value]) => ({
-      time: Math.floor(timestamp),
+      time: Math.floor(timestamp) * 1000,
       value,
     }));
 

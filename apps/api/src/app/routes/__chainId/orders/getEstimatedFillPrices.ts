@@ -77,12 +77,19 @@ export async function getEstimatedFillPrices(
   console.log(
     'gasPricesGwei times',
     new Date(gasPricesGwei[0].time).toISOString(),
-    new Date(gasPricesGwei[matchedPrices.length - 1].time).toISOString()
+    new Date(gasPricesGwei[gasPricesGwei.length - 1].time).toISOString()
   );
   console.log(
     'matchedPrices times',
     new Date(matchedPrices[0].time).toISOString(),
     new Date(matchedPrices[matchedPrices.length - 1].time).toISOString()
+  );
+  console.log(
+    'sellTokenPriceInEthWei',
+    new Date(sellTokenPriceInEthWei[0].time).toISOString(),
+    new Date(
+      sellTokenPriceInEthWei[sellTokenPriceInEthWei.length - 1].time
+    ).toISOString()
   );
 
   // Process each matched point
