@@ -8,9 +8,10 @@ import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
-import { UsdRepositoryCoingecko } from '@cowprotocol/repositories';
-import { OrderBookApi } from '@cowprotocol/cow-sdk';
-import { Big, MathContext, RoundingMode } from 'bigdecimal.js';
+import { OrderBookApi, SupportedChainId } from '@cowprotocol/cow-sdk';
+import { Big, RoundingMode } from 'bigdecimal.js';
+import { get24HourRange } from '../../../../../utils/date';
+import * as process from 'node:process';
 
 const CACHE_SECONDS = 120;
 
@@ -74,25 +75,26 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       fastify.log.info(
         `Get gas cost time series for chain ${chainId} in sell token`
       );
-      const now = Math.round(Date.now() / 1000);
-      const startTimestamp = now - 24 * 60 * 60;
+      const { start, end } = get24HourRange(new Date());
+      const startTime = new Date(start * 1000);
+      const endTime = new Date(end * 1000);
       const orderBookApi = new OrderBookApi({chainId, env:'prod'})
       const order = await orderBookApi.getOrder(orderId as string);
-      const usdRepository = new UsdRepositoryCoingecko();
 
-      const sellTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.sellToken, startTimestamp, now);
-      const buyTokenHistory = await usdRepository.getUsdPricesBetween(chainId, order.buyToken, startTimestamp, now);
+      const authToken = process.env.ALCHEMY_API_KEY as string;
+      const sellTokenHistory = await fetchTokenHistory(order.sellToken, startTime, endTime, authToken, chainId);
+      const buyTokenHistory = await fetchTokenHistory(order.buyToken, startTime, endTime, authToken, chainId);
       const dataPoints = [];
       if (sellTokenHistory && buyTokenHistory) {
         // TODO: use a wiser approach here
         const length = Math.min(sellTokenHistory.length, buyTokenHistory.length);
         for (let i = 0; i < length; i++) {
-          const sellTokenPrice = new Big(sellTokenHistory[i].price.toString());
-          const buyTokenPrice = new Big(buyTokenHistory[i].price.toString());
+          const sellTokenPrice = new Big(sellTokenHistory[i].value.toString());
+          const buyTokenPrice = new Big(buyTokenHistory[i].value.toString());
           const marketPrice = buyTokenPrice.divide(sellTokenPrice, 20, RoundingMode.HALF_UP);
           dataPoints.push({
             value: marketPrice.toString(),
-            time: sellTokenHistory[i].date.getTime()
+            time: new Date(sellTokenHistory[i].timestamp).getTime()
           });
         }
       }
@@ -106,5 +108,38 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     }
   );
 };
+
+const AlchemyNetworkByChainId: Record<SupportedChainId, string> = {
+  [SupportedChainId.MAINNET]: 'eth-mainnet',
+  [SupportedChainId.GNOSIS_CHAIN]: 'eth-gnosis',
+  [SupportedChainId.ARBITRUM_ONE]: 'eth-arbitrum',
+  [SupportedChainId.SEPOLIA]: 'eth-sepolia',
+  [SupportedChainId.BASE]: 'eth-base',
+};
+
+async function fetchTokenHistory(token: string, startTime: Date, endTime: Date, auth_token: string, chain_id: SupportedChainId) {
+  const options = {
+    method: 'POST',
+    headers: {accept: 'application/json', 'content-type': 'application/json', 'Authorization': `Bearer ${auth_token}`},
+    body: JSON.stringify({
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      interval: '5m',
+      address: token,
+      network: AlchemyNetworkByChainId[chain_id],
+    })
+  };
+
+  console.log(`request=${JSON.stringify(options)}`);
+
+  try {
+    const response = await fetch('https://api.g.alchemy.com/prices/v1/tokens/historical', options);
+    const data = await response.json();
+    return data.data;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
 
 export default root;
