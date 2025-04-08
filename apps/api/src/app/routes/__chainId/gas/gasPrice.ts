@@ -2,10 +2,7 @@ import { log } from 'console';
 import { FastifyPluginAsync } from 'fastify';
 
 import { readFileSync } from 'fs';
-const GIT_COMMIT_HASH_FILE = 'git-commit-hash.txt';
-const VERSION =
-  process.env.VERSION || 'UNKNOWN, please set the environment variable';
-const COMMIT_HASH = getCommitHash();
+
 import { join } from 'path';
 import { server } from '../../../../main';
 import {
@@ -17,7 +14,6 @@ import ms from 'ms';
 const CACHE_SECONDS = ms('10m') / 1000;
 
 // Prometheus configuration
-// const PROMETHEUS_URL = process.env.PROMETHEUS_URL || 'http://localhost:9090';
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL;
 const PROMETHEUS_USERNAME = process.env.PROMETHEUS_USERNAME;
 const PROMETHEUS_PASSWORD = process.env.PROMETHEUS_PASSWORD;
@@ -178,21 +174,5 @@ const gasPrice: FastifyPluginAsync = async (fastify): Promise<void> => {
     }
   );
 };
-
-/**
- * Read a file with the git commit hash (generated for example using github actions)
- */
-function getCommitHash(): string | undefined {
-  const filePath = join(__dirname, '../..', GIT_COMMIT_HASH_FILE);
-  try {
-    return readFileSync(filePath, 'utf-8');
-  } catch (error) {
-    // Not a big deal, if the file is not present, the about won't
-    server.log.warn(
-      `Unable to read the file with the git commit hash: ${filePath}. /about endpoint won't export the 'gitCommitHash'`
-    );
-    return undefined;
-  }
-}
 
 export default gasPrice;
