@@ -12,6 +12,8 @@ import { OrderBookApi } from '@cowprotocol/cow-sdk';
 import { fetchTokenHistory } from '../../../../../utils/alchemy';
 import { get24HourRange } from '../../../../../utils/date';
 import { Big, RoundingMode } from 'bigdecimal.js';
+import { getEstimatedFillPrices } from '../getEstimatedFillPrices';
+import { ValuePoint } from '../types';
 
 const CACHE_SECONDS = 120;
 
@@ -36,6 +38,7 @@ const gasCostSuccessSchema = {
   items: {
     type: 'object',
     required: ['time', 'value'],
+    additionalProperties: false,
     properties: {
       time: {
         type: 'number',
@@ -103,32 +106,58 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const startTime = new Date(start * 1000);
       const endTime = new Date(end * 1000);
       const weth_address = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-      const eth_prices = await await fetchTokenHistory(weth_address, startTime, endTime, authToken, chainId);
+      const eth_prices = await await fetchTokenHistory(
+        weth_address,
+        startTime,
+        endTime,
+        authToken,
+        chainId
+      );
 
       //  Get Token prices in USD
-      const sell_token_prices = await await fetchTokenHistory(order.sellToken, startTime, endTime, authToken, chainId);
-      
-      const sellTokenPriceInEth = [];
-            if (eth_prices && sell_token_prices) {
-              // TODO: use a wiser approach here
-              const length = Math.min(sell_token_prices.length, eth_prices.length);
-              for (let i = 0; i < length; i++) {
-                const sellTokenPrice = new Big(sell_token_prices[i].value.toString());
-                const ethPrice = new Big(eth_prices[i].value.toString());
-                const value = sellTokenPrice.divide(ethPrice, 20, RoundingMode.HALF_UP);
-                sellTokenPriceInEth.push({
-                  value: value.toString(),
-                  time: new Date(sell_token_prices[i].timestamp).getTime()
-                });
-              }
+      const sell_token_prices = await await fetchTokenHistory(
+        order.sellToken,
+        startTime,
+        endTime,
+        authToken,
+        chainId
+      );
+
+      const sellTokenPriceInEth: ValuePoint[] = [];
+      if (eth_prices && sell_token_prices) {
+        // TODO: use a wiser approach here
+        const length = Math.min(sell_token_prices.length, eth_prices.length);
+        for (let i = 0; i < length; i++) {
+          const sellTokenPrice = new Big(sell_token_prices[i].value.toString());
+          const ethPrice = new Big(eth_prices[i].value.toString());
+          const value = sellTokenPrice.divide(
+            ethPrice,
+            20,
+            RoundingMode.HALF_UP
+          );
+          sellTokenPriceInEth.push({
+            value: value.toString(),
+            time: new Date(sell_token_prices[i].timestamp).getTime(),
+          });
+        }
       }
+
+      const prices = await getEstimatedFillPrices({
+        orderGas: gasAmountString,
+        gasPrices: [],
+        sellTokenPriceInEth: sell_token_prices,
+        limitPrice: {
+          sellAmount: order.sellAmount,
+          buyAmount: order.buyAmount,
+        },
+      });
 
       reply.header(
         CACHE_CONTROL_HEADER,
         getCacheControlHeaderValue(CACHE_SECONDS)
       );
 
-      reply.send(sellTokenPriceInEth);
+      reply.send(prices);
     }
   );
 };
