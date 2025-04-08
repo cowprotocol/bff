@@ -8,6 +8,9 @@ import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
+import { OrderBookApi } from '@cowprotocol/cow-sdk';
+
+
 
 const CACHE_SECONDS = 120;
 
@@ -17,13 +20,14 @@ const routeSchema = {
   additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
-    orderId: OrderIdSchema,
   },
 } as const satisfies JSONSchema;
 
 const gasCostQueryStringSchema = {
   type: 'object',
-  properties: {},
+  properties: {
+    orderId: OrderIdSchema,
+  },
 } as const satisfies JSONSchema;
 
 const gasCostSuccessSchema = {
@@ -66,12 +70,21 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       const { chainId } = request.params;
+      const orderId= request.query.orderId as string;
       fastify.log.info(
         `Get gas cost time series for chain ${chainId} in sell token`
       );
 
       // TODO: Implement the actual gas cost fetching logic
+
       //  Get order details from orderbook
+      const orderBookApi = new OrderBookApi({chainId, env:'prod'})
+      const order = await orderBookApi.getOrder(orderId as string);
+      console.log({order});
+      // @ts-ignore 
+      const gasAmount = order.quote.gasAmount;
+      console.log({gasAmount});
+      
       //  Get gas prices from prometheus
       //  Get Ethereum prices in USD (coingecko)
       //  Get Token prices in USD
