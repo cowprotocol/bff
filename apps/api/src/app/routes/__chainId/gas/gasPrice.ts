@@ -81,8 +81,8 @@ export async function fetchGasPriceFromPrometheus(
       return undefined;
     }
 
-    const result = data.data.result[0];
-    const values = result.values;
+    const results = data.data.result;
+    const values = results.flatMap((result) => result.values);
 
     if (!values || values.length === 0) {
       return undefined;
