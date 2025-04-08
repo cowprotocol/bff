@@ -2,7 +2,7 @@ import {
   Erc20Repository,
   erc20RepositorySymbol,
 } from '@cowprotocol/repositories';
-import { ValuePoint } from './types';
+import { EstimatedFillPrice, ValuePoint } from './types';
 import BigNumber from 'bignumber.js';
 import { apiContainer } from '../../../inversify.config';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
@@ -24,7 +24,7 @@ export type GetEstimatedFillPricesParams = {
 
 export async function getEstimatedFillPrices(
   params: GetEstimatedFillPricesParams
-): Promise<ValuePoint[]> {
+): Promise<EstimatedFillPrice[]> {
   // console.log('params', {
   //   gasPricesGwei: params.gasPricesGwei[0],
   //   sellTokenPriceInEthWei: params.sellTokenPriceInEthWei[0],
@@ -57,6 +57,33 @@ export async function getEstimatedFillPrices(
   const sellTokenDecimals = sellToken?.decimals || 18;
   const buyTokenDecimals = buyToken?.decimals || 18;
   const tokenDecimalsDifference = sellTokenDecimals - buyTokenDecimals;
+
+  // Print first 10 matched prices
+  // console.log(
+  //   'gasPricesGwei',
+  //   gasPricesGwei
+  //     .slice(0, 10)
+  //     .map((p) => p.value)
+  //     .join(', ')
+  // );
+  // console.log(
+  //   'matchedPrices',
+  //   matchedPrices
+  //     .slice(0, 10)
+  //     .map((p) => p.value)
+  //     .join(', ')
+  // );
+
+  console.log(
+    'gasPricesGwei times',
+    new Date(gasPricesGwei[0].time).toISOString(),
+    new Date(gasPricesGwei[matchedPrices.length - 1].time).toISOString()
+  );
+  console.log(
+    'matchedPrices times',
+    new Date(matchedPrices[0].time).toISOString(),
+    new Date(matchedPrices[matchedPrices.length - 1].time).toISOString()
+  );
 
   // Process each matched point
   return matchedPrices.map((gasPrice, index) => {
@@ -107,7 +134,9 @@ export async function getEstimatedFillPrices(
 
     return {
       time: tokenPriceInEthWei.time,
-      value: priceIncludingCosts.toString(),
+      fillPrice: priceIncludingCosts.toString(),
+      gasPriceGwei: gasPrice.value,
+      sellTokenPriceInEthWei: tokenPriceInEthWei.value,
     };
   });
 }

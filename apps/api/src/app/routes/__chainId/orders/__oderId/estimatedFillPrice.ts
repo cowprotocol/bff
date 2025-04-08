@@ -43,16 +43,24 @@ const gasCostSuccessSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['time', 'value'],
+    required: ['time', 'fillPrice', 'gasPriceGwei', 'sellTokenPriceInEthWei'],
     additionalProperties: false,
     properties: {
       time: {
         type: 'number',
         description: 'Unix timestamp in seconds',
       },
-      value: {
+      fillPrice: {
         type: 'string',
         description: 'Gas cost expressed in sell token decimals',
+      },
+      gasPriceGwei: {
+        type: 'string',
+        description: 'Gas price in Gwei',
+      },
+      sellTokenPriceInEthWei: {
+        type: 'string',
+        description: 'Sell token price in ETH Wei',
       },
     },
   },

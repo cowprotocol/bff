@@ -14,3 +14,10 @@ export interface ValuePoint {
   time: number;
   value: string;
 }
+
+export interface EstimatedFillPrice {
+  time: number;
+  fillPrice: string;
+  gasPriceGwei: string;
+  sellTokenPriceInEthWei: string;
+}
