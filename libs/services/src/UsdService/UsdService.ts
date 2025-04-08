@@ -1,7 +1,7 @@
 import {
   UsdRepository,
   usdRepositorySymbol,
-  SupportedChainId,
+  SupportedChainId, PriceStrategy, PricePoint
 } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 
@@ -26,5 +26,12 @@ export class UsdServiceMain implements UsdService {
     tokenAddress: string
   ): Promise<number | null> {
     return this.usdRepository.getUsdPrice(chainId, tokenAddress);
+  }
+
+  async get24hUsdPrice(
+    chainId: SupportedChainId,
+    tokenAddress: string,
+  ): Promise<PricePoint[] | null> {
+    return this.usdRepository.getUsdPrices(chainId, tokenAddress, '5m')
   }
 }
