@@ -10,7 +10,7 @@ import {
 } from '../../../../../utils/cache';
 import { OrderBookApi } from '@cowprotocol/cow-sdk';
 import { fetchTokenHistory } from '../../../../../utils/alchemy';
-import { get24HourRange } from '../../../../../utils/date';
+import { get24HourRange, getLast24HourRange } from '../../../../../utils/date';
 import { Big, RoundingMode } from 'bigdecimal.js';
 import { getEstimatedFillPrices } from '../getEstimatedFillPrices';
 import { ValuePoint } from '../types';
@@ -114,7 +114,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       //  Get Ethereum prices in USD (coingecko)
       const authToken = process.env.ALCHEMY_API_KEY as string;
-      const { start, end } = get24HourRange(new Date());
+      const { start, end } = getLast24HourRange();
       const startTime = new Date(start * 1000);
       const endTime = new Date(end * 1000);
       const weth_address = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';

@@ -16,6 +16,17 @@ export function get24HourRange(date: Date) {
   };
 }
 
+export function getLast24HourRange() {
+  const dateOffset = (24*60*60*1000); //1 day
+  const startTime = new Date();
+  const start = startTime.setTime(startTime.getTime() - dateOffset);
+
+  return {
+    start:  Math.floor(start/ 1000),
+    end: Math.floor(new Date().getTime() / 1000),
+  };
+}
+
 function getStartOfDay(date: Date): Date {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);

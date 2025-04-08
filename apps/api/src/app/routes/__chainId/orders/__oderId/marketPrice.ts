@@ -10,7 +10,7 @@ import {
 } from '../../../../../utils/cache';
 import { OrderBookApi, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Big, RoundingMode } from 'bigdecimal.js';
-import { get24HourRange } from '../../../../../utils/date';
+import { get24HourRange, getLast24HourRange } from '../../../../../utils/date';
 import * as process from 'node:process';
 
 import { fetchTokenHistory } from '../../../../../utils/alchemy';
@@ -77,7 +77,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       fastify.log.info(
         `Get gas cost time series for chain ${chainId} in sell token`
       );
-      const { start, end } = get24HourRange(new Date());
+      const { start, end } = getLast24HourRange();
       const startTime = new Date(start * 1000);
       const endTime = new Date(end * 1000);
       const orderBookApi = new OrderBookApi({chainId, env:'prod'})
