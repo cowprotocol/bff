@@ -75,7 +75,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         `Get gas cost time series for chain ${chainId} in sell token`
       );
       const now = Math.round(Date.now() / 1000);
-      const startTimestamp = now - 3 * 24 * 60 * 60;
+      const startTimestamp = now - 24 * 60 * 60;
       const orderBookApi = new OrderBookApi({chainId, env:'prod'})
       const order = await orderBookApi.getOrder(orderId as string);
       const usdRepository = new UsdRepositoryCoingecko();
