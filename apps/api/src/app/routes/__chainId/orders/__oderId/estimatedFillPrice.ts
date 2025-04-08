@@ -13,7 +13,7 @@ const CACHE_SECONDS = 120;
 
 const routeSchema = {
   type: 'object',
-  required: ['chainId', 'orderId'],
+  required: ['chainId'],
   additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
@@ -30,13 +30,13 @@ const gasCostSuccessSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['timestamp', 'gasCost'],
+    required: ['time', 'value'],
     properties: {
-      timestamp: {
+      time: {
         type: 'number',
         description: 'Unix timestamp in seconds',
       },
-      gasCost: {
+      value: {
         type: 'string',
         description: 'Gas cost expressed in sell token decimals',
       },
@@ -52,7 +52,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Querystring: FromSchema<typeof gasCostQueryStringSchema>;
     Reply: FromSchema<typeof gasCostSuccessSchema>;
   }>(
-    '/gasCosts',
+    '/estimatedFillPrice',
     {
       schema: {
         description: 'Retrieve 24h gas cost time series in 5-minute intervals',
@@ -79,8 +79,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const now = Math.floor(Date.now() / 1000);
       const fiveMinutes = 5 * 60;
       const dataPoints = Array.from({ length: 288 }, (_, i) => ({
-        timestamp: now - (287 - i) * fiveMinutes,
-        gasCost: (BigInt(Math.floor(Math.random() * 1e15)) * 100n).toString(),
+        time: now - (287 - i) * fiveMinutes,
+        value: (BigInt(Math.floor(Math.random() * 1e15)) * 100n).toString(),
       }));
 
       reply.header(
