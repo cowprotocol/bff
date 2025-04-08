@@ -9,6 +9,7 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
 import { OrderStatus } from '@cowprotocol/cow-sdk';
+import { getOrderEvents } from '../getOrderEvents';
 
 const CACHE_SECONDS = 120;
 
@@ -18,20 +19,23 @@ const routeSchema = {
   additionalProperties: false,
   properties: {
     chainId: ChainIdSchema,
+  },
+} as const satisfies JSONSchema;
+
+const gasQueryStringSchema = {
+  type: 'object',
+  required: ['orderId'],
+  properties: {
     orderId: OrderIdSchema,
   },
 } as const satisfies JSONSchema;
 
-const gasCostQueryStringSchema = {
-  type: 'object',
-  properties: {},
-} as const satisfies JSONSchema;
-
-const gasCostSuccessSchema = {
+const gasSuccessSchema = {
   type: 'array',
   items: {
     type: 'object',
     required: ['time', 'value'],
+    additionalProperties: false,
     properties: {
       time: {
         type: 'number',
@@ -39,7 +43,17 @@ const gasCostSuccessSchema = {
       },
       value: {
         type: 'string',
-        description: 'Gas cost expressed in sell token decimals',
+        enum: [
+          'created',
+          'ready',
+          'filtered',
+          'invalid',
+          'executing',
+          'considered',
+          'traded',
+          'cancelled',
+        ],
+        description: 'Order status event',
       },
     },
   },
@@ -50,8 +64,8 @@ type RouteSchema = FromSchema<typeof routeSchema>;
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{
     Params: RouteSchema;
-    Querystring: FromSchema<typeof gasCostQueryStringSchema>;
-    Reply: FromSchema<typeof gasCostSuccessSchema>;
+    Querystring: FromSchema<typeof gasQueryStringSchema>;
+    Reply: FromSchema<typeof gasSuccessSchema>;
   }>(
     '/statusEvents',
     {
@@ -59,9 +73,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         description: 'Retrieve 24h gas cost time series in 5-minute intervals',
         tags: ['orders'],
         params: routeSchema,
-        querystring: gasCostQueryStringSchema,
+        querystring: gasQueryStringSchema,
         response: {
-          '2XX': gasCostSuccessSchema,
+          '2XX': gasSuccessSchema,
         },
       },
     },
@@ -71,21 +85,17 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         `Get gas cost time series for chain ${chainId} in sell token`
       );
 
-      // TODO: Implement the actual order status events
+      const { orderId } = request.query;
 
-      const now = Math.floor(Date.now() / 1000);
-      const fiveMinutes = 5 * 60;
-      const dataPoints = Array.from({ length: 288 }, (_, i) => ({
-        time: now - (287 - i) * fiveMinutes,
-        value: OrderStatus.OPEN,
-      }));
+      // TODO: Implement the actual order status events
+      const events = await getOrderEvents(chainId, orderId);
 
       reply.header(
         CACHE_CONTROL_HEADER,
         getCacheControlHeaderValue(CACHE_SECONDS)
       );
 
-      reply.send(dataPoints);
+      reply.send(events);
     }
   );
 };
