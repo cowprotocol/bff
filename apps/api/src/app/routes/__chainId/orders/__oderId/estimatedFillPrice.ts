@@ -9,6 +9,9 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
 import { OrderBookApi } from '@cowprotocol/cow-sdk';
+import { fetchTokenHistory } from '../../../../../utils/alchemy';
+import { get24HourRange } from '../../../../../utils/date';
+import { Big, RoundingMode } from 'bigdecimal.js';
 
 const CACHE_SECONDS = 120;
 
@@ -93,22 +96,39 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       }
 
       //  Get gas prices from prometheus
-      //  Get Ethereum prices in USD (coingecko)
-      //  Get Token prices in USD
 
-      const now = Math.floor(Date.now() / 1000);
-      const fiveMinutes = 5 * 60;
-      const dataPoints = Array.from({ length: 288 }, (_, i) => ({
-        time: now - (287 - i) * fiveMinutes,
-        value: (BigInt(Math.floor(Math.random() * 1e15)) * 100n).toString(),
-      }));
+      //  Get Ethereum prices in USD (coingecko)
+      const authToken = process.env.ALCHEMY_API_KEY as string;
+      const { start, end } = get24HourRange(new Date());
+      const startTime = new Date(start * 1000);
+      const endTime = new Date(end * 1000);
+      const weth_address = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+      const eth_prices = await await fetchTokenHistory(weth_address, startTime, endTime, authToken, chainId);
+
+      //  Get Token prices in USD
+      const sell_token_prices = await await fetchTokenHistory(order.sellToken, startTime, endTime, authToken, chainId);
+      
+      const sellTokenPriceInEth = [];
+            if (eth_prices && sell_token_prices) {
+              // TODO: use a wiser approach here
+              const length = Math.min(sell_token_prices.length, eth_prices.length);
+              for (let i = 0; i < length; i++) {
+                const sellTokenPrice = new Big(sell_token_prices[i].value.toString());
+                const ethPrice = new Big(eth_prices[i].value.toString());
+                const value = sellTokenPrice.divide(ethPrice, 20, RoundingMode.HALF_UP);
+                sellTokenPriceInEth.push({
+                  value: value.toString(),
+                  time: new Date(sell_token_prices[i].timestamp).getTime()
+                });
+              }
+      }
 
       reply.header(
         CACHE_CONTROL_HEADER,
         getCacheControlHeaderValue(CACHE_SECONDS)
       );
 
-      reply.send(dataPoints);
+      reply.send(sellTokenPriceInEth);
     }
   );
 };
