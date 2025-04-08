@@ -1,5 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Pool } from 'pg'; // If using node-postgres
+import { OrderEvent } from './types';
 
 // Database connection
 // TODO: do this properly using fastify
@@ -20,22 +21,6 @@ async function executeQuery(query: string, params: any[]) {
     console.error('Database error:', error);
     throw error;
   }
-}
-
-export enum OrderStatus {
-  CREATED = 'created',
-  READY = 'ready',
-  FILTERED = 'filtered',
-  INVALID = 'invalid',
-  EXECUTING = 'executing',
-  CONSIDERED = 'considered',
-  TRADED = 'traded',
-  CANCELLED = 'cancelled',
-}
-
-export interface OrderEvent {
-  time: number;
-  value: OrderStatus;
 }
 
 export async function getOrderEvents(
