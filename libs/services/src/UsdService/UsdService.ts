@@ -1,7 +1,7 @@
 import {
   UsdRepository,
   usdRepositorySymbol,
-  SupportedChainId,
+  SupportedChainId, PriceStrategy, PricePoint
 } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 
