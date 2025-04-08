@@ -124,4 +124,74 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     return pricePoints;
   }
+
+  async getUsdPricesBetween(
+    chainId: SupportedChainId,
+    tokenAddress: string,
+    startTimestamp: number,
+    endTimestamp: number,
+  ): Promise<PricePoint[] | null> {
+    const platform = COINGECKO_PLATFORMS[chainId];
+    if (!platform) {
+      return null;
+    }
+
+    const tokenAddressLower = tokenAddress.toLowerCase();
+    const daysInterval = Math.floor((endTimestamp - startTimestamp) / (1000 * 60 * 60 * 24));
+    // TODO: 5m strategy requires an Enterprise plan
+    // let priceStrategy: PriceStrategy = '5m';
+    // if (daysInterval > 90) {
+    //   priceStrategy = 'daily';
+    // } else if (daysInterval >= 2) {
+    //   priceStrategy = 'hourly';
+    // }
+    console.log(`daysInterval: ${daysInterval}`);
+    // console.log(`priceStrategy: ${priceStrategy}`);
+
+    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
+    const { data: priceData, response } = await coingeckoProClient.GET(
+      `/coins/{id}/contract/{contract_address}/market_chart/range`,
+      {
+        params: {
+          path: {
+            id: platform,
+            contract_address: tokenAddressLower,
+          },
+          query: {
+            vs_currency: 'usd',
+            from: startTimestamp,
+            to: endTimestamp,
+            // interval: priceStrategy,
+          },
+        },
+      }
+    );
+
+    if (response.status === 404 || !priceData) {
+      return null;
+    }
+    await throwIfUnsuccessful(
+      'Error getting USD prices from Coingecko',
+      response
+    );
+
+    const volumesMap =
+      priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {
+        acc.set(timestamp, volume);
+        return acc;
+      }, new Map<number, number>()) || undefined;
+
+    const prices = priceData.prices;
+    if (!prices) {
+      return null;
+    }
+
+    const pricePoints = prices.map(([timestamp, price]) => ({
+      date: new Date(timestamp),
+      price,
+      volume: volumesMap?.get(timestamp) ?? 0,
+    }));
+
+    return pricePoints;
+  }
 }
