@@ -210,15 +210,13 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for a token without decimals
-      const pricePromise = usdRepositoryCow.getUsdPrice(
+      const price = await usdRepositoryCow.getUsdPrice(
         SupportedChainId.MAINNET,
         WETH
       );
 
-      // Should throw error about missing decimals
-      await expect(pricePromise).rejects.toThrow(
-        'Token decimals not found for ' + WETH
-      );
+      // Should return null when missing decimals
+      expect(price).toBe(null);
     });
   });
 
