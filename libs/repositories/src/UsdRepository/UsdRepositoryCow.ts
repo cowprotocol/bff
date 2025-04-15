@@ -1,11 +1,11 @@
-import { injectable } from 'inversify';
-import { UsdRepositoryNoop } from './UsdRepository';
-import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
-import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { injectable } from 'inversify';
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
+import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
+import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { UsdRepositoryNoop } from './UsdRepository';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
@@ -26,8 +26,8 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       return null;
     }
     const erc20 = await this.erc20Repository.get(chainId, tokenAddress);
-    const tokenDecimals = erc20?.decimals || 18;
-    if (tokenDecimals === null) {
+    const tokenDecimals = erc20?.decimals;
+    if (tokenDecimals === undefined) {
       throw new Error('Token decimals not found for ' + tokenAddress);
     }
 
