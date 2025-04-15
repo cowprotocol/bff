@@ -182,6 +182,44 @@ describe('UsdRepositoryCow', () => {
         "Error getting native prices. 418 (I'm a teapot): This server is a teapot, and it cannot brew coffee. URL: http://calling-a-teapot.com"
       );
     });
+
+    it('Handles not finding token decimals', async () => {
+      // Mock native price
+      mockApiGet.mockReturnValue(
+        okResponse({
+          data: { price: WETH_NATIVE_PRICE },
+        })
+      );
+
+      const mockErc20Repository = {
+        async get(
+          chainId: SupportedChainId,
+          tokenAddress: string
+        ): Promise<Erc20 | null> {
+          const decimals = undefined; // Simulate not finding the token decimals
+          return {
+            address: tokenAddress,
+            decimals,
+          };
+        },
+      } as jest.Mocked<Erc20Repository>;
+
+      const usdRepositoryCow = new UsdRepositoryCow(
+        cowApiClients,
+        mockErc20Repository
+      );
+
+      // Get USD price for a token without decimals
+      const pricePromise = usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // Should throw error about missing decimals
+      await expect(pricePromise).rejects.toThrow(
+        'Token decimals not found for ' + WETH
+      );
+    });
   });
 
   describe('getUsdPrices', () => {
