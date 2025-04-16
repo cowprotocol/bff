@@ -1,17 +1,19 @@
-import { injectable } from 'inversify';
-import { UsdRepositoryNoop } from './UsdRepository';
-import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
-import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { inject, injectable } from 'inversify';
+import { Logger } from 'pino';
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
+import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
+import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { UsdRepositoryNoop } from './UsdRepository';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
   constructor(
     private cowApiClients: Record<SupportedChainId, CowApiClient>,
-    private erc20Repository: Erc20Repository
+    private erc20Repository: Erc20Repository,
+    @inject('Logger') private readonly logger: Logger
   ) {
     super();
   }
@@ -22,19 +24,32 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   ): Promise<number | null> {
     // Get native price for token (in ETH/xDAI)
     const tokenNativePrice = await this.getNativePrice(chainId, tokenAddress);
+
     if (!tokenNativePrice) {
+      this.logger.info({
+        msg: `Native price not found for ${tokenAddress} on chain ${chainId}`,
+      });
       return null;
     }
+
     const erc20 = await this.erc20Repository.get(chainId, tokenAddress);
-    const tokenDecimals = erc20?.decimals || 18;
-    if (tokenDecimals === null) {
-      throw new Error('Token decimals not found for ' + tokenAddress);
+    const tokenDecimals = erc20?.decimals;
+
+    if (tokenDecimals === undefined) {
+      this.logger.info({
+        msg: `Token decimals not found for ${tokenAddress} on chain ${chainId}`,
+      });
+      return null;
     }
 
     // Get native price for USDC (in ETH/xDAI)
     const { address: usdAddress, decimals: usdDecimals } = USDC[chainId];
     const usdcNativePrice = await this.getNativePrice(chainId, usdAddress);
+
     if (!usdcNativePrice) {
+      this.logger.info({
+        msg: `Usd native price not found for ${usdAddress} on chain ${chainId}`,
+      });
       return null;
     }
 
@@ -48,6 +63,9 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     );
 
     if (tokenPrice.eq(ZeroBigNumber)) {
+      this.logger.info({
+        msg: `Token price is zero for ${tokenAddress} on chain ${chainId}`,
+      });
       return null;
     }
 
