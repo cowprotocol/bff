@@ -1,6 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
+import { Logger } from 'pino';
 import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
 import { USDC } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
@@ -31,6 +32,11 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
+// const mockLogger = jest.fn() as unknown as jest.Mocked<Logger>;
+const mockLogger = jest.mocked<Logger>({
+  info: jest.fn(),
+} as unknown as Logger);
+
 const cowApiClients = {
   [SupportedChainId.MAINNET]: mockApi,
   [SupportedChainId.GNOSIS_CHAIN]: mockApi,
@@ -38,9 +44,11 @@ const cowApiClients = {
   [SupportedChainId.BASE]: mockApi,
   [SupportedChainId.SEPOLIA]: mockApi,
 };
+
 const usdRepositoryCow = new UsdRepositoryCow(
   cowApiClients,
-  mockErc20Repository
+  mockErc20Repository,
+  mockLogger
 );
 
 // const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
@@ -181,6 +189,43 @@ describe('UsdRepositoryCow', () => {
       expect(priceResult).rejects.toThrow(
         "Error getting native prices. 418 (I'm a teapot): This server is a teapot, and it cannot brew coffee. URL: http://calling-a-teapot.com"
       );
+    });
+
+    it('Handles not finding token decimals', async () => {
+      // Mock native price
+      mockApiGet.mockReturnValue(
+        okResponse({
+          data: { price: WETH_NATIVE_PRICE },
+        })
+      );
+
+      const mockErc20Repository = {
+        async get(
+          chainId: SupportedChainId,
+          tokenAddress: string
+        ): Promise<Erc20 | null> {
+          const decimals = undefined; // Simulate not finding the token decimals
+          return {
+            address: tokenAddress,
+            decimals,
+          };
+        },
+      } as jest.Mocked<Erc20Repository>;
+
+      const usdRepositoryCow = new UsdRepositoryCow(
+        cowApiClients,
+        mockErc20Repository,
+        mockLogger
+      );
+
+      // Get USD price for a token without decimals
+      const price = await usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET,
+        WETH
+      );
+
+      // Should return null when missing decimals
+      expect(price).toBe(null);
     });
   });
 

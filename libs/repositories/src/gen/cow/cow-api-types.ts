@@ -1209,23 +1209,22 @@ export interface components {
              *
              */
             availableBalance?: components["schemas"]["TokenAmount"] | null;
-            /** @description The total amount of `sellToken` that has been executed for this order including fees.
+            /** @description The total amount of `sellToken` that has been transferred from the user for this order so far.
              *      */
             executedSellAmount: components["schemas"]["BigUint"];
-            /** @description The total amount of `sellToken` that has been executed for this order without fees.
+            /** @description The total amount of `sellToken` that has been transferred from the user for this order so far minus tokens that were transferred as part of the signed `fee` of the order. This is only relevant for old orders because now all orders have a signed `fee` of 0 and solvers compute an appropriate fee dynamically at the time of the order execution.
              *      */
             executedSellAmountBeforeFees: components["schemas"]["BigUint"];
             /** @description The total amount of `buyToken` that has been executed for this order.
              *      */
             executedBuyAmount: components["schemas"]["BigUint"];
-            /** @description The total amount of fees that have been executed for this order. */
+            /** @description [DEPRECATED] The total amount of the user signed `fee` that have been executed for this order. This value is only non-negative for very old orders.
+             *      */
             executedFeeAmount: components["schemas"]["BigUint"];
             /** @description Has this order been invalidated? */
             invalidated: boolean;
             /** @description Order status. */
             status: components["schemas"]["OrderStatus"];
-            /** @description Amount that the signed fee would be without subsidies. */
-            fullFeeAmount?: components["schemas"]["TokenAmount"];
             /** @description Liquidity orders are functionally the same as normal smart contract
              *     orders but are not placed with the intent of actively getting
              *     traded. Instead they facilitate the trade of normal orders by
@@ -1245,8 +1244,11 @@ export interface components {
             /** @description There is some data only available for orders that are placed on-chain. This data can be found in this object.
              *      */
             onchainOrderData?: components["schemas"]["OnchainOrderData"];
-            /** @description Surplus fee that the limit order was executed with. */
-            executedSurplusFee?: components["schemas"]["BigUint"] | null;
+            /** @description Total fee charged for execution of the order. Contains network fee and protocol fees. This takes into account the historic static fee signed by the user and the new dynamic fee computed by solvers.
+             *      */
+            executedFee?: components["schemas"]["BigUint"];
+            /** @description Token the executed fee was captured in. */
+            executedFeeToken?: components["schemas"]["Address"];
             /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
@@ -1316,10 +1318,6 @@ export interface components {
             /** @description The block number for the auction. Orders and prices are guaranteed to be valid on this block. Proposed settlements should be valid for this block as well.
              *      */
             block?: number;
-            /** @description The latest block on which a settlement has been processed.
-             *     **NOTE**: Under certain conditions it is possible for a settlement to have been mined as part of `block` but not have yet been processed.
-             *      */
-            latestSettlementBlock?: number;
             /** @description The solvable orders included in the auction.
              *      */
             orders?: components["schemas"]["AuctionOrder"][];
@@ -1436,7 +1434,7 @@ export interface components {
         PreSignature: string;
         OrderPostError: {
             /** @enum {string} */
-            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppdataFromMismatch";
+            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppdataFromMismatch" | "OldOrderActivelyBidOn";
             description: string;
         };
         OrderCancellationError: {
@@ -1585,6 +1583,8 @@ export interface components {
                 id?: components["schemas"]["UID"];
                 executedAmount?: components["schemas"]["BigUint"];
             }[];
+            /** @description whether the solution is a winner (received the right to get executed) or not */
+            isWinner?: boolean;
         };
         /** @description The estimated native price for the token
          *      */
