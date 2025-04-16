@@ -53,15 +53,41 @@ async function getSubscriptions(
   return SUBSCRIPTION_CACHE.get(account) || [];
 }
 
+function parseNewMessage(msg: ConsumeMessage): Notification | null {
+  try {
+    return parseNotification(msg.content.toString());
+  } catch (error) {
+    console.error(`Error parsing notification`, error);
+    return null;
+  }
+}
+
 async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
-  const notification = parseNotification(msg.content.toString());
+  // Parse the message
+  const notification = parseNewMessage(msg);
+  if (!notification) {
+    return;
+  }
+
   const { id, message, account, title, url } = notification;
   console.debug(
     `[telegram:main] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
   );
 
   // Get the subscriptions for this account
-  const telegramSubscriptions = await getSubscriptions(account);
+  const telegramSubscriptions = await getSubscriptions(account).catch(
+    (error) => {
+      console.error(
+        `Error getting subscriptions for account ${account}`,
+        error
+      );
+      return null;
+    }
+  );
+
+  if (!telegramSubscriptions) {
+    return;
+  }
 
   let consumeMessage = false;
   try {
@@ -104,7 +130,9 @@ async function connect() {
     NOTIFICATIONS_QUEUE,
     async (msg) => {
       if (msg !== null) {
-        onNewMessage(channel, msg);
+        onNewMessage(channel, msg).catch((error) =>
+          console.error('Error processing queue message', error)
+        );
       }
     },
     {
