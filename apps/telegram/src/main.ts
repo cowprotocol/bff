@@ -93,7 +93,7 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   try {
     if (telegramSubscriptions.length > 0) {
       // Send the message to all subscribers
-      for (const { chat_id: chatId } of telegramSubscriptions) {
+      for (const { chatId } of telegramSubscriptions) {
         console.debug(
           `[telegram:main] Sending message ${id} to chatId ${chatId}`
         );
