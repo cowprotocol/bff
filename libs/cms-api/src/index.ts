@@ -5,9 +5,8 @@ type Schemas = components['schemas'];
 export type CmsNotification = Schemas['NotificationListResponseDataItem'];
 export type CmsNotificationResponse = Schemas['NotificationListResponse'];
 export type CmsTelegramSubscription = {
-  id: number;
   account: string;
-  chat_id: string;
+  chatId: string;
 };
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
@@ -186,7 +185,7 @@ async function getTelegramSubscriptionsForAccounts({
   CmsTelegramSubscription[]
 > {
   const { data, error, response } = await cmsClient.GET(
-    `/tg-subscriptions?accounts=${accounts.join(',')}`,
+    `/accounts/${accounts.join(',')}/subscriptions/telegram`,
     {
       // Pagination
       'pagination[page]': page,
