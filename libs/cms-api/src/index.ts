@@ -5,9 +5,8 @@ type Schemas = components['schemas'];
 export type CmsNotification = Schemas['NotificationListResponseDataItem'];
 export type CmsNotificationResponse = Schemas['NotificationListResponse'];
 export type CmsTelegramSubscription = {
-  id: number;
   account: string;
-  chat_id: string;
+  chatId: string;
 };
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
