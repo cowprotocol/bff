@@ -1,6 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
+import { Logger } from 'pino';
 import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
 import { USDC } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
@@ -31,6 +32,11 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
+// const mockLogger = jest.fn() as unknown as jest.Mocked<Logger>;
+const mockLogger = jest.mocked<Logger>({
+  info: jest.fn(),
+} as unknown as Logger);
+
 const cowApiClients = {
   [SupportedChainId.MAINNET]: mockApi,
   [SupportedChainId.GNOSIS_CHAIN]: mockApi,
@@ -38,9 +44,11 @@ const cowApiClients = {
   [SupportedChainId.BASE]: mockApi,
   [SupportedChainId.SEPOLIA]: mockApi,
 };
+
 const usdRepositoryCow = new UsdRepositoryCow(
   cowApiClients,
-  mockErc20Repository
+  mockErc20Repository,
+  mockLogger
 );
 
 // const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
@@ -206,7 +214,8 @@ describe('UsdRepositoryCow', () => {
 
       const usdRepositoryCow = new UsdRepositoryCow(
         cowApiClients,
-        mockErc20Repository
+        mockErc20Repository,
+        mockLogger
       );
 
       // Get USD price for a token without decimals

@@ -27,7 +27,6 @@ import {
   viemClients,
 } from '@cowprotocol/repositories';
 
-import { Container } from 'inversify';
 import {
   SimulationService,
   SlippageService,
@@ -41,6 +40,7 @@ import {
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
+import { Container } from 'inversify';
 import ms from 'ms';
 import { Logger, logger } from '../logger';
 
@@ -71,7 +71,11 @@ function getUsdRepositoryCow(
   erc20Repository: Erc20Repository
 ): UsdRepository {
   return new UsdRepositoryCache(
-    new UsdRepositoryCow(cowApiClients, erc20Repository),
+    new UsdRepositoryCow(
+      cowApiClients,
+      erc20Repository,
+      logger.child({ module: 'usd-cow' })
+    ),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
