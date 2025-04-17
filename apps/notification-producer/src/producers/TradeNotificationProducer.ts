@@ -1,15 +1,21 @@
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Notification } from '@cowprotocol/notifications';
-import { NotificationsRepository } from '../NotificationsRepository';
+import { viemClients } from '@cowprotocol/repositories';
+import { NotificationsRepository } from '../repositories/NotificationsRepository';
 import { doForever } from '../utils';
 
 import { Runnable } from '../../types';
-import { SubscriptionRepository } from '../SubscriptionsRepository';
+import { SubscriptionRepository } from '../repositories/SubscriptionsRepository';
+import { NotificationsIndexerStateRepository } from '../repositories/NotificationsIndexerStateRepository';
 
 const WAIT_TIME = 30000;
+const PRODUCER_NAME = 'trade_notification_producer';
 
 export type TradeNotificationProducerProps = {
+  chainId: SupportedChainId;
   notificationsRepository: NotificationsRepository;
   subscriptionRepository: SubscriptionRepository;
+  notificationsIndexerStateRepository: NotificationsIndexerStateRepository;
 };
 
 export class TradeNotificationProducer implements Runnable {
@@ -40,9 +46,23 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
+    const {
+      chainId,
+      subscriptionRepository,
+      notificationsIndexerStateRepository,
+    } = this.props;
+
     // Get last indexed block
-    // TODO:
+    const stateRegistry = await notificationsIndexerStateRepository.get(
+      PRODUCER_NAME,
+      chainId
+    );
+
+    console.log('stateRegistry', stateRegistry);
+
     // Get last block
+    const lastBlock = await viemClients[chainId].getBlock();
+
     // TODO:
     // Get trade events from block to last block
     // TODO:
@@ -53,12 +73,22 @@ export class TradeNotificationProducer implements Runnable {
     // Send notifications
     // TODO:
 
-    const accounts =
-      await this.props.subscriptionRepository.getAllSubscribedAccounts();
+    const accounts = await subscriptionRepository.getAllSubscribedAccounts();
 
     console.log(
       'For now, nothing to do. I plan to fetch trades for: ' +
         accounts.join(', ')
+    );
+
+    // Update state
+    notificationsIndexerStateRepository.upsert(
+      PRODUCER_NAME,
+      {
+        lastBlock: lastBlock.number,
+        lastBlockTimestamp: lastBlock.timestamp,
+        lastBlockHash: lastBlock.hash,
+      },
+      chainId
     );
   }
 }

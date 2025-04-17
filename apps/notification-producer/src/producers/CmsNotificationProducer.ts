@@ -3,11 +3,11 @@ import {
   getPushNotifications,
 } from '@cowprotocol/cms-api';
 import { Notification } from '@cowprotocol/notifications';
-import { NotificationsRepository } from '../NotificationsRepository';
+import { NotificationsRepository } from '../repositories/NotificationsRepository';
 import { doForever } from '../utils';
 import Mustache from 'mustache';
 import { Runnable } from '../../types';
-import { SubscriptionRepository } from '../SubscriptionsRepository';
+import { SubscriptionRepository } from '../repositories/SubscriptionsRepository';
 
 const WAIT_TIME = 30000;
 
