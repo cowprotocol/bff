@@ -75,7 +75,7 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
       const sent = await sendNotification(notification);
 
       if (!sent && !consumeMessage) {
-        // If we didn't send any notification, we just throw
+        // If we didn't send any notification, we just throw. Otherwise we try to send the next notification
         throw new Error(`Failed to send the notifications`);
       }
       consumeMessage ||= sent;
