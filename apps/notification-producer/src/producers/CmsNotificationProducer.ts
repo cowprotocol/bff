@@ -6,10 +6,11 @@ import { Notification } from '@cowprotocol/notifications';
 import { NotificationsRepository } from '../NotificationsRepository';
 import { doForever } from '../utils';
 import Mustache from 'mustache';
+import { Runnable } from '../../types';
 
 const WAIT_TIME = 30000;
 
-export class CmsNotificationProducer {
+export class CmsNotificationProducer implements Runnable {
   /**
    * This in-memory state just adds some resilience in case there's an error posting the message.
    * Because the PUSH notifications are currently consumed just by reading, in case of a failure the notification is lost
