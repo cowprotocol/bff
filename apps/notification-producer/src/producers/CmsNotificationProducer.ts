@@ -7,8 +7,14 @@ import { NotificationsRepository } from '../NotificationsRepository';
 import { doForever } from '../utils';
 import Mustache from 'mustache';
 import { Runnable } from '../../types';
+import { SubscriptionRepository } from '../SubscriptionsRepository';
 
 const WAIT_TIME = 30000;
+
+export type CmsNotificationProducerProps = {
+  notificationsRepository: NotificationsRepository;
+  subscriptionRepository: SubscriptionRepository;
+};
 
 export class CmsNotificationProducer implements Runnable {
   /**
@@ -19,9 +25,7 @@ export class CmsNotificationProducer implements Runnable {
    */
   pendingNotifications = new Map<string, Notification>();
 
-  constructor(
-    private readonly notificationsRepository: NotificationsRepository
-  ) {}
+  constructor(private props: CmsNotificationProducerProps) {}
 
   /**
    * Main loop: Run the CMS notification producer. This method runs indefinitely,
@@ -40,8 +44,15 @@ export class CmsNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
+    const accounts =
+      await this.props.subscriptionRepository.getAllSubscribedAccounts();
+
     // Get PUSH notifications
-    const cmsPushNotifications = await getPushNotifications();
+    const cmsPushNotifications = (await getPushNotifications()).filter(
+      // Include only the notifications for subscribed accounts
+      ({ account }) => accounts.includes(account)
+    );
+
     const pendingNotifications = Array.from(this.pendingNotifications.values());
     const pushNotifications = cmsPushNotifications
       .map(fromCmsToNotifications)
@@ -61,10 +72,10 @@ export class CmsNotificationProducer implements Runnable {
     );
 
     // Connect
-    await this.notificationsRepository.connect();
+    await this.props.notificationsRepository.connect();
 
     // Post notifications to queue
-    this.notificationsRepository.sendNotifications(pushNotifications);
+    this.props.notificationsRepository.sendNotifications(pushNotifications);
     this.pendingNotifications.clear();
   }
 }

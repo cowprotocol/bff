@@ -1,6 +1,8 @@
 import { Runnable } from '../types';
 import { NotificationsRepository } from './NotificationsRepository';
 import { CmsNotificationProducer } from './producers/CmsNotificationProducer';
+import { TradeNotificationProducer } from './producers/TradeNotificationProducer';
+import { SubscriptionRepository } from './SubscriptionsRepository';
 
 /**
  * Main loop: Run and re-attempt on error
@@ -10,11 +12,18 @@ async function mainLoop() {
 
   // TODO: Move to DI
   const notificationsRepository = new NotificationsRepository();
+  const subscriptionRepository = new SubscriptionRepository();
+
+  const repositories = {
+    notificationsRepository,
+    subscriptionRepository,
+  };
 
   // Create all producers
   const producers: Runnable[] = [
     // CMS producer: Fetch PUSH notifications
-    new CmsNotificationProducer(notificationsRepository),
+    new CmsNotificationProducer(repositories),
+    new TradeNotificationProducer(repositories),
   ];
 
   const promises = [];
