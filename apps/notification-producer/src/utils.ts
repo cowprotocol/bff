@@ -12,9 +12,7 @@ export async function doForever(
     } catch (error) {
       console.error(`[${name}] Error `, error);
       console.log(
-        `[notification-producer:main] Reconnecting in ${
-          waitTimeMilliseconds / 1000
-        }s...`
+        `[${name}] Reconnecting in ${waitTimeMilliseconds / 1000}s...`
       );
     } finally {
       await sleep(waitTimeMilliseconds);

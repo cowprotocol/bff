@@ -31,7 +31,7 @@ export class CmsNotificationProducer implements Runnable {
    */
   async start(): Promise<void> {
     doForever(
-      'notification-producer',
+      'CmsNotificationProducer',
       async () => {
         await this.fetchAndSend();
       },
