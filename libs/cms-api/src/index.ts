@@ -9,6 +9,10 @@ export type CmsTelegramSubscription = {
 };
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
+
+export type CmsTelegramSubscriptions =
+  Schemas['TelegramSubscriptionResponse']['data'];
+
 export type CmsPushNotification = {
   id: number;
   account: string;
@@ -203,7 +207,7 @@ async function getTelegramSubscriptionsForAccounts({
   CmsTelegramSubscription[]
 > {
   const { data, error, response } = await cmsClient.GET(
-    `/tg-subscriptions?accounts=${accounts.join(',')}`,
+    `/accounts/${accounts.join(',')}/subscriptions/telegram`,
     {
       // Pagination
       'pagination[page]': page,
@@ -225,11 +229,14 @@ async function getSubscribedAccounts({
   page = 0,
   pageSize = PAGE_SIZE,
 }: PaginationParam): Promise<string[]> {
-  const { data, error, response } = await cmsClient.GET(`/tg-subscriptions`, {
-    // Pagination
-    'pagination[page]': page,
-    'pagination[pageSize]': pageSize,
-  });
+  const { data, error, response } = await cmsClient.GET(
+    `/telegram-subscriptions`,
+    {
+      // Pagination
+      'pagination[page]': page,
+      'pagination[pageSize]': pageSize,
+    }
+  );
 
   if (error) {
     console.error(
@@ -239,7 +246,15 @@ async function getSubscribedAccounts({
     throw error;
   }
 
-  return (data as CmsTelegramSubscription[]).map(({ account }) => account);
+  const subscriptions = data.data as CmsTelegramSubscriptions[];
+
+  return subscriptions.reduce<string[]>((acc, subscription) => {
+    const account = subscription?.attributes?.account;
+    if (account) {
+      acc.push(account);
+    }
+    return acc;
+  }, []);
 }
 
 export async function getPushNotifications(): Promise<CmsPushNotification[]> {

@@ -35,7 +35,7 @@ export class NotificationsIndexerStateRepository {
   /**
    * Update or insert indexer state
    */
-  async upsert(key: string, state: unknown, chainId?: number): Promise<void> {
+  async upsert<T>(key: string, state: T, chainId?: number): Promise<void> {
     const query = `
       INSERT INTO notifications_indexer_state (key, chainId, state)
       VALUES ($1, $2, $3)
