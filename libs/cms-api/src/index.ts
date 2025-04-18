@@ -213,8 +213,7 @@ async function getTelegramSubscriptionsForAccounts({
 
   if (error) {
     console.error(
-      `Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`,
-      error
+      `Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`
     );
     throw error;
   }

@@ -17,9 +17,11 @@ import TelegramBot from 'node-telegram-bot-api';
 
 const WAIT_TIME = ms(`10s`);
 const SUBSCRIPTION_CACHE_TiME = ms(`5m`);
+const MAX_RETRIES = 3; // Maximum number of retry attempts before dropping a message
 
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
+const MESSAGE_RETRIES = new Map<string, number>(); // Track message retries by message ID
 
 let telegramBot: TelegramBot;
 
@@ -55,22 +57,48 @@ async function getSubscriptions(
 
 function parseNewMessage(msg: ConsumeMessage): Notification[] | null {
   try {
-    return parseNotifications(msg.content.toString());
+    const message = msg.content.toString();
+    const notifications = parseNotifications(message);
+
+    if (!isNotificationArray(notifications)) {
+      throw new Error('The message is not a valid notification array');
+    }
+
+    return notifications;
   } catch (error) {
     console.error(`Error parsing notification`, error);
     return null;
   }
 }
 
-async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
-  // Parse the message
-  const notifications = parseNewMessage(msg);
-  if (!notifications) {
-    return;
-  }
+function isNotificationArray(
+  notifications: unknown
+): notifications is Notification[] {
+  return Array.isArray(notifications) && notifications.every(isNotification);
+}
 
+function isNotification(notification: unknown): notification is Notification {
+  return (
+    typeof notification === 'object' &&
+    notification !== null &&
+    'id' in notification &&
+    'account' in notification &&
+    'title' in notification &&
+    'message' in notification
+  );
+}
+
+async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   let consumeMessage = false;
+
   try {
+    // Parse the message
+    const notifications = parseNewMessage(msg);
+
+    if (!notifications) {
+      return;
+    }
+
     for (const notification of notifications) {
       const sent = await sendNotification(notification);
 
@@ -81,11 +109,28 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
       consumeMessage ||= sent;
     }
   } finally {
-    // We ACK if at least one notification was sent, otherwise we NACK to re-attempt later
+    const messageId = msg.properties.messageId || msg.content.toString();
+    const retryCount = MESSAGE_RETRIES.get(messageId) || 0;
+
     if (consumeMessage) {
+      // Successfully processed, acknowledge the message
+      MESSAGE_RETRIES.delete(messageId); // Clear retry count
       channel.ack(msg);
+    } else if (retryCount >= MAX_RETRIES) {
+      // Max retries reached, drop the message
+      console.error(
+        `[telegram:main] Max retries (${MAX_RETRIES}) reached for message ${messageId}, dropping it`
+      );
+      MESSAGE_RETRIES.delete(messageId); // Clear retry count
+      channel.ack(msg); // Acknowledge to remove from queue
     } else {
-      channel.nack(msg);
+      // Increment retry count and NACK the message
+      const newRetryCount = retryCount + 1;
+      MESSAGE_RETRIES.set(messageId, newRetryCount);
+      console.warn(
+        `[telegram:main] Retry attempt ${newRetryCount}/${MAX_RETRIES} for message ${messageId}`
+      );
+      channel.nack(msg, false, false);
     }
   }
 }

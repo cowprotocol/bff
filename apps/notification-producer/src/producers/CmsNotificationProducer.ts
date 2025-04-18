@@ -3,11 +3,11 @@ import {
   getPushNotifications,
 } from '@cowprotocol/cms-api';
 import { Notification } from '@cowprotocol/notifications';
-import { NotificationsRepository } from '../NotificationsRepository';
+import { NotificationsRepository } from '../repositories/NotificationsRepository';
 import { doForever } from '../utils';
 import Mustache from 'mustache';
 import { Runnable } from '../../types';
-import { SubscriptionRepository } from '../SubscriptionsRepository';
+import { SubscriptionRepository } from '../repositories/SubscriptionsRepository';
 
 const WAIT_TIME = 30000;
 
@@ -17,6 +17,8 @@ export type CmsNotificationProducerProps = {
 };
 
 export class CmsNotificationProducer implements Runnable {
+  isStopping = false;
+
   /**
    * This in-memory state just adds some resilience in case there's an error posting the message.
    * Because the PUSH notifications are currently consumed just by reading, in case of a failure the notification is lost
@@ -34,13 +36,24 @@ export class CmsNotificationProducer implements Runnable {
    * The method should not throw or finish.
    */
   async start(): Promise<void> {
-    doForever(
+    await doForever(
       'CmsNotificationProducer',
-      async () => {
+      async (stop) => {
+        if (this.isStopping) {
+          stop();
+          return;
+        }
         await this.fetchAndSend();
       },
       WAIT_TIME
     );
+
+    console.log('CmsNotificationProducer', 'stopped');
+  }
+
+  async stop(): Promise<void> {
+    console.log('Stopping CmsNotificationProducer');
+    this.isStopping = true;
   }
 
   async fetchAndSend(): Promise<void> {

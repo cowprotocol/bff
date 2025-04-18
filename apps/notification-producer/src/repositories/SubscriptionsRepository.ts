@@ -9,13 +9,19 @@ export class SubscriptionRepository {
 
   async getAllSubscribedAccounts(): Promise<string[]> {
     const now = Date.now();
-    if (!this.lastCheck || now - this.lastCheck > CACHE_TIME) {
-      this.cachedAccounts = Array.from(
-        new Set(await getAllSubscribedAccounts())
-      );
+    if (
+      !this.cachedAccounts ||
+      !this.lastCheck ||
+      now - this.lastCheck > CACHE_TIME
+    ) {
+      this.cachedAccounts = uniqueLowercase(await getAllSubscribedAccounts());
       this.lastCheck = now;
       return this.cachedAccounts;
     }
     return this.cachedAccounts || [];
   }
+}
+
+function uniqueLowercase(items: string[]): string[] {
+  return Array.from(new Set(items.map((item) => item.toLowerCase())));
 }

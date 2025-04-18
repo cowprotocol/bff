@@ -33,6 +33,9 @@ Make sure your `.env` file is defined, if not create one using `.env.example` as
 # Start RabbitMQ
 docker-compose up -d queue
 
+# Start DB
+docker-compose up -d db
+
 # Start the notification producer
 yarn producer
 ```
