@@ -8,7 +8,6 @@ import { Pool } from 'pg';
 import { NotificationsIndexerStateRepository } from './repositories/NotificationsIndexerStateRepository';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
-import { error } from 'console';
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`);
 
@@ -74,7 +73,7 @@ async function mainLoop() {
   const producersPromise = Promise.all(promises);
 
   // Cleanup resources on application termination
-  process.on('SIGTERM', () => {
+  process.on('SIGKILL', () => {
     gracefulShutdown(pool, producers, producersPromise).catch((error) => {
       console.error('Error during shutdown', error);
       process.exit(1);
