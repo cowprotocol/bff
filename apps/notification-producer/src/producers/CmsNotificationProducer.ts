@@ -36,7 +36,7 @@ export class CmsNotificationProducer implements Runnable {
    * The method should not throw or finish.
    */
   async start(): Promise<void> {
-    doForever(
+    await doForever(
       'CmsNotificationProducer',
       async (stop) => {
         if (this.isStopping) {
@@ -47,6 +47,8 @@ export class CmsNotificationProducer implements Runnable {
       },
       WAIT_TIME
     );
+
+    console.log('CmsNotificationProducer', 'stopped');
   }
 
   async stop(): Promise<void> {

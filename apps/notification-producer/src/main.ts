@@ -8,10 +8,11 @@ import { Pool } from 'pg';
 import { NotificationsIndexerStateRepository } from './repositories/NotificationsIndexerStateRepository';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
+import { error } from 'console';
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`);
 
-let exit = false;
+let shuttingDown = false;
 /**
  * Main loop: Run and re-attempt on error
  */
@@ -57,48 +58,70 @@ async function mainLoop() {
     }),
   ];
 
+  // Run all producers in the background
+  const promises = producers.map((producer) =>
+    producer
+      .start()
+      .then(() => {
+        if (!shuttingDown) producer.start();
+      })
+      .catch(() => {
+        if (!shuttingDown) producer.start();
+      })
+  );
+
+  // Wrap all producers in a promise
+  const producersPromise = Promise.all(promises);
+
   // Cleanup resources on application termination
-  process.on('SIGINT', async () => {
-    exit = true;
-
-    // Stop all producers
-    console.log('Stopping producers...');
-    await Promise.race([
-      Promise.all(producers.map((producer) => producer.stop())),
-      new Promise((resolve) =>
-        setTimeout(() => {
-          console.log(
-            `Some of the producers did not stop in time (${
-              TIMEOUT_STOP_PRODUCERS / 1000
-            }s), forcing exit`
-          );
-          resolve(true);
-        }, TIMEOUT_STOP_PRODUCERS)
-      ), // Give some grace period to stop the producers
-    ]);
-
-    console.log('Closing database pool...');
-    await pool.end();
-    process.exit(0);
+  process.on('SIGTERM', () => {
+    gracefulShutdown(pool, producers, producersPromise).catch((error) => {
+      console.error('Error during shutdown', error);
+      process.exit(1);
+    });
   });
 
-  const promises = [];
-  for (const producer of producers) {
-    // Run the producer in the background forever, and re-attempt on error (even-though runnables should not throw, we want to make sure a bug in a producer never affects another producer)
-    promises.push(
-      producer
-        .start()
-        .then(() => {
-          if (!exit) producer.start();
-        })
-        .catch(() => {
-          if (!exit) producer.start();
-        })
-    );
-  }
+  await producersPromise;
+}
 
-  // Wait for all producers
-  await Promise.all(promises);
+async function gracefulShutdown(
+  pool: Pool,
+  producers: Runnable[],
+  producersPromise: Promise<void[]>
+) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+
+  // Command all producers to stop
+  console.log('Stopping producers...');
+
+  const stopProducersPromise = Promise.all(
+    producers.map((producer) => producer.stop())
+  );
+
+  const timeoutInGracePeriod = new Promise((resolve) =>
+    setTimeout(() => {
+      console.log(
+        `Some of the producers did not stop in time (${
+          TIMEOUT_STOP_PRODUCERS / 1000
+        }s), forcing exit`
+      );
+      resolve(true);
+    }, TIMEOUT_STOP_PRODUCERS)
+  );
+
+  await Promise.race([
+    // Wait for all producers to actually stop
+    stopProducersPromise.then(() => producersPromise),
+    // Give some grace period (otherwise timeout)
+    timeoutInGracePeriod,
+  ]);
+
+  await producersPromise;
+
+  console.log('Closing database pool...');
+  await pool.end();
+  process.exit(0);
 }
 
 // Start the main loop

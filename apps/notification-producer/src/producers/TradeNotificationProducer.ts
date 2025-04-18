@@ -38,9 +38,14 @@ export class TradeNotificationProducer implements Runnable {
    * The method should not throw or finish.
    */
   async start(): Promise<void> {
-    doForever(
+    await doForever(
       'TradeNotificationProducer:' + this.props.chainId,
       async (stop) => {
+        console.log(
+          'TradeNotificationProducer:' + this.props.chainId,
+          'isStopping?',
+          this.isStopping
+        );
         if (this.isStopping) {
           stop();
           return;
@@ -49,6 +54,8 @@ export class TradeNotificationProducer implements Runnable {
       },
       WAIT_TIME
     );
+
+    console.log('TradeNotificationProducer:' + this.props.chainId, 'stopped');
   }
 
   async stop(): Promise<void> {
