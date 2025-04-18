@@ -3,21 +3,22 @@ import {
   SupportedChainId,
 } from '@cowprotocol/cow-sdk';
 import { Notification } from '@cowprotocol/notifications';
-import { viemClients } from '@cowprotocol/repositories';
+import { Erc20, Erc20Repository, viemClients } from '@cowprotocol/repositories';
 import { NotificationsRepository } from '../repositories/NotificationsRepository';
 import { doForever } from '../utils';
 
 import { Runnable } from '../../types';
 import { SubscriptionRepository } from '../repositories/SubscriptionsRepository';
 import { NotificationsIndexerStateRepository } from '../repositories/NotificationsIndexerStateRepository';
-import { getAddress, parseAbi } from 'viem';
+import { formatUnits, getAddress, parseAbi } from 'viem';
+import { bigIntReplacer } from '@cowprotocol/shared';
 
 const EVENTS = parseAbi([
   'event OrderInvalidated(address indexed owner, bytes orderUid)',
   'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)',
 ]);
 
-const WAIT_TIME = 30000;
+const WAIT_TIME = 10000;
 const PRODUCER_NAME = 'trade_notification_producer';
 
 // TODO: Get from SDK
@@ -34,6 +35,7 @@ export type TradeNotificationProducerProps = {
   notificationsRepository: NotificationsRepository;
   subscriptionRepository: SubscriptionRepository;
   notificationsIndexerStateRepository: NotificationsIndexerStateRepository;
+  erc20Repository: Erc20Repository;
 };
 
 export class TradeNotificationProducer implements Runnable {
@@ -62,11 +64,6 @@ export class TradeNotificationProducer implements Runnable {
     await doForever(
       'TradeNotificationProducer:' + this.props.chainId,
       async (stop) => {
-        console.log(
-          'TradeNotificationProducer:' + this.props.chainId,
-          'isStopping?',
-          this.isStopping
-        );
         if (this.isStopping) {
           stop();
           return;
@@ -91,6 +88,7 @@ export class TradeNotificationProducer implements Runnable {
       chainId,
       subscriptionRepository,
       notificationsIndexerStateRepository,
+      erc20Repository,
     } = this.props;
 
     // Get last indexed block
@@ -116,7 +114,7 @@ export class TradeNotificationProducer implements Runnable {
     }
 
     const accounts = await subscriptionRepository.getAllSubscribedAccounts();
-    console.log(`${this.prefix} Accounts: ${accounts.join(', ')}`);
+    // console.log(`${this.prefix} Accounts: ${accounts.join(', ')}`);
 
     const logs = await client.getLogs({
       events: EVENTS,
@@ -127,51 +125,104 @@ export class TradeNotificationProducer implements Runnable {
         owner: accounts,
       } as any,
     });
+
+    if (logs.length === 0) {
+      return;
+    }
+
     console.log(`${this.prefix} Found ${logs.length} events`);
 
-    const notifications = logs.reduce<Notification[]>((acc, log) => {
-      if (!log.args.owner) {
-        // TODO: Filter for relevant ones (or better, filter in the getLogs already)
-        // No owner
+    const notificationPromises = logs.reduce<Promise<Notification>[]>(
+      (acc, log) => {
+        switch (log.eventName) {
+          case 'Trade': {
+            const {
+              owner,
+              orderUid,
+              sellToken: sellTokenAddress,
+              buyToken: buyTokenAddress,
+              sellAmount,
+              buyAmount,
+              feeAmount,
+            } = log.args;
+            if (
+              owner === undefined ||
+              sellTokenAddress === undefined ||
+              buyTokenAddress === undefined ||
+              orderUid === undefined ||
+              sellAmount === undefined ||
+              buyAmount === undefined ||
+              feeAmount === undefined
+            ) {
+              console.error(
+                `${this.prefix} Invalid Trade event ${JSON.stringify(
+                  log,
+                  bigIntReplacer,
+                  2
+                )}`
+              );
+              break;
+            }
+
+            acc.push(
+              getTradeNotification({
+                prefix: this.prefix,
+                id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
+                chainId,
+                orderUid,
+                owner,
+                sellTokenAddress,
+                buyTokenAddress,
+                sellAmount,
+                buyAmount,
+                feeAmount,
+                erc20Repository,
+              })
+            );
+            break;
+          }
+
+          case 'OrderInvalidated': {
+            const { orderUid, owner } = log.args;
+            if (orderUid === undefined || owner === undefined) {
+              console.error(
+                `${this.prefix} Invalid OrderInvalidated event ${JSON.stringify(
+                  log,
+                  bigIntReplacer,
+                  2
+                )}`
+              );
+              break;
+            }
+
+            // console.log(`${this.prefix} ${message}`);
+            acc.push(
+              getOrderInvalidatedNotification({
+                id:
+                  'OrderInvalidated-' +
+                  log.transactionHash +
+                  '-' +
+                  log.logIndex,
+                chainId,
+                orderUid,
+                owner,
+                prefix: this.prefix,
+              })
+            );
+            break;
+          }
+          default:
+            console.log(`${this.prefix} Unknown event ${log}`);
+            break;
+        }
         return acc;
-      }
+      },
+      []
+    );
 
-      const url = log.args.orderUid
-        ? getExplorerUrl(chainId, log.args.orderUid)
-        : undefined;
-
-      switch (log.eventName) {
-        case 'Trade': {
-          const message = `Trade ${log.args.sellAmount} ${log.args.sellToken} for ${log.args.buyAmount} ${log.args.buyToken}`;
-          console.log(`${this.prefix} New ${message}`);
-          acc.push({
-            id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
-            account: log.args.owner,
-            title: 'Trade',
-            message,
-            url,
-          });
-          break;
-        }
-
-        case 'OrderInvalidated': {
-          const message = 'Order invalidated ' + log.args.orderUid;
-          console.log(`${this.prefix} ${message}`);
-          acc.push({
-            id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
-            account: log.args.owner,
-            title: 'Trade',
-            message,
-            url,
-          });
-          break;
-        }
-        default:
-          console.log(`${this.prefix} Unknown event ${log}`);
-          break;
-      }
-      return acc;
-    }, []);
+    if (notificationPromises.length === 0) {
+      return;
+    }
 
     // TODO:
     // Get trade events from block to last block
@@ -183,10 +234,16 @@ export class TradeNotificationProducer implements Runnable {
     // Send notifications
     // TODO:
 
-    console.log(`${this.prefix} Notifications:`, notifications);
-
     // Connect
     await this.props.notificationsRepository.connect();
+
+    // Await to resolve all notifications
+    const notifications = await Promise.all(notificationPromises);
+
+    console.log(
+      `${this.prefix} Sending ${notifications.length} notifications`,
+      JSON.stringify(notifications, null, 2)
+    );
 
     // Post notifications to queue
     this.props.notificationsRepository.sendNotifications(notifications);
@@ -203,6 +260,89 @@ export class TradeNotificationProducer implements Runnable {
       chainId
     );
   }
+}
+
+async function getTradeNotification(props: {
+  prefix: string;
+  id: string;
+  chainId: SupportedChainId;
+  orderUid: string;
+  owner: string;
+  sellTokenAddress: string;
+  buyTokenAddress: string;
+  sellAmount: bigint;
+  buyAmount: bigint;
+  feeAmount: bigint;
+  erc20Repository: Erc20Repository;
+}): Promise<Notification> {
+  const {
+    id,
+    chainId,
+    owner,
+    sellTokenAddress,
+    buyTokenAddress,
+    sellAmount,
+    buyAmount,
+    erc20Repository,
+    prefix,
+    orderUid,
+  } = props;
+
+  const sellToken = await erc20Repository.get(
+    chainId,
+    getAddress(sellTokenAddress)
+  );
+
+  const buyToken = await erc20Repository.get(
+    chainId,
+    getAddress(buyTokenAddress)
+  );
+
+  const sellAmountFormatted = formatAmount(sellAmount, sellToken?.decimals);
+  const buyAmountFormatted = formatAmount(buyAmount, buyToken?.decimals);
+
+  const sellTokenName = formatTokenName(sellToken);
+  const buyTokenName = formatTokenName(buyToken);
+
+  const message = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName}`;
+  const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
+  console.log(`${prefix} New ${message}`);
+  return {
+    id,
+    account: owner,
+    title: 'New Trade',
+    message,
+    url,
+  };
+}
+
+async function getOrderInvalidatedNotification(props: {
+  id: string;
+  chainId: SupportedChainId;
+  orderUid: string;
+  owner: string;
+  prefix: string;
+}): Promise<Notification> {
+  const { id, chainId, orderUid, owner, prefix } = props;
+  const message = 'Order invalidated ' + orderUid;
+  const url = getExplorerUrl(chainId, orderUid);
+  console.log(`${prefix} ${message}`);
+
+  return {
+    id,
+    account: owner,
+    title: 'Trade',
+    message,
+    url,
+  };
+}
+
+function formatAmount(amount: bigint, decimals: number | undefined) {
+  return decimals ? formatUnits(amount, decimals) : amount.toString();
+}
+
+function formatTokenName(token: Erc20 | null) {
+  return token?.symbol ? `${token.symbol}` : token?.address;
 }
 
 interface TradeNotificationProducerState {
