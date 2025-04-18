@@ -93,19 +93,19 @@ export class TradeNotificationProducer implements Runnable {
     // Send notifications
     // TODO:
 
-    const accounts = await subscriptionRepository.getAllSubscribedAccounts();
+    // const accounts = await subscriptionRepository.getAllSubscribedAccounts();
 
-    console.log(
-      'For now, nothing to do. I plan to fetch trades for: ' +
-        accounts.join(', ')
-    );
+    // console.log(
+    //   'For now, nothing to do. I plan to fetch trades for: ' +
+    //     accounts.join(', ')
+    // );
 
     // Update state
     notificationsIndexerStateRepository.upsert(
       PRODUCER_NAME,
       {
-        lastBlock: lastBlock.number,
-        lastBlockTimestamp: lastBlock.timestamp,
+        lastBlock: lastBlock.number.toString(),
+        lastBlockTimestamp: lastBlock.timestamp.toString(),
         lastBlockHash: lastBlock.hash,
       },
       chainId
