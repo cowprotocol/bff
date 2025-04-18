@@ -33,10 +33,8 @@ import {
   usdServiceSymbol,
 } from '@cowprotocol/services';
 
-import { logger } from '@cowprotocol/shared';
-
 import { Container } from 'inversify';
-import { Logger } from '@cowprotocol/shared';
+import { logger } from '@cowprotocol/shared';
 
 function getApiContainer(): Container {
   const apiContainer = new Container();
