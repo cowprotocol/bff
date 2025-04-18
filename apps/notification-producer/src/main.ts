@@ -1,7 +1,10 @@
 import 'reflect-metadata';
+
+import { getCacheRepository, getErc20Repository } from '@cowprotocol/services';
+
+import 'reflect-metadata';
 import { Runnable } from '../types';
 import { NotificationsRepository } from './repositories/NotificationsRepository';
-import { CmsNotificationProducer } from './producers/CmsNotificationProducer';
 import { TradeNotificationProducer } from './producers/TradeNotificationProducer';
 import { SubscriptionRepository } from './repositories/SubscriptionsRepository';
 import { Pool } from 'pg';
@@ -32,6 +35,8 @@ async function mainLoop() {
     process.exit(-1);
   });
 
+  const cacheRepository = getCacheRepository();
+  const erc20Repository = getErc20Repository(cacheRepository);
   const notificationsRepository = new NotificationsRepository();
   const subscriptionRepository = new SubscriptionRepository();
   const notificationsIndexerStateRepository =
@@ -41,6 +46,7 @@ async function mainLoop() {
     notificationsRepository,
     subscriptionRepository,
     notificationsIndexerStateRepository,
+    erc20Repository,
   };
 
   // Create all producers
