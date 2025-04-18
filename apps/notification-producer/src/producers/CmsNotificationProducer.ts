@@ -17,6 +17,8 @@ export type CmsNotificationProducerProps = {
 };
 
 export class CmsNotificationProducer implements Runnable {
+  isStopping = false;
+
   /**
    * This in-memory state just adds some resilience in case there's an error posting the message.
    * Because the PUSH notifications are currently consumed just by reading, in case of a failure the notification is lost
@@ -36,11 +38,20 @@ export class CmsNotificationProducer implements Runnable {
   async start(): Promise<void> {
     doForever(
       'CmsNotificationProducer',
-      async () => {
+      async (stop) => {
+        if (this.isStopping) {
+          stop();
+          return;
+        }
         await this.fetchAndSend();
       },
       WAIT_TIME
     );
+  }
+
+  async stop(): Promise<void> {
+    console.log('Stopping CmsNotificationProducer');
+    this.isStopping = true;
   }
 
   async fetchAndSend(): Promise<void> {

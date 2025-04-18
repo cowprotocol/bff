@@ -19,6 +19,8 @@ export type TradeNotificationProducerProps = {
 };
 
 export class TradeNotificationProducer implements Runnable {
+  isStopping = false;
+
   /**
    * This in-memory state just adds some resilience in case there's an error posting the message.
    * Because the PUSH notifications are currently consumed just by reading, in case of a failure the notification is lost
@@ -38,11 +40,20 @@ export class TradeNotificationProducer implements Runnable {
   async start(): Promise<void> {
     doForever(
       'TradeNotificationProducer',
-      async () => {
+      async (stop) => {
+        if (this.isStopping) {
+          stop();
+          return;
+        }
         await this.fetchAndSend();
       },
       WAIT_TIME
     );
+  }
+
+  async stop(): Promise<void> {
+    console.log('Stopping CmsNotificationProducer');
+    this.isStopping = true;
   }
 
   async fetchAndSend(): Promise<void> {
