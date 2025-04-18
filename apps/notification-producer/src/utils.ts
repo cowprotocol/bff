@@ -9,7 +9,7 @@ export async function doForever(
   let running = true;
   while (running) {
     const stop = () => {
-      console.log(`[${name}] Stopped`);
+      console.log(`[${name}] Stopping...`);
       running = false;
     };
 
@@ -24,4 +24,5 @@ export async function doForever(
       await sleep(waitTimeMilliseconds);
     }
   }
+  console.log(`[${name}] Stopped`);
 }

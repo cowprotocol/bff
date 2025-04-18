@@ -39,7 +39,7 @@ export class TradeNotificationProducer implements Runnable {
    */
   async start(): Promise<void> {
     doForever(
-      'TradeNotificationProducer',
+      'TradeNotificationProducer:' + this.props.chainId,
       async (stop) => {
         if (this.isStopping) {
           stop();
@@ -52,7 +52,9 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   async stop(): Promise<void> {
-    console.log('Stopping CmsNotificationProducer');
+    console.log(
+      'Stopping TradeNotificationProducer for chainId=' + this.props.chainId
+    );
     this.isStopping = true;
   }
 

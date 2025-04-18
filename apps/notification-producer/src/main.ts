@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Runnable } from '../types';
 import { NotificationsRepository } from './repositories/NotificationsRepository';
 import { CmsNotificationProducer } from './producers/CmsNotificationProducer';
@@ -45,7 +46,7 @@ async function mainLoop() {
   // Create all producers
   const producers: Runnable[] = [
     // CMS producer: Fetch PUSH notifications
-    new CmsNotificationProducer(repositories),
+    // new CmsNotificationProducer(repositories),
 
     // Trade producer: Fetch trade notifications
     ...ALL_SUPPORTED_CHAIN_IDS.map((chainId) => {
