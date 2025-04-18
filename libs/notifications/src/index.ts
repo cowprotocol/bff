@@ -20,12 +20,14 @@ export interface Notification {
   url?: string;
 }
 
-export function parseNotification(notificationString: string): Notification {
-  return JSON.parse(notificationString);
+export function parseNotifications(
+  notificationsString: string
+): Notification[] {
+  return JSON.parse(notificationsString);
 }
 
-export function stringifyNotification(notification: Notification): string {
-  return JSON.stringify(notification);
+export function stringifyNotifications(notifications: Notification[]): string {
+  return JSON.stringify(notifications);
 }
 
 // TODO: Move to commons lib
@@ -70,11 +72,11 @@ export async function connectToChannel(
 export interface SendToQueueParams {
   channel: Channel;
   queue: string;
-  notification: Notification;
+  notifications: Notification[];
 }
 
-export function sendNotificationToQueue(params: SendToQueueParams) {
-  const { channel, queue, notification } = params;
-  const message = stringifyNotification(notification);
+export function sendNotificationsToQueue(params: SendToQueueParams) {
+  const { channel, queue, notifications } = params;
+  const message = stringifyNotifications(notifications);
   channel.sendToQueue(queue, Buffer.from(message));
 }

@@ -8,7 +8,7 @@ import {
   NOTIFICATIONS_QUEUE,
   Notification,
   connectToChannel,
-  parseNotification,
+  parseNotifications,
   sleep,
 } from '@cowprotocol/notifications';
 import { Channel, ConsumeMessage } from 'amqplib';
@@ -53,9 +53,9 @@ async function getSubscriptions(
   return SUBSCRIPTION_CACHE.get(account) || [];
 }
 
-function parseNewMessage(msg: ConsumeMessage): Notification | null {
+function parseNewMessage(msg: ConsumeMessage): Notification[] | null {
   try {
-    return parseNotification(msg.content.toString());
+    return parseNotifications(msg.content.toString());
   } catch (error) {
     console.error(`Error parsing notification`, error);
     return null;
@@ -64,11 +64,33 @@ function parseNewMessage(msg: ConsumeMessage): Notification | null {
 
 async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   // Parse the message
-  const notification = parseNewMessage(msg);
-  if (!notification) {
+  const notifications = parseNewMessage(msg);
+  if (!notifications) {
     return;
   }
 
+  let consumeMessage = false;
+  try {
+    for (const notification of notifications) {
+      const sent = await sendNotification(notification);
+
+      if (!sent && !consumeMessage) {
+        // If we didn't send any notification, we just throw. Otherwise we try to send the next notification
+        throw new Error(`Failed to send the notifications`);
+      }
+      consumeMessage ||= sent;
+    }
+  } finally {
+    // We ACK if at least one notification was sent, otherwise we NACK to re-attempt later
+    if (consumeMessage) {
+      channel.ack(msg);
+    } else {
+      channel.nack(msg);
+    }
+  }
+}
+
+async function sendNotification(notification: Notification): Promise<boolean> {
   const { id, message, account, title, url } = notification;
   console.debug(
     `[telegram:main] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
@@ -86,7 +108,7 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   );
 
   if (!telegramSubscriptions) {
-    return;
+    return false;
   }
 
   let consumeMessage = false;
@@ -109,13 +131,14 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
         `[telegram:main] No subscriptions found for account ${account}`
       );
     }
-  } finally {
-    if (consumeMessage) {
-      channel.ack(msg);
-    } else {
-      channel.nack(msg);
+  } catch (error) {
+    if (!consumeMessage) {
+      console.error(`Error sending notification`, error);
     }
   }
+
+  // We return whether we notified at least one consumer
+  return consumeMessage;
 }
 
 async function connect() {
