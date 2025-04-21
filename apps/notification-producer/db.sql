@@ -1,4 +1,6 @@
-CREATE TABLE notifications_indexer_state (
+-- This table stores the state of various indexers, allowing them to track their progress
+-- and resume from where they left off after restarts.
+CREATE TABLE indexer_state (
   key TEXT NOT NULL,
   chainId INTEGER,
   state JSONB,
@@ -17,7 +19,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_set_updated_at
-BEFORE UPDATE ON notifications_indexer_state
+BEFORE UPDATE ON indexer_state
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 

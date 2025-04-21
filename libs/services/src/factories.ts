@@ -5,6 +5,12 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  IndexerStateRepository,
+  IndexerStateRepositoryPostgres,
+  PushNotificationsRepository,
+  PushNotificationsRepositoryRabbit,
+  PushSubscriptionsRepository,
+  PushSubscriptionsRepositoryCms,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TokenHolderRepository,
@@ -24,6 +30,7 @@ import {
 import { logger } from '@cowprotocol/shared';
 
 import ms from 'ms';
+import { Pool } from 'pg';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
@@ -119,6 +126,18 @@ export function getTokenHolderRepository(
     getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
+}
+
+export function getPushNotificationsRepository(): PushNotificationsRepository {
+  return new PushNotificationsRepositoryRabbit();
+}
+
+export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
+  return new PushSubscriptionsRepositoryCms();
+}
+
+export function getIndexerStateRepository(): IndexerStateRepository {
+  return new IndexerStateRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {

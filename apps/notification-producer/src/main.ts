@@ -1,16 +1,20 @@
 import 'reflect-metadata';
 
-import { getCacheRepository, getErc20Repository } from '@cowprotocol/services';
+import {
+  getCacheRepository,
+  getErc20Repository,
+  getIndexerStateRepository,
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
+} from '@cowprotocol/services';
 
 import 'reflect-metadata';
 import { Runnable } from '../types';
-import { NotificationsRepository } from './repositories/NotificationsRepository';
-import { TradeNotificationProducer } from './producers/TradeNotificationProducer';
-import { SubscriptionRepository } from './repositories/SubscriptionsRepository';
-import { Pool } from 'pg';
-import { NotificationsIndexerStateRepository } from './repositories/NotificationsIndexerStateRepository';
+import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
+import { CmsNotificationProducer } from './producers/CmsNotificationProducer';
+import { logger } from '@cowprotocol/shared';
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`);
 
@@ -19,40 +23,25 @@ let shuttingDown = false;
  * Main loop: Run and re-attempt on error
  */
 async function mainLoop() {
-  console.info('[notification-producer:main] Start notification producer');
-
-  // TODO: Move to DI
-  const pool = new Pool({
-    user: process.env.DATABASE_USERNAME,
-    host: process.env.DATABASE_HOST,
-    database: process.env.DATABASE_NAME,
-    password: process.env.DATABASE_PASSWORD,
-    port: Number(process.env.DATABASE_PORT) || 5432,
-  });
-  // Handle connection errors
-  pool.on('error', (err) => {
-    console.error('Unexpected error on idle database client', err);
-    process.exit(-1);
-  });
+  logger.info('[notification-producer:main] Start notification producer');
 
   const cacheRepository = getCacheRepository();
   const erc20Repository = getErc20Repository(cacheRepository);
-  const notificationsRepository = new NotificationsRepository();
-  const subscriptionRepository = new SubscriptionRepository();
-  const notificationsIndexerStateRepository =
-    new NotificationsIndexerStateRepository(pool);
+  const pushNotificationsRepository = getPushNotificationsRepository();
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository();
+  const indexerStateRepository = getIndexerStateRepository();
 
   const repositories = {
-    notificationsRepository,
-    subscriptionRepository,
-    notificationsIndexerStateRepository,
+    pushNotificationsRepository,
+    pushSubscriptionsRepository,
+    indexerStateRepository,
     erc20Repository,
   };
 
   // Create all producers
   const producers: Runnable[] = [
     // CMS producer: Fetch PUSH notifications
-    // new CmsNotificationProducer(repositories),
+    new CmsNotificationProducer(repositories),
 
     // Trade producer: Fetch trade notifications
     ...ALL_SUPPORTED_CHAIN_IDS.map((chainId) => {
@@ -79,18 +68,20 @@ async function mainLoop() {
   const producersPromise = Promise.all(promises);
 
   // Cleanup resources on application termination
-  process.on('SIGKILL', () => {
-    gracefulShutdown(pool, producers, producersPromise).catch((error) => {
-      console.error('Error during shutdown', error);
+  const shutdown = () => {
+    gracefulShutdown(producers, producersPromise).catch((error) => {
+      logger.error(error, 'Error during shutdown');
       process.exit(1);
     });
-  });
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 
   await producersPromise;
 }
 
 async function gracefulShutdown(
-  pool: Pool,
   producers: Runnable[],
   producersPromise: Promise<void[]>
 ) {
@@ -98,7 +89,7 @@ async function gracefulShutdown(
   shuttingDown = true;
 
   // Command all producers to stop
-  console.log('Stopping producers...');
+  logger.info('Stopping producers...');
 
   const stopProducersPromise = Promise.all(
     producers.map((producer) => producer.stop())
@@ -106,7 +97,7 @@ async function gracefulShutdown(
 
   const timeoutInGracePeriod = new Promise((resolve) =>
     setTimeout(() => {
-      console.log(
+      logger.info(
         `Some of the producers did not stop in time (${
           TIMEOUT_STOP_PRODUCERS / 1000
         }s), forcing exit`
@@ -122,12 +113,9 @@ async function gracefulShutdown(
     timeoutInGracePeriod,
   ]);
 
-  await producersPromise;
-
-  console.log('Closing database pool...');
-  await pool.end();
+  logger.info('Force exit. Bye!');
   process.exit(0);
 }
 
 // Start the main loop
-mainLoop().catch(console.error);
+mainLoop().catch(logger.error);

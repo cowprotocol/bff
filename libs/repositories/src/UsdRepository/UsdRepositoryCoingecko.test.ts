@@ -61,7 +61,7 @@ describe('UsdRepositoryCoingecko', () => {
         const previousPrice = prices[i - 1];
 
         // Check the time difference between the two prices is around 5 minutes
-        // console.log('Price', price, previousPrice);
+        // logger.info('Price', price, previousPrice);
         expect(
           Math.abs(
             price.date.getTime() - previousPrice.date.getTime() - FIVE_MINUTES

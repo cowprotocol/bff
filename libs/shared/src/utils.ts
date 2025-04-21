@@ -1,4 +1,5 @@
 import { Address, getAddress } from 'viem';
+
 import {
   AllChainIds,
   NativeCurrencyAddress,
@@ -79,4 +80,38 @@ export function bigIntReviver(key: string, value: any): any {
     return BigInt(value.slice(0, -1));
   }
   return value;
+}
+
+export async function doForever(params: {
+  name: string;
+  callback: (stop: () => void) => Promise<void>;
+  waitTimeMilliseconds: number;
+  logger: Logger;
+}) {
+  const { name, callback, waitTimeMilliseconds, logger } = params;
+
+  // eslint-disable-next-line no-constant-condition
+  let running = true;
+  while (running) {
+    const stop = () => {
+      logger.info(`[${name}:doForever] Stopping...`);
+      running = false;
+    };
+
+    try {
+      await callback(stop);
+    } catch (error) {
+      logger.error(error, `[${name}] Error `);
+      logger.info(
+        `[${name}:doForever] Next-run in ${waitTimeMilliseconds / 1000}s...`
+      );
+    } finally {
+      await sleep(waitTimeMilliseconds);
+    }
+  }
+  logger.info(`[${name}] Stopped`);
+}
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

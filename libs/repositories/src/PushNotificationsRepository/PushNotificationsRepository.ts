@@ -6,8 +6,20 @@ import {
   Notification,
 } from '@cowprotocol/notifications';
 
-// TODO: Move to repositories
-export class NotificationsRepository {
+/**
+ * Notifications repository.
+ *
+ * This repository allows to send notifications to a queue.
+ */
+export interface PushNotificationsRepository {
+  connect(): Promise<unknown>;
+  sendNotifications(notifications: Notification[]): Promise<void>;
+  pingConnection(): Promise<boolean>;
+}
+
+export class PushNotificationsRepositoryRabbit
+  implements PushNotificationsRepository
+{
   connection: ConnectToChannelResponse | null = null;
   constructor(private readonly queueName = NOTIFICATIONS_QUEUE) {}
 

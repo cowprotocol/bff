@@ -4,12 +4,12 @@ import {
   CmsTelegramSubscription,
   getAllTelegramSubscriptionsForAccounts,
 } from '@cowprotocol/cms-api';
+import { doForever, logger, sleep } from '@cowprotocol/shared';
 import {
   NOTIFICATIONS_QUEUE,
   Notification,
   connectToChannel,
   parseNotifications,
-  sleep,
 } from '@cowprotocol/notifications';
 import { Channel, ConsumeMessage } from 'amqplib';
 import assert from 'assert';
@@ -66,7 +66,7 @@ function parseNewMessage(msg: ConsumeMessage): Notification[] | null {
 
     return notifications;
   } catch (error) {
-    console.error(`Error parsing notification`, error);
+    logger.error(error, `Error parsing notification`);
     return null;
   }
 }
@@ -91,6 +91,8 @@ function isNotification(notification: unknown): notification is Notification {
 async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   let consumeMessage = false;
 
+  const messageId = msg.properties.messageId || msg.content.toString();
+  const clearRetryCount = () => MESSAGE_RETRIES.delete(messageId);
   try {
     // Parse the message
     const notifications = parseNewMessage(msg);
@@ -108,25 +110,33 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
       }
       consumeMessage ||= sent;
     }
-  } finally {
-    const messageId = msg.properties.messageId || msg.content.toString();
+
+    // Successfully processed, acknowledge the message
+    clearRetryCount();
+    channel.ack(msg);
+  } catch (error) {
     const retryCount = MESSAGE_RETRIES.get(messageId) || 0;
 
     if (consumeMessage) {
-      // Successfully processed, acknowledge the message
-      MESSAGE_RETRIES.delete(messageId); // Clear retry count
-      channel.ack(msg);
+      // If we sent at least one notification, clear retry count and acknowledge the message
+      clearRetryCount();
+      channel.ack(msg); // Acknowledge to remove from queue
     } else if (retryCount >= MAX_RETRIES) {
       // Max retries reached, drop the message
-      console.error(
+      logger.error(
+        error,
         `[telegram:main] Max retries (${MAX_RETRIES}) reached for message ${messageId}, dropping it`
       );
-      MESSAGE_RETRIES.delete(messageId); // Clear retry count
+      clearRetryCount();
       channel.ack(msg); // Acknowledge to remove from queue
     } else {
       // Increment retry count and NACK the message
       const newRetryCount = retryCount + 1;
       MESSAGE_RETRIES.set(messageId, newRetryCount);
+      console.error(
+        error,
+        `[telegram:main] Error processing message. Retrying later`
+      );
       console.warn(
         `[telegram:main] Retry attempt ${newRetryCount}/${MAX_RETRIES} for message ${messageId}`
       );
@@ -144,10 +154,7 @@ async function sendNotification(notification: Notification): Promise<boolean> {
   // Get the subscriptions for this account
   const telegramSubscriptions = await getSubscriptions(account).catch(
     (error) => {
-      console.error(
-        `Error getting subscriptions for account ${account}`,
-        error
-      );
+      logger.error(error, `Error getting subscriptions for account ${account}`);
       return null;
     }
   );
@@ -178,7 +185,7 @@ async function sendNotification(notification: Notification): Promise<boolean> {
     }
   } catch (error) {
     if (!consumeMessage) {
-      console.error(`Error sending notification`, error);
+      logger.error(error, `Error sending notification`);
     }
   }
 
@@ -199,7 +206,7 @@ async function connect() {
     async (msg) => {
       if (msg !== null) {
         onNewMessage(channel, msg).catch((error) =>
-          console.error('Error processing queue message', error)
+          logger.error(error, 'Error processing queue message')
         );
       }
     },
@@ -223,7 +230,7 @@ async function main() {
   // Watch for connection close
   let connectionOpen = true;
   connection.on('close', () => {
-    console.error(
+    logger.error(
       `[telegram:main] Queue connection closed! Reconnecting in ${
         WAIT_TIME / 1000
       }s`
@@ -257,17 +264,12 @@ More info in ${url}`
  */
 async function mainLoop() {
   console.info('[telegram:main] Start telegram consumer');
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    try {
-      await main();
-    } catch (error) {
-      console.error('[telegram:main] Error', error);
-      console.info(`[telegram:main] Reconnecting in ${WAIT_TIME / 1000}s...`);
-    } finally {
-      await sleep(WAIT_TIME);
-    }
-  }
+  doForever({
+    name: 'telegram',
+    callback: main,
+    waitTimeMilliseconds: WAIT_TIME,
+    logger,
+  });
 }
 
 mainLoop();

@@ -30,11 +30,6 @@ export function stringifyNotifications(notifications: Notification[]): string {
   return JSON.stringify(notifications);
 }
 
-// TODO: Move to commons lib
-export function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export interface ConnectToQueueParams {
   channel?: string;
 }

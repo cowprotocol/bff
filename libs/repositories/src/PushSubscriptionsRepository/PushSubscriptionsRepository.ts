@@ -2,8 +2,19 @@ import { getAllSubscribedAccounts } from '@cowprotocol/cms-api';
 
 const CACHE_TIME = 30000;
 
-// TODO: Move to repositories and make a proper cached repository and use DI
-export class SubscriptionRepository {
+/**
+ * Repository to keep track of subscribed accounts for push notifications.
+ */
+export interface PushSubscriptionsRepository {
+  getAllSubscribedAccounts(): Promise<string[]>;
+}
+
+/**
+ * Repository to keep track of subscribed accounts for push notifications.
+ *
+ * Uses the CMS to retrieve the subscriptions
+ */
+export class PushSubscriptionsRepositoryCms {
   private lastCheck: number | null = null;
   private cachedAccounts: string[] | null = null;
 
