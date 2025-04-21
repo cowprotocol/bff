@@ -13,7 +13,7 @@ import { Runnable } from '../types';
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
-import { CmsNotificationProducer } from './producers/CmsNotificationProducer';
+import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer';
 import { logger } from '@cowprotocol/shared';
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`);
@@ -89,7 +89,7 @@ async function gracefulShutdown(
   shuttingDown = true;
 
   // Command all producers to stop
-  logger.info('Stopping producers...');
+  logger.info(`Stopping ${producers.length} producers...`);
 
   const stopProducersPromise = Promise.all(
     producers.map((producer) => producer.stop())
@@ -108,12 +108,14 @@ async function gracefulShutdown(
 
   await Promise.race([
     // Wait for all producers to actually stop
-    stopProducersPromise.then(() => producersPromise),
+    stopProducersPromise
+      .then(() => producersPromise)
+      .then(() => logger.info('All producers have been stopped')),
     // Give some grace period (otherwise timeout)
     timeoutInGracePeriod,
   ]);
 
-  logger.info('Force exit. Bye!');
+  logger.info('Bye!');
   process.exit(0);
 }
 

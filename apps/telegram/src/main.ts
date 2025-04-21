@@ -264,7 +264,7 @@ More info in ${url}`
  */
 async function mainLoop() {
   console.info('[telegram:main] Start telegram consumer');
-  doForever({
+  await doForever({
     name: 'telegram',
     callback: main,
     waitTimeMilliseconds: WAIT_TIME,

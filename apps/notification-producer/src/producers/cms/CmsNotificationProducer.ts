@@ -5,7 +5,7 @@ import {
 import { Notification } from '@cowprotocol/notifications';
 import { PushNotificationsRepository } from '@cowprotocol/repositories';
 import Mustache from 'mustache';
-import { Runnable } from '../../types';
+import { Runnable } from '../../../types';
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
 import { doForever, logger } from '@cowprotocol/shared';
 
@@ -53,7 +53,6 @@ export class CmsNotificationProducer implements Runnable {
   }
 
   async stop(): Promise<void> {
-    logger.info('Stopping CmsNotificationProducer');
     this.isStopping = true;
   }
 

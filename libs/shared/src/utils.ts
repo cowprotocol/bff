@@ -92,9 +92,13 @@ export async function doForever(params: {
 
   // eslint-disable-next-line no-constant-condition
   let running = true;
+
+  const { wakeUpPromise, wakeUp } = createWakeUpPromise();
+
   while (running) {
     const stop = () => {
-      logger.info(`[${name}:doForever] Stopping...`);
+      logger.info(`[${name}] Stopping...`);
+      wakeUp(); // Wake up if its sleeping (so it can end faster)
       running = false;
     };
 
@@ -102,14 +106,28 @@ export async function doForever(params: {
       await callback(stop);
     } catch (error) {
       logger.error(error, `[${name}] Error `);
-      logger.info(
-        `[${name}:doForever] Next-run in ${waitTimeMilliseconds / 1000}s...`
-      );
+      logger.info(`[${name}] Next-run in ${waitTimeMilliseconds / 1000}s...`);
     } finally {
-      await sleep(waitTimeMilliseconds);
+      await Promise.race([sleep(waitTimeMilliseconds), wakeUpPromise]);
     }
   }
   logger.info(`[${name}] Stopped`);
+}
+
+function createWakeUpPromise(): {
+  wakeUpPromise: Promise<unknown>;
+  wakeUp: () => void;
+} {
+  let wakeUp: ((value: unknown) => void) | undefined = undefined;
+  const wakeUpPromise = new Promise((resolve) => {
+    wakeUp = resolve;
+  });
+
+  if (!wakeUp) {
+    throw new Error('Wakeup promise not initialized');
+  }
+
+  return { wakeUpPromise, wakeUp };
 }
 
 export function sleep(ms: number) {

@@ -55,14 +55,9 @@ export class TradeNotificationProducer implements Runnable {
       waitTimeMilliseconds: WAIT_TIME,
       logger,
     });
-
-    logger.info(`${this.prefix} stopped`);
   }
 
   async stop(): Promise<void> {
-    logger.info(
-      `${this.prefix} Stopping TradeNotificationProducer for chainId=${this.props.chainId}`
-    );
     this.isStopping = true;
   }
 
@@ -115,6 +110,11 @@ export class TradeNotificationProducer implements Runnable {
 
     // Await to resolve all notifications
     const notifications = await notificationPromises;
+
+    // Return early if there are no notifications
+    if (notifications.length === 0) {
+      return;
+    }
 
     logger.info(
       `${this.prefix} Sending ${notifications.length} notifications`,
