@@ -52,16 +52,7 @@ async function mainLoop() {
   ];
 
   // Run all producers in the background
-  const promises = producers.map((producer) =>
-    producer
-      .start()
-      .then(() => {
-        if (!shuttingDown) producer.start();
-      })
-      .catch(() => {
-        if (!shuttingDown) producer.start();
-      })
-  );
+  const promises = producers.map((producer) => producer.start());
 
   // Wrap all producers in a promise
   const producersPromise = Promise.all(promises);
@@ -119,4 +110,4 @@ async function gracefulShutdown(
 }
 
 // Start the main loop
-mainLoop().catch(logger.error);
+mainLoop().catch((error) => logger.error(error, 'Unhandled error in producer'));

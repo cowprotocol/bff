@@ -7,7 +7,7 @@ import { PushNotificationsRepository } from '@cowprotocol/repositories';
 import Mustache from 'mustache';
 import { Runnable } from '../../../types';
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
-import { doForever, logger } from '@cowprotocol/shared';
+import { logger, doForever } from '@cowprotocol/shared';
 
 const WAIT_TIME = 30000;
 
