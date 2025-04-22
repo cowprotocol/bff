@@ -1,7 +1,7 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { logger, SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
-import { inject, injectable } from 'inversify';
-import { Logger } from 'pino';
+import { injectable } from 'inversify';
+
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
@@ -12,8 +12,7 @@ import { UsdRepositoryNoop } from './UsdRepository';
 export class UsdRepositoryCow extends UsdRepositoryNoop {
   constructor(
     private cowApiClients: Record<SupportedChainId, CowApiClient>,
-    private erc20Repository: Erc20Repository,
-    @inject('Logger') private readonly logger: Logger
+    private erc20Repository: Erc20Repository
   ) {
     super();
   }
@@ -26,7 +25,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     const tokenNativePrice = await this.getNativePrice(chainId, tokenAddress);
 
     if (!tokenNativePrice) {
-      this.logger.info({
+      logger.info({
         msg: `Native price not found for ${tokenAddress} on chain ${chainId}`,
       });
       return null;
@@ -36,7 +35,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     const tokenDecimals = erc20?.decimals;
 
     if (tokenDecimals === undefined) {
-      this.logger.info({
+      logger.info({
         msg: `Token decimals not found for ${tokenAddress} on chain ${chainId}`,
       });
       return null;
@@ -47,7 +46,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     const usdcNativePrice = await this.getNativePrice(chainId, usdAddress);
 
     if (!usdcNativePrice) {
-      this.logger.info({
+      logger.info({
         msg: `Usd native price not found for ${usdAddress} on chain ${chainId}`,
       });
       return null;
@@ -63,7 +62,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     );
 
     if (tokenPrice.eq(ZeroBigNumber)) {
-      this.logger.info({
+      logger.info({
         msg: `Token price is zero for ${tokenAddress} on chain ${chainId}`,
       });
       return null;

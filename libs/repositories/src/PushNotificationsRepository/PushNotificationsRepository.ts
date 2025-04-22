@@ -3,16 +3,28 @@ import {
   ConnectToChannelResponse,
   NOTIFICATIONS_QUEUE,
   sendNotificationsToQueue,
-  Notification,
+  PushNotification,
 } from '@cowprotocol/notifications';
 
-// TODO: Move to repositories
-export class NotificationsRepository {
+/**
+ * Notifications repository.
+ *
+ * This repository allows to send notifications to a queue.
+ */
+export interface PushNotificationsRepository {
+  connect(): Promise<unknown>;
+  sendNotifications(notifications: PushNotification[]): Promise<void>;
+  pingConnection(): Promise<boolean>;
+}
+
+export class PushNotificationsRepositoryRabbit
+  implements PushNotificationsRepository
+{
   connection: ConnectToChannelResponse | null = null;
   constructor(private readonly queueName = NOTIFICATIONS_QUEUE) {}
 
   async connect(): Promise<ConnectToChannelResponse> {
-    if (!this.connection || !this.pingConnection()) {
+    if (!this.connection || (await !this.pingConnection())) {
       // Connect to the queue
       this.connection = await connectToChannel({
         channel: this.queueName,
@@ -38,7 +50,7 @@ export class NotificationsRepository {
     }
   }
 
-  async sendNotifications(notifications: Notification[]) {
+  async sendNotifications(notifications: PushNotification[]) {
     const connection = await this.connect();
 
     await sendNotificationsToQueue({

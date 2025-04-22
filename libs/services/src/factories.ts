@@ -5,6 +5,12 @@ import {
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  IndexerStateRepository,
+  IndexerStateRepositoryPostgres,
+  PushNotificationsRepository,
+  PushNotificationsRepositoryRabbit,
+  PushSubscriptionsRepository,
+  PushSubscriptionsRepositoryCms,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TokenHolderRepository,
@@ -21,14 +27,16 @@ import {
   redisClient,
   viemClients,
 } from '@cowprotocol/repositories';
-import { logger } from '@cowprotocol/shared';
+import { createNewPostgresPool } from '@cowprotocol/repositories';
 
 import ms from 'ms';
+import { Pool } from 'pg';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
 
 const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
+let postgresPool: Pool | undefined = undefined;
 
 export function getErc20Repository(
   cacheRepository: CacheRepository
@@ -54,11 +62,7 @@ export function getUsdRepositoryCow(
   erc20Repository: Erc20Repository
 ): UsdRepository {
   return new UsdRepositoryCache(
-    new UsdRepositoryCow(
-      cowApiClients,
-      erc20Repository,
-      logger.child({ module: 'usd-cow' })
-    ),
+    new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
@@ -121,6 +125,27 @@ export function getTokenHolderRepository(
   ]);
 }
 
+export function getPushNotificationsRepository(): PushNotificationsRepository {
+  return new PushNotificationsRepositoryRabbit();
+}
+
+export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
+  return new PushSubscriptionsRepositoryCms();
+}
+
+export function getPostgresPool(): Pool {
+  if (!postgresPool) {
+    postgresPool = createNewPostgresPool();
+  }
+
+  return postgresPool;
+}
+
+export function getIndexerStateRepository(): IndexerStateRepository {
+  const pool = getPostgresPool();
+  return new IndexerStateRepositoryPostgres(pool);
+}
+
 export function getSimulationRepository(): SimulationRepository {
-  return new SimulationRepositoryTenderly(logger.child({ module: 'tenderly' }));
+  return new SimulationRepositoryTenderly();
 }

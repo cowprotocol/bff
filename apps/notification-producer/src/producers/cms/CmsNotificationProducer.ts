@@ -2,18 +2,18 @@ import {
   CmsPushNotification,
   getPushNotifications,
 } from '@cowprotocol/cms-api';
-import { Notification } from '@cowprotocol/notifications';
-import { NotificationsRepository } from '../repositories/NotificationsRepository';
-import { doForever } from '../utils';
+import { PushNotification } from '@cowprotocol/notifications';
+import { PushNotificationsRepository } from '@cowprotocol/repositories';
 import Mustache from 'mustache';
-import { Runnable } from '../../types';
-import { SubscriptionRepository } from '../repositories/SubscriptionsRepository';
+import { Runnable } from '../../../types';
+import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
+import { logger, doForever } from '@cowprotocol/shared';
 
 const WAIT_TIME = 30000;
 
 export type CmsNotificationProducerProps = {
-  notificationsRepository: NotificationsRepository;
-  subscriptionRepository: SubscriptionRepository;
+  pushNotificationsRepository: PushNotificationsRepository;
+  pushSubscriptionsRepository: PushSubscriptionsRepository;
 };
 
 export class CmsNotificationProducer implements Runnable {
@@ -25,7 +25,7 @@ export class CmsNotificationProducer implements Runnable {
    *
    * This solution is a patch until we properly implement a more reliable consumption
    */
-  pendingNotifications = new Map<string, Notification>();
+  pendingNotifications = new Map<string, PushNotification>();
 
   constructor(private props: CmsNotificationProducerProps) {}
 
@@ -36,29 +36,29 @@ export class CmsNotificationProducer implements Runnable {
    * The method should not throw or finish.
    */
   async start(): Promise<void> {
-    await doForever(
-      'CmsNotificationProducer',
-      async (stop) => {
+    await doForever({
+      name: 'CmsNotificationProducer',
+      callback: async (stop) => {
         if (this.isStopping) {
           stop();
           return;
         }
         await this.fetchAndSend();
       },
-      WAIT_TIME
-    );
+      waitTimeMilliseconds: WAIT_TIME,
+      logger,
+    });
 
-    console.log('CmsNotificationProducer', 'stopped');
+    logger.info('CmsNotificationProducer', 'stopped');
   }
 
   async stop(): Promise<void> {
-    console.log('Stopping CmsNotificationProducer');
     this.isStopping = true;
   }
 
   async fetchAndSend(): Promise<void> {
     const accounts =
-      await this.props.subscriptionRepository.getAllSubscribedAccounts();
+      await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts();
 
     // Get PUSH notifications
     const cmsPushNotifications = (await getPushNotifications()).filter(
@@ -75,7 +75,7 @@ export class CmsNotificationProducer implements Runnable {
       return;
     }
 
-    console.debug(
+    logger.debug(
       `[notification-producer:main] ${pushNotifications.length} new PUSH notifications`
     );
 
@@ -85,10 +85,10 @@ export class CmsNotificationProducer implements Runnable {
     );
 
     // Connect
-    await this.props.notificationsRepository.connect();
+    await this.props.pushNotificationsRepository.connect();
 
     // Post notifications to queue
-    this.props.notificationsRepository.sendNotifications(pushNotifications);
+    this.props.pushNotificationsRepository.sendNotifications(pushNotifications);
     this.pendingNotifications.clear();
   }
 }
@@ -98,7 +98,7 @@ function fromCmsToNotifications({
   account,
   data,
   notification_template: { title, description, url },
-}: CmsPushNotification): Notification {
+}: CmsPushNotification): PushNotification {
   const message = Mustache.render(description, data);
 
   return {

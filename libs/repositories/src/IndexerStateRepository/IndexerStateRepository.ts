@@ -1,7 +1,14 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Pool } from 'pg';
 
-export type NotificationsIndexerState<T> = {
+/**
+ * Indexer state.
+ *
+ * An indexer allows to track the state of a specific data source (for example, an API, DB or blockchain).
+ *
+ * The state is stored in a JSON object, so each indexer can define its own state schema.
+ */
+export type IndexerState<T> = {
   key: string;
   chainId: number | null;
   state: T;
@@ -9,8 +16,21 @@ export type NotificationsIndexerState<T> = {
   updated_at: Date;
 };
 
-export class NotificationsIndexerStateRepository {
-  constructor(private readonly db: Pool) {}
+/**
+ * Indexer state repository.
+ *
+ * This repository allows to store and retrieve the state of an indexer.
+ */
+export interface IndexerStateRepository {
+  get<T>(
+    key: string,
+    chainId?: SupportedChainId
+  ): Promise<IndexerState<T> | null>;
+  upsert<T>(key: string, state: T, chainId?: number): Promise<void>;
+}
+
+export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
+  constructor(readonly db: Pool) {}
 
   /**
    * Get indexer state by key and optional chainId
@@ -18,10 +38,10 @@ export class NotificationsIndexerStateRepository {
   async get<T>(
     key: string,
     chainId?: SupportedChainId
-  ): Promise<NotificationsIndexerState<T> | null> {
+  ): Promise<IndexerState<T> | null> {
     const query = `
       SELECT state 
-      FROM notifications_indexer_state 
+      FROM indexer_state 
       WHERE key = $1 
       ${chainId !== undefined ? 'AND chainId = $2' : ''}
       LIMIT 1
@@ -37,7 +57,7 @@ export class NotificationsIndexerStateRepository {
    */
   async upsert<T>(key: string, state: T, chainId?: number): Promise<void> {
     const query = `
-      INSERT INTO notifications_indexer_state (key, chainId, state)
+      INSERT INTO indexer_state (key, chainId, state)
       VALUES ($1, $2, $3)
       ON CONFLICT (key, chainId) 
       DO UPDATE SET state = $3
