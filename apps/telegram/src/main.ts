@@ -130,7 +130,7 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
         `[telegram:main] Max retries (${MAX_RETRIES}) reached for message ${messageId}, dropping it`
       );
       clearRetryCount();
-      channel.nack(msg, false, true); // Negative acknowledge and remove from queue
+      channel.nack(msg, false, false); // Negative acknowledge and remove from queue
     } else {
       // Increment retry count and NACK the message
       const newRetryCount = retryCount + 1;
