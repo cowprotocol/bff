@@ -1,6 +1,16 @@
+import { ensureEnvs } from '@cowprotocol/shared';
 import { Pool } from 'pg';
 
+const REQUIRED_ENVS = [
+  'DATABASE_USERNAME',
+  'DATABASE_HOST',
+  'DATABASE_NAME',
+  'DATABASE_PASSWORD',
+];
+
 export function createNewPostgresPool(): Pool {
+  ensureEnvs(REQUIRED_ENVS);
+
   const pool = new Pool({
     user: process.env.DATABASE_USERNAME,
     host: process.env.DATABASE_HOST,

@@ -170,3 +170,12 @@ export function formatTokenName(
 ) {
   return token?.symbol ? `${token.symbol}` : token?.address;
 }
+
+export function ensureEnvs(envs: string[]) {
+  const missingEnvs = envs.filter((env) => !process.env[env]);
+  if (missingEnvs.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missingEnvs.join(', ')}`
+    );
+  }
+}
