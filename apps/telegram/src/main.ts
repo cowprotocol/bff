@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import ms from 'ms';
 
 import {
@@ -6,34 +8,35 @@ import {
 } from '@cowprotocol/cms-api';
 import { doForever, logger, sleep } from '@cowprotocol/shared';
 import {
-  NOTIFICATIONS_QUEUE,
-  PushNotification,
-  connectToChannel,
-  parseNotifications,
-} from '@cowprotocol/notifications';
-import { Channel, ConsumeMessage } from 'amqplib';
-import assert from 'assert';
+  getPushNotificationsRepository,
+  getTelegramBot,
+} from '@cowprotocol/services';
+import { PushNotification } from '@cowprotocol/notifications';
 import TelegramBot from 'node-telegram-bot-api';
 
 const WAIT_TIME = ms(`10s`);
 const SUBSCRIPTION_CACHE_TiME = ms(`5m`);
-const MAX_RETRIES = 3; // Maximum number of retry attempts before dropping a message
 
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
-const MESSAGE_RETRIES = new Map<string, number>(); // Track message retries by message ID
 
 let telegramBot: TelegramBot;
 
-// Create telegram bot
-function createTelegramBot() {
-  if (!telegramBot) {
-    const token = process.env.TELEGRAM_SECRET;
-    assert(token, 'TELEGRAM_SECRET is required');
-    telegramBot = new TelegramBot(token, { polling: true });
-  }
+/**
+ * Main loop: Run and re-attempt on error
+ */
+async function mainLoop() {
+  // Create telegram bot
+  telegramBot = getTelegramBot();
 
-  return telegramBot;
+  // Subscribe to notifications
+  logger.info('[telegram] Start telegram consumer');
+  await doForever({
+    name: 'telegram',
+    callback: subscribeToNotifications,
+    waitTimeMilliseconds: WAIT_TIME,
+    logger,
+  });
 }
 
 async function getSubscriptions(
@@ -55,104 +58,12 @@ async function getSubscriptions(
   return SUBSCRIPTION_CACHE.get(account) || [];
 }
 
-function parseNewMessage(msg: ConsumeMessage): PushNotification[] | null {
-  try {
-    const message = msg.content.toString();
-    const notifications = parseNotifications(message);
-
-    if (!isNotificationArray(notifications)) {
-      throw new Error('The message is not a valid notification array');
-    }
-
-    return notifications;
-  } catch (error) {
-    logger.error(error, `Error parsing notification`);
-    return null;
-  }
-}
-
-function isNotificationArray(
-  notifications: unknown
-): notifications is PushNotification[] {
-  return Array.isArray(notifications) && notifications.every(isNotification);
-}
-
-function isNotification(
-  notification: unknown
-): notification is PushNotification {
-  return (
-    typeof notification === 'object' &&
-    notification !== null &&
-    'id' in notification &&
-    'account' in notification &&
-    'title' in notification &&
-    'message' in notification
-  );
-}
-
-async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
-  let consumeMessage = false;
-  const messageId = msg.properties.messageId || msg.content.toString();
-  const clearRetryCount = () => MESSAGE_RETRIES.delete(messageId);
-  logger.debug(`[telegram:main] Received message ${messageId}`);
-  try {
-    // Parse the message
-    const notifications = parseNewMessage(msg);
-
-    if (!notifications) {
-      return;
-    }
-
-    for (const notification of notifications) {
-      const sent = await sendNotification(notification);
-
-      if (!sent && !consumeMessage) {
-        // If we didn't send any notification, we just throw. Otherwise we try to send the next notification
-        throw new Error(`Failed to send the notifications`);
-      }
-      consumeMessage ||= sent;
-    }
-
-    // Successfully processed, acknowledge the message
-    clearRetryCount();
-    channel.ack(msg);
-  } catch (error) {
-    const retryCount = MESSAGE_RETRIES.get(messageId) || 0;
-
-    if (consumeMessage) {
-      // If we sent at least one notification, clear retry count and acknowledge the message
-      clearRetryCount();
-      channel.ack(msg); // Acknowledge to remove from queue
-    } else if (retryCount >= MAX_RETRIES) {
-      // Max retries reached, drop the message
-      logger.error(
-        error,
-        `[telegram:main] Max retries (${MAX_RETRIES}) reached for message ${messageId}, dropping it`
-      );
-      clearRetryCount();
-      channel.nack(msg, false, false); // Negative acknowledge and remove from queue
-    } else {
-      // Increment retry count and NACK the message
-      const newRetryCount = retryCount + 1;
-      MESSAGE_RETRIES.set(messageId, newRetryCount);
-      logger.error(
-        error,
-        `[telegram:main] Error processing message. Retrying later`
-      );
-      logger.warn(
-        `[telegram:main] Retry attempt ${newRetryCount}/${MAX_RETRIES} for message ${messageId}`
-      );
-      channel.nack(msg, false, true); // Negative acknowledge but keep in queue
-    }
-  }
-}
-
-async function sendNotification(
+async function sendNotificationToTelegram(
   notification: PushNotification
 ): Promise<boolean> {
   const { id, message, account, title, url } = notification;
   logger.debug(
-    `[telegram:main] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+    `[telegram] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}`
   );
 
   // Get the subscriptions for this account
@@ -173,7 +84,7 @@ async function sendNotification(
       // Send the message to all subscribers
       for (const { chatId } of telegramSubscriptions) {
         logger.info(
-          `[telegram:main] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
+          `[telegram] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
         );
         telegramBot.sendMessage(chatId, formatMessage(notification));
 
@@ -183,9 +94,7 @@ async function sendNotification(
     } else {
       // No telegram subscriptions found for this account
       consumeMessage = true;
-      logger.debug(
-        `[telegram:main] No subscriptions found for account ${account}`
-      );
+      logger.debug(`[telegram] No subscriptions found for account ${account}`);
     }
   } catch (error) {
     if (!consumeMessage) {
@@ -197,49 +106,35 @@ async function sendNotification(
   return consumeMessage;
 }
 
-async function connect() {
-  const { connection, channel } = await connectToChannel({
-    channel: NOTIFICATIONS_QUEUE,
-  });
-
-  logger.info(
-    `[telegram:main] Waiting for messages in "${NOTIFICATIONS_QUEUE}" queue`
-  );
-  await channel.consume(
-    NOTIFICATIONS_QUEUE,
-    async (msg) => {
-      if (msg !== null) {
-        onNewMessage(channel, msg).catch((error) =>
-          logger.error(error, 'Error processing queue message')
-        );
-      }
-    },
-    {
-      noAck: false,
-    }
-  );
-
-  return { connection, channel };
-}
-
 /**
- * Connect to RabbitMQ and listen for messages. It will post them to Telegram when they belong to a subscribed account.
+ * Subscribe to new notifications. It will post them to Telegram when they belong to a subscribed account.
  *
  * This function will not resolved until the connection is closed or an error occurs.
  */
-async function main() {
-  telegramBot = createTelegramBot();
-  const { connection } = await connect();
+async function subscribeToNotifications() {
+  const pushNotificationsRepository = getPushNotificationsRepository();
+
+  // Connect to push notifications
+  const { connection } = await pushNotificationsRepository.connect();
+
+  // Subscribe to new notifications
+  const { subscriptionId, cancelSubscription } =
+    await pushNotificationsRepository.subscribe(sendNotificationToTelegram);
+
+  logger.info(
+    `[telegram] Subscribed to notifications with ID ${subscriptionId}`
+  );
 
   // Watch for connection close
   let connectionOpen = true;
   connection.on('close', () => {
     logger.error(
-      `[telegram:main] Queue connection closed! Reconnecting in ${
-        WAIT_TIME / 1000
-      }s`
+      `[telegram] Queue connection closed! Reconnecting in ${WAIT_TIME / 1000}s`
     );
     connectionOpen = false;
+
+    // Cancel the subscription
+    cancelSubscription();
   });
 
   // Wait while we have an open connection
@@ -257,17 +152,4 @@ ${title}
 ${message}${moreInfo}`;
 }
 
-/**
- * Main loop: Run and re-attempt on error
- */
-async function mainLoop() {
-  logger.info('[telegram:main] Start telegram consumer');
-  await doForever({
-    name: 'telegram',
-    callback: main,
-    waitTimeMilliseconds: WAIT_TIME,
-    logger,
-  });
-}
-
-mainLoop();
+mainLoop().catch((error) => logger.error(error, 'Unhandled error in telegram'));

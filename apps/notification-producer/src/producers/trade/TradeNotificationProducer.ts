@@ -122,7 +122,7 @@ export class TradeNotificationProducer implements Runnable {
     );
 
     // Post notifications to queue
-    this.props.pushNotificationsRepository.sendNotifications(notifications);
+    this.props.pushNotificationsRepository.send(notifications);
 
     // Update state
     indexerStateRepository.upsert<TradeNotificationProducerState>(
