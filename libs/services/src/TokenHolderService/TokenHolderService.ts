@@ -1,9 +1,9 @@
 import {
   TokenHolderRepository,
   tokenHolderRepositorySymbol,
-  SupportedChainId,
   TokenHolderPoint,
 } from '@cowprotocol/repositories';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { injectable, inject } from 'inversify';
 
 export interface TokenHolderService {

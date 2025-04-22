@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { logger, SupportedChainId } from '@cowprotocol/shared';
 import {
   AssetChange,
   SimulationError,
@@ -10,14 +10,13 @@ import {
   TENDERLY_API_BASE_ENDPOINT,
   TENDERLY_API_KEY,
 } from '../datasources/tenderlyApi';
-import { injectable, inject } from 'inversify';
+import { injectable } from 'inversify';
 import {
   SimulationData,
   SimulationInput,
   SimulationRepository,
 } from './SimulationRepository';
 import { BigNumber } from 'ethers';
-import { Logger } from 'pino';
 
 interface TenderlyRequestLog {
   timestamp: string;
@@ -44,8 +43,6 @@ export const tenderlyRepositorySymbol = Symbol.for('TenderlyRepository');
 
 @injectable()
 export class SimulationRepositoryTenderly implements SimulationRepository {
-  constructor(@inject('Logger') private readonly logger: Logger) {}
-
   private logRequest(
     chainId: SupportedChainId,
     simulations: TenderlySimulatePayload[]
@@ -59,7 +56,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       simulations,
     };
 
-    this.logger.info({
+    logger.info({
       msg: 'Tenderly simulation request',
       ...requestLog,
     });
@@ -90,7 +87,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       );
     }
 
-    this.logger.info({
+    logger.info({
       msg: 'Tenderly simulation response',
       ...responseLog,
     });
@@ -149,7 +146,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         };
       });
     } catch (error) {
-      this.logger.error({
+      logger.error({
         msg: 'Tenderly simulation unexpected error',
         error: error instanceof Error ? error.message : 'Unknown error',
         chainId,

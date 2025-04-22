@@ -33,6 +33,9 @@ Make sure your `.env` file is defined, if not create one using `.env.example` as
 # Start RabbitMQ
 docker-compose up -d queue
 
+# Start DB
+docker-compose up -d db
+
 # Start the notification producer
 yarn producer
 ```
@@ -101,3 +104,24 @@ yarn gen:types
 
 If you have faced the error above - check this fix and its description:
 https://github.com/cowprotocol/bff/pull/101
+
+# Development notes
+
+## Notifications
+To run locally the notifications, you will need to run:
+- RabbitMQ locally: `docker-compose up -d queue`
+- DB locally: `docker-compose up -d db`
+- Telegram consumer: `yarn telegram`
+- Notification producer: `yarn producer`
+
+You need to make sure you have the relevant environment variables set.
+
+## Quick PUSH notifications Test
+There's a unit test used as a convenient way to do a quick test of the PUSH notifications.
+
+If you have a subscription to any of the channels (i.e. Telegram), you can use the following command to send a test notification:
+
+```bash
+# Replace the POST_TO_QUEUE_ACCOUNT with your account address
+POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 nx test notification-producer --testFile=src/postToQueueTest.test.ts
+```

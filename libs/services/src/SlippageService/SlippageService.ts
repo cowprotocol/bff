@@ -1,5 +1,5 @@
-import { PricePoint, SupportedChainId } from '@cowprotocol/repositories';
-import { Address } from 'viem';
+import { PricePoint } from '@cowprotocol/repositories';
+import { SupportedChainId } from '@cowprotocol/shared';
 
 /**
  * BPS (Basis Points)

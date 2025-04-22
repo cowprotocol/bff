@@ -12,7 +12,7 @@ assert(queueUser, 'QUEUE_USER is required');
 const queuePassword = process.env.QUEUE_PASSWORD;
 assert(queuePassword, 'QUEUE_PASSWORD is required');
 
-export interface Notification {
+export interface PushNotification {
   id: string;
   account: string;
   title: string;
@@ -20,17 +20,16 @@ export interface Notification {
   url?: string;
 }
 
-export function parseNotification(notificationString: string): Notification {
-  return JSON.parse(notificationString);
+export function parseNotifications(
+  notificationsString: string
+): PushNotification[] {
+  return JSON.parse(notificationsString);
 }
 
-export function stringifyNotification(notification: Notification): string {
-  return JSON.stringify(notification);
-}
-
-// TODO: Move to commons lib
-export function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function stringifyNotifications(
+  notifications: PushNotification[]
+): string {
+  return JSON.stringify(notifications);
 }
 
 export interface ConnectToQueueParams {
@@ -70,11 +69,17 @@ export async function connectToChannel(
 export interface SendToQueueParams {
   channel: Channel;
   queue: string;
-  notification: Notification;
+  notifications: PushNotification[];
 }
 
-export function sendNotificationToQueue(params: SendToQueueParams) {
-  const { channel, queue, notification } = params;
-  const message = stringifyNotification(notification);
+export function sendNotificationsToQueue(params: SendToQueueParams) {
+  const { channel, queue, notifications } = params;
+
+  // If there are no notifications, do nothing
+  if (notifications.length === 0) {
+    return;
+  }
+
+  const message = stringifyNotifications(notifications);
   channel.sendToQueue(queue, Buffer.from(message));
 }

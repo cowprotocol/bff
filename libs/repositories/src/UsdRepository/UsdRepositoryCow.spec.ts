@@ -32,11 +32,6 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
-// const mockLogger = jest.fn() as unknown as jest.Mocked<Logger>;
-const mockLogger = jest.mocked<Logger>({
-  info: jest.fn(),
-} as unknown as Logger);
-
 const cowApiClients = {
   [SupportedChainId.MAINNET]: mockApi,
   [SupportedChainId.GNOSIS_CHAIN]: mockApi,
@@ -47,8 +42,7 @@ const cowApiClients = {
 
 const usdRepositoryCow = new UsdRepositoryCow(
   cowApiClients,
-  mockErc20Repository,
-  mockLogger
+  mockErc20Repository
 );
 
 // const cowApiMock = jest.spyOn(cowApiClientMainnet, 'GET');
@@ -214,8 +208,7 @@ describe('UsdRepositoryCow', () => {
 
       const usdRepositoryCow = new UsdRepositoryCow(
         cowApiClients,
-        mockErc20Repository,
-        mockLogger
+        mockErc20Repository
       );
 
       // Get USD price for a token without decimals

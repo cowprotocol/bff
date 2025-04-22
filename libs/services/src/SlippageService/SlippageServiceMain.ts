@@ -1,8 +1,4 @@
-import {
-  UsdRepository,
-  usdRepositorySymbol,
-  SupportedChainId,
-} from '@cowprotocol/repositories';
+import { UsdRepository, usdRepositorySymbol } from '@cowprotocol/repositories';
 import { injectable, inject } from 'inversify';
 import {
   Bps,
@@ -12,7 +8,7 @@ import {
   VolatilityDetails,
 } from './SlippageService';
 import ms from 'ms';
-import { toTokenAddress } from '@cowprotocol/shared';
+import { SupportedChainId, toTokenAddress } from '@cowprotocol/shared';
 
 export const MIN_SLIPPAGE_BPS = 50;
 export const MAX_SLIPPAGE_BPS = 200;

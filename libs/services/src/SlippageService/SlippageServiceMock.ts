@@ -1,11 +1,5 @@
 import { injectable } from 'inversify';
-import {
-  Bps,
-  OrderForSlippageCalculation,
-  SlippageService,
-  VolatilityDetails,
-} from './SlippageService';
-import { SupportedChainId } from '@cowprotocol/repositories';
+import { Bps, SlippageService, VolatilityDetails } from './SlippageService';
 
 const DEFAULT_SLIPPAGE_BPS = 50;
 

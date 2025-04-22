@@ -1,5 +1,4 @@
 import { CmsClient, components } from '@cowprotocol/cms';
-import assert from 'assert';
 
 type Schemas = components['schemas'];
 export type CmsNotification = Schemas['NotificationListResponseDataItem'];
@@ -10,6 +9,10 @@ export type CmsTelegramSubscription = {
 };
 export type CmsTelegramSubscriptionsResponse =
   Schemas['TelegramSubscriptionResponse'];
+
+export type CmsTelegramSubscriptions =
+  Schemas['TelegramSubscriptionResponse']['data'];
+
 export type CmsPushNotification = {
   id: number;
   account: string;
@@ -137,31 +140,50 @@ async function getNotificationsPage({
   return data.data;
 }
 
+export async function getAllSubscribedAccounts(): Promise<string[]> {
+  return getAllPages({
+    pageSize: PAGE_SIZE,
+    getPage: (params) => getSubscribedAccounts(params),
+  });
+}
+
 export async function getAllTelegramSubscriptionsForAccounts(
   accounts: string[]
 ): Promise<CmsTelegramSubscription[]> {
+  return getAllPages({
+    pageSize: PAGE_SIZE,
+    getPage: (params) =>
+      getTelegramSubscriptionsForAccounts({
+        ...params,
+        accounts,
+      }),
+  });
+}
+
+async function getAllPages<T>({
+  pageSize = PAGE_SIZE,
+  getPage,
+}: PaginationParam & {
+  getPage: (params: PaginationParam) => Promise<T[]>;
+}): Promise<T[]> {
   const allSubscriptions = [];
   let page = 0;
 
-  let subscriptions = await getTelegramSubscriptionsForAccounts({
+  let subscriptions = await getPage({
     page,
-    pageSize: PAGE_SIZE + 1,
-    accounts,
+    pageSize: pageSize + 1,
   }); // Get one extra to check if there's more pages
 
   allSubscriptions.push(
-    subscriptions.length > PAGE_SIZE
-      ? subscriptions.slice(0, -1)
-      : subscriptions
+    subscriptions.length > pageSize ? subscriptions.slice(0, -1) : subscriptions
   );
 
-  while (subscriptions.length > PAGE_SIZE) {
-    subscriptions = await getTelegramSubscriptionsForAccounts({
+  while (subscriptions.length > pageSize) {
+    subscriptions = await getPage({
       page,
-      pageSize: PAGE_SIZE + 1,
-      accounts,
+      pageSize: pageSize + 1,
     }); // Get one extra to check if there's more pages
-    const hasMorePages = subscriptions.length > PAGE_SIZE;
+    const hasMorePages = subscriptions.length > pageSize;
     allSubscriptions.push(
       hasMorePages ? subscriptions.slice(0, -1) : subscriptions
     );
@@ -185,7 +207,30 @@ async function getTelegramSubscriptionsForAccounts({
   CmsTelegramSubscription[]
 > {
   const { data, error, response } = await cmsClient.GET(
-    `/tg-subscriptions?accounts=${accounts.join(',')}`,
+    `/accounts/${accounts.join(',')}/subscriptions/telegram`,
+    {
+      // Pagination
+      'pagination[page]': page,
+      'pagination[pageSize]': pageSize,
+    }
+  );
+
+  if (error) {
+    console.error(
+      `Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`
+    );
+    throw error;
+  }
+
+  return data;
+}
+
+async function getSubscribedAccounts({
+  page = 0,
+  pageSize = PAGE_SIZE,
+}: PaginationParam): Promise<string[]> {
+  const { data, error, response } = await cmsClient.GET(
+    `/telegram-subscriptions`,
     {
       // Pagination
       'pagination[page]': page,
@@ -201,7 +246,15 @@ async function getTelegramSubscriptionsForAccounts({
     throw error;
   }
 
-  return data;
+  const subscriptions = data.data as CmsTelegramSubscriptions[];
+
+  return subscriptions.reduce<string[]>((acc, subscription) => {
+    const account = subscription?.attributes?.account;
+    if (account) {
+      acc.push(account);
+    }
+    return acc;
+  }, []);
 }
 
 export async function getPushNotifications(): Promise<CmsPushNotification[]> {

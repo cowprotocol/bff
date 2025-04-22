@@ -18,12 +18,31 @@ export const WrappedNativeTokenAddress: Record<SupportedChainId, Address> = {
   [SupportedChainId.SEPOLIA]: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
 };
 
+// TODO: Get from SDK
 export const ChainNames: Record<SupportedChainId, string> = {
   [SupportedChainId.MAINNET]: 'Mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'Gnosis Chain',
   [SupportedChainId.ARBITRUM_ONE]: 'Arbitrum',
   [SupportedChainId.BASE]: 'Base',
   [SupportedChainId.SEPOLIA]: 'Sepolia',
+};
+
+// TODO: Get from SDK
+export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.GNOSIS_CHAIN]: 'gc',
+  [SupportedChainId.ARBITRUM_ONE]: 'arb1',
+  [SupportedChainId.BASE]: 'base',
+  [SupportedChainId.SEPOLIA]: 'sepolia',
+};
+
+// TODO: Get from SDK
+export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
+  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum_one',
+  [SupportedChainId.BASE]: 'base',
+  [SupportedChainId.SEPOLIA]: 'sepolia',
 };
 
 export const AllChainIds: SupportedChainId[] = Object.values(SupportedChainId)

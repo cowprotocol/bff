@@ -1,30 +1,22 @@
 import {
+  getCacheRepository,
+  getErc20Repository,
+  getSimulationRepository,
+  getTokenHolderRepository,
+  getUsdRepository,
+} from '@cowprotocol/services';
+
+import {
   CacheRepository,
-  CacheRepositoryMemory,
-  CacheRepositoryRedis,
   Erc20Repository,
-  Erc20RepositoryCache,
-  Erc20RepositoryViem,
   SimulationRepository,
-  SimulationRepositoryTenderly,
   TokenHolderRepository,
-  TokenHolderRepositoryCache,
-  TokenHolderRepositoryEthplorer,
-  TokenHolderRepositoryFallback,
-  TokenHolderRepositoryMoralis,
   UsdRepository,
-  UsdRepositoryCache,
-  UsdRepositoryCoingecko,
-  UsdRepositoryCow,
-  UsdRepositoryFallback,
   cacheRepositorySymbol,
-  cowApiClients,
   erc20RepositorySymbol,
-  redisClient,
   tenderlyRepositorySymbol,
   tokenHolderRepositorySymbol,
   usdRepositorySymbol,
-  viemClients,
 } from '@cowprotocol/repositories';
 
 import {
@@ -40,107 +32,9 @@ import {
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
+
 import { Container } from 'inversify';
-import ms from 'ms';
-import { Logger, logger } from '../logger';
-
-const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
-const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
-
-const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
-
-function getErc20Repository(cacheRepository: CacheRepository): Erc20Repository {
-  return new Erc20RepositoryCache(
-    new Erc20RepositoryViem(viemClients),
-    cacheRepository,
-    'erc20',
-    CACHE_TOKEN_INFO_SECONDS
-  );
-}
-
-function getCacheRepository(): CacheRepository {
-  if (redisClient) {
-    return new CacheRepositoryRedis(redisClient);
-  }
-
-  return new CacheRepositoryMemory();
-}
-
-function getUsdRepositoryCow(
-  cacheRepository: CacheRepository,
-  erc20Repository: Erc20Repository
-): UsdRepository {
-  return new UsdRepositoryCache(
-    new UsdRepositoryCow(
-      cowApiClients,
-      erc20Repository,
-      logger.child({ module: 'usd-cow' })
-    ),
-    cacheRepository,
-    'usdCow',
-    DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
-  );
-}
-
-function getUsdRepositoryCoingecko(
-  cacheRepository: CacheRepository
-): UsdRepository {
-  return new UsdRepositoryCache(
-    new UsdRepositoryCoingecko(),
-    cacheRepository,
-    'usdCoingecko',
-    DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
-  );
-}
-
-function getUsdRepository(
-  cacheRepository: CacheRepository,
-  erc20Repository: Erc20Repository
-): UsdRepository {
-  return new UsdRepositoryFallback([
-    getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository),
-  ]);
-}
-
-function getTokenHolderRepositoryEthplorer(
-  cacheRepository: CacheRepository
-): TokenHolderRepository {
-  return new TokenHolderRepositoryCache(
-    new TokenHolderRepositoryEthplorer(),
-    cacheRepository,
-    'tokenHolderEthplorer',
-    DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
-  );
-}
-
-function getTokenHolderRepositoryMoralis(
-  cacheRepository: CacheRepository
-): TokenHolderRepository {
-  return new TokenHolderRepositoryCache(
-    new TokenHolderRepositoryMoralis(),
-    cacheRepository,
-    'tokenHolderMoralis',
-    DEFAULT_CACHE_VALUE_SECONDS,
-    DEFAULT_CACHE_NULL_SECONDS
-  );
-}
-
-function getTokenHolderRepository(
-  cacheRepository: CacheRepository
-): TokenHolderRepository {
-  return new TokenHolderRepositoryFallback([
-    getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository),
-  ]);
-}
-
-function getSimulationRepository(): SimulationRepository {
-  return new SimulationRepositoryTenderly(logger.child({ module: 'tenderly' }));
-}
+import { Logger, logger } from '@cowprotocol/shared';
 
 function getApiContainer(): Container {
   const apiContainer = new Container();
@@ -153,6 +47,7 @@ function getApiContainer(): Container {
   const erc20Repository = getErc20Repository(cacheRepository);
   const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
+  const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -168,7 +63,7 @@ function getApiContainer(): Container {
 
   apiContainer
     .bind<UsdRepository>(usdRepositorySymbol)
-    .toConstantValue(getUsdRepository(cacheRepository, erc20Repository));
+    .toConstantValue(usdRepository);
 
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
