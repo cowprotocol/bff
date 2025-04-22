@@ -9,6 +9,7 @@ import {
 import { createRabbitMqConnection } from '../datasources/rabbitMq';
 import { logger } from '@cowprotocol/shared';
 import { ConsumeMessage } from 'amqplib';
+import crypto from 'node:crypto';
 
 const MAX_RETRIES = 3; // Maximum number of retry attempts before dropping a message
 export const NOTIFICATIONS_QUEUE = 'notifications';
@@ -85,7 +86,9 @@ export class PushNotificationsRepositoryRabbit
     }
 
     const message = stringifyNotifications(notifications);
-    channel.sendToQueue(this.queueName, Buffer.from(message));
+    channel.sendToQueue(this.queueName, Buffer.from(message), {
+      messageId: crypto.randomUUID(),
+    });
   }
 
   async subscribe(
