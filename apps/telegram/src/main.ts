@@ -90,9 +90,9 @@ function isNotification(notification: unknown): notification is Notification {
 
 async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   let consumeMessage = false;
-
   const messageId = msg.properties.messageId || msg.content.toString();
   const clearRetryCount = () => MESSAGE_RETRIES.delete(messageId);
+  logger.debug(`[telegram:main] Received message ${messageId}`);
   try {
     // Parse the message
     const notifications = parseNewMessage(msg);
@@ -133,11 +133,11 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
       // Increment retry count and NACK the message
       const newRetryCount = retryCount + 1;
       MESSAGE_RETRIES.set(messageId, newRetryCount);
-      console.error(
+      logger.error(
         error,
         `[telegram:main] Error processing message. Retrying later`
       );
-      console.warn(
+      logger.warn(
         `[telegram:main] Retry attempt ${newRetryCount}/${MAX_RETRIES} for message ${messageId}`
       );
       channel.nack(msg, false, false);
@@ -147,7 +147,7 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
 
 async function sendNotification(notification: Notification): Promise<boolean> {
   const { id, message, account, title, url } = notification;
-  console.debug(
+  logger.debug(
     `[telegram:main] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
   );
 
@@ -168,8 +168,8 @@ async function sendNotification(notification: Notification): Promise<boolean> {
     if (telegramSubscriptions.length > 0) {
       // Send the message to all subscribers
       for (const { chatId } of telegramSubscriptions) {
-        console.debug(
-          `[telegram:main] Sending message ${id} to chatId ${chatId}`
+        logger.info(
+          `[telegram:main] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
         );
         telegramBot.sendMessage(chatId, formatMessage(notification));
 
@@ -179,7 +179,7 @@ async function sendNotification(notification: Notification): Promise<boolean> {
     } else {
       // No telegram subscriptions found for this account
       consumeMessage = true;
-      console.debug(
+      logger.debug(
         `[telegram:main] No subscriptions found for account ${account}`
       );
     }
@@ -198,7 +198,7 @@ async function connect() {
     channel: NOTIFICATIONS_QUEUE,
   });
 
-  console.info(
+  logger.info(
     `[telegram:main] Waiting for messages in "${NOTIFICATIONS_QUEUE}" queue`
   );
   await channel.consume(
@@ -245,25 +245,19 @@ async function main() {
 }
 
 function formatMessage({ title, message, url }: Notification) {
+  const moreInfo = url ? `\n\nMore info in ${url}` : '';
+
   return `\
 ${title}
 
-${message}
-
-${
-  url
-    ? `
-
-More info in ${url}`
-    : ''
-}`;
+${message}${moreInfo}`;
 }
 
 /**
  * Main loop: Run and re-attempt on error
  */
 async function mainLoop() {
-  console.info('[telegram:main] Start telegram consumer');
+  logger.info('[telegram:main] Start telegram consumer');
   await doForever({
     name: 'telegram',
     callback: main,

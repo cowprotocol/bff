@@ -20,13 +20,6 @@ it('Post to queue', async () => {
     account: POST_TO_QUEUE_ACCOUNT,
     url: 'https://swap.cow.fi/#/1/limit/WETH/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48?tab=all&page=1',
   };
-  console.log(
-    `Posting a message to queue for account ${POST_TO_QUEUE_ACCOUNT}:\n${JSON.stringify(
-      message,
-      null,
-      2
-    )}`
-  );
 
   const { channel } = await connectToChannel({
     channel: NOTIFICATIONS_QUEUE,
@@ -37,4 +30,12 @@ it('Post to queue', async () => {
     queue: NOTIFICATIONS_QUEUE,
     notifications: [message],
   });
+
+  console.log(
+    `✅ Posted a message to queue for account ${POST_TO_QUEUE_ACCOUNT}:\n${JSON.stringify(
+      message,
+      null,
+      2
+    )}`
+  );
 });
