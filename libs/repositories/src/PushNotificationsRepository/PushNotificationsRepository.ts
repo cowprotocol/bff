@@ -24,7 +24,7 @@ export class PushNotificationsRepositoryRabbit
   constructor(private readonly queueName = NOTIFICATIONS_QUEUE) {}
 
   async connect(): Promise<ConnectToChannelResponse> {
-    if (!this.connection || !this.pingConnection()) {
+    if (!this.connection || (await !this.pingConnection())) {
       // Connect to the queue
       this.connection = await connectToChannel({
         channel: this.queueName,
