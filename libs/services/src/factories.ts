@@ -63,11 +63,7 @@ export function getUsdRepositoryCow(
   erc20Repository: Erc20Repository
 ): UsdRepository {
   return new UsdRepositoryCache(
-    new UsdRepositoryCow(
-      cowApiClients,
-      erc20Repository,
-      logger.child({ module: 'usd-cow' })
-    ),
+    new UsdRepositoryCow(cowApiClients, erc20Repository),
     cacheRepository,
     'usdCow',
     DEFAULT_CACHE_VALUE_SECONDS,
@@ -152,5 +148,5 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 }
 
 export function getSimulationRepository(): SimulationRepository {
-  return new SimulationRepositoryTenderly(logger.child({ module: 'tenderly' }));
+  return new SimulationRepositoryTenderly();
 }

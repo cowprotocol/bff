@@ -1,10 +1,10 @@
 import {
-  SupportedChainId,
   tenderlyRepositorySymbol,
   SimulationRepository,
   SimulationInput,
   SimulationData,
 } from '@cowprotocol/repositories';
+import { SupportedChainId } from '@cowprotocol/shared';
 import { injectable, inject } from 'inversify';
 
 export const simulationServiceSymbol = Symbol.for('SimulationServiceSymbol');

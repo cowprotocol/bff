@@ -2,7 +2,12 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { getAddress } from 'viem';
-import { logger } from '@cowprotocol/shared';
+import {
+  formatAmount,
+  formatTokenName,
+  getExplorerUrl,
+  logger,
+} from '@cowprotocol/shared';
 
 export async function fromTradeToNotification(props: {
   prefix: string;
@@ -56,12 +61,4 @@ export async function fromTradeToNotification(props: {
     message,
     url,
   };
-}
-
-function formatAmount(amount: bigint, decimals: number | undefined) {
-  return decimals ? formatUnits(amount, decimals) : amount.toString();
-}
-
-function formatTokenName(token: Erc20 | null) {
-  return token?.symbol ? `${token.symbol}` : token?.address;
 }

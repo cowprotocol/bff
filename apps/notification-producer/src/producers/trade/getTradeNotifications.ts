@@ -3,10 +3,11 @@ import {
   SupportedChainId,
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
-import { Erc20, Erc20Repository, viemClients } from '@cowprotocol/repositories';
-import { formatUnits, getAddress, parseAbi } from 'viem';
-import { bigIntReplacer, getExplorerUrl, logger } from '@cowprotocol/shared';
+import { Erc20Repository, viemClients } from '@cowprotocol/repositories';
+import { getAddress, parseAbi } from 'viem';
+import { bigIntReplacer, logger } from '@cowprotocol/shared';
 import { fromTradeToNotification } from './fromTradeToNotification';
+import { fromOrderInvalidationToNotification } from './fromOrderInvalidationToNotification';
 
 const EVENTS = parseAbi([
   'event OrderInvalidated(address indexed owner, bytes orderUid)',
@@ -112,7 +113,7 @@ export async function getTradeNotifications(
 
           // logger.info(`${this.prefix} ${message}`);
           acc.push(
-            getOrderInvalidatedNotification({
+            fromOrderInvalidationToNotification({
               id:
                 'OrderInvalidated-' + log.transactionHash + '-' + log.logIndex,
               chainId,
