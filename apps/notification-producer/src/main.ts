@@ -8,7 +8,6 @@ import {
   getPushSubscriptionsRepository,
 } from '@cowprotocol/services';
 
-import 'reflect-metadata';
 import { Runnable } from '../types';
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
