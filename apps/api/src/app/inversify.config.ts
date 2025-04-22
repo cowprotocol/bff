@@ -34,7 +34,7 @@ import {
 } from '@cowprotocol/services';
 
 import { Container } from 'inversify';
-import { logger } from '@cowprotocol/shared';
+import { Logger, logger } from '@cowprotocol/shared';
 
 function getApiContainer(): Container {
   const apiContainer = new Container();

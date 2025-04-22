@@ -8,6 +8,7 @@ import {
 import { SupportedChainId } from './types';
 
 import pino from 'pino';
+import { logger } from './logger';
 
 export type Logger = pino.Logger;
 
@@ -118,16 +119,21 @@ function createWakeUpPromise(): {
   wakeUpPromise: Promise<unknown>;
   wakeUp: () => void;
 } {
-  let wakeUp: ((value: unknown) => void) | undefined = undefined;
+  let wakeUpResolve: ((value: unknown) => void) | undefined = undefined;
   const wakeUpPromise = new Promise((resolve) => {
-    wakeUp = resolve;
+    wakeUpResolve = resolve;
   });
 
-  if (!wakeUp) {
-    throw new Error('Wakeup promise not initialized');
-  }
-
-  return { wakeUpPromise, wakeUp };
+  return {
+    wakeUpPromise,
+    wakeUp: () => {
+      if (wakeUpResolve) {
+        wakeUpResolve(undefined);
+      } else {
+        logger.warn('WakeUp promise not initialized. Nothing to wake up.');
+      }
+    },
+  };
 }
 
 export function sleep(ms: number) {
