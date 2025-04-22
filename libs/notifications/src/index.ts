@@ -26,7 +26,14 @@ export interface SendToQueueParams {
 export function parseNotifications(
   notificationsString: string
 ): PushNotification[] {
-  return JSON.parse(notificationsString);
+  const notifications = JSON.parse(notificationsString);
+  if (!isNotificationArray(notifications)) {
+    throw new Error(
+      `The parsed message is not a valid notification array. Message: ${notificationsString}`
+    );
+  }
+
+  return notifications;
 }
 
 export function stringifyNotifications(

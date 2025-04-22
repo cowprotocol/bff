@@ -1,14 +1,12 @@
 import {
   ConnectToChannelResponse,
   ConnectToQueueParams,
-  isNotificationArray,
   parseNotifications,
   PushNotification,
   stringifyNotifications,
 } from '@cowprotocol/notifications';
 import { createRabbitMqConnection } from '../datasources/rabbitMq';
 import { logger } from '@cowprotocol/shared';
-import { ConsumeMessage } from 'amqplib';
 import crypto from 'node:crypto';
 
 const MAX_RETRIES = 3; // Maximum number of retry attempts before dropping a message
@@ -113,8 +111,8 @@ export class PushNotificationsRepositoryRabbit
           );
 
           try {
-            // Parse the message
-            const notifications = parseNewMessage(msg);
+            // Parse the message into a notifications array (or throw if invalid)
+            const notifications = parseNotifications(msg.content.toString());
 
             for (const notification of notifications) {
               const sent = await callback(notification);
@@ -209,24 +207,4 @@ async function connectToChannel(
   }
 
   return { connection, channel };
-}
-
-function parseNewMessage(msg: ConsumeMessage): PushNotification[] {
-  const message = msg.content.toString();
-  try {
-    const notifications = parseNotifications(message);
-
-    if (!isNotificationArray(notifications)) {
-      throw new Error('The message is not a valid notification array');
-    }
-
-    return notifications;
-  } catch (error) {
-    logger.error(
-      error,
-      `[PushNotificationsRepository] Error parsing notification message: ${message}`
-    );
-
-    throw error;
-  }
 }
