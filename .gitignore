@@ -69,3 +69,6 @@ dist
 # env file
 .env*
 !.env.examples
+
+# MCP
+mcp.json
