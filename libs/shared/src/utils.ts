@@ -115,7 +115,8 @@ export async function doForever(params: {
     try {
       await callback(stop);
     } catch (error) {
-      logger.error(error, `[${name}] Error `);
+      const errorName = error instanceof Error ? `: ${error.name}` : '';
+      logger.error(error, `[${name}] Error${errorName}`);
       logger.info(`[${name}] Next-run in ${waitTimeMilliseconds / 1000}s...`);
     } finally {
       await Promise.race([sleep(waitTimeMilliseconds), wakeUpPromise]);
