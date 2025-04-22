@@ -1,10 +1,19 @@
 import { Address, formatUnits, getAddress } from 'viem';
 
 // TODO: Get from SDK
-const CHAIN_NAME_MAP: Record<SupportedChainId, string> = {
+const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.MAINNET]: 'mainnet',
   [SupportedChainId.ARBITRUM_ONE]: 'arb1',
   [SupportedChainId.GNOSIS_CHAIN]: 'gc',
+  [SupportedChainId.BASE]: 'base',
+  [SupportedChainId.SEPOLIA]: 'sepolia',
+};
+
+// TODO: Get from SDK
+export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
+  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum_one',
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
@@ -157,7 +166,9 @@ export function getExplorerUrl(chainId: SupportedChainId, orderUid: string) {
 
 export function getExplorerBaseUrl(chainId: SupportedChainId) {
   const suffix =
-    chainId === SupportedChainId.MAINNET ? '' : `/${CHAIN_NAME_MAP[chainId]}`;
+    chainId === SupportedChainId.MAINNET
+      ? ''
+      : `/${EXPLORER_NETWORK_NAMES[chainId]}`;
   return `https://explorer.cow.fi${suffix}`;
 }
 
