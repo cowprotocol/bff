@@ -125,6 +125,10 @@ export class PushNotificationsRepositoryRabbit
               }
               consumeMessage ||= sent;
             }
+
+            // All notifications handled. Acknowledge & clear the retry counter
+            clearRetryCount();
+            channel.ack(msg);
           } catch (error) {
             const retryCount = this.messageRetries.get(messageId) || 0;
 
