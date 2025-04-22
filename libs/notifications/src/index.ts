@@ -44,12 +44,16 @@ export function isNotificationArray(
 export function isNotification(
   notification: unknown
 ): notification is PushNotification {
+  if (typeof notification !== 'object' || notification === null) {
+    return false;
+  }
+
+  const record = notification as Record<string, unknown>;
+
   return (
-    typeof notification === 'object' &&
-    notification !== null &&
-    'id' in notification &&
-    'account' in notification &&
-    'title' in notification &&
-    'message' in notification
+    typeof record.id === 'string' &&
+    typeof record.account === 'string' &&
+    typeof record.title === 'string' &&
+    typeof record.message === 'string'
   );
 }
