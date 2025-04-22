@@ -15,7 +15,7 @@ import { PushNotification } from '@cowprotocol/notifications';
 import TelegramBot from 'node-telegram-bot-api';
 
 const WAIT_TIME = ms(`10s`);
-const SUBSCRIPTION_CACHE_TiME = ms(`5m`);
+const SUBSCRIPTION_CACHE_TIME = ms(`5m`);
 
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
@@ -46,7 +46,7 @@ async function getSubscriptions(
   const lastCheck = LAST_SUBSCRIPTION_CHECK.get(account);
   if (
     !lastCheck ||
-    lastCheck.getTime() + SUBSCRIPTION_CACHE_TiME < Date.now()
+    lastCheck.getTime() + SUBSCRIPTION_CACHE_TIME < Date.now()
   ) {
     // Get the subscriptions for this account (if we haven't checked in a while)
     const subscriptionForAccount = await getAllTelegramSubscriptionsForAccounts(
