@@ -14,7 +14,9 @@ export interface PushSubscriptionsRepository {
  *
  * Uses the CMS to retrieve the subscriptions
  */
-export class PushSubscriptionsRepositoryCms {
+export class PushSubscriptionsRepositoryCms
+  implements PushSubscriptionsRepository
+{
   private lastCheck: number | null = null;
   private cachedAccounts: string[] | null = null;
 
