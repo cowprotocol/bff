@@ -1,5 +1,3 @@
-export * from '../../shared/src/types';
-
 // Utils
 export * from './utils/cache';
 
@@ -7,7 +5,7 @@ export * from './utils/cache';
 export * from './datasources/redis';
 export * from './datasources/viem';
 export * from './datasources/cowApi';
-
+export * from './datasources/postgres';
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
 

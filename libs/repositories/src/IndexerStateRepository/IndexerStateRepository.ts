@@ -1,7 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Pool } from 'pg';
-import { getPostgresPool } from '../datasources/postgres';
-import { logger } from '@cowprotocol/shared';
 
 /**
  * Indexer state.
@@ -32,7 +30,7 @@ export interface IndexerStateRepository {
 }
 
 export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
-  constructor(readonly db: Pool = getPostgresPool()) {}
+  constructor(readonly db: Pool) {}
 
   /**
    * Get indexer state by key and optional chainId
