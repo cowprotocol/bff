@@ -48,7 +48,7 @@ export class PushNotificationsRepositoryRabbit
   ) {}
 
   async connect(): Promise<ConnectToChannelResponse> {
-    if (!this.connection || (await !this.ping())) {
+    if (!this.connection || !(await this.ping())) {
       // Connect to the queue
       this.connection = await connectToChannel({
         channel: this.queueName,
