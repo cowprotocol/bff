@@ -2,17 +2,17 @@ import {
   TokenHolderService,
   tokenHolderServiceSymbol,
 } from '@cowprotocol/services';
-import { AddressSchema, ChainIdSchema } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
+import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
 
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'tokenAddress'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdSchema,
+    chainId: SupportedChainIdSchema,
     tokenAddress: AddressSchema,
   },
 } as const satisfies JSONSchema;
