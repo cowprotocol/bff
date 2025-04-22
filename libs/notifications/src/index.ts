@@ -72,6 +72,12 @@ export interface SendToQueueParams {
 
 export function sendNotificationsToQueue(params: SendToQueueParams) {
   const { channel, queue, notifications } = params;
+
+  // If there are no notifications, do nothing
+  if (notifications.length === 0) {
+    return;
+  }
+
   const message = stringifyNotifications(notifications);
   channel.sendToQueue(queue, Buffer.from(message));
 }
