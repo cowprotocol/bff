@@ -132,11 +132,11 @@ export class PushNotificationsRepositoryRabbit
               // If we sent at least one notification, clear retry count and acknowledge the message
               clearRetryCount();
               channel.ack(msg); // Acknowledge to remove from queue
-            } else if (retryCount >= MAX_RETRIES) {
+            } else if (retryCount >= this.maxRetries) {
               // Max retries reached, drop the message
               logger.error(
                 error,
-                `[PushNotificationsRepository] Max retries (${MAX_RETRIES}) reached for message ${messageId}, dropping it`
+                `[PushNotificationsRepository] Max retries (${this.maxRetries}) reached for message ${messageId}, dropping it`
               );
               clearRetryCount();
               channel.nack(msg, false, false); // Negative acknowledge and remove from queue
@@ -149,7 +149,7 @@ export class PushNotificationsRepositoryRabbit
                 `[PushNotificationsRepository] Error processing message. Retrying later`
               );
               logger.warn(
-                `[PushNotificationsRepository] Retry attempt ${newRetryCount}/${MAX_RETRIES} for message ${messageId}`
+                `[PushNotificationsRepository] Retry attempt ${newRetryCount}/${this.maxRetries} for message ${messageId}`
               );
               channel.nack(msg, false, true); // Negative acknowledge but keep in queue
             }
