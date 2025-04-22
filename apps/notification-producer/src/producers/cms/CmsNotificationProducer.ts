@@ -88,7 +88,7 @@ export class CmsNotificationProducer implements Runnable {
     await this.props.pushNotificationsRepository.connect();
 
     // Post notifications to queue
-    this.props.pushNotificationsRepository.sendNotifications(pushNotifications);
+    this.props.pushNotificationsRepository.send(pushNotifications);
     this.pendingNotifications.clear();
   }
 }

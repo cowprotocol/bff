@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {
   CacheRepository,
   CacheRepositoryMemory,
@@ -13,6 +15,7 @@ import {
   PushSubscriptionsRepositoryCms,
   SimulationRepository,
   SimulationRepositoryTenderly,
+  TelegramBot,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -24,6 +27,7 @@ import {
   UsdRepositoryCow,
   UsdRepositoryFallback,
   cowApiClients,
+  createTelegramBot,
   redisClient,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -36,7 +40,10 @@ const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by def
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
 
 const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
+
+// Singleton instances
 let postgresPool: Pool | undefined = undefined;
+let telegramBot: TelegramBot | undefined = undefined;
 
 export function getErc20Repository(
   cacheRepository: CacheRepository
@@ -148,4 +155,12 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 
 export function getSimulationRepository(): SimulationRepository {
   return new SimulationRepositoryTenderly();
+}
+
+export function getTelegramBot(): TelegramBot {
+  if (!telegramBot) {
+    telegramBot = createTelegramBot();
+  }
+
+  return telegramBot;
 }
