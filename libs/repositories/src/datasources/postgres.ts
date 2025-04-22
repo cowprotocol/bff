@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-export function getPostgresPool(): Pool {
+export function createNewPostgresPool(): Pool {
   const pool = new Pool({
     user: process.env.DATABASE_USERNAME,
     host: process.env.DATABASE_HOST,

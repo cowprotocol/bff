@@ -27,8 +27,7 @@ import {
   redisClient,
   viemClients,
 } from '@cowprotocol/repositories';
-import { logger } from '@cowprotocol/shared';
-import { getPostgresPool as getPostgresPoolFactory } from '@cowprotocol/repositories';
+import { createNewPostgresPool } from '@cowprotocol/repositories';
 
 import ms from 'ms';
 import { Pool } from 'pg';
@@ -136,7 +135,7 @@ export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
 
 export function getPostgresPool(): Pool {
   if (!postgresPool) {
-    postgresPool = getPostgresPoolFactory();
+    postgresPool = createNewPostgresPool();
   }
 
   return postgresPool;
