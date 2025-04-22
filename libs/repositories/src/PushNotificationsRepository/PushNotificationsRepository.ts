@@ -3,7 +3,7 @@ import {
   ConnectToChannelResponse,
   NOTIFICATIONS_QUEUE,
   sendNotificationsToQueue,
-  Notification,
+  PushNotification,
 } from '@cowprotocol/notifications';
 
 /**
@@ -13,7 +13,7 @@ import {
  */
 export interface PushNotificationsRepository {
   connect(): Promise<unknown>;
-  sendNotifications(notifications: Notification[]): Promise<void>;
+  sendNotifications(notifications: PushNotification[]): Promise<void>;
   pingConnection(): Promise<boolean>;
 }
 
@@ -50,7 +50,7 @@ export class PushNotificationsRepositoryRabbit
     }
   }
 
-  async sendNotifications(notifications: Notification[]) {
+  async sendNotifications(notifications: PushNotification[]) {
     const connection = await this.connect();
 
     await sendNotificationsToQueue({

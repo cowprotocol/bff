@@ -3,7 +3,7 @@ import {
   connectToChannel,
   sendNotificationsToQueue,
 } from '@cowprotocol/notifications';
-import { Notification } from '@cowprotocol/notifications';
+import { PushNotification } from '@cowprotocol/notifications';
 
 const POST_TO_QUEUE_ACCOUNT = process.env.POST_TO_QUEUE_ACCOUNT;
 
@@ -12,7 +12,7 @@ it('Post to queue', async () => {
     return;
   }
 
-  const message: Notification = {
+  const message: PushNotification = {
     id: '1',
     title: 'My little test',
     message:

@@ -2,7 +2,7 @@ import {
   CmsPushNotification,
   getPushNotifications,
 } from '@cowprotocol/cms-api';
-import { Notification } from '@cowprotocol/notifications';
+import { PushNotification } from '@cowprotocol/notifications';
 import { PushNotificationsRepository } from '@cowprotocol/repositories';
 import Mustache from 'mustache';
 import { Runnable } from '../../../types';
@@ -25,7 +25,7 @@ export class CmsNotificationProducer implements Runnable {
    *
    * This solution is a patch until we properly implement a more reliable consumption
    */
-  pendingNotifications = new Map<string, Notification>();
+  pendingNotifications = new Map<string, PushNotification>();
 
   constructor(private props: CmsNotificationProducerProps) {}
 
@@ -98,7 +98,7 @@ function fromCmsToNotifications({
   account,
   data,
   notification_template: { title, description, url },
-}: CmsPushNotification): Notification {
+}: CmsPushNotification): PushNotification {
   const message = Mustache.render(description, data);
 
   return {

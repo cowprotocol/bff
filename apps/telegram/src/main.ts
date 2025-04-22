@@ -7,7 +7,7 @@ import {
 import { doForever, logger, sleep } from '@cowprotocol/shared';
 import {
   NOTIFICATIONS_QUEUE,
-  Notification,
+  PushNotification,
   connectToChannel,
   parseNotifications,
 } from '@cowprotocol/notifications';
@@ -55,7 +55,7 @@ async function getSubscriptions(
   return SUBSCRIPTION_CACHE.get(account) || [];
 }
 
-function parseNewMessage(msg: ConsumeMessage): Notification[] | null {
+function parseNewMessage(msg: ConsumeMessage): PushNotification[] | null {
   try {
     const message = msg.content.toString();
     const notifications = parseNotifications(message);
@@ -73,11 +73,13 @@ function parseNewMessage(msg: ConsumeMessage): Notification[] | null {
 
 function isNotificationArray(
   notifications: unknown
-): notifications is Notification[] {
+): notifications is PushNotification[] {
   return Array.isArray(notifications) && notifications.every(isNotification);
 }
 
-function isNotification(notification: unknown): notification is Notification {
+function isNotification(
+  notification: unknown
+): notification is PushNotification {
   return (
     typeof notification === 'object' &&
     notification !== null &&
@@ -145,10 +147,12 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
   }
 }
 
-async function sendNotification(notification: Notification): Promise<boolean> {
+async function sendNotification(
+  notification: PushNotification
+): Promise<boolean> {
   const { id, message, account, title, url } = notification;
   logger.debug(
-    `[telegram:main] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+    `[telegram:main] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}`
   );
 
   // Get the subscriptions for this account
@@ -244,7 +248,7 @@ async function main() {
   }
 }
 
-function formatMessage({ title, message, url }: Notification) {
+function formatMessage({ title, message, url }: PushNotification) {
   const moreInfo = url ? `\n\nMore info in ${url}` : '';
 
   return `\

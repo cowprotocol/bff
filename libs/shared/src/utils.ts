@@ -1,4 +1,13 @@
-import { Address, getAddress } from 'viem';
+import { Address, formatUnits, getAddress } from 'viem';
+
+// TODO: Get from SDK
+const CHAIN_NAME_MAP: Record<SupportedChainId, string> = {
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.ARBITRUM_ONE]: 'arb1',
+  [SupportedChainId.GNOSIS_CHAIN]: 'gc',
+  [SupportedChainId.BASE]: 'base',
+  [SupportedChainId.SEPOLIA]: 'sepolia',
+};
 
 import {
   AllChainIds,
@@ -138,4 +147,25 @@ function createWakeUpPromise(): {
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function getExplorerUrl(chainId: SupportedChainId, orderUid: string) {
+  const baseUrl = getExplorerBaseUrl(chainId);
+  return `${baseUrl}/orders/${orderUid}`;
+}
+
+export function getExplorerBaseUrl(chainId: SupportedChainId) {
+  const suffix =
+    chainId === SupportedChainId.MAINNET ? '' : `/${CHAIN_NAME_MAP[chainId]}`;
+  return `https://explorer.cow.fi${suffix}`;
+}
+
+export function formatAmount(amount: bigint, decimals: number | undefined) {
+  return decimals ? formatUnits(amount, decimals) : amount.toString();
+}
+
+export function formatTokenName(
+  token: { symbol?: string; address: string } | null
+) {
+  return token?.symbol ? `${token.symbol}` : token?.address;
 }
