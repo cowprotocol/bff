@@ -22,7 +22,12 @@ let shuttingDown = false;
  * Main loop: Run and re-attempt on error
  */
 async function mainLoop() {
-  logger.info('[notification-producer:main] Start notification producer');
+  const chainIds = getProducerChains();
+  logger.info(
+    `[notification-producer:main] Start notification producer for networks: ${chainIds.join(
+      ', '
+    )}`
+  );
 
   const cacheRepository = getCacheRepository();
   const erc20Repository = getErc20Repository(cacheRepository);
@@ -43,7 +48,7 @@ async function mainLoop() {
     new CmsNotificationProducer(repositories),
 
     // Trade producer: Fetch trade notifications
-    ...ALL_SUPPORTED_CHAIN_IDS.map((chainId) => {
+    ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
         chainId,
@@ -71,6 +76,22 @@ async function mainLoop() {
   await producersPromise;
 }
 
+function getProducerChains() {
+  // Comma-separated list of chain IDs to run the notification producer on
+  const producerNetworks =
+    process.env.NOTIFICATIONS_PRODUCER_CHAINS?.split(',').map((chain) =>
+      Number(chain.trim())
+    ) || [];
+
+  // If no producer networks are specified, use all supported chain ids
+  if (producerNetworks.length === 0) {
+    return ALL_SUPPORTED_CHAIN_IDS;
+  }
+
+  return ALL_SUPPORTED_CHAIN_IDS.filter((chain) =>
+    producerNetworks.includes(chain)
+  );
+}
 async function gracefulShutdown(
   producers: Runnable[],
   producersPromise: Promise<void[]>
