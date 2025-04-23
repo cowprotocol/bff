@@ -53,7 +53,7 @@ export async function fromTradeToNotification(props: {
 
   const message = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName}`;
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
-  logger.info(`${prefix} New ${message}`);
+  logger.info(`${prefix} New ${message} for ${owner}`);
   return {
     id,
     account: owner,
