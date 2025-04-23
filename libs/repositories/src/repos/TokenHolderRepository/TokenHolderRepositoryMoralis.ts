@@ -4,7 +4,7 @@ import {
   MORALIS_API_BASE_URL,
   MORALIS_API_KEY,
   MORALIS_CLIENT_NETWORK_MAPPING,
-} from '../datasources/moralis';
+} from '../../datasources/moralis';
 import {
   TokenHolderPoint,
   TokenHolderRepository,

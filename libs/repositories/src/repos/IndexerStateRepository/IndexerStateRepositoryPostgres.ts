@@ -16,7 +16,7 @@ export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
       SELECT state 
       FROM indexer_state 
       WHERE key = $1 
-      ${chainId !== undefined ? 'AND chainId = $2' : ''}
+      ${chainId !== undefined ? 'AND chain_id = $2' : ''}
       LIMIT 1
     `;
     const params = chainId !== undefined ? [key, chainId] : [key];
@@ -30,9 +30,9 @@ export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
    */
   async upsert<T>(key: string, state: T, chainId?: number): Promise<void> {
     const query = `
-      INSERT INTO indexer_state (key, chainId, state)
+      INSERT INTO indexer_state (key, chain_id, state)
       VALUES ($1, $2, $3)
-      ON CONFLICT (key, chainId) 
+      ON CONFLICT (key, chain_id) 
       DO UPDATE SET state = $3
     `;
 

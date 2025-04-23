@@ -13,7 +13,7 @@ export class IndexerState {
   @PrimaryColumn('text')
   key!: string;
 
-  @Column('integer', { nullable: true })
+  @Column('integer', { name: 'chain_id', nullable: true })
   chainId!: number | null;
 
   @Column('jsonb')

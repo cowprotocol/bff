@@ -3,11 +3,11 @@
 -- and resume from where they left off after restarts.
 CREATE TABLE indexer_state (
   key TEXT NOT NULL,
-  chainId INTEGER,
+  chain_id INTEGER,
   state JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (key, chainId)
+  UNIQUE (key, chain_id)
 );
 
 -- Update the updated_at column with the current timestamp

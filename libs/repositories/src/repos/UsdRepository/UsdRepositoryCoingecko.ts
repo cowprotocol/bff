@@ -4,9 +4,9 @@ import {
   COINGECKO_PLATFORMS,
   SimplePriceResponse,
   coingeckoProClient,
-} from '../datasources/coingecko';
+} from '../../datasources/coingecko';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
 
 /**
  * Number of days of data to fetch for each price strategy

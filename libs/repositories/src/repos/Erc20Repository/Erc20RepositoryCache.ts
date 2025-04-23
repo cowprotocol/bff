@@ -1,9 +1,8 @@
-import { inject, injectable } from 'inversify';
-import NodeCache from 'node-cache';
+import { injectable } from 'inversify';
 import { Erc20, Erc20Repository } from './Erc20Repository';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { getCacheKey, PartialCacheKey } from '../utils/cache';
+import { getCacheKey, PartialCacheKey } from '../../utils/cache';
 
 const NULL_VALUE = 'null';
 

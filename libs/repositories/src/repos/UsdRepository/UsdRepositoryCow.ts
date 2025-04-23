@@ -3,9 +3,9 @@ import { BigNumber } from 'bignumber.js';
 import { injectable } from 'inversify';
 
 import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
-import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../const';
-import { CowApiClient } from '../datasources/cowApi';
-import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../../const';
+import { CowApiClient } from '../../datasources/cowApi';
+import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
 import { UsdRepositoryNoop } from './UsdRepository';
 
 @injectable()

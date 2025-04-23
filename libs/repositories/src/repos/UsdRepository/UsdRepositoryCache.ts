@@ -7,9 +7,8 @@ import {
   serializePricePoints,
 } from './UsdRepository';
 import { SupportedChainId } from '@cowprotocol/shared';
-import ms from 'ms';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
-import { getCacheKey, PartialCacheKey } from '../utils/cache';
+import { getCacheKey, PartialCacheKey } from '../../utils/cache';
 
 const NULL_VALUE = 'null';
 

@@ -9,7 +9,7 @@ import {
   getTenderlySimulationLink,
   TENDERLY_API_BASE_ENDPOINT,
   TENDERLY_API_KEY,
-} from '../datasources/tenderlyApi';
+} from '../../datasources/tenderlyApi';
 import { injectable } from 'inversify';
 import {
   SimulationData,

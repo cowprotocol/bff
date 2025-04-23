@@ -8,7 +8,7 @@ import {
   GOLD_RUSH_API_BASE_URL,
   GOLD_RUSH_API_KEY,
   GOLD_RUSH_CLIENT_NETWORK_MAPPING,
-} from '../datasources/goldRush';
+} from '../../datasources/goldRush';
 
 interface GoldRushTokenHolderItem {
   contract_decimals: number;

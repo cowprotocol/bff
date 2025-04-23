@@ -2,6 +2,7 @@
 import { DataSource } from 'typeorm';
 
 import assert from 'assert';
+import { IndexerState } from '../../database/IndexerState.entity';
 
 export function createNewPostgresOrm(): DataSource {
   assert(process.env.DATABASE_HOST, 'DATABASE_HOST is not set');
@@ -17,7 +18,8 @@ export function createNewPostgresOrm(): DataSource {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: ['src/database/*.ts'],
+    // entities: ['src/database/*.ts'],
+    entities: [IndexerState],
     migrations: ['src/migrations/*.ts'],
     migrationsTableName: 'migrations_repositories',
   });
