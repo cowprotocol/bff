@@ -90,7 +90,7 @@ export class TradeNotificationProducer implements Runnable {
     const numberOfBlocksToIndex = toBlock - fromBlock + 1n;
 
     // Print debug message
-    if (numberOfBlocksToIndex < 1) {
+    if (numberOfBlocksToIndex < 1n) {
       // We are up to date. Nothing to index
       logger.trace(`${this.prefix} No new blocks to index`);
       return;
