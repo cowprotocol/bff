@@ -1,33 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Pool } from 'pg';
-
-/**
- * Indexer state.
- *
- * An indexer allows to track the state of a specific data source (for example, an API, DB or blockchain).
- *
- * The state is stored in a JSON object, so each indexer can define its own state schema.
- */
-export type IndexerState<T> = {
-  key: string;
-  chainId: number | null;
-  state: T;
-  created_at: Date;
-  updated_at: Date;
-};
-
-/**
- * Indexer state repository.
- *
- * This repository allows to store and retrieve the state of an indexer.
- */
-export interface IndexerStateRepository {
-  get<T>(
-    key: string,
-    chainId?: SupportedChainId
-  ): Promise<IndexerState<T> | null>;
-  upsert<T>(key: string, state: T, chainId?: number): Promise<void>;
-}
+import { IndexerState, IndexerStateRepository } from './IndexerStateRepository';
 
 export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
   constructor(readonly db: Pool) {}

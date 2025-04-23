@@ -1,3 +1,4 @@
+-- UP
 -- This table stores the state of various indexers, allowing them to track their progress
 -- and resume from where they left off after restarts.
 CREATE TABLE indexer_state (
@@ -22,6 +23,11 @@ CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON indexer_state
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- DOWN
+DROP TRIGGER IF EXISTS trigger_set_updated_at ON indexer_state;
+DROP FUNCTION IF EXISTS set_updated_at();
+DROP TABLE IF EXISTS indexer_state;
 
 
 

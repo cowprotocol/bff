@@ -5,7 +5,7 @@ export * from './utils/cache';
 export * from './datasources/redis';
 export * from './datasources/viem';
 export * from './datasources/cowApi';
-export * from './datasources/postgres';
+export * from './datasources/postgresPlain';
 export * from './datasources/rabbitMq';
 export * from './datasources/telegram';
 
@@ -13,9 +13,9 @@ export * from './datasources/telegram';
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
 
 // Cache repositories
-export * from './CacheRepository/CacheRepository';
-export * from './CacheRepository/CacheRepositoryMemory';
-export * from './CacheRepository/CacheRepositoryRedis';
+export * from './repos/CacheRepository/CacheRepository';
+export * from './repos/CacheRepository/CacheRepositoryMemory';
+export * from './repos/CacheRepository/CacheRepositoryRedis';
 
 // Erc20Repository
 export * from './Erc20Repository/Erc20Repository';
@@ -43,8 +43,8 @@ export * from './SimulationRepository/SimulationRepositoryTenderly';
 export * from './SimulationRepository/tenderlyTypes';
 
 // Indexer state repository
-export * from './IndexerStateRepository/IndexerStateRepository';
+export * from './repos/IndexerStateRepository/IndexerStateRepository';
 
 // Notifications repositories
-export * from './PushNotificationsRepository/PushNotificationsRepository';
-export * from './PushSubscriptionsRepository/PushSubscriptionsRepository';
+export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
+export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';

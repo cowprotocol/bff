@@ -5,7 +5,7 @@ import {
   PushNotification,
   stringifyNotifications,
 } from '@cowprotocol/notifications';
-import { createRabbitMqConnection } from '../datasources/rabbitMq';
+import { createRabbitMqConnection } from '../../datasources/rabbitMq';
 import { logger } from '@cowprotocol/shared';
 import crypto from 'node:crypto';
 
