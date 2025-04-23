@@ -24,6 +24,41 @@
           "codeCoverage": true
         }
       }
+    },
+
+    "typeorm": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "command": "ts-node --project tsconfig.lib.json ../../node_modules/.bin/typeorm",
+        "cwd": "libs/repositories"
+      }
+    },
+    "migration:generate": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "command": "nx run typeorm migration:generate --pretty -d src/datasources/orm/datasource.config.ts src/migrations/migration",
+        "cwd": "libs/repositories"
+      }
+    },
+
+    "migration:run": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "command": "nx run typeorm migration:run -d src/datasources/orm/datasource.config.ts",
+        "cwd": "libs/repositories"
+      }
+    },
+
+    "migration:revert": {
+      "executor": "nx:run-commands",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "command": "nx run typeorm migration:revert -d src/datasources/orm/datasource.config.ts",
+        "cwd": "libs/repositories"
+      }
     }
   },
   "tags": []

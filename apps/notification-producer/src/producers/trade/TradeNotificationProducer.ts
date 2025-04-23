@@ -1,6 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   Erc20Repository,
+  IndexerStateValue,
   PushNotificationsRepository,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -22,7 +23,7 @@ export type TradeNotificationProducerProps = {
   erc20Repository: Erc20Repository;
 };
 
-export interface TradeNotificationProducerState {
+export interface TradeNotificationProducerState extends IndexerStateValue {
   lastBlock: string;
   lastBlockTimestamp: string;
   lastBlockHash: string;
@@ -112,14 +113,12 @@ export class TradeNotificationProducer implements Runnable {
     const notifications = await notificationPromises;
 
     // Return early if there are no notifications
-    if (notifications.length === 0) {
-      return;
+    if (notifications.length > 0) {
+      logger.info(
+        `${this.prefix} Sending ${notifications.length} notifications`,
+        JSON.stringify(notifications, null, 2)
+      );
     }
-
-    logger.info(
-      `${this.prefix} Sending ${notifications.length} notifications`,
-      JSON.stringify(notifications, null, 2)
-    );
 
     // Post notifications to queue
     this.props.pushNotificationsRepository.send(notifications);
