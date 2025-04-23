@@ -84,7 +84,7 @@ function getProducerChains() {
     ) || [];
 
   // If no producer networks are specified, use all supported chain ids
-  if (producerNetworks.length == 0) {
+  if (producerNetworks.length === 0) {
     return ALL_SUPPORTED_CHAIN_IDS;
   }
 
