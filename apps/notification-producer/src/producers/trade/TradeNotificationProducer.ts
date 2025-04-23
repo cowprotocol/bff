@@ -80,15 +80,24 @@ export class TradeNotificationProducer implements Runnable {
     // Get last block
     const client = viemClients[chainId];
     const lastBlock = await client.getBlock();
+    const toBlock = lastBlock.number;
 
     // Get trade events from block to last block
     const fromBlock = stateRegistry?.state
       ? BigInt(stateRegistry.state.lastBlock) + 1n
-      : lastBlock.number;
+      : toBlock;
 
-    if (fromBlock > lastBlock.number) {
-      logger.info(`${this.prefix} No new blocks to index`);
+    const numberOfBlocksToIndex = toBlock - fromBlock + 1n;
+
+    // Print debug message
+    if (numberOfBlocksToIndex < 1) {
+      // We are up to date. Nothing to index
+      logger.trace(`${this.prefix} No new blocks to index`);
       return;
+    } else {
+      logger.debug(
+        `${this.prefix} Indexing from block ${fromBlock} to ${toBlock}: ${numberOfBlocksToIndex} blocks`
+      );
     }
 
     // Get all accounts subscribed to PUSH notifications
@@ -96,7 +105,6 @@ export class TradeNotificationProducer implements Runnable {
       await pushSubscriptionsRepository.getAllSubscribedAccounts();
 
     // Get all trade notifications for the block range
-    const toBlock = lastBlock.number;
     const notificationPromises = getTradeNotifications({
       accounts,
       fromBlock,
@@ -127,7 +135,7 @@ export class TradeNotificationProducer implements Runnable {
     indexerStateRepository.upsert<TradeNotificationProducerState>(
       PRODUCER_NAME,
       {
-        lastBlock: lastBlock.number.toString(),
+        lastBlock: toBlock.toString(),
         lastBlockTimestamp: lastBlock.timestamp.toString(),
         lastBlockHash: lastBlock.hash,
       },

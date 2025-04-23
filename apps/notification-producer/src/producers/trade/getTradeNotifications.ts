@@ -46,7 +46,7 @@ export async function getTradeNotifications(
     return [];
   }
 
-  logger.info(`${prefix} Found ${logs.length} events`);
+  logger.debug(`${prefix} Found ${logs.length} events`);
 
   const notificationPromises = logs.reduce<Promise<PushNotification>[]>(
     (acc, log) => {
