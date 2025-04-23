@@ -36,6 +36,16 @@ export class InitialMigration1745364046891 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop the trigger
+    await queryRunner.query(`
+      DROP TRIGGER IF EXISTS trigger_set_updated_at ON indexer_state
+    `);
+
+    // Drop the function
+    await queryRunner.query(`
+      DROP FUNCTION IF EXISTS set_updated_at
+    `);
+
     // Drop the table
     await queryRunner.query(`
       DROP TABLE IF EXISTS indexer_state
