@@ -149,6 +149,7 @@ Inside this file, you will need to edit the migration logic, where:
 Once you have added the migration logic, you can run the migration with:
 ```bash
 yarn migration:run
+```
 
 ## Revert migrations
 To revert the last migration, run:
