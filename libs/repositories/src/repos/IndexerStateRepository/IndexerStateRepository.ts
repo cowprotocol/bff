@@ -15,15 +15,22 @@ export type IndexerState<T = unknown> = {
   updatedAt: Date;
 };
 
+export type IndexerStateValue = Record<string, unknown>;
+
 /**
  * Indexer state repository.
  *
  * This repository allows to store and retrieve the state of an indexer.
  */
 export interface IndexerStateRepository {
-  get<T>(
+  get<T extends IndexerStateValue>(
     key: string,
     chainId?: SupportedChainId
   ): Promise<IndexerState<T> | null>;
-  upsert<T>(key: string, state: T, chainId?: number): Promise<void>;
+
+  upsert<T extends IndexerStateValue>(
+    key: string,
+    state: T,
+    chainId?: number
+  ): Promise<void>;
 }

@@ -2,7 +2,11 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { DataSource, Repository, FindOptionsWhere } from 'typeorm';
 import { IndexerState as IndexerStateEntity } from '../../database/IndexerState.entity';
 import { injectable } from 'inversify';
-import { IndexerState, IndexerStateRepository } from './IndexerStateRepository';
+import {
+  IndexerState,
+  IndexerStateRepository,
+  IndexerStateValue,
+} from './IndexerStateRepository';
 
 @injectable()
 export class IndexerStateRepositoryTypeOrm implements IndexerStateRepository {
@@ -15,7 +19,7 @@ export class IndexerStateRepositoryTypeOrm implements IndexerStateRepository {
   /**
    * Get indexer state by key and optional chainId
    */
-  async get<T>(
+  async get<T extends IndexerStateValue>(
     key: string,
     chainId?: SupportedChainId
   ): Promise<IndexerState<T> | null> {
@@ -35,6 +39,7 @@ export class IndexerStateRepositoryTypeOrm implements IndexerStateRepository {
     return {
       key,
       chainId: chainId ?? null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state: state as any as T,
       createdAt,
       updatedAt,
@@ -44,7 +49,11 @@ export class IndexerStateRepositoryTypeOrm implements IndexerStateRepository {
   /**
    * Update or insert indexer state
    */
-  async upsert<T>(key: string, state: T, chainId?: number): Promise<void> {
+  async upsert<T extends IndexerStateValue>(
+    key: string,
+    state: T,
+    chainId?: number
+  ): Promise<void> {
     const entity = this.repository.create({
       key,
       chainId: chainId ?? null,

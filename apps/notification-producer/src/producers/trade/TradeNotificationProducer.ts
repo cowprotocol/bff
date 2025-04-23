@@ -1,6 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   Erc20Repository,
+  IndexerStateValue,
   PushNotificationsRepository,
   viemClients,
 } from '@cowprotocol/repositories';
@@ -22,7 +23,7 @@ export type TradeNotificationProducerProps = {
   erc20Repository: Erc20Repository;
 };
 
-export interface TradeNotificationProducerState {
+export interface TradeNotificationProducerState extends IndexerStateValue {
   lastBlock: string;
   lastBlockTimestamp: string;
   lastBlockHash: string;

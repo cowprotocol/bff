@@ -1,6 +1,10 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Pool } from 'pg';
-import { IndexerState, IndexerStateRepository } from './IndexerStateRepository';
+import {
+  IndexerState,
+  IndexerStateRepository,
+  IndexerStateValue,
+} from './IndexerStateRepository';
 
 export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
   constructor(readonly db: Pool) {}
@@ -8,7 +12,7 @@ export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
   /**
    * Get indexer state by key and optional chainId
    */
-  async get<T>(
+  async get<T extends IndexerStateValue>(
     key: string,
     chainId?: SupportedChainId
   ): Promise<IndexerState<T> | null> {
