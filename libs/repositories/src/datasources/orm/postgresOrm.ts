@@ -25,7 +25,5 @@ export function createNewPostgresOrm(): DataSource {
     migrationsTableName: 'migrations_repositories',
   });
 
-  dataSource.initialize();
-
   return dataSource;
 }

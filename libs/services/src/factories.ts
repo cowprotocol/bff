@@ -38,6 +38,7 @@ import { createNewPostgresPool } from '@cowprotocol/repositories';
 import ms from 'ms';
 import { Pool } from 'pg';
 import { DataSource } from 'typeorm';
+import { logger } from '@cowprotocol/shared';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
@@ -155,6 +156,10 @@ export function getPostgresPool(): Pool {
 export function getOrmDataSource(): DataSource {
   if (!ormDataSource) {
     ormDataSource = createNewPostgresOrm();
+    ormDataSource.initialize().catch((error) => {
+      logger.error('Error initializing ORM data source', error);
+      throw error;
+    });
   }
   return ormDataSource;
 }
