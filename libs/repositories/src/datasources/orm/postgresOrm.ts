@@ -2,6 +2,7 @@
 import { DataSource } from 'typeorm';
 
 import assert from 'assert';
+import { IndexerState } from '../../database/IndexerState.entity';
 
 export function getDatabaseParams() {
   // Note: not using the `ensureEnvs` util function because it causes issues with the migrations)
@@ -24,6 +25,7 @@ export function createNewPostgresOrm(): DataSource {
   const dataSource = new DataSource({
     type: 'postgres',
     ...getDatabaseParams(),
+    entities: [IndexerState],
     migrations: ['src/migrations/*.ts'],
     migrationsTableName: 'migrations_repositories',
   });
