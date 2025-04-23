@@ -39,6 +39,15 @@ docker-compose up -d db
 # Start the notification producer
 yarn producer
 ```
+
+The application will start the notification producer for the networks, but you can run it for a specific network or networks by setting the `NOTIFICATIONS_PRODUCER_CHAINS` environment variable.
+
+```yaml
+# Run producer only on networks 1 and 100
+NOTIFICATIONS_PRODUCER_CHAINS=1,100
+```
+
+
 ## Create a new service or library
 
 To add a new app or library, you can run the following command;
