@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../test/mock';
+import { WETH, NULL_ADDRESS } from '../../../test/mock';
 import ms from 'ms';
 
 const FIVE_MINUTES = ms('5m');

@@ -2,9 +2,14 @@ import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
 import { Logger } from 'pino';
-import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
-import { USDC } from '../const';
-import { CowApiClient } from '../datasources/cowApi';
+import {
+  NULL_ADDRESS,
+  WETH,
+  errorResponse,
+  okResponse,
+} from '../../../test/mock';
+import { USDC } from '../../const';
+import { CowApiClient } from '../../datasources/cowApi';
 import { Erc20, Erc20Repository } from '../Erc20Repository/Erc20Repository';
 
 const mockApiGet = jest.fn();

@@ -3,7 +3,7 @@ import IORedis from 'ioredis';
 import { UsdRepository } from './UsdRepository';
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH } from '../../test/mock';
+import { WETH } from '../../../test/mock';
 import type { PricePoint } from './UsdRepository';
 
 const CACHE_VALUE_SECONDS = 10;

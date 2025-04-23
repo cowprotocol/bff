@@ -1,7 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { Container } from 'inversify';
-import { NULL_ADDRESS, WETH } from '../../test/mock';
-import { MORALIS_API_KEY } from '../datasources/moralis';
+import { NULL_ADDRESS, WETH } from '../../../test/mock';
+import { MORALIS_API_KEY } from '../../datasources/moralis';
 import { TokenHolderRepositoryMoralis } from './TokenHolderRepositoryMoralis';
 
 describe('TokenHolderRepositoryMoralis', () => {

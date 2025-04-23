@@ -1,7 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { PricePoint, UsdRepository } from './UsdRepository';
 import { UsdRepositoryFallback } from './UsdRepositoryFallback';
-import { WETH } from '../../test/mock';
+import { WETH } from '../../../test/mock';
 const mockDate = new Date('2024-01-01T00:00:00Z');
 class UsdRepositoryMock_1_1 implements UsdRepository {
   async getUsdPrice() {

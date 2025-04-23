@@ -1,12 +1,12 @@
 import { Container } from 'inversify';
 import { SimulationRepositoryTenderly } from './SimulationRepositoryTenderly';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../test/mock';
+import { WETH, NULL_ADDRESS } from '../../../test/mock';
 import {
   TENDERLY_API_KEY,
   TENDERLY_ORG_NAME,
   TENDERLY_PROJECT_NAME,
-} from '../datasources/tenderlyApi';
+} from '../../datasources/tenderlyApi';
 import { AssetChange } from './tenderlyTypes';
 
 // Transfering ETH from WETH to NULL ADDRESS

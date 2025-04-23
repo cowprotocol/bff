@@ -1,7 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { TokenHolderRepository } from './TokenHolderRepository';
 import { TokenHolderRepositoryFallback } from './TokenHolderRepositoryFallback';
-import { NULL_ADDRESS, WETH } from '../../test/mock';
+import { NULL_ADDRESS, WETH } from '../../../test/mock';
 
 const firstRepositoryResult = [
   {

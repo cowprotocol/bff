@@ -123,7 +123,7 @@ If you have a subscription to any of the channels (i.e. Telegram), you can use t
 
 ```bash
 # Replace the POST_TO_QUEUE_ACCOUNT with your account address
-POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 nx test notification-producer --testFile=src/postToQueueTest.test.ts
+POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 nx test notification-producer --testFile=src/sendPush.test.ts
 ```
 # Database Migrations
 The database access, and therefore the migrations is handled in `libs/repositories`.

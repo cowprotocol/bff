@@ -1,16 +1,16 @@
-import {
-  NOTIFICATIONS_QUEUE,
-  connectToChannel,
-  sendNotificationsToQueue,
-} from '@cowprotocol/notifications';
 import { PushNotification } from '@cowprotocol/notifications';
+import { getPushNotificationsRepository } from '@cowprotocol/services';
 
 const POST_TO_QUEUE_ACCOUNT = process.env.POST_TO_QUEUE_ACCOUNT;
 
 it('Post to queue', async () => {
+  console.log('POST_TO_QUEUE_ACCOUNT', POST_TO_QUEUE_ACCOUNT);
   if (!POST_TO_QUEUE_ACCOUNT) {
     return;
   }
+
+  const pushNotificationsRepository = getPushNotificationsRepository();
+  await pushNotificationsRepository.connect();
 
   const message: PushNotification = {
     id: '1',
@@ -21,16 +21,7 @@ it('Post to queue', async () => {
     url: 'https://swap.cow.fi/#/1/limit/WETH/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48?tab=all&page=1',
   };
 
-  const { channel } = await connectToChannel({
-    channel: NOTIFICATIONS_QUEUE,
-  });
-
-  sendNotificationsToQueue({
-    channel,
-    queue: NOTIFICATIONS_QUEUE,
-    notifications: [message],
-  });
-
+  await pushNotificationsRepository.send([message]);
   console.log(
     `✅ Posted a message to queue for account ${POST_TO_QUEUE_ACCOUNT}:\n${JSON.stringify(
       message,

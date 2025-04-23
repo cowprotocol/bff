@@ -2,7 +2,7 @@ import { TokenHolderRepositoryCache } from './TokenHolderRepositoryCache';
 import IORedis from 'ioredis';
 import { TokenHolderRepository } from './TokenHolderRepository';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { NULL_ADDRESS, WETH } from '../../test/mock';
+import { NULL_ADDRESS, WETH } from '../../../test/mock';
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 
 const CACHE_VALUE_SECONDS = 10;

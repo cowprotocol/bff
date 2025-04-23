@@ -1,7 +1,7 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { Container } from 'inversify';
-import { NULL_ADDRESS, WETH } from '../../test/mock';
-import { GOLD_RUSH_API_KEY } from '../datasources/goldRush';
+import { NULL_ADDRESS, WETH } from '../../../test/mock';
+import { GOLD_RUSH_API_KEY } from '../../datasources/goldRush';
 import { TokenHolderRepositoryGoldRush } from './TokenHolderRepositoryGoldRush';
 
 // Skip this test as it requires an https://goldrush.dev API key. Enable it locally when needed
