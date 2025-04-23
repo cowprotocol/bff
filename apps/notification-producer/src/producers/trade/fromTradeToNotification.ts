@@ -3,6 +3,7 @@ import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { getAddress } from 'viem';
 import {
+  ChainNames,
   formatAmount,
   formatTokenName,
   getExplorerUrl,
@@ -57,7 +58,7 @@ export async function fromTradeToNotification(props: {
   return {
     id,
     account: owner,
-    title: 'New Trade',
+    title: `New Trade from ${owner} in ${ChainNames[chainId]}`,
     message,
     url,
   };
