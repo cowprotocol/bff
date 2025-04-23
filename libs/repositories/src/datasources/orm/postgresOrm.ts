@@ -5,6 +5,7 @@ import assert from 'assert';
 import { IndexerState } from '../../database/IndexerState.entity';
 
 export function createNewPostgresOrm(): DataSource {
+  // Note: not using the `ensureEnvs` util function because it causes issues with the migrations)
   assert(process.env.DATABASE_HOST, 'DATABASE_HOST is not set');
   assert(process.env.DATABASE_PORT, 'DATABASE_PORT is not set');
   assert(process.env.DATABASE_USERNAME, 'DATABASE_USERNAME is not set');
