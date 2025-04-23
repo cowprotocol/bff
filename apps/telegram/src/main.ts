@@ -147,7 +147,7 @@ function formatMessage({ title, message, url }: PushNotification) {
   const moreInfo = url ? `\n\nMore info in ${url}` : '';
 
   return `\
-${title}
+${title}.
 
 ${message}${moreInfo}`;
 }
