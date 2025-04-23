@@ -41,7 +41,7 @@ export default fp(async function (fastify: FastifyInstance) {
     try {
       logger.info('Starting migrations...');
       logger.info('Migrations dir:', migrationsDir);
-      printMigrations(migrationsDir);
+      await printMigrations(migrationsDir);
       const result = await fastify.orm.repositories.runMigrations({
         transaction: 'all',
       });
