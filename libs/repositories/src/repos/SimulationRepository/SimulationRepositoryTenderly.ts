@@ -1,6 +1,7 @@
 import { logger, SupportedChainId } from '@cowprotocol/shared';
 import {
   AssetChange,
+  RawElement,
   SimulationError,
   StateDiff,
   TenderlyBundleSimulationResponse,
@@ -211,14 +212,48 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
     });
   }
 
-  buildStateDiff(stateDiffList: StateDiff[][]): Omit<StateDiff, 'raw'>[][] {
-    const cumulativeStateDiff: Omit<StateDiff, 'raw'>[][] = [];
-    const accumulatedStateDiff: Omit<StateDiff, 'raw'>[] = [];
+  buildStateDiff(stateDiffList: StateDiff[][]): StateDiff[][] {
+    const cumulativeStateDiff: StateDiff[][] = [];
+    const accumulatedStateDiff: StateDiff[] = [];
+    // Object to track accumulated raw changes by address and key
+    const accumulatedRawChanges: Record<
+      string,
+      Record<string, RawElement>
+    > = {};
 
     for (const stateDiffs of stateDiffList) {
       for (const diff of stateDiffs) {
-        if (!diff.soltype) continue;
+        // Skip diffs if soltype, original, or dirty is null
+        if (!diff.soltype || diff.original === null || diff.dirty === null) {
+          // Process the raw data anyway if it exists
+          if (diff.raw) {
+            const rawElements = Array.isArray(diff.raw) ? diff.raw : [diff.raw];
 
+            for (const rawElement of rawElements) {
+              const { address, key } = rawElement;
+
+              // Initialize objects if they don't exist
+              if (!accumulatedRawChanges[address]) {
+                accumulatedRawChanges[address] = {};
+              }
+
+              if (!accumulatedRawChanges[address][key]) {
+                accumulatedRawChanges[address][key] = {
+                  address,
+                  key,
+                  original: rawElement.original,
+                  dirty: rawElement.dirty,
+                };
+              } else {
+                // Update only the dirty value, keep the original original
+                accumulatedRawChanges[address][key].dirty = rawElement.dirty;
+              }
+            }
+          }
+          continue; // Skip the rest of the processing for this diff
+        }
+
+        // Process regular diffs where soltype, original, and dirty are not null
         const diffKey = `${diff.address}-${diff.soltype.name}`;
 
         const existingIndex = accumulatedStateDiff.findIndex((item) => {
@@ -232,6 +267,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
             soltype: diff.soltype,
             original: diff.original,
             dirty: diff.dirty,
+            raw: diff.raw || [], // Initialize raw property
           });
         } else {
           accumulatedStateDiff[existingIndex] = {
@@ -239,7 +275,51 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
             dirty: diff.dirty,
           };
         }
+
+        // Handle the raw changes
+        if (diff.raw) {
+          const rawElements = Array.isArray(diff.raw) ? diff.raw : [diff.raw];
+
+          for (const rawElement of rawElements) {
+            const { address, key } = rawElement;
+
+            // Initialize objects if they don't exist
+            if (!accumulatedRawChanges[address]) {
+              accumulatedRawChanges[address] = {};
+            }
+
+            // For each raw change, we want to keep the original original value
+            // but update the dirty value as changes accumulate
+            if (!accumulatedRawChanges[address][key]) {
+              accumulatedRawChanges[address][key] = {
+                address,
+                key,
+                original: rawElement.original,
+                dirty: rawElement.dirty,
+              };
+            } else {
+              // Update only the dirty value, keep the original original
+              accumulatedRawChanges[address][key].dirty = rawElement.dirty;
+            }
+          }
+        }
       }
+
+      // Update the raw arrays in accumulatedStateDiff with the latest from accumulatedRawChanges
+      for (const diff of accumulatedStateDiff) {
+        if (diff.address) {
+          const addressChanges = accumulatedRawChanges[diff.address];
+          if (addressChanges) {
+            // Convert the object values to an array
+            const rawArray = Object.values(addressChanges);
+            if (rawArray.length > 0) {
+              diff.raw = rawArray;
+            }
+          }
+        }
+      }
+
+      // Create a deep copy of the accumulated state diff for this simulation
       cumulativeStateDiff.push(
         JSON.parse(JSON.stringify(accumulatedStateDiff))
       );

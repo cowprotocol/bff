@@ -588,7 +588,7 @@ export interface StateDiff {
   raw: RawElement[];
 }
 
-interface RawElement {
+export interface RawElement {
   address: string;
   key: string;
   original: string;
