@@ -64,9 +64,11 @@ async function getSubscriptions(
 async function sendNotificationToTelegram(
   notification: PushNotification
 ): Promise<boolean> {
-  const { id, message, account, title, url } = notification;
+  const { id, message, account, title, url, context } = notification;
   logger.debug(
-    `[telegram] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+    `[telegram] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}. Context=${JSON.stringify(
+      context
+    )}`
   );
 
   // Get the subscriptions for this account
