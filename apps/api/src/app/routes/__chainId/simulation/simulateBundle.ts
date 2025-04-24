@@ -49,6 +49,11 @@ const successSchema = {
           },
         },
       },
+      stateDiff: {
+        title: 'State Diff',
+        description: 'Changes in blockchain states.',
+        type: 'array',
+      },
       gasUsed: {
         title: 'Gas Used',
         description: 'Amount of gas used in the transaction with decimals.',

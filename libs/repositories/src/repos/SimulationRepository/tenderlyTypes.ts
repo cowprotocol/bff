@@ -580,7 +580,8 @@ interface LogRaw {
   data: string;
 }
 
-interface StateDiff {
+export interface StateDiff {
+  address: string;
   soltype: SoltypeElement | null;
   original: string | Record<string, any>;
   dirty: string | Record<string, any>;

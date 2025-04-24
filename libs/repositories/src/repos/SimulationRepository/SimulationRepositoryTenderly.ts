@@ -2,6 +2,7 @@ import { logger, SupportedChainId } from '@cowprotocol/shared';
 import {
   AssetChange,
   SimulationError,
+  StateDiff,
   TenderlyBundleSimulationResponse,
   TenderlySimulatePayload,
 } from './tenderlyTypes';
@@ -136,12 +137,20 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         )
       );
 
+      const stateDiff = this.buildStateDiff(
+        response.simulation_results.map(
+          (result) =>
+            result.transaction?.transaction_info.call_trace.state_diff || []
+        )
+      );
+
       return response.simulation_results.map((simulation_result, i) => {
         return {
           status: simulation_result.simulation.status,
           id: simulation_result.simulation.id,
           link: getTenderlySimulationLink(simulation_result.simulation.id),
           cumulativeBalancesDiff: balancesDiff[i],
+          stateDiff: stateDiff[i],
           gasUsed: simulation_result.transaction?.gas_used.toString(),
         };
       });
@@ -200,5 +209,42 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       });
       return JSON.parse(JSON.stringify(cumulativeBalancesDiff));
     });
+  }
+
+  buildStateDiff(stateDiffList: StateDiff[][]): Omit<StateDiff, 'raw'>[][] {
+    const cumulativeStateDiff: Omit<StateDiff, 'raw'>[][] = [];
+    const accumulatedStateDiff: Omit<StateDiff, 'raw'>[] = [];
+
+    for (const stateDiffs of stateDiffList) {
+      for (const diff of stateDiffs) {
+        if (!diff.soltype) continue;
+
+        const diffKey = `${diff.address}-${diff.soltype.name}`;
+
+        const existingIndex = accumulatedStateDiff.findIndex((item) => {
+          if (!item.soltype) return false;
+          return `${item.address}-${item.soltype.name}` === diffKey;
+        });
+
+        if (existingIndex === -1) {
+          accumulatedStateDiff.push({
+            address: diff.address,
+            soltype: diff.soltype,
+            original: diff.original,
+            dirty: diff.dirty,
+          });
+        } else {
+          accumulatedStateDiff[existingIndex] = {
+            ...accumulatedStateDiff[existingIndex],
+            dirty: diff.dirty,
+          };
+        }
+      }
+      cumulativeStateDiff.push(
+        JSON.parse(JSON.stringify(accumulatedStateDiff))
+      );
+    }
+
+    return JSON.parse(JSON.stringify(cumulativeStateDiff));
   }
 }
