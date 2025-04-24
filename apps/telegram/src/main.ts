@@ -86,7 +86,9 @@ async function sendNotificationToTelegram(
         logger.info(
           `[telegram] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
         );
-        telegramBot.sendMessage(chatId, formatMessage(notification));
+        telegramBot.sendMessage(chatId, formatMessage(notification), {
+          disable_web_page_preview: true
+        });
 
         // Acknowledge the message once its been sent to at least one subscriber for this account
         consumeMessage = true;
@@ -144,10 +146,10 @@ async function subscribeToNotifications() {
 }
 
 function formatMessage({ title, message, url }: PushNotification) {
-  const moreInfo = url ? `\n\nMore info in ${url}` : '';
+  const moreInfo = url ? `\n\nMore info in [Explorer](${url})` : '';
 
   return `\
-${title}.
+**${title}**.
 
 ${message}${moreInfo}`;
 }

@@ -52,13 +52,15 @@ export async function fromTradeToNotification(props: {
   const sellTokenName = formatTokenName(sellToken);
   const buyTokenName = formatTokenName(buyToken);
 
-  const message = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName}`;
+  const title = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName} in ${ChainNames[chainId]}`;
+  const message = `Account: ${owner}`
+
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
   logger.info(`${prefix} New ${message} for ${owner}`);
   return {
     id,
     account: owner,
-    title: `New Trade from ${owner} in ${ChainNames[chainId]}`,
+    title,
     message,
     url,
   };
