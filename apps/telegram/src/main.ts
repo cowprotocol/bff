@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 
 import ms from 'ms';
+import { marked } from 'marked';
+import { JSDOM } from 'jsdom';
+import createDOMPurify from 'dompurify';
 
 import {
   CmsTelegramSubscription,
@@ -86,9 +89,9 @@ async function sendNotificationToTelegram(
         logger.info(
           `[telegram] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
         );
-        telegramBot.sendMessage(chatId, formatMessage(notification), {
-          disable_web_page_preview: true
-        });
+
+        // Send message to Telegram
+        await sendMessageTelegram(chatId, notification);
 
         // Acknowledge the message once its been sent to at least one subscriber for this account
         consumeMessage = true;
@@ -99,9 +102,7 @@ async function sendNotificationToTelegram(
       logger.debug(`[telegram] No subscriptions found for account ${account}`);
     }
   } catch (error) {
-    if (!consumeMessage) {
-      logger.error(error, `Error sending notification`);
-    }
+    logger.error(error, `Error sending notification`);
   }
 
   // We return whether we notified at least one consumer
@@ -145,13 +146,73 @@ async function subscribeToNotifications() {
   }
 }
 
-function formatMessage({ title, message, url }: PushNotification) {
+async function sendMessageTelegram(
+  chatId: string,
+  notification: PushNotification
+) {
+  const markdown = formatMessageMarkdown(notification);
+  const html = await markdownToTelegramHTMLSafe(markdown);
+  try {
+    telegramBot.sendMessage(chatId, html, {
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    });
+  } catch (error) {
+    console.error(
+      `Error sending message to telegram.\nMarkdown:\n${markdown}\n\nOffending. HTML:\n${html}\n\n`
+    );
+
+    throw error;
+  }
+}
+
+function formatMessageMarkdown({ title, message, url }: PushNotification) {
   const moreInfo = url ? `\n\nMore info in [Explorer](${url})` : '';
 
   return `\
 **${title}**.
 
 ${message}${moreInfo}`;
+}
+
+async function markdownToTelegramHTMLSafe(markdown: string): Promise<string> {
+  const html = await marked(markdown);
+
+  const window = new JSDOM('').window;
+  const DOMPurify = createDOMPurify(window);
+
+  // Replace paragraph tags with double line breaks
+  const withLineBreaks = html
+    .replace(/<\/p>\s*<p>/g, '<br/><br/>') // between paragraphs
+    .replace(/^<p>/, '') // opening <p> at the start
+    .replace(/<\/p>$/, '') // closing </p> at the end
+    .replace(/<\/p>/g, '<br/><br/>') // fallback: closing p
+    .replace(/<p>/g, ''); // fallback: opening p
+
+  // Only allow Telegram-supported tags
+  const cleanHtml = DOMPurify.sanitize(withLineBreaks, {
+    ALLOWED_TAGS: [
+      'b',
+      'strong',
+      'i',
+      'em',
+      'u',
+      'ins',
+      's',
+      'strike',
+      'del',
+      'a',
+      'code',
+      'pre',
+      'br',
+    ],
+    ALLOWED_ATTR: ['href'],
+  });
+
+  // Replace <br/> tags with newlines
+  const finalHtml = cleanHtml.replace(/<br\s*\/?>/g, '\n');
+
+  return finalHtml;
 }
 
 mainLoop().catch((error) => logger.error(error, 'Unhandled error in telegram'));
