@@ -93,19 +93,26 @@ export class CmsNotificationProducer implements Runnable {
   }
 }
 
-function fromCmsToNotifications({
-  id,
-  account,
-  data,
-  notification_template: { title, description, url },
-}: CmsPushNotification): PushNotification {
+function fromCmsToNotifications(
+  cmsNotification: CmsPushNotification
+): PushNotification {
+  const {
+    id,
+    account,
+    data,
+    notification_template: { title, description, url },
+  } = cmsNotification;
   const message = Mustache.render(description, data);
+  const cmsNotificationId = id.toString();
 
   return {
-    id: id.toString(),
+    id: cmsNotificationId,
     title,
     message,
     account,
     url: url || undefined,
+    context: {
+      cmsId: cmsNotificationId,
+    },
   };
 }
