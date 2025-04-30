@@ -71,7 +71,7 @@ export async function fromTradeToNotification(props: {
     url,
     context: {
       transactionHash,
-      logIndex,
+      logIndex: logIndex.toString(),
     },
   };
 }
