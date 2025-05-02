@@ -234,6 +234,15 @@ describe('UsdRepositoryCow', () => {
       // Should return null when received an unsupported chainId as number
       expect(price).toBe(null);
     });
+
+    it('Handles receiving no token address', async () => {
+      const price = await usdRepositoryCow.getUsdPrice(
+        SupportedChainId.MAINNET
+      );
+
+      // Should return null when received an empty token address
+      expect(price).toBe(null);
+    });
   });
 
   describe('getUsdPrices', () => {

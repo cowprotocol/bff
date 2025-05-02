@@ -22,12 +22,12 @@ export interface PricePoint {
 export interface UsdRepository {
   getUsdPrice(
     chainIdOrSlug: number | string,
-    tokenAddress: string
+    tokenAddress?: string | undefined
   ): Promise<number | null>;
 
   getUsdPrices(
     chainIdOrSlug: number | string,
-    tokenAddress: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null>;
 }
@@ -35,13 +35,13 @@ export interface UsdRepository {
 export class UsdRepositoryNoop implements UsdRepository {
   async getUsdPrice(
     chainIdOrSlug: number | string,
-    tokenAddress: string
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
     return null;
   }
   async getUsdPrices(
     chainIdOrSlug: number | string,
-    tokenAddress: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     return null;

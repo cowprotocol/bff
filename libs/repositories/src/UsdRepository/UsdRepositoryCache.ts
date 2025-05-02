@@ -27,14 +27,14 @@ export class UsdRepositoryCache implements UsdRepository {
 
   async getUsdPrice(
     chainIdOrSlug: number | string,
-    tokenAddress: string
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
     // Get price from cache
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-price',
       chainIdOrSlug,
-      tokenAddress
+      tokenAddress || ''
     );
     const usdPriceCached = await this.getValueFromCache({
       key,
@@ -59,14 +59,14 @@ export class UsdRepositoryCache implements UsdRepository {
   }
   async getUsdPrices(
     chainIdOrSlug: number | string,
-    tokenAddress: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-prices',
       chainIdOrSlug,
-      tokenAddress,
+      tokenAddress || '',
       priceStrategy
     );
 

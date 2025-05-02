@@ -45,6 +45,12 @@ describe('UsdRepositoryCoingecko', () => {
       expect(price).toBeGreaterThan(0);
     });
 
+    it('should return the current price without token address', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice('bitcoin');
+
+      expect(price).toBeGreaterThan(0);
+    });
+
     it('should return NULL for an unknown token', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
         SupportedChainId.MAINNET,
@@ -94,6 +100,21 @@ describe('UsdRepositoryCoingecko', () => {
         ).toBeLessThanOrEqual(FIVE_MINUTES * BUFFER_ERROR_TOLERANCE); // 5 min of error tolerance (we don't need to be super precise, but we also want to assert the points are kind of 5min apart)
         expect(price.price).toBeGreaterThan(0);
       }
+    });
+
+    it('should return prices without token address', async () => {
+      const prices = await usdRepositoryCoingecko.getUsdPrices(
+        'bitcoin',
+        undefined,
+        '5m'
+      );
+      if (prices === null) {
+        throw new Error('Prices should not be null');
+      }
+
+      // We expect around 288 prices. We just assert we receive between 250 and 300 prices
+      expect(prices.length).toBeGreaterThan(250);
+      expect(prices.length).toBeLessThan(300);
     });
 
     it('[5m] should return NULL for an unknown token', async () => {
