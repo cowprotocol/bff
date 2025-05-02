@@ -1,17 +1,19 @@
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
   constructor(private usdRepositories: UsdRepository[]) {}
 
   async getUsdPrice(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string
   ): Promise<number | null> {
     for (const usdRepository of this.usdRepositories) {
-      const price = await usdRepository.getUsdPrice(chainId, tokenAddress);
+      const price = await usdRepository.getUsdPrice(
+        chainIdOrSlug,
+        tokenAddress
+      );
       if (price !== null) {
         return price;
       }
@@ -20,13 +22,13 @@ export class UsdRepositoryFallback implements UsdRepository {
   }
 
   async getUsdPrices(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     for (const usdRepository of this.usdRepositories) {
       const prices = await usdRepository.getUsdPrices(
-        chainId,
+        chainIdOrSlug,
         tokenAddress,
         priceStrategy
       );

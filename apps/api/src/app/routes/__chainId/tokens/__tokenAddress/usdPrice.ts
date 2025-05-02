@@ -2,14 +2,14 @@ import { UsdService, usdServiceSymbol } from '@cowprotocol/services';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
-import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
+import { AddressSchema, ChainIdOrSlugSchema } from '../../../../schemas';
 
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'tokenAddress'],
   additionalProperties: false,
   properties: {
-    chainId: SupportedChainIdSchema,
+    chainId: ChainIdOrSlugSchema,
     tokenAddress: AddressSchema,
   },
 } as const satisfies JSONSchema;
@@ -67,7 +67,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress } = request.params;
+      const { chainIdOrSlug, tokenAddress } = request.params;
 
       const price = await usdService.getUsdPrice(chainId, tokenAddress);
       fastify.log.info(

@@ -1,8 +1,8 @@
-import { Container } from 'inversify';
-import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../test/mock';
+import { Container } from 'inversify';
 import ms from 'ms';
+import { NULL_ADDRESS, WETH } from '../../test/mock';
+import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 
 const FIVE_MINUTES = ms('5m');
 const ONE_HOUR = ms('1h');
@@ -30,10 +30,35 @@ describe('UsdRepositoryCoingecko', () => {
       expect(price).toBeGreaterThan(0);
     });
 
+    it('should return the current price for a chain by slug', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice('ethereum', WETH);
+
+      expect(price).toBeGreaterThan(0);
+    });
+
+    it('should return the current price for a unsupported chain by id', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice(
+        369, // pulsechain
+        '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39' // Hex on pulsechain
+      );
+
+      expect(price).toBeGreaterThan(0);
+    });
+
     it('should return NULL for an unknown token', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
         SupportedChainId.MAINNET,
         NULL_ADDRESS
+      );
+
+      // Price should be null (no data available)
+      expect(price).toBeNull();
+    });
+
+    it('should return NULL for an unknown chain', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice(
+        'unknown-chain',
+        WETH
       );
 
       // Price should be null (no data available)
@@ -78,6 +103,16 @@ describe('UsdRepositoryCoingecko', () => {
         '5m'
       );
 
+      // Prices should be null (no data available)
+      expect(prices).toBeNull();
+    });
+
+    it('[5m] should return NULL for an unknown chain', async () => {
+      const prices = await usdRepositoryCoingecko.getUsdPrices(
+        '', // unknown-chain
+        WETH,
+        '5m'
+      );
       // Prices should be null (no data available)
       expect(prices).toBeNull();
     });

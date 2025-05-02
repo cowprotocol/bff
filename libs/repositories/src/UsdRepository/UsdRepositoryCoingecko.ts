@@ -1,12 +1,11 @@
 import { injectable } from 'inversify';
-import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import {
   COINGECKO_PLATFORMS,
   SimplePriceResponse,
   coingeckoProClient,
 } from '../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/shared';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
+import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -25,11 +24,21 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
+  private getPlatform(chainIdOrSlug: number | string): string | undefined {
+    // If the chainIdOrSlug is a string, it is a slug and should already match Coingecko's platform ids
+    if (typeof chainIdOrSlug === 'string') {
+      return chainIdOrSlug;
+    }
+
+    // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
+    return COINGECKO_PLATFORMS[chainIdOrSlug];
+  }
+
   async getUsdPrice(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string
   ): Promise<number | null> {
-    const platform = COINGECKO_PLATFORMS[chainId];
+    const platform = this.getPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }
@@ -67,11 +76,11 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   }
 
   async getUsdPrices(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const platform = COINGECKO_PLATFORMS[chainId];
+    const platform = this.getPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }

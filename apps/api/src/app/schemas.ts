@@ -7,6 +7,20 @@ export const SupportedChainIdSchema = {
   type: 'integer',
 } as const;
 
+export const ChainIdOrSlugSchema = {
+  title: 'Chain ID or Slug',
+  description: 'Chain ID (integer) or chain slug (string)',
+  oneOf: [
+    {
+      type: 'integer',
+    },
+    {
+      type: 'string',
+      pattern: '^[0-9a-z\\-]{3,30}$',
+    },
+  ],
+} as const;
+
 export const AddressSchema = {
   title: 'Address',
   description: 'Ethereum address.',

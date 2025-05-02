@@ -18,9 +18,18 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   }
 
   async getUsdPrice(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string
   ): Promise<number | null> {
+    // Only SupportedChainIds are supported
+    if (typeof chainIdOrSlug === 'string' || !SupportedChainId[chainIdOrSlug]) {
+      logger.debug({
+        msg: `Chain ${chainIdOrSlug} not supported on UsdRepositoryCow`,
+      });
+      return null;
+    }
+    const chainId = chainIdOrSlug as SupportedChainId;
+
     // Get native price for token (in ETH/xDAI)
     const tokenNativePrice = await this.getNativePrice(chainId, tokenAddress);
 

@@ -1,7 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/shared';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
-import { Logger } from 'pino';
 import { NULL_ADDRESS, WETH, errorResponse, okResponse } from '../../test/mock';
 import { USDC } from '../const';
 import { CowApiClient } from '../datasources/cowApi';
@@ -218,6 +217,21 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Should return null when missing decimals
+      expect(price).toBe(null);
+    });
+
+    it('Handles receiving an unsupported chainId', async () => {
+      let price = await usdRepositoryCow.getUsdPrice(
+        'this-is-not-a-chain-id',
+        WETH
+      );
+
+      // Should return null when received an unsupported chainId as string
+      expect(price).toBe(null);
+
+      price = await usdRepositoryCow.getUsdPrice(8931273, WETH);
+
+      // Should return null when received an unsupported chainId as number
       expect(price).toBe(null);
     });
   });

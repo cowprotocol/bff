@@ -1,15 +1,13 @@
-import { inject, injectable } from 'inversify';
-import {
-  PricePoint,
-  PriceStrategy,
-  UsdRepository,
-  deserializePricePoints,
-  serializePricePoints,
-} from './UsdRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
-import ms from 'ms';
+import { injectable } from 'inversify';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { getCacheKey, PartialCacheKey } from '../utils/cache';
+import {
+  deserializePricePoints,
+  PricePoint,
+  PriceStrategy,
+  serializePricePoints,
+  UsdRepository,
+} from './UsdRepository';
 
 const NULL_VALUE = 'null';
 
@@ -28,14 +26,14 @@ export class UsdRepositoryCache implements UsdRepository {
   }
 
   async getUsdPrice(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string
   ): Promise<number | null> {
     // Get price from cache
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-price',
-      chainId,
+      chainIdOrSlug,
       tokenAddress
     );
     const usdPriceCached = await this.getValueFromCache({
@@ -49,7 +47,7 @@ export class UsdRepositoryCache implements UsdRepository {
     }
 
     // Get the usd Price (delegate call)
-    const usdPrice = await this.proxy.getUsdPrice(chainId, tokenAddress);
+    const usdPrice = await this.proxy.getUsdPrice(chainIdOrSlug, tokenAddress);
 
     // Cache price (or absence of it)
     this.cacheValue({
@@ -60,14 +58,14 @@ export class UsdRepositoryCache implements UsdRepository {
     return usdPrice;
   }
   async getUsdPrices(
-    chainId: SupportedChainId,
+    chainIdOrSlug: number | string,
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-prices',
-      chainId,
+      chainIdOrSlug,
       tokenAddress,
       priceStrategy
     );
@@ -85,7 +83,7 @@ export class UsdRepositoryCache implements UsdRepository {
 
     // Get the usd Prices (delegate call)
     const usdPrices = await this.proxy.getUsdPrices(
-      chainId,
+      chainIdOrSlug,
       tokenAddress,
       priceStrategy
     );
@@ -113,7 +111,7 @@ export class UsdRepositoryCache implements UsdRepository {
     return undefined;
   }
 
-  private async cacheValue<T>(props: {
+  private async cacheValue(props: {
     key: string;
     value: string | null;
   }): Promise<void> {
