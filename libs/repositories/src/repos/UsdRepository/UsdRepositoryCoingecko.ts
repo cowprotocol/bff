@@ -22,6 +22,8 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
   daily: 90, // 90 Days of daily data (~90 points)
 };
 
+import { isAddress } from 'viem';
+
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
@@ -33,13 +35,30 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null;
     }
 
-    const addressOrPlatform = tokenAddress?.toLowerCase() || platform;
+    const addressOrPlatform = this.getAddressOrPlatform(tokenAddress, platform);
 
     const fetchPromise = tokenAddress
       ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
       : this.getSinglePriceByPlatformId(platform);
 
     return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform);
+  }
+
+  private getAddressOrPlatform(
+    tokenAddress: string | undefined,
+    platform: string
+  ): string {
+    if (!tokenAddress) {
+      return platform;
+    }
+
+    if (isAddress(tokenAddress)) {
+      // EVM like address, Coingecko expects it lowercased
+      return tokenAddress.toLowerCase();
+    }
+
+    // Non-EVM address, Coingecko expects it as is
+    return tokenAddress;
   }
 
   async getUsdPrices(
