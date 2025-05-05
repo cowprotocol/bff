@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import {
   COINGECKO_PLATFORMS,
-  SimplePriceResponse,
   coingeckoProClient,
+  SimplePriceResponse,
 } from '../datasources/coingecko';
 import { throwIfUnsuccessful } from '../utils/throwIfUnsuccessful';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
@@ -33,9 +33,13 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null;
     }
 
-    return tokenAddress
-      ? this.getSinglePriceByContractAddress(platform, tokenAddress)
+    const addressOrPlatform = tokenAddress?.toLocaleLowerCase() || platform;
+
+    const fetchPromise = tokenAddress
+      ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
       : this.getSinglePriceByPlatformId(platform);
+
+    return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform);
   }
 
   async getUsdPrices(
@@ -98,41 +102,23 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     platform: string,
     tokenAddress: string
   ) {
-    const address = tokenAddress.toLowerCase();
     // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    const { data, response } = await coingeckoProClient.GET(
-      `/simple/token_price/{id}`,
-      {
-        params: {
-          path: {
-            id: platform,
-          },
-          query: {
-            contract_addresses: address,
-            vs_currencies: 'usd',
-          },
+    return coingeckoProClient.GET(`/simple/token_price/{id}`, {
+      params: {
+        path: {
+          id: platform,
         },
-      }
-    );
-
-    // FIXME: This is a workaround for the fact that Coingecko Open API has a hardcoded BTC address in the response (notified the Coingecko team about this issue, so remove when the issue is fixed)
-    const priceData = data as SimplePriceResponse;
-
-    if (response.status === 404 || !priceData?.[address]?.usd) {
-      return null;
-    }
-
-    await throwIfUnsuccessful(
-      'Error getting USD price from Coingecko',
-      response
-    );
-
-    return priceData[address].usd;
+        query: {
+          contract_addresses: tokenAddress,
+          vs_currencies: 'usd',
+        },
+      },
+    });
   }
 
   private async getSinglePriceByPlatformId(platform: string) {
     // https://docs.coingecko.com/reference/simple-price
-    const { data, response } = await coingeckoProClient.GET(`/simple/price`, {
+    return coingeckoProClient.GET(`/simple/price`, {
       params: {
         query: {
           ids: platform,
@@ -140,10 +126,18 @@ export class UsdRepositoryCoingecko implements UsdRepository {
         },
       },
     });
+  }
 
-    const priceData = data as SimplePriceResponse;
+  private async handleSinglePriceResponse(
+    fetchPromise: Promise<unknown>,
+    key: string
+  ): Promise<number | null> {
+    const { data, response } = (await fetchPromise) as {
+      data: SimplePriceResponse;
+      response: Response;
+    };
 
-    if (response.status === 404 || !priceData?.[platform]?.usd) {
+    if (response.status === 404 || !data?.[key]?.usd) {
       return null;
     }
 
@@ -152,7 +146,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       response
     );
 
-    return priceData[platform].usd;
+    return data[key].usd;
   }
 
   private async getMarketDataByTokenAddress(
