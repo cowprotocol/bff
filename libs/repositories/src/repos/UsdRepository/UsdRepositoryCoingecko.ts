@@ -1,12 +1,11 @@
 import { injectable } from 'inversify';
-import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import {
   COINGECKO_PLATFORMS,
   SimplePriceResponse,
   coingeckoProClient,
 } from '../../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/shared';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
+import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -34,7 +33,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null;
     }
 
-    const addressOrPlatform = tokenAddress?.toLocaleLowerCase() || platform;
+    const addressOrPlatform = tokenAddress?.toLowerCase() || platform;
 
     const fetchPromise = tokenAddress
       ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
