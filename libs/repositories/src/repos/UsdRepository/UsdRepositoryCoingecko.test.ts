@@ -1,8 +1,8 @@
-import { Container } from 'inversify';
-import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 import { SupportedChainId } from '@cowprotocol/shared';
-import { WETH, NULL_ADDRESS } from '../../../test/mock';
+import { Container } from 'inversify';
 import ms from 'ms';
+import { NULL_ADDRESS, WETH } from '../../../test/mock';
+import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 
 const FIVE_MINUTES = ms('5m');
 const ONE_HOUR = ms('1h');
@@ -38,6 +38,15 @@ describe('UsdRepositoryCoingecko', () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
         '369', // pulsechain
         '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39' // Hex on pulsechain
+      );
+
+      expect(price).toBeGreaterThan(0);
+    });
+
+    it('should return the current price for a unsupported chain by id for a non-evm chain', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice(
+        'solana',
+        'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' // USDC on Solana
       );
 
       expect(price).toBeGreaterThan(0);

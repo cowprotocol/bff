@@ -24,11 +24,11 @@ export const AddressSchema = {
 export const OptionalAddressSchema = {
   title: 'Optional Address',
   description:
-    'Either provide an Ethereum address or a dash (-) to indicate no address.',
+    'Either provide a token address or a dash (-) to indicate no address.',
   oneOf: [
     {
       type: 'string',
-      pattern: '^0x[a-fA-F0-9]{40}$',
+      pattern: '^[0x]?[a-fA-F0-9\\.:]{3,80}$',
     },
     {
       type: 'string',
