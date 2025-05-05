@@ -25,7 +25,7 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
-    chainIdOrSlug: number | string,
+    chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null> {
     const platform = this.getPlatform(chainIdOrSlug);
@@ -43,7 +43,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   }
 
   async getUsdPrices(
-    chainIdOrSlug: number | string,
+    chainIdOrSlug: string,
     tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
@@ -88,14 +88,9 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     return pricePoints;
   }
 
-  private getPlatform(chainIdOrSlug: number | string): string | undefined {
-    // If the chainIdOrSlug is a string, it is a slug and should already match Coingecko's platform ids
-    if (typeof chainIdOrSlug === 'string') {
-      return chainIdOrSlug;
-    }
-
+  private getPlatform(chainIdOrSlug: string): string | undefined {
     // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
-    return COINGECKO_PLATFORMS[chainIdOrSlug];
+    return COINGECKO_PLATFORMS[+chainIdOrSlug] || chainIdOrSlug;
   }
 
   private async getSinglePriceByContractAddress(

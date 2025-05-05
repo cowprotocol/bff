@@ -10,15 +10,8 @@ export const SupportedChainIdSchema = {
 export const ChainIdOrSlugSchema = {
   title: 'Chain ID or Slug',
   description: 'Chain ID (integer) or chain slug (string)',
-  oneOf: [
-    {
-      type: 'integer',
-    },
-    {
-      type: 'string',
-      pattern: '^[0-9a-z\\-]{3,30}$',
-    },
-  ],
+  type: 'string',
+  pattern: '^(\\d{1,20})|([0-9a-z\\-]{3,30})$',
 } as const;
 
 export const AddressSchema = {

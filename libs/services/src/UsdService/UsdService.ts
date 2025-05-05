@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 
 export interface UsdService {
   getUsdPrice(
-    chainIdOrSlug: string | number,
+    chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null>;
 }
@@ -18,7 +18,7 @@ export class UsdServiceMain implements UsdService {
   ) {}
 
   async getUsdPrice(
-    chainIdOrSlug: string | number,
+    chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null> {
     return this.usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress);

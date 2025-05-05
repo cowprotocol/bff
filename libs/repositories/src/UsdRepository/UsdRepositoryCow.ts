@@ -18,17 +18,17 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   }
 
   async getUsdPrice(
-    chainIdOrSlug: number | string,
+    chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null> {
     // Only SupportedChainIds are supported
-    if (typeof chainIdOrSlug === 'string' || !SupportedChainId[chainIdOrSlug]) {
+    if (!SupportedChainId[+chainIdOrSlug]) {
       logger.debug({
         msg: `Chain ${chainIdOrSlug} not supported on UsdRepositoryCow`,
       });
       return null;
     }
-    const chainId = chainIdOrSlug as SupportedChainId;
+    const chainId = +chainIdOrSlug as SupportedChainId;
 
     if (!tokenAddress) {
       logger.debug({

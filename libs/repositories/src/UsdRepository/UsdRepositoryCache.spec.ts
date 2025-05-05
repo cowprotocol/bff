@@ -1,16 +1,16 @@
-import { UsdRepositoryCache } from './UsdRepositoryCache';
-import IORedis from 'ioredis';
-import { UsdRepository } from './UsdRepository';
-import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import { SupportedChainId } from '@cowprotocol/shared';
+import IORedis from 'ioredis';
 import { WETH } from '../../test/mock';
+import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import type { PricePoint } from './UsdRepository';
+import { UsdRepository } from './UsdRepository';
+import { UsdRepositoryCache } from './UsdRepositoryCache';
 
 const CACHE_VALUE_SECONDS = 10;
 const CACHE_NULL_SECONDS = 20;
 
 const wethLowercase = WETH.toLocaleLowerCase();
-const chainId = SupportedChainId.MAINNET;
+const chainId = SupportedChainId.MAINNET.toString();
 
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({

@@ -26,7 +26,7 @@ export class UsdRepositoryCache implements UsdRepository {
   }
 
   async getUsdPrice(
-    chainIdOrSlug: number | string,
+    chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null> {
     // Get price from cache
@@ -58,7 +58,7 @@ export class UsdRepositoryCache implements UsdRepository {
     return usdPrice;
   }
   async getUsdPrices(
-    chainIdOrSlug: number | string,
+    chainIdOrSlug: string,
     tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {

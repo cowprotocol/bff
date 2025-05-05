@@ -8,6 +8,7 @@ const FIVE_MINUTES = ms('5m');
 const ONE_HOUR = ms('1h');
 const ONE_DAY = ms('1d');
 const BUFFER_ERROR_TOLERANCE = 1.5; // 50% error tolerance
+const CHAIN_ID = SupportedChainId.MAINNET.toString();
 
 describe('UsdRepositoryCoingecko', () => {
   let usdRepositoryCoingecko: UsdRepositoryCoingecko;
@@ -22,10 +23,7 @@ describe('UsdRepositoryCoingecko', () => {
 
   describe('getUsdPrice', () => {
     it('should return the current price of WETH', async () => {
-      const price = await usdRepositoryCoingecko.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCoingecko.getUsdPrice(CHAIN_ID, WETH);
 
       expect(price).toBeGreaterThan(0);
     });
@@ -38,7 +36,7 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('should return the current price for a unsupported chain by id', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
-        369, // pulsechain
+        '369', // pulsechain
         '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39' // Hex on pulsechain
       );
 
@@ -53,7 +51,7 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('should return NULL for an unknown token', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         NULL_ADDRESS
       );
 
@@ -75,7 +73,7 @@ describe('UsdRepositoryCoingecko', () => {
   describe('getUsdPrices', () => {
     it('[5m] should return ~288 prices of WETH (~5min apart)', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         WETH,
         '5m'
       );
@@ -119,7 +117,7 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('[5m] should return NULL for an unknown token', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         NULL_ADDRESS,
         '5m'
       );
@@ -140,7 +138,7 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('[hourly] should return ~120 prices of WETH (~60min apart)', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         WETH,
         'hourly'
       );
@@ -169,7 +167,7 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('[daily] should return ~90 prices of WETH (~24h apart)', async () => {
       const prices = await usdRepositoryCoingecko.getUsdPrices(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         WETH,
         'daily'
       );

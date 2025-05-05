@@ -17,6 +17,7 @@ const mockApi: CowApiClient = {
 const NATIVE_PRICE_ENDPOINT = '/api/v1/token/{token}/native_price';
 const WETH_NATIVE_PRICE = 1; // See https://api.cow.fi/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
 const USDC_PRICE = 288778763.042292; // USD price: 3,462.8585200136 (calculated 1e12 / 288778763.042292). See https://api.cow.fi/mainnet/api/v1/token/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/native_price
+const CHAIN_ID = SupportedChainId.MAINNET.toString();
 
 const mockErc20Repository = {
   async get(
@@ -70,10 +71,7 @@ describe('UsdRepositoryCow', () => {
       });
 
       // Get USD price for WETH
-      const price = await usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCow.getUsdPrice(CHAIN_ID, WETH);
 
       // Assert that the implementation did the right calls to the API
       expect(mockApiGet).toHaveBeenCalledTimes(2);
@@ -105,7 +103,7 @@ describe('UsdRepositoryCow', () => {
 
       // Get USD price for a not supported token
       const price = await usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         NULL_ADDRESS // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
       );
 
@@ -128,10 +126,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for a not supported token
-      const pricePromise = usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const pricePromise = usdRepositoryCow.getUsdPrice(CHAIN_ID, WETH);
 
       // USD calculation based on native price is correct
       expect(pricePromise).rejects.toThrow(
@@ -151,7 +146,7 @@ describe('UsdRepositoryCow', () => {
 
       // Get USD price for something is not even an address
       const price = await usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         'this-is-not-a-token' // See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
       );
 
@@ -174,7 +169,7 @@ describe('UsdRepositoryCow', () => {
 
       // Get USD price for something is not even an address
       const priceResult = usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
+        CHAIN_ID,
         'this-is-not-a-token'
       );
 
@@ -211,10 +206,7 @@ describe('UsdRepositoryCow', () => {
       );
 
       // Get USD price for a token without decimals
-      const price = await usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET,
-        WETH
-      );
+      const price = await usdRepositoryCow.getUsdPrice(CHAIN_ID, WETH);
 
       // Should return null when missing decimals
       expect(price).toBe(null);
@@ -229,16 +221,14 @@ describe('UsdRepositoryCow', () => {
       // Should return null when received an unsupported chainId as string
       expect(price).toBe(null);
 
-      price = await usdRepositoryCow.getUsdPrice(8931273, WETH);
+      price = await usdRepositoryCow.getUsdPrice('8931273', WETH);
 
       // Should return null when received an unsupported chainId as number
       expect(price).toBe(null);
     });
 
     it('Handles receiving no token address', async () => {
-      const price = await usdRepositoryCow.getUsdPrice(
-        SupportedChainId.MAINNET
-      );
+      const price = await usdRepositoryCow.getUsdPrice(CHAIN_ID);
 
       // Should return null when received an empty token address
       expect(price).toBe(null);
@@ -247,11 +237,7 @@ describe('UsdRepositoryCow', () => {
 
   describe('getUsdPrices', () => {
     it('Returns null', async () => {
-      const price = await usdRepositoryCow.getUsdPrices(
-        SupportedChainId.MAINNET,
-        WETH,
-        '5m'
-      );
+      const price = await usdRepositoryCow.getUsdPrices(CHAIN_ID, WETH, '5m');
       expect(price).toEqual(null);
     });
   });
