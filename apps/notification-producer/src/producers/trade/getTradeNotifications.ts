@@ -93,6 +93,8 @@ export async function getTradeNotifications(
               buyAmount,
               feeAmount,
               erc20Repository,
+              transactionHash: log.transactionHash,
+              logIndex: log.logIndex,
             })
           );
           break;

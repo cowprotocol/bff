@@ -6,6 +6,7 @@ export interface PushNotification {
   title: string;
   message: string;
   url?: string;
+  context?: Record<string, string>;
 }
 
 export interface ConnectToQueueParams {

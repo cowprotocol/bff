@@ -22,6 +22,8 @@ export async function fromTradeToNotification(props: {
   buyAmount: bigint;
   feeAmount: bigint;
   erc20Repository: Erc20Repository;
+  transactionHash: string;
+  logIndex: number;
 }): Promise<PushNotification> {
   const {
     id,
@@ -34,6 +36,8 @@ export async function fromTradeToNotification(props: {
     erc20Repository,
     prefix,
     orderUid,
+    transactionHash,
+    logIndex,
   } = props;
 
   const sellToken = await erc20Repository.get(
@@ -53,15 +57,21 @@ export async function fromTradeToNotification(props: {
   const buyTokenName = formatTokenName(buyToken);
 
   const title = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName} in ${ChainNames[chainId]}`;
-  const message = `Account: ${owner}`
+  const message = `Account: ${owner}`;
 
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
-  logger.info(`${prefix} New ${message} for ${owner}`);
+  logger.info(
+    `${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}`
+  );
   return {
     id,
     account: owner,
     title,
     message,
     url,
+    context: {
+      transactionHash,
+      logIndex: logIndex.toString(),
+    },
   };
 }
