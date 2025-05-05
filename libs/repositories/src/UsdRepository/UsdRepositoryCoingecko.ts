@@ -55,7 +55,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
     const interval = priceStrategy === 'daily' ? 'daily' : undefined;
 
-    const priceData = tokenAddress
+    const { data, response } = tokenAddress
       ? await this.getMarketDataByTokenAddress(
           platform,
           days,
@@ -64,17 +64,21 @@ export class UsdRepositoryCoingecko implements UsdRepository {
         )
       : await this.getMarketDataByPlatformId(platform, days, interval);
 
-    if (!priceData) {
+    if (response.status === 404 || !data) {
       return null;
     }
+    await throwIfUnsuccessful(
+      'Error getting USD prices from Coingecko',
+      response
+    );
 
     const volumesMap =
-      priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {
+      data.total_volumes?.reduce((acc, [timestamp, volume]) => {
         acc.set(timestamp, volume);
         return acc;
       }, new Map<number, number>()) || undefined;
 
-    const prices = priceData.prices;
+    const prices = data.prices;
     if (!prices) {
       return null;
     }
@@ -152,7 +156,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   ) {
     const address = tokenAddress.toLowerCase();
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    const { data: priceData, response } = await coingeckoProClient.GET(
+    return coingeckoProClient.GET(
       `/coins/{id}/contract/{contract_address}/market_chart`,
       {
         params: {
@@ -168,16 +172,6 @@ export class UsdRepositoryCoingecko implements UsdRepository {
         },
       }
     );
-
-    if (response.status === 404 || !priceData) {
-      return null;
-    }
-    await throwIfUnsuccessful(
-      'Error getting USD prices from Coingecko',
-      response
-    );
-
-    return priceData;
   }
 
   private async getMarketDataByPlatformId(
@@ -186,30 +180,17 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     interval: 'daily' | undefined
   ) {
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    const { data: priceData, response } = await coingeckoProClient.GET(
-      `/coins/{id}/market_chart`,
-      {
-        params: {
-          path: {
-            id: platform,
-          },
-          query: {
-            vs_currency: 'usd',
-            days,
-            interval, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
-          },
+    return coingeckoProClient.GET(`/coins/{id}/market_chart`, {
+      params: {
+        path: {
+          id: platform,
         },
-      }
-    );
-
-    if (response.status === 404 || !priceData) {
-      return null;
-    }
-    await throwIfUnsuccessful(
-      'Error getting USD prices from Coingecko',
-      response
-    );
-
-    return priceData;
+        query: {
+          vs_currency: 'usd',
+          days,
+          interval, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
+        },
+      },
+    });
   }
 }
