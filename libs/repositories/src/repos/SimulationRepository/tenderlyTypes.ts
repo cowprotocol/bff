@@ -115,7 +115,7 @@ interface SoltypeElement {
   name: string;
   type: SoltypeType;
   storage_location: StorageLocation;
-  components?: SoltypeElement[] | null;
+  components?: Record<string, any>[] | null;
   offset: number;
   index: string;
   indexed: boolean;
@@ -580,7 +580,7 @@ export interface StateDiff {
   soltype: SoltypeElement | null;
   original: string | Record<string, any> | null;
   dirty: string | Record<string, any> | null;
-  raw: RawElement[];
+  raw?: RawElement[];
 }
 
 export interface RawElement {

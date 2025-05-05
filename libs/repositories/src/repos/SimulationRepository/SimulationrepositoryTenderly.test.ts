@@ -189,6 +189,48 @@ describe('SimulationRepositoryTenderly', () => {
       expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
     });
 
+    it('should handle diffs with missing soltype', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: null,
+            original: null,
+            dirty: null,
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0000',
+                dirty: '0x0001',
+              },
+            ],
+          },
+        ],
+      ];
+
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: null,
+            original: null,
+            dirty: null,
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0000',
+                dirty: '0x0001',
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
+    });
+
     it('should handle empty input', () => {
       const input: AssetChange[][] = [];
       expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([]);

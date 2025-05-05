@@ -1,7 +1,6 @@
 import { logger, SupportedChainId } from '@cowprotocol/shared';
 import {
   AssetChange,
-  RawElement,
   SimulationError,
   StateDiff,
   TenderlyBundleSimulationResponse,
@@ -141,7 +140,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       const stateDiff = this.buildStateDiff(
         response.simulation_results.map(
           (result) =>
-            result.transaction?.transaction_info.call_trace.state_diff || []
+            result.transaction?.transaction_info.call_trace?.state_diff || []
         )
       );
 
@@ -208,123 +207,136 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
           updateBalance(to, contract_address, raw_amount);
         }
       });
-      return JSON.parse(JSON.stringify(cumulativeBalancesDiff));
+      return structuredClone<typeof cumulativeBalancesDiff>(
+        cumulativeBalancesDiff
+      );
     });
   }
 
   buildStateDiff(stateDiffList: StateDiff[][]): StateDiff[][] {
+    if (stateDiffList.length === 0) return [];
+
     const cumulativeStateDiff: StateDiff[][] = [];
+    // This will store our accumulated state across all simulations
     const accumulatedStateDiff: StateDiff[] = [];
-    // Object to track accumulated raw changes by address and key
-    const accumulatedRawChanges: Record<
-      string,
-      Record<string, RawElement>
-    > = {};
 
-    for (const stateDiffs of stateDiffList) {
-      for (const diff of stateDiffs) {
-        // Skip diffs if soltype, original, or dirty is null
-        if (!diff.soltype || diff.original === null || diff.dirty === null) {
-          // Process the raw data anyway if it exists
-          if (diff.raw) {
-            const rawElements = Array.isArray(diff.raw) ? diff.raw : [diff.raw];
+    for (let i = 0; i < stateDiffList.length; i++) {
+      const stateDiffs = stateDiffList[i];
 
-            for (const rawElement of rawElements) {
-              const { address, key } = rawElement;
+      // Process each diff in the current simulation
+      for (let j = 0; j < stateDiffs.length; j++) {
+        const diff = stateDiffs[j];
 
-              // Initialize objects if they don't exist
-              if (!accumulatedRawChanges[address]) {
-                accumulatedRawChanges[address] = {};
-              }
+        // Handle regular diffs (with complete soltype, original, dirty data)
+        if (diff?.soltype && diff?.original && diff?.dirty) {
+          const diffKey = `${diff.address}-${diff.soltype.name}`;
 
-              if (!accumulatedRawChanges[address][key]) {
-                accumulatedRawChanges[address][key] = {
-                  address,
-                  key,
-                  original: rawElement.original,
-                  dirty: rawElement.dirty,
-                };
-              } else {
-                // Update only the dirty value, keep the original original
-                accumulatedRawChanges[address][key].dirty = rawElement.dirty;
-              }
-            }
-          }
-          continue; // Skip the rest of the processing for this diff
-        }
-
-        // Process regular diffs where soltype, original, and dirty are not null
-        const diffKey = `${diff.address}-${diff.soltype.name}`;
-
-        const existingIndex = accumulatedStateDiff.findIndex((item) => {
-          if (!item.soltype) return false;
-          return `${item.address}-${item.soltype.name}` === diffKey;
-        });
-
-        if (existingIndex === -1) {
-          accumulatedStateDiff.push({
-            address: diff.address,
-            soltype: diff.soltype,
-            original: diff.original,
-            dirty: diff.dirty,
-            raw: diff.raw || [], // Initialize raw property
+          const existingIndex = accumulatedStateDiff.findIndex((item) => {
+            if (!item.soltype) return false;
+            return `${item.address}-${item.soltype.name}` === diffKey;
           });
-        } else {
-          accumulatedStateDiff[existingIndex] = {
-            ...accumulatedStateDiff[existingIndex],
-            dirty: diff.dirty,
-          };
+
+          if (existingIndex === -1) {
+            // New entry - add it to our accumulated state
+            accumulatedStateDiff.push(structuredClone<typeof diff>(diff));
+          } else {
+            // Update existing entry - keep original values, update dirty values
+
+            // Update dirty values
+            accumulatedStateDiff[existingIndex].dirty = structuredClone<
+              typeof diff.dirty
+            >(diff.dirty);
+
+            // Handle raw updates if present
+            if (diff.raw) {
+              if (!accumulatedStateDiff[existingIndex].raw) {
+                accumulatedStateDiff[existingIndex].raw = structuredClone<
+                  typeof diff.raw
+                >(diff.raw);
+              } else {
+                // Update each raw element, preserving original values
+                const updatedRaw = [...accumulatedStateDiff[existingIndex].raw];
+
+                for (const rawElement of diff.raw) {
+                  const idx = updatedRaw.findIndex(
+                    (item) => item.key === rawElement.key
+                  );
+
+                  if (idx === -1) {
+                    // New raw element
+                    updatedRaw.push(
+                      structuredClone<typeof rawElement>(rawElement)
+                    );
+                  } else {
+                    // Update existing raw element - keep original, update dirty
+                    updatedRaw[idx] = {
+                      ...updatedRaw[idx],
+                      dirty: rawElement.dirty,
+                    };
+                  }
+                }
+
+                accumulatedStateDiff[existingIndex].raw = updatedRaw;
+              }
+            }
+          }
         }
 
-        // Handle the raw changes
-        if (diff.raw) {
-          const rawElements = Array.isArray(diff.raw) ? diff.raw : [diff.raw];
+        // Handle raw-only diffs (missing soltype, original, or dirty)
+        else if (diff?.raw && diff.raw.length > 0) {
+          for (const rawElement of diff.raw) {
+            let updated = false;
 
-          for (const rawElement of rawElements) {
-            const { address, key } = rawElement;
+            // First try to find and update existing entries
+            for (let k = 0; k < accumulatedStateDiff.length; k++) {
+              const stateDiff = accumulatedStateDiff[k];
 
-            // Initialize objects if they don't exist
-            if (!accumulatedRawChanges[address]) {
-              accumulatedRawChanges[address] = {};
+              if (stateDiff.address === diff.address && stateDiff.raw) {
+                const rawIndex = stateDiff.raw.findIndex(
+                  (raw) => raw.key === rawElement.key
+                );
+
+                if (rawIndex !== -1) {
+                  // Found matching raw element - update only dirty value
+                  const newRaw = [...stateDiff.raw];
+                  newRaw[rawIndex] = {
+                    ...newRaw[rawIndex],
+                    dirty: rawElement.dirty,
+                  };
+
+                  accumulatedStateDiff[k] = {
+                    ...accumulatedStateDiff[k],
+                    raw: newRaw,
+                  };
+
+                  updated = true;
+                  break;
+                }
+              }
             }
 
-            // For each raw change, we want to keep the original original value
-            // but update the dirty value as changes accumulate
-            if (!accumulatedRawChanges[address][key]) {
-              accumulatedRawChanges[address][key] = {
-                address,
-                key,
-                original: rawElement.original,
-                dirty: rawElement.dirty,
+            // If no existing entry was updated, create a new one
+            if (!updated) {
+              const newDiff: StateDiff = {
+                address: diff.address,
+                soltype: diff.soltype || null,
+                original: diff.original || null,
+                dirty: diff.dirty || null,
+                raw: [structuredClone<typeof rawElement>(rawElement)],
               };
-            } else {
-              // Update only the dirty value, keep the original original
-              accumulatedRawChanges[address][key].dirty = rawElement.dirty;
+
+              accumulatedStateDiff.push(newDiff);
             }
           }
         }
       }
 
-      // Update the raw arrays in accumulatedStateDiff with the latest from accumulatedRawChanges
-      for (const diff of accumulatedStateDiff) {
-        if (diff.address) {
-          const addressChanges = accumulatedRawChanges[diff.address];
-          if (addressChanges) {
-            // Convert the object values to an array
-            const rawArray = Object.values(addressChanges);
-            if (rawArray.length > 0) {
-              diff.raw = rawArray;
-            }
-          }
-        }
-      }
-
-      // Create a deep copy of the accumulated state diff for this simulation
+      // Add a deep copy of the current accumulated state to our results
       cumulativeStateDiff.push(
-        JSON.parse(JSON.stringify(accumulatedStateDiff))
+        structuredClone<typeof accumulatedStateDiff>(accumulatedStateDiff)
       );
     }
 
-    return JSON.parse(JSON.stringify(cumulativeStateDiff));
+    return cumulativeStateDiff;
   }
 }
