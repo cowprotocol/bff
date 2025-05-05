@@ -30,8 +30,8 @@ export const ChainNames: Record<SupportedChainId, string> = {
 // TODO: Get from SDK
 export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.MAINNET]: 'mainnet',
-  [SupportedChainId.ARBITRUM_ONE]: 'arb1',
   [SupportedChainId.GNOSIS_CHAIN]: 'gc',
+  [SupportedChainId.ARBITRUM_ONE]: 'arb1',
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };

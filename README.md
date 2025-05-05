@@ -39,6 +39,15 @@ docker-compose up -d db
 # Start the notification producer
 yarn producer
 ```
+
+The application will start the notification producer for the networks, but you can run it for a specific network or networks by setting the `NOTIFICATIONS_PRODUCER_CHAINS` environment variable.
+
+```yaml
+# Run producer only on networks 1 and 100
+NOTIFICATIONS_PRODUCER_CHAINS=1,100
+```
+
+
 ## Create a new service or library
 
 To add a new app or library, you can run the following command;
@@ -123,5 +132,38 @@ If you have a subscription to any of the channels (i.e. Telegram), you can use t
 
 ```bash
 # Replace the POST_TO_QUEUE_ACCOUNT with your account address
-POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 nx test notification-producer --testFile=src/postToQueueTest.test.ts
+POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 nx test notification-producer --testFile=src/sendPush.test.ts --skip-nx-cache
 ```
+# Database Migrations
+The database access, and therefore the migrations is handled in `libs/repositories`.
+
+
+## Create a new migration
+To create a new migration, run:
+```bash
+# Create a new migration with "your-migration-name" as name
+yarn typeorm migration:create src/migrations/your-migration-name
+
+# Alternatively, you could define the entities in `libs/repositories/src/database` and then run:
+yarn migration:generate
+```
+
+This will create a new migration file in the `libs/repositories/src/migrations` directory. For example `1745364046891-initial-migration.ts`. 
+
+Inside this file, you will need to edit the migration logic, where:
+- `up` is the logic to execute the migration
+- `down` is the logic to revert the migration
+
+## Run migrations
+Once you have added the migration logic, you can run the migration with:
+```bash
+yarn migration:run
+```
+
+## Revert migrations
+To revert the last migration, run:
+```bash
+yarn migration:revert
+```
+
+
