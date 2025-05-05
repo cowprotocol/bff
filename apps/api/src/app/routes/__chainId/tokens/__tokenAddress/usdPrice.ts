@@ -72,8 +72,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, tokenAddress } = request.params;
 
-      fastify.log.info(`Get USD price for ${tokenAddress} on chain ${chainId}`);
-
       const price = await usdService.getUsdPrice(
         chainId,
         tokenAddress === '-' ? undefined : tokenAddress
