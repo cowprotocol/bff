@@ -11,16 +11,13 @@ import { UsdRepositoryNoop } from './UsdRepository';
 import { COINGECKO_PLATFORMS } from '../../datasources/coingecko';
 
 // Invert number→slug map to slug→SupportedChainId
-const CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> = Object.entries(
-  COINGECKO_PLATFORMS
-).reduce((map, [id, slug]) => {
-  if (!slug) {
+const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
+  Object.entries(COINGECKO_PLATFORMS).reduce((map, [id, slug]) => {
+    if (slug && SupportedChainId[+id]) {
+      map[slug as string] = +id as SupportedChainId;
+    }
     return map;
-  }
-
-  map[slug as string] = Number(id) as SupportedChainId;
-  return map;
-}, {} as Record<string, SupportedChainId>);
+  }, {} as Record<string, SupportedChainId>);
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
@@ -100,7 +97,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   private getChainId(chainIdOrSlug: string) {
     // Only SupportedChainIds are supported
     const numericId = isNaN(+chainIdOrSlug)
-      ? CHAIN_SLUG_TO_ID[chainIdOrSlug]
+      ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]
       : (+chainIdOrSlug as SupportedChainId);
 
     if (!SupportedChainId[numericId]) {
