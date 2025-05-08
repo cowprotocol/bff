@@ -2,6 +2,7 @@ import { logger, SupportedChainId } from '@cowprotocol/shared';
 import {
   AssetChange,
   SimulationError,
+  StateDiff,
   TenderlyBundleSimulationResponse,
   TenderlySimulatePayload,
 } from './tenderlyTypes';
@@ -17,6 +18,7 @@ import {
   SimulationRepository,
 } from './SimulationRepository';
 import { BigNumber } from 'ethers';
+import { buildStateDiff } from '../../utils/buildStateDiff';
 
 interface TenderlyRequestLog {
   timestamp: string;
@@ -136,12 +138,20 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
         )
       );
 
+      const stateDiff = this.buildStateDiff(
+        response.simulation_results.map(
+          (result) =>
+            result.transaction?.transaction_info.call_trace?.state_diff ?? []
+        )
+      );
+
       return response.simulation_results.map((simulation_result, i) => {
         return {
           status: simulation_result.simulation.status,
           id: simulation_result.simulation.id,
           link: getTenderlySimulationLink(simulation_result.simulation.id),
           cumulativeBalancesDiff: balancesDiff[i],
+          stateDiff: stateDiff[i],
           gasUsed: simulation_result.transaction?.gas_used.toString(),
         };
       });
@@ -198,7 +208,13 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
           updateBalance(to, contract_address, raw_amount);
         }
       });
-      return JSON.parse(JSON.stringify(cumulativeBalancesDiff));
+      return structuredClone<typeof cumulativeBalancesDiff>(
+        cumulativeBalancesDiff
+      );
     });
+  }
+
+  buildStateDiff(stateDiffList: StateDiff[][]): StateDiff[][] {
+    return buildStateDiff(stateDiffList);
   }
 }

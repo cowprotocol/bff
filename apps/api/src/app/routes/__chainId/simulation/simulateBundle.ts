@@ -49,6 +49,67 @@ const successSchema = {
           },
         },
       },
+      stateDiff: {
+        title: 'State Diff',
+        description: 'Changes in blockchain states.',
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            address: {
+              title: 'Address',
+              description: 'Contract address where state change occurred',
+              type: 'string',
+            },
+            soltype: {
+              title: 'Soltype',
+              description: 'Solidity type information',
+              type: ['object', 'null'],
+              additionalProperties: false,
+              properties: {
+                name: { type: 'string' },
+                type: { type: 'string' },
+                storage_location: { type: 'string' },
+                offset: { type: 'number' },
+                index: { type: 'string' },
+                indexed: { type: 'boolean' },
+                components: {
+                  type: ['array', 'null'],
+                  items: {
+                    type: 'object',
+                  },
+                },
+              },
+            },
+            original: {
+              title: 'Original',
+              description: 'Original value before the state change',
+              type: ['string', 'object', 'null'],
+            },
+            dirty: {
+              title: 'Dirty',
+              description: 'New value after the state change',
+              type: ['string', 'object', 'null'],
+            },
+            raw: {
+              title: 'Raw Elements',
+              description: 'Raw state change details',
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  address: { type: 'string' },
+                  key: { type: 'string' },
+                  original: { type: 'string' },
+                  dirty: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      },
       gasUsed: {
         title: 'Gas Used',
         description: 'Amount of gas used in the transaction with decimals.',

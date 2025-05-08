@@ -7,7 +7,7 @@ import {
   TENDERLY_ORG_NAME,
   TENDERLY_PROJECT_NAME,
 } from '../../datasources/tenderlyApi';
-import { AssetChange } from './tenderlyTypes';
+import { AssetChange, StateDiff } from './tenderlyTypes';
 
 // Transfering ETH from WETH to NULL ADDRESS
 const TENDERLY_SIMULATION = {
@@ -189,6 +189,48 @@ describe('SimulationRepositoryTenderly', () => {
       expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
     });
 
+    it('should handle diffs with missing soltype', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: null,
+            original: null,
+            dirty: null,
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0000',
+                dirty: '0x0001',
+              },
+            ],
+          },
+        ],
+      ];
+
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: null,
+            original: null,
+            dirty: null,
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0000',
+                dirty: '0x0001',
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
+    });
+
     it('should handle empty input', () => {
       const input: AssetChange[][] = [];
       expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([]);
@@ -261,6 +303,509 @@ describe('SimulationRepositoryTenderly', () => {
       ];
 
       expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
+    });
+  });
+  describe('buildStateDiff', () => {
+    it('should correctly process a single state diff', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1000',
+              '0xdef': '2000',
+            },
+            dirty: {
+              '0xabc': '1500',
+              '0xdef': '1500',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1000',
+                dirty: '0x1500',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x2000',
+                dirty: '0x1500',
+              },
+            ],
+          },
+        ],
+      ];
+
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1000',
+              '0xdef': '2000',
+            },
+            dirty: {
+              '0xabc': '1500',
+              '0xdef': '1500',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1000',
+                dirty: '0x1500',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x2000',
+                dirty: '0x1500',
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
+    });
+
+    it('should accumulate state changes across multiple simulations', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1000',
+              '0xdef': '2000',
+            },
+            dirty: {
+              '0xabc': '1500',
+              '0xdef': '1500',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1000',
+                dirty: '0x1500',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x2000',
+                dirty: '0x1500',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1500',
+              '0xdef': '1500',
+            },
+            dirty: {
+              '0xabc': '2000',
+              '0xdef': '1000',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1500',
+                dirty: '0x2000',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x1500',
+                dirty: '0x1000',
+              },
+            ],
+          },
+        ],
+      ];
+
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1000',
+              '0xdef': '2000',
+            },
+            dirty: {
+              '0xabc': '1500',
+              '0xdef': '1500',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1000',
+                dirty: '0x1500',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x2000',
+                dirty: '0x1500',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: {
+              '0xabc': '1000',
+              '0xdef': '2000',
+            },
+            dirty: {
+              '0xabc': '2000',
+              '0xdef': '1000',
+            },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x1000',
+                dirty: '0x2000',
+              },
+              {
+                address: '0x123',
+                key: '0xkey2',
+                original: '0x2000',
+                dirty: '0x1000',
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
+    });
+
+    it('should process multiple addresses with different properties', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '200' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x100',
+                dirty: '0x200',
+              },
+            ],
+          },
+          {
+            address: '0x456',
+            soltype: {
+              name: 'allowed',
+              type: 'mapping (address => mapping (address => uint256))',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x001',
+              indexed: false,
+            },
+            original: { '0xabc': { '0xdef': '1000' } },
+            dirty: { '0xabc': { '0xdef': '500' } },
+            raw: [
+              {
+                address: '0x456',
+                key: '0xkey2',
+                original: '0x1000',
+                dirty: '0x500',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '200' },
+            dirty: { '0xabc': '300' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x200',
+                dirty: '0x300',
+              },
+            ],
+          },
+        ],
+      ];
+
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '200' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x100',
+                dirty: '0x200',
+              },
+            ],
+          },
+          {
+            address: '0x456',
+            soltype: {
+              name: 'allowed',
+              type: 'mapping (address => mapping (address => uint256))',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x001',
+              indexed: false,
+            },
+            original: { '0xabc': { '0xdef': '1000' } },
+            dirty: { '0xabc': { '0xdef': '500' } },
+            raw: [
+              {
+                address: '0x456',
+                key: '0xkey2',
+                original: '0x1000',
+                dirty: '0x500',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '300' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x100',
+                dirty: '0x300',
+              },
+            ],
+          },
+          {
+            address: '0x456',
+            soltype: {
+              name: 'allowed',
+              type: 'mapping (address => mapping (address => uint256))',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x001',
+              indexed: false,
+            },
+            original: { '0xabc': { '0xdef': '1000' } },
+            dirty: { '0xabc': { '0xdef': '500' } },
+            raw: [
+              {
+                address: '0x456',
+                key: '0xkey2',
+                original: '0x1000',
+                dirty: '0x500',
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
+    });
+
+    it('should handle empty input', () => {
+      const input: StateDiff[][] = [];
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual([]);
+    });
+
+    it('should handle input with empty state diffs', () => {
+      const input: StateDiff[][] = [[], []];
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual([[], []]);
+    });
+
+    it('should correctly update raw elements when address and key match', () => {
+      const input: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '200' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0064', // hex for 100
+                dirty: '0x00c8', // hex for 200
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: null,
+            original: null,
+            dirty: null,
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x00c8', // hex for 200
+                dirty: '0x012c', // hex for 300
+              },
+            ],
+          },
+        ],
+      ];
+
+      // In the expected result, the accumulated state should maintain the original "original" value
+      // but update the "dirty" value
+      const expected: StateDiff[][] = [
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '200' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0064',
+                dirty: '0x00c8',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            address: '0x123',
+            soltype: {
+              name: 'balanceOf',
+              type: 'mapping (address => uint256)',
+              storage_location: 'storage',
+              offset: 0,
+              index: '0x000',
+              indexed: false,
+            },
+            original: { '0xabc': '100' },
+            dirty: { '0xabc': '200' },
+            raw: [
+              {
+                address: '0x123',
+                key: '0xkey1',
+                original: '0x0064', // keeps the original original
+                dirty: '0x012c', // updated with the latest dirty value
+              },
+            ],
+          },
+        ],
+      ];
+
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
     });
   });
 });

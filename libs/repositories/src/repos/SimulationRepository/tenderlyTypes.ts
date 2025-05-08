@@ -115,7 +115,7 @@ interface SoltypeElement {
   name: string;
   type: SoltypeType;
   storage_location: StorageLocation;
-  components: SoltypeElement[] | null;
+  components?: Record<string, any>[] | null;
   offset: number;
   index: string;
   indexed: boolean;
@@ -135,35 +135,30 @@ enum SimpleTypeType {
   Uint = 'uint',
 }
 
-enum StorageLocation {
-  Calldata = 'calldata',
-  Default = 'default',
-  Memory = 'memory',
-  Storage = 'storage',
-}
+type StorageLocation = 'calldata' | 'default' | 'memory' | 'storage';
 
-enum SoltypeType {
-  Address = 'address',
-  Bool = 'bool',
-  Bytes32 = 'bytes32',
-  MappingAddressUint256 = 'mapping (address => uint256)',
-  MappingUint256Uint256 = 'mapping (uint256 => uint256)',
-  String = 'string',
-  Tuple = 'tuple',
-  TypeAddress = 'address[]',
-  TypeTuple = 'tuple[]',
-  Uint16 = 'uint16',
-  Uint256 = 'uint256',
-  Uint48 = 'uint48',
-  Uint56 = 'uint56',
-  Uint8 = 'uint8',
-}
+type SoltypeType =
+  | 'address'
+  | 'bool'
+  | 'bytes32'
+  | 'mapping (address => uint256)'
+  | 'mapping (uint256 => uint256)'
+  | 'mapping (address => mapping (address => uint256))'
+  | 'string'
+  | 'tuple'
+  | 'address[]'
+  | 'tuple[]'
+  | 'uint16'
+  | 'uint256'
+  | 'uint48'
+  | 'uint56'
+  | 'uint8';
 
 interface Output {
   name: string;
   type: SoltypeType;
   storage_location: StorageLocation;
-  components: SoltypeElement[] | null;
+  components?: SoltypeElement[] | null;
   offset: number;
   index: string;
   indexed: boolean;
@@ -551,7 +546,7 @@ interface PurpleSoltype {
   name: string;
   type: SoltypeType;
   storage_location: StorageLocation;
-  components: null;
+  components?: null;
   offset: number;
   index: string;
   indexed: boolean;
@@ -580,14 +575,15 @@ interface LogRaw {
   data: string;
 }
 
-interface StateDiff {
+export interface StateDiff {
+  address: string;
   soltype: SoltypeElement | null;
-  original: string | Record<string, any>;
-  dirty: string | Record<string, any>;
-  raw: RawElement[];
+  original: string | Record<string, any> | null;
+  dirty: string | Record<string, any> | null;
+  raw?: RawElement[];
 }
 
-interface RawElement {
+export interface RawElement {
   address: string;
   key: string;
   original: string;
