@@ -1,5 +1,5 @@
-import { AddressSchema, ChainIdSchema } from '../../../schemas';
 import { JSONSchema } from 'json-schema-to-ts';
+import { AddressSchema, SupportedChainIdSchema } from '../../../schemas';
 import { POOLS_RESULT_LIMIT } from './const';
 
 export const paramsSchema = {
@@ -7,7 +7,7 @@ export const paramsSchema = {
   required: ['chainId'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdSchema,
+    chainId: SupportedChainIdSchema,
   },
 } as const satisfies JSONSchema;
 
@@ -22,16 +22,16 @@ export const poolsInfoSuccessSchema = {
       'apr',
       'fee',
       'tvl',
-      'volume'
+      'volume',
     ],
     additionalProperties: false,
     properties: {
       contract_address: {
         title: 'Pool address',
         type: 'string',
-        pattern: AddressSchema.pattern
+        pattern: AddressSchema.pattern,
       },
-      chain_id: ChainIdSchema,
+      chain_id: SupportedChainIdSchema,
       project: {
         title: 'Liquidity provider',
         type: 'string',
@@ -68,15 +68,14 @@ export const poolsInfoBodySchema = {
     type: 'string',
     pattern: AddressSchema.pattern,
   },
-  maxItems: POOLS_RESULT_LIMIT
+  maxItems: POOLS_RESULT_LIMIT,
 } as const satisfies JSONSchema;
 
 export const poolsAverageAprBodySchema = {
   type: 'object',
   title: 'Liquidity provider - apr',
-  additionalProperties: true
+  additionalProperties: true,
 } as const satisfies JSONSchema;
-
 
 export const errorSchema = {
   type: 'object',

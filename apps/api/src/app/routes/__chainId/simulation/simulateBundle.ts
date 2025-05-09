@@ -4,15 +4,15 @@ import {
 } from '@cowprotocol/services';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { AddressSchema, ChainIdSchema } from '../../../schemas';
 import { apiContainer } from '../../../inversify.config';
+import { AddressSchema, SupportedChainIdSchema } from '../../../schemas';
 
 const paramsSchema = {
   type: 'object',
   required: ['chainId'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdSchema,
+    chainId: SupportedChainIdSchema,
   },
 } as const satisfies JSONSchema;
 

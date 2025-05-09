@@ -2,11 +2,22 @@ import { logger, SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
 import { injectable } from 'inversify';
 
-import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../../const';
 import { CowApiClient } from '../../datasources/cowApi';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
+import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 import { UsdRepositoryNoop } from './UsdRepository';
+
+import { COINGECKO_PLATFORMS } from '../../datasources/coingecko';
+
+// Invert number→slug map to slug→SupportedChainId
+const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
+  Object.entries(COINGECKO_PLATFORMS).reduce((map, [id, slug]) => {
+    if (slug && SupportedChainId[+id]) {
+      map[slug as string] = +id as SupportedChainId;
+    }
+    return map;
+  }, {} as Record<string, SupportedChainId>);
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
@@ -18,9 +29,21 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   }
 
   async getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
+    const chainId = this.getChainId(chainIdOrSlug);
+    if (!chainId) {
+      return null;
+    }
+
+    if (!tokenAddress) {
+      logger.debug({
+        msg: `Token address is required for UsdRepositoryCow`,
+      });
+      return null;
+    }
+
     // Get native price for token (in ETH/xDAI)
     const tokenNativePrice = await this.getNativePrice(chainId, tokenAddress);
 
@@ -69,6 +92,22 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     }
 
     return usdcPrice.div(tokenPrice).toNumber();
+  }
+
+  private getChainId(chainIdOrSlug: string) {
+    // Only SupportedChainIds are supported
+    const numericId = isNaN(+chainIdOrSlug)
+      ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]
+      : (+chainIdOrSlug as SupportedChainId);
+
+    if (!SupportedChainId[numericId]) {
+      logger.debug({
+        msg: `Chain ${chainIdOrSlug} not supported on UsdRepositoryCow`,
+      });
+      return null;
+    }
+
+    return numericId;
   }
 
   private async getNativePrice(

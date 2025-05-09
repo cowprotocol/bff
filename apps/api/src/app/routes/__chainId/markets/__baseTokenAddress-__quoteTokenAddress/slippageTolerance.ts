@@ -3,14 +3,17 @@ import {
   slippageServiceSymbol,
   VolatilityDetails,
 } from '@cowprotocol/services';
-import { ChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../../inversify.config';
 import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
+import { apiContainer } from '../../../../inversify.config';
+import {
+  ETHEREUM_ADDRESS_PATTERN,
+  SupportedChainIdSchema,
+} from '../../../../schemas';
 
 const CACHE_SECONDS = 120;
 
@@ -19,7 +22,7 @@ const routeSchema = {
   required: ['chainId', 'baseTokenAddress', 'quoteTokenAddress'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdSchema,
+    chainId: SupportedChainIdSchema,
     baseTokenAddress: {
       title: 'Base token address',
       description: 'Currency that is being bought or sold.',
@@ -81,7 +84,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/slippageTolerance',
     {
       schema: {
-        description: 'Retrieve a proposed slippage tolerance for a given market',
+        description:
+          'Retrieve a proposed slippage tolerance for a given market',
         tags: ['markets'],
         params: routeSchema,
         response: {

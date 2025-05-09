@@ -64,7 +64,7 @@ export class SlippageServiceMain implements SlippageService {
   ): Promise<VolatilityDetails | null> {
     const tokenAddress = toTokenAddress(tokenAddressString, chainId);
     const prices = await this.usdRepository.getUsdPrices(
-      chainId,
+      chainId.toString(),
       tokenAddress,
       '5m'
     );
@@ -75,7 +75,7 @@ export class SlippageServiceMain implements SlippageService {
 
     // Get price of the token
     const usdPrice = await this.usdRepository.getUsdPrice(
-      chainId,
+      chainId.toString(),
       tokenAddress
     );
 

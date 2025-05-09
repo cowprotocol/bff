@@ -1,5 +1,3 @@
-import { SupportedChainId } from '@cowprotocol/shared';
-
 export const usdRepositorySymbol = Symbol.for('UsdRepository');
 
 export type PriceStrategy = '5m' | 'hourly' | 'daily';
@@ -23,27 +21,27 @@ export interface PricePoint {
 
 export interface UsdRepository {
   getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null>;
 
   getUsdPrices(
-    chainId: SupportedChainId,
-    tokenAddress: string,
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null>;
 }
 
 export class UsdRepositoryNoop implements UsdRepository {
   async getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
     return null;
   }
   async getUsdPrices(
-    chainId: SupportedChainId,
-    tokenAddress: string,
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     return null;
