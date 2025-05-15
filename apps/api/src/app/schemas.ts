@@ -23,6 +23,7 @@ export const AddressSchema = {
 
 export const OptionalAddressSchema = {
   title: 'Optional Address',
+  //  Since the token address is part of the path, we can't leave it empty
   description:
     'Either provide a token address or a dash (-) to indicate no address.',
   oneOf: [
