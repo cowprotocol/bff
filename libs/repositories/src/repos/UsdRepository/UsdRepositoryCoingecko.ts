@@ -1,11 +1,11 @@
 import { injectable } from 'inversify';
 import {
-  COINGECKO_PLATFORMS,
   SimplePriceResponse,
   coingeckoProClient,
 } from '../../datasources/coingecko';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
+import { getAddressOrPlatform, getCoingeckoPlatform } from '../../utils/coingeckoUtils';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -22,20 +22,18 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
   daily: 90, // 90 Days of daily data (~90 points)
 };
 
-import { isAddress } from 'viem';
-
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
     chainIdOrSlug: string,
     tokenAddress?: string | undefined
   ): Promise<number | null> {
-    const platform = this.getPlatform(chainIdOrSlug);
+    const platform = getCoingeckoPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }
 
-    const addressOrPlatform = this.getAddressOrPlatform(tokenAddress, platform);
+    const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform);
 
     const fetchPromise = tokenAddress
       ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
@@ -44,29 +42,12 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform);
   }
 
-  private getAddressOrPlatform(
-    tokenAddress: string | undefined,
-    platform: string
-  ): string {
-    if (!tokenAddress) {
-      return platform;
-    }
-
-    if (isAddress(tokenAddress)) {
-      // EVM like address, Coingecko expects it lowercased
-      return tokenAddress.toLowerCase();
-    }
-
-    // Non-EVM address, Coingecko expects it as is
-    return tokenAddress;
-  }
-
   async getUsdPrices(
     chainIdOrSlug: string,
     tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const platform = this.getPlatform(chainIdOrSlug);
+    const platform = getCoingeckoPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }
@@ -109,11 +90,6 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     }));
 
     return pricePoints;
-  }
-
-  private getPlatform(chainIdOrSlug: string): string | undefined {
-    // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
-    return COINGECKO_PLATFORMS[+chainIdOrSlug] || chainIdOrSlug;
   }
 
   private async getSinglePriceByContractAddress(

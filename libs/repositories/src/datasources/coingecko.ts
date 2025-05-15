@@ -6,15 +6,22 @@ import type { components, paths } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
+export const SUPPORTED_COINGECKO_PLATFORMS: Record<SupportedChainId, string | undefined> = {
+  [SupportedChainId.SEPOLIA]: undefined,
+  [SupportedChainId.MAINNET]: 'ethereum',
+  [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
+  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
+  [SupportedChainId.BASE]: 'base',
+}
+
 /**
  * Map of chain IDs to Coingecko platform IDs, for every platform that has a network id.
  * The platform ID is used to identify the blockchain on Coingecko.
+ * https://api.coingecko.com/api/v3/asset_platforms
  */
 export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
-  [SupportedChainId.SEPOLIA]: undefined,
-  [SupportedChainId.MAINNET]: 'ethereum',
+  ...SUPPORTED_COINGECKO_PLATFORMS,
   [10]: 'optimistic-ethereum',
-  [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
   [10000]: 'smartbch',
   [100009]: 'vechain',
   [10201]: 'maxxchain',
@@ -136,7 +143,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [41923]: 'edu-chain',
   [42]: 'lukso',
   [4200]: 'merlin-chain',
-  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
   [42170]: 'arbitrum-nova',
   [42220]: 'celo',
   [42262]: 'oasis',
@@ -201,7 +207,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [8217]: 'klay-token',
   [83872]: 'zedxion',
   [841]: 'taraxa',
-  [SupportedChainId.BASE]: 'base',
   [8668]: 'hela',
   [88]: 'tomochain',
   [8822]: 'iota-evm',
