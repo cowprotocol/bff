@@ -1,12 +1,11 @@
 import { injectable } from 'inversify';
-import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import {
-  COINGECKO_PLATFORMS,
   SimplePriceResponse,
   coingeckoProClient,
 } from '../../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/shared';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
+import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
+import { getAddressOrPlatform, getCoingeckoPlatform } from '../../utils/coingeckoUtils';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -26,78 +25,46 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
   async getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
-    const platform = COINGECKO_PLATFORMS[chainId];
+    const platform = getCoingeckoPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }
 
-    const tokenAddressLower = tokenAddress.toLowerCase();
+    const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform);
 
-    // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    const { data, response } = await coingeckoProClient.GET(
-      `/simple/token_price/{id}`,
-      {
-        params: {
-          path: {
-            id: platform,
-          },
-          query: {
-            contract_addresses: tokenAddressLower,
-            vs_currencies: 'usd',
-          },
-        },
-      }
-    );
+    const fetchPromise = tokenAddress
+      ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
+      : this.getSinglePriceByPlatformId(platform);
 
-    // FIXME: This is a workaround for the fact that Coingecko Open API has a hardcoded BTC address in the response (notified the Coingecko team about this issue, so remove when the issue is fixed)
-    const priceData = data as SimplePriceResponse;
-
-    if (response.status === 404 || !priceData?.[tokenAddressLower]?.usd) {
-      return null;
-    }
-    await throwIfUnsuccessful(
-      'Error getting USD price from Coingecko',
-      response
-    );
-
-    return priceData[tokenAddressLower].usd;
+    return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform);
   }
 
   async getUsdPrices(
-    chainId: SupportedChainId,
-    tokenAddress: string,
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const platform = COINGECKO_PLATFORMS[chainId];
+    const platform = getCoingeckoPlatform(chainIdOrSlug);
     if (!platform) {
       return null;
     }
 
-    const tokenAddressLower = tokenAddress.toLowerCase();
     const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
+    const interval = priceStrategy === 'daily' ? 'daily' : undefined;
 
-    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    const { data: priceData, response } = await coingeckoProClient.GET(
-      `/coins/{id}/contract/{contract_address}/market_chart`,
-      {
-        params: {
-          path: {
-            id: platform,
-            contract_address: tokenAddressLower,
-          },
-          query: {
-            vs_currency: 'usd',
-            days,
-            interval: priceStrategy === 'daily' ? 'daily' : undefined, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
-          },
-        },
-      }
-    );
+    const { data, response } = tokenAddress
+      ? await this.getMarketDataByTokenAddress(
+          platform,
+          days,
+          interval,
+          tokenAddress
+        )
+      : await this.getMarketDataByPlatformId(platform, days, interval);
 
-    if (response.status === 404 || !priceData) {
+    if (response.status === 404 || !data) {
       return null;
     }
     await throwIfUnsuccessful(
@@ -106,12 +73,12 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     );
 
     const volumesMap =
-      priceData.total_volumes?.reduce((acc, [timestamp, volume]) => {
+      data.total_volumes?.reduce((acc, [timestamp, volume]) => {
         acc.set(timestamp, volume);
         return acc;
       }, new Map<number, number>()) || undefined;
 
-    const prices = priceData.prices;
+    const prices = data.prices;
     if (!prices) {
       return null;
     }
@@ -123,5 +90,102 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     }));
 
     return pricePoints;
+  }
+
+  private async getSinglePriceByContractAddress(
+    platform: string,
+    tokenAddress: string
+  ) {
+    // Get USD price: https://docs.coingecko.com/reference/simple-token-price
+    return coingeckoProClient.GET(`/simple/token_price/{id}`, {
+      params: {
+        path: {
+          id: platform,
+        },
+        query: {
+          contract_addresses: tokenAddress,
+          vs_currencies: 'usd',
+        },
+      },
+    });
+  }
+
+  private async getSinglePriceByPlatformId(platform: string) {
+    // https://docs.coingecko.com/reference/simple-price
+    return coingeckoProClient.GET(`/simple/price`, {
+      params: {
+        query: {
+          ids: platform,
+          vs_currencies: 'usd',
+        },
+      },
+    });
+  }
+
+  private async handleSinglePriceResponse(
+    fetchPromise: Promise<unknown>,
+    key: string
+  ): Promise<number | null> {
+    const { data, response } = (await fetchPromise) as {
+      data: SimplePriceResponse;
+      response: Response;
+    };
+
+    if (response.status === 404 || !data?.[key]?.usd) {
+      return null;
+    }
+
+    await throwIfUnsuccessful(
+      'Error getting USD price from Coingecko',
+      response
+    );
+
+    return data[key].usd;
+  }
+
+  private async getMarketDataByTokenAddress(
+    platform: string,
+    days: string,
+    interval: 'daily' | undefined,
+    tokenAddress: string
+  ) {
+    const address = tokenAddress.toLowerCase();
+    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
+    return coingeckoProClient.GET(
+      `/coins/{id}/contract/{contract_address}/market_chart`,
+      {
+        params: {
+          path: {
+            id: platform,
+            contract_address: address,
+          },
+          query: {
+            vs_currency: 'usd',
+            days,
+            interval, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
+          },
+        },
+      }
+    );
+  }
+
+  private async getMarketDataByPlatformId(
+    platform: string,
+    days: string,
+    interval: 'daily' | undefined
+  ) {
+    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
+    return coingeckoProClient.GET(`/coins/{id}/market_chart`, {
+      params: {
+        path: {
+          id: platform,
+        },
+        query: {
+          vs_currency: 'usd',
+          days,
+          interval, // Coingecko will auto-choose the granularity based on the number of days (but days, its required in our case). However, is not good to specify it for the other because it will throw an error (saying that the PRO account is not enough)
+        },
+      },
+    });
   }
 }

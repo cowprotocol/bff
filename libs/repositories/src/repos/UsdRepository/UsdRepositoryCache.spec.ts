@@ -10,7 +10,7 @@ const CACHE_VALUE_SECONDS = 10;
 const CACHE_NULL_SECONDS = 20;
 
 const wethLowercase = WETH.toLocaleLowerCase();
-const chainId = SupportedChainId.MAINNET;
+const chainId = SupportedChainId.MAINNET.toString();
 
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({

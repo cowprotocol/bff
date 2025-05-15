@@ -1,16 +1,19 @@
 import { UsdService, usdServiceSymbol } from '@cowprotocol/services';
-import { AddressSchema, ChainIdSchema } from '../../../../schemas';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
+import {
+  ChainIdOrSlugSchema,
+  OptionalAddressSchema,
+} from '../../../../schemas';
 
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'tokenAddress'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdSchema,
-    tokenAddress: AddressSchema,
+    chainId: ChainIdOrSlugSchema,
+    tokenAddress: OptionalAddressSchema,
   },
 } as const satisfies JSONSchema;
 
@@ -67,9 +70,17 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress } = request.params;
+      const { chainId, tokenAddress: _tokenAddress } = request.params;
 
-      const price = await usdService.getUsdPrice(chainId, tokenAddress);
+      /**
+       * The token address is optional. If it is not provided, it should be '-'.
+       * @see {@link OptionalAddressSchema}
+       */
+      const tokenAddress = _tokenAddress === '-' ? undefined : _tokenAddress
+      const price = await usdService.getUsdPrice(
+        chainId,
+        tokenAddress
+      );
       fastify.log.info(
         `Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`
       );

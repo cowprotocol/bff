@@ -2,11 +2,13 @@ import { logger, SupportedChainId } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
 import { injectable } from 'inversify';
 
-import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 import { OneBigNumber, TenBigNumber, USDC, ZeroBigNumber } from '../../const';
 import { CowApiClient } from '../../datasources/cowApi';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
+import { Erc20Repository } from '../Erc20Repository/Erc20Repository';
 import { UsdRepositoryNoop } from './UsdRepository';
+
+import { getSupportedCoingeckoChainId } from '../../utils/coingeckoUtils';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
@@ -18,9 +20,21 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
   }
 
   async getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
+    const chainId = getSupportedCoingeckoChainId(chainIdOrSlug);
+    if (!chainId) {
+      return null;
+    }
+
+    if (!tokenAddress) {
+      logger.debug({
+        msg: `Token address is required for UsdRepositoryCow`,
+      });
+      return null;
+    }
+
     // Get native price for token (in ETH/xDAI)
     const tokenNativePrice = await this.getNativePrice(chainId, tokenAddress);
 

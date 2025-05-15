@@ -27,15 +27,15 @@ export class UsdRepositoryCache implements UsdRepository {
   }
 
   async getUsdPrice(
-    chainId: SupportedChainId,
-    tokenAddress: string
+    chainIdOrSlug: string,
+    tokenAddress?: string | undefined
   ): Promise<number | null> {
     // Get price from cache
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-price',
-      chainId,
-      tokenAddress
+      chainIdOrSlug,
+      tokenAddress || ''
     );
     const usdPriceCached = await this.getValueFromCache({
       key,
@@ -48,7 +48,7 @@ export class UsdRepositoryCache implements UsdRepository {
     }
 
     // Get the usd Price (delegate call)
-    const usdPrice = await this.proxy.getUsdPrice(chainId, tokenAddress);
+    const usdPrice = await this.proxy.getUsdPrice(chainIdOrSlug, tokenAddress);
 
     // Cache price (or absence of it)
     this.cacheValue({
@@ -59,15 +59,15 @@ export class UsdRepositoryCache implements UsdRepository {
     return usdPrice;
   }
   async getUsdPrices(
-    chainId: SupportedChainId,
-    tokenAddress: string,
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     const key = getCacheKey(
       ...this.baseCacheKey,
       'usd-prices',
-      chainId,
-      tokenAddress,
+      chainIdOrSlug,
+      tokenAddress || '',
       priceStrategy
     );
 
@@ -84,7 +84,7 @@ export class UsdRepositoryCache implements UsdRepository {
 
     // Get the usd Prices (delegate call)
     const usdPrices = await this.proxy.getUsdPrices(
-      chainId,
+      chainIdOrSlug,
       tokenAddress,
       priceStrategy
     );
@@ -112,7 +112,7 @@ export class UsdRepositoryCache implements UsdRepository {
     return undefined;
   }
 
-  private async cacheValue<T>(props: {
+  private async cacheValue(props: {
     key: string;
     value: string | null;
   }): Promise<void> {
