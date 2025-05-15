@@ -50,7 +50,7 @@ export const OptionalAddressSchema = {
        *     "solana": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
        *   }
        */
-      pattern: '^[0x]?[a-fA-F0-9\\.:]{3,80}$',
+      pattern: '^(0x)?[a-fA-F0-9\\.:]{3,80}$',
     },
     {
       type: 'string',
