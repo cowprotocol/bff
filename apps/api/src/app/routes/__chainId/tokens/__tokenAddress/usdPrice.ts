@@ -70,11 +70,16 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress } = request.params;
+      const { chainId, tokenAddress: _tokenAddress } = request.params;
 
+      /**
+       * The token address is optional. If it is not provided, it should be '-'.
+       * @see {@link OptionalAddressSchema}
+       */
+      const tokenAddress = _tokenAddress === '-' ? undefined : _tokenAddress
       const price = await usdService.getUsdPrice(
         chainId,
-        tokenAddress === '-' ? undefined : tokenAddress
+        tokenAddress
       );
       fastify.log.info(
         `Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`
