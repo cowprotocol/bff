@@ -118,9 +118,11 @@ export class TradeNotificationProducer implements Runnable {
           toBlock - fromBlock + 1n
         } blocks`
       );
+      const toBlockTimestamp = (await client.getBlock({ blockNumber: toBlock }))
+        .timestamp;
       const producerState: TradeNotificationProducerState = {
         lastBlock: toBlock.toString(),
-        lastBlockTimestamp: lastBlock.timestamp.toString(),
+        lastBlockTimestamp: toBlockTimestamp.toString(),
         lastBlockHash: lastBlock.hash,
       };
       await this.processBlocks(fromBlock, toBlock, producerState);
