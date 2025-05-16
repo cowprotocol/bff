@@ -188,7 +188,7 @@ export class TradeNotificationProducer implements Runnable {
     this.props.pushNotificationsRepository.send(notifications);
 
     // Update state
-    indexerStateRepository.upsert<TradeNotificationProducerState>(
+    await indexerStateRepository.upsert<TradeNotificationProducerState>(
       PRODUCER_NAME,
       producerState,
       chainId
