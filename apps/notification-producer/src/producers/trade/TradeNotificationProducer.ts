@@ -122,13 +122,16 @@ export class TradeNotificationProducer implements Runnable {
 
       // Process this batch of blocks
 
-      logger.debug(
-        `${
-          this.prefix
-        } Processing batch ${page} of ${totalPages}: From block ${fromBlock} to ${toBlock}: ${
-          toBlock - fromBlock + 1n
-        } blocks`
-      );
+      // Print debug message only if there's more than one page (otherwise is too spammy)
+      if (totalPages !== 1) {
+        logger.debug(
+          `${
+            this.prefix
+          } Processing batch ${page} of ${totalPages}: From block ${fromBlock} to ${toBlock}: ${
+            toBlock - fromBlock + 1n
+          } blocks`
+        );
+      }
 
       const toBlockInfo = await client.getBlock({ blockNumber: toBlock });
       const producerState: TradeNotificationProducerState = {
