@@ -98,6 +98,10 @@ export class TradeNotificationProducer implements Runnable {
     }
 
     // Process blocks in batches
+    let page = 1;
+    const totalPages = Math.ceil(
+      Number(totalBlocksToIndex) / Number(MAX_BLOCKS_PER_BATCH)
+    );
     while (fromBlock <= toBlockFinal) {
       // Calculate toBlock for this batch
       const toBlock =
@@ -106,6 +110,14 @@ export class TradeNotificationProducer implements Runnable {
           : fromBlock + MAX_BLOCKS_PER_BATCH - 1n;
 
       // Process this batch of blocks
+
+      logger.debug(
+        `${
+          this.prefix
+        } Processing batch ${page} of ${totalPages}: From block ${fromBlock} to ${toBlock}: ${
+          toBlock - fromBlock + 1n
+        } blocks`
+      );
       const producerState: TradeNotificationProducerState = {
         lastBlock: toBlock.toString(),
         lastBlockTimestamp: lastBlock.timestamp.toString(),
@@ -115,6 +127,7 @@ export class TradeNotificationProducer implements Runnable {
 
       // Move to next batch
       fromBlock = toBlock + 1n;
+      page++;
     }
 
     // Check if during the process time there were some new blocks
@@ -142,12 +155,6 @@ export class TradeNotificationProducer implements Runnable {
       indexerStateRepository,
       erc20Repository,
     } = this.props;
-
-    logger.debug(
-      `${this.prefix} Processing batch from block ${fromBlock} to ${toBlock}: ${
-        toBlock - fromBlock + 1n
-      } blocks`
-    );
 
     // Get all accounts subscribed to PUSH notifications
     const accounts =
