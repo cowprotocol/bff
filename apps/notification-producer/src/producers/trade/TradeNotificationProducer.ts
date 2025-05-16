@@ -14,6 +14,7 @@ import { getTradeNotifications } from './getTradeNotifications';
 
 const WAIT_TIME = 10000;
 const PRODUCER_NAME = 'trade_notification_producer';
+const MAX_BLOCKS_PER_BATCH = 5000n;
 
 export type TradeNotificationProducerProps = {
   chainId: SupportedChainId;
@@ -63,12 +64,7 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
-    const {
-      chainId,
-      pushSubscriptionsRepository,
-      indexerStateRepository,
-      erc20Repository,
-    } = this.props;
+    const { chainId, indexerStateRepository } = this.props;
 
     // Get last indexed block
     const stateRegistry =
@@ -80,25 +76,78 @@ export class TradeNotificationProducer implements Runnable {
     // Get last block
     const client = viemClients[chainId];
     const lastBlock = await client.getBlock();
-    const toBlock = lastBlock.number;
 
-    // Get trade events from block to last block
-    const fromBlock = stateRegistry?.state
+    const toBlockFinal = lastBlock.number;
+
+    // Get starting block
+    let fromBlock = stateRegistry?.state
       ? BigInt(stateRegistry.state.lastBlock) + 1n
-      : toBlock;
+      : toBlockFinal;
 
-    const numberOfBlocksToIndex = toBlock - fromBlock + 1n;
+    const totalBlocksToIndex = toBlockFinal - fromBlock + 1n;
 
     // Print debug message
-    if (numberOfBlocksToIndex < 1n) {
+    if (totalBlocksToIndex < 1n) {
       // We are up to date. Nothing to index
       logger.trace(`${this.prefix} No new blocks to index`);
       return;
     } else {
       logger.debug(
-        `${this.prefix} Indexing from block ${fromBlock} to ${toBlock}: ${numberOfBlocksToIndex} blocks`
+        `${this.prefix} Indexing from block ${fromBlock} to ${toBlockFinal}: ${totalBlocksToIndex} blocks`
       );
     }
+
+    // Process blocks in batches
+    while (fromBlock <= toBlockFinal) {
+      // Calculate toBlock for this batch
+      const toBlock =
+        fromBlock + MAX_BLOCKS_PER_BATCH - 1n > toBlockFinal
+          ? toBlockFinal
+          : fromBlock + MAX_BLOCKS_PER_BATCH - 1n;
+
+      // Process this batch of blocks
+      const producerState: TradeNotificationProducerState = {
+        lastBlock: toBlock.toString(),
+        lastBlockTimestamp: lastBlock.timestamp.toString(),
+        lastBlockHash: lastBlock.hash,
+      };
+      await this.processBlocks(fromBlock, toBlock, producerState);
+
+      // Move to next batch
+      fromBlock = toBlock + 1n;
+    }
+
+    // Check if during the process time there were some new blocks
+    const newLastBlock = await client.getBlock();
+    if (newLastBlock.number > toBlockFinal) {
+      logger.debug(
+        `${this.prefix} New blocks were indexed during the process: ${
+          lastBlock.number - toBlockFinal
+        } blocks`
+      );
+
+      // Recursive call to process them
+      return this.fetchAndSend();
+    }
+  }
+
+  async processBlocks(
+    fromBlock: bigint,
+    toBlock: bigint,
+    producerState: TradeNotificationProducerState
+  ): Promise<void> {
+    const {
+      chainId,
+      pushSubscriptionsRepository,
+      indexerStateRepository,
+      erc20Repository,
+    } = this.props;
+
+    logger.debug(
+      `${this.prefix} Processing batch from block ${fromBlock} to ${toBlock}: ${
+        toBlock - fromBlock + 1n
+      } blocks`
+    );
 
     // Get all accounts subscribed to PUSH notifications
     const accounts =
@@ -134,11 +183,7 @@ export class TradeNotificationProducer implements Runnable {
     // Update state
     indexerStateRepository.upsert<TradeNotificationProducerState>(
       PRODUCER_NAME,
-      {
-        lastBlock: toBlock.toString(),
-        lastBlockTimestamp: lastBlock.timestamp.toString(),
-        lastBlockHash: lastBlock.hash,
-      },
+      producerState,
       chainId
     );
   }
