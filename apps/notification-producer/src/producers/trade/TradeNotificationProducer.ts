@@ -16,6 +16,9 @@ const WAIT_TIME = 10000;
 const PRODUCER_NAME = 'trade_notification_producer';
 const MAX_BLOCKS_PER_BATCH = 5000n;
 
+const NO_PENDING_BLOCKS = { hasPendingBlocks: false };
+const HAS_PENDING_BLOCKS = { hasPendingBlocks: true };
+
 export type TradeNotificationProducerProps = {
   chainId: SupportedChainId;
   pushNotificationsRepository: PushNotificationsRepository;
@@ -64,6 +67,15 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
+    let hasPendingBlocks = true;
+
+    // Keep processing blocks until there are no more pending blocks
+    while (hasPendingBlocks) {
+      ({ hasPendingBlocks } = await this.processAllPendingBlocks());
+    }
+  }
+
+  async processAllPendingBlocks(): Promise<{ hasPendingBlocks: boolean }> {
     const { chainId, indexerStateRepository } = this.props;
 
     // Get last indexed block
@@ -76,7 +88,6 @@ export class TradeNotificationProducer implements Runnable {
     // Get last block
     const client = viemClients[chainId];
     const lastBlock = await client.getBlock();
-
     const toBlockFinal = lastBlock.number;
 
     // Get starting block
@@ -90,7 +101,7 @@ export class TradeNotificationProducer implements Runnable {
     if (totalBlocksToIndex < 1n) {
       // We are up to date. Nothing to index
       logger.trace(`${this.prefix} No new blocks to index`);
-      return;
+      return NO_PENDING_BLOCKS;
     } else {
       logger.debug(
         `${this.prefix} Indexing from block ${fromBlock} to ${toBlockFinal}: ${totalBlocksToIndex} blocks`
@@ -142,7 +153,9 @@ export class TradeNotificationProducer implements Runnable {
       );
 
       // Recursive call to process the new blocks
-      return this.fetchAndSend();
+      return HAS_PENDING_BLOCKS;
+    } else {
+      return NO_PENDING_BLOCKS;
     }
   }
 
