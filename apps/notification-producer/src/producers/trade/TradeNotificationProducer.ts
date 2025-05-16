@@ -137,7 +137,7 @@ export class TradeNotificationProducer implements Runnable {
     if (newLastBlock.number > toBlockFinal) {
       logger.debug(
         `${this.prefix} New blocks were indexed during the process: ${
-          lastBlock.number - toBlockFinal
+          newLastBlock.number - toBlockFinal
         } blocks`
       );
 
