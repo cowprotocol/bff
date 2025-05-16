@@ -126,7 +126,7 @@ export class TradeNotificationProducer implements Runnable {
         } blocks`
       );
 
-      // Recursive call to process them
+      // Recursive call to process the new blocks
       return this.fetchAndSend();
     }
   }
