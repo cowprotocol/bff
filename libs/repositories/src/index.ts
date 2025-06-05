@@ -1,5 +1,6 @@
 // Utils
 export * from './utils/cache';
+export * from './utils/isDbEnabled';
 
 // Data-sources
 export * from './datasources/redis';

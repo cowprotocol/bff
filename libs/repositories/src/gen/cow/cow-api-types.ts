@@ -1134,7 +1134,7 @@ export interface components {
             /** @description Unix timestamp (`uint32`) until which the order is valid. */
             validTo: number;
             appData: components["schemas"]["AppDataHash"];
-            /** @description feeRatio * sellAmount + minimal_fee in atoms. */
+            /** @description sellAmount in atoms to cover network fees. Needs to be zero (and incorporated into the limit price) when placing the order */
             feeAmount: components["schemas"]["TokenAmount"];
             /** @description The kind is either a buy or sell order. */
             kind: components["schemas"]["OrderKind"];
@@ -1515,6 +1515,9 @@ export interface components {
              * @default false
              */
             onchainOrder: unknown;
+            /** @description User provided timeout in milliseconds. Can only be used to reduce the response time for quote requests if the default is too slow as values greater than the default will be capped to the default. Note that reducing the timeout can result in worse quotes because the reduced timeout might be too slow for some price estimators.
+             *      */
+            timeout?: number;
         };
         /** @description An order quoted by the backend that can be directly signed and
          *     submitted to the order creation backend.
