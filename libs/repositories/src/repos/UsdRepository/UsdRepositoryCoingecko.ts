@@ -1,11 +1,14 @@
 import { injectable } from 'inversify';
 import {
+  getCoingeckoProClient,
   SimplePriceResponse,
-  coingeckoProClient,
 } from '../../datasources/coingecko';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
-import { getAddressOrPlatform, getCoingeckoPlatform } from '../../utils/coingeckoUtils';
+import {
+  getAddressOrPlatform,
+  getCoingeckoPlatform,
+} from '../../utils/coingeckoUtils';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -97,7 +100,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     tokenAddress: string
   ) {
     // Get USD price: https://docs.coingecko.com/reference/simple-token-price
-    return coingeckoProClient.GET(`/simple/token_price/{id}`, {
+    return getCoingeckoProClient().GET(`/simple/token_price/{id}`, {
       params: {
         path: {
           id: platform,
@@ -112,7 +115,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
   private async getSinglePriceByPlatformId(platform: string) {
     // https://docs.coingecko.com/reference/simple-price
-    return coingeckoProClient.GET(`/simple/price`, {
+    return getCoingeckoProClient().GET(`/simple/price`, {
       params: {
         query: {
           ids: platform,
@@ -151,7 +154,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   ) {
     const address = tokenAddress.toLowerCase();
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    return coingeckoProClient.GET(
+    return getCoingeckoProClient().GET(
       `/coins/{id}/contract/{contract_address}/market_chart`,
       {
         params: {
@@ -175,7 +178,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     interval: 'daily' | undefined
   ) {
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
-    return coingeckoProClient.GET(`/coins/{id}/market_chart`, {
+    return getCoingeckoProClient().GET(`/coins/{id}/market_chart`, {
       params: {
         path: {
           id: platform,
