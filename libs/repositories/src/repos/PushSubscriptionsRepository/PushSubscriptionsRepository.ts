@@ -20,11 +20,11 @@ export type CmsTelegramSubscriptions =
 export type CmsPushNotification = {
   id: number;
   account: string;
-  data: object;
+  data: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   notification_template: {
-    id: null | number;
+    id: number;
     title: string;
     description: string;
     url: null | string;
