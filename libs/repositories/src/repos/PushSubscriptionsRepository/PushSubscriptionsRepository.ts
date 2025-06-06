@@ -1,40 +1,58 @@
-import { getAllSubscribedAccounts } from '@cowprotocol/cms-api';
+import { components } from '@cowprotocol/cms';
 
-const CACHE_TIME = 30000;
+export const pushSubscriptionsRepositorySymbol = Symbol.for(
+  'PushSubscriptionsRepository'
+);
+
+type Schemas = components['schemas'];
+export type CmsNotification = Schemas['NotificationListResponseDataItem'];
+export type CmsNotificationResponse = Schemas['NotificationListResponse'];
+export type CmsTelegramSubscription = {
+  account: string;
+  chatId: string;
+};
+export type CmsTelegramSubscriptionsResponse =
+  Schemas['TelegramSubscriptionResponse'];
+
+export type CmsTelegramSubscriptions =
+  Schemas['TelegramSubscriptionResponse']['data'];
+
+export type CmsPushNotification = {
+  id: number;
+  account: string;
+  data: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  notification_template: {
+    id: number;
+    title: string;
+    description: string;
+    url: null | string;
+    push: boolean;
+    thumbnail: null | string;
+  };
+};
+
+export interface NotificationModel {
+  id: number;
+  account: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  url: string | null;
+  thumbnail: string | null;
+}
 
 /**
  * Repository to keep track of subscribed accounts for push notifications.
  */
 export interface PushSubscriptionsRepository {
   getAllSubscribedAccounts(): Promise<string[]>;
-}
-
-/**
- * Repository to keep track of subscribed accounts for push notifications.
- *
- * Uses the CMS to retrieve the subscriptions
- */
-export class PushSubscriptionsRepositoryCms
-  implements PushSubscriptionsRepository
-{
-  private lastCheck: number | null = null;
-  private cachedAccounts: string[] | null = null;
-
-  async getAllSubscribedAccounts(): Promise<string[]> {
-    const now = Date.now();
-    if (
-      !this.cachedAccounts ||
-      !this.lastCheck ||
-      now - this.lastCheck > CACHE_TIME
-    ) {
-      this.cachedAccounts = uniqueLowercase(await getAllSubscribedAccounts());
-      this.lastCheck = now;
-      return this.cachedAccounts;
-    }
-    return this.cachedAccounts || [];
-  }
-}
-
-function uniqueLowercase(items: string[]): string[] {
-  return Array.from(new Set(items.map((item) => item.toLowerCase())));
+  getAllTelegramSubscriptionsForAccounts(
+    accounts: string[]
+  ): Promise<CmsTelegramSubscription[]>;
+  getPushNotifications(): Promise<CmsPushNotification[]>;
+  getNotificationsByAccount(params: {
+    account: string;
+  }): Promise<NotificationModel[]>;
 }

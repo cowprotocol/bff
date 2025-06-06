@@ -10,6 +10,7 @@ export * from './datasources/postgresPlain';
 export * from './datasources/orm/postgresOrm';
 export * from './datasources/rabbitMq';
 export * from './datasources/telegram';
+export * from './datasources/cms';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
@@ -52,3 +53,4 @@ export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm';
 // Notifications repositories
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
+export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
