@@ -13,9 +13,7 @@ export function getCmsClient(): CmsClient {
 
   const cmsApiKey = process.env.CMS_API_KEY;
   if (!cmsApiKey) {
-    console.warn(
-      'CMS_API_KEY is not set. Some CMS integrations might not work for lack of permissions.'
-    );
+    throw new Error('CMS_API_KEY is not set');
   }
 
   cmsClient = CmsClient({
