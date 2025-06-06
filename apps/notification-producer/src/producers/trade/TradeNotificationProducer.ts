@@ -1,9 +1,9 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   Erc20Repository,
+  getViemClients,
   IndexerStateValue,
   PushNotificationsRepository,
-  viemClients,
 } from '@cowprotocol/repositories';
 
 import { Runnable } from '../../../types';
@@ -86,7 +86,7 @@ export class TradeNotificationProducer implements Runnable {
       );
 
     // Get last block
-    const client = viemClients[chainId];
+    const client = getViemClients()[chainId];
     const lastBlock = await client.getBlock();
     const toBlockFinal = lastBlock.number;
 
