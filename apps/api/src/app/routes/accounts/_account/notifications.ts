@@ -7,11 +7,13 @@ import {
 } from '../../../../utils/cache';
 import ms from 'ms';
 import {
+  isCmsEnabled,
   NotificationModel,
   PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
 } from '@cowprotocol/repositories';
 import { apiContainer } from '../../../inversify.config';
+import { logger } from '@cowprotocol/shared';
 
 const CACHE_SECONDS = ms('5m') / 1000;
 
@@ -32,10 +34,16 @@ type RouteSchema = FromSchema<typeof routeSchema>;
 
 type GetNotificationsSchema = RouteSchema;
 
-const pushSubscriptionsRepository: PushSubscriptionsRepository =
-  apiContainer.get(pushSubscriptionsRepositorySymbol);
-
 const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
+  if (!isCmsEnabled) {
+    logger.warn(
+      'CMS is not enabled. Please check CMS_ENABLED and CMS_API_KEY environment variables'
+    );
+  }
+
+  const pushSubscriptionsRepository: PushSubscriptionsRepository =
+    apiContainer.get(pushSubscriptionsRepositorySymbol);
+
   // GET /accounts/:account/notifications
   fastify.get<{
     Params: GetNotificationsSchema;
