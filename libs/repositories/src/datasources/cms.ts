@@ -1,15 +1,15 @@
 import { CmsClient } from '@cowprotocol/cms';
 
-export type CmsClient = ReturnType<typeof CmsClient>;
+export type CmsClientType = ReturnType<typeof CmsClient>;
 
-let cmsClient: CmsClient | undefined = undefined;
+let cmsClient: CmsClientType | undefined = undefined;
 
 export const isCmsEnabled =
   process.env.CMS_ENABLED !== undefined
     ? process.env.CMS_ENABLED.toLowerCase() === 'true'
     : !!process.env.CMS_API_KEY;
 
-export function getCmsClient(): CmsClient {
+export function getCmsClient(): CmsClientType {
   if (cmsClient) {
     return cmsClient;
   }
