@@ -1,6 +1,8 @@
 import {
   getCacheRepository,
   getErc20Repository,
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
   getSimulationRepository,
   getTokenHolderRepository,
   getUsdRepository,
@@ -9,11 +11,15 @@ import {
 import {
   CacheRepository,
   Erc20Repository,
+  PushNotificationsRepository,
+  PushSubscriptionsRepository,
   SimulationRepository,
   TokenHolderRepository,
   UsdRepository,
   cacheRepositorySymbol,
   erc20RepositorySymbol,
+  pushNotificationsRepositorySymbol,
+  pushSubscriptionsRepositorySymbol,
   tenderlyRepositorySymbol,
   tokenHolderRepositorySymbol,
   usdRepositorySymbol,
@@ -48,6 +54,8 @@ function getApiContainer(): Container {
   const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
+  const pushNotificationsRepository = getPushNotificationsRepository();
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository();
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -64,6 +72,14 @@ function getApiContainer(): Container {
   apiContainer
     .bind<UsdRepository>(usdRepositorySymbol)
     .toConstantValue(usdRepository);
+
+  apiContainer
+    .bind<PushNotificationsRepository>(pushNotificationsRepositorySymbol)
+    .toConstantValue(pushNotificationsRepository);
+
+  apiContainer
+    .bind<PushSubscriptionsRepository>(pushSubscriptionsRepositorySymbol)
+    .toConstantValue(pushSubscriptionsRepository);
 
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)

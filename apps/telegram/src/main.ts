@@ -5,17 +5,18 @@ import { marked } from 'marked';
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
 
-import {
-  CmsTelegramSubscription,
-  getAllTelegramSubscriptionsForAccounts,
-} from '@cowprotocol/cms-api';
 import { doForever, logger, sleep } from '@cowprotocol/shared';
 import {
   getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
   getTelegramBot,
 } from '@cowprotocol/services';
 import { PushNotification } from '@cowprotocol/notifications';
 import TelegramBot from 'node-telegram-bot-api';
+import {
+  CmsTelegramSubscription,
+  PushSubscriptionsRepository,
+} from '@cowprotocol/repositories';
 
 const WAIT_TIME = ms(`10s`);
 const SUBSCRIPTION_CACHE_TIME = ms(`5m`);
@@ -43,7 +44,8 @@ async function mainLoop() {
 }
 
 async function getSubscriptions(
-  account: string
+  account: string,
+  pushSubscriptionsRepository: PushSubscriptionsRepository
 ): Promise<CmsTelegramSubscription[]> {
   // Get the subscriptions for this account
   const lastCheck = LAST_SUBSCRIPTION_CHECK.get(account);
@@ -52,9 +54,10 @@ async function getSubscriptions(
     lastCheck.getTime() + SUBSCRIPTION_CACHE_TIME < Date.now()
   ) {
     // Get the subscriptions for this account (if we haven't checked in a while)
-    const subscriptionForAccount = await getAllTelegramSubscriptionsForAccounts(
-      [account]
-    );
+    const subscriptionForAccount =
+      await pushSubscriptionsRepository.getAllTelegramSubscriptionsForAccounts([
+        account,
+      ]);
     SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
   }
 
@@ -62,7 +65,8 @@ async function getSubscriptions(
 }
 
 async function sendNotificationToTelegram(
-  notification: PushNotification
+  notification: PushNotification,
+  pushSubscriptionsRepository: PushSubscriptionsRepository
 ): Promise<boolean> {
   const { id, message, account, title, url, context } = notification;
   logger.debug(
@@ -72,12 +76,13 @@ async function sendNotificationToTelegram(
   );
 
   // Get the subscriptions for this account
-  const telegramSubscriptions = await getSubscriptions(account).catch(
-    (error) => {
-      logger.error(error, `Error getting subscriptions for account ${account}`);
-      return null;
-    }
-  );
+  const telegramSubscriptions = await getSubscriptions(
+    account,
+    pushSubscriptionsRepository
+  ).catch((error) => {
+    logger.error(error, `Error getting subscriptions for account ${account}`);
+    return null;
+  });
 
   if (!telegramSubscriptions) {
     return false;
@@ -118,13 +123,19 @@ async function sendNotificationToTelegram(
  */
 async function subscribeToNotifications() {
   const pushNotificationsRepository = getPushNotificationsRepository();
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository();
 
   // Connect to push notifications
   const { connection } = await pushNotificationsRepository.connect();
 
   // Subscribe to new notifications
   const { subscriptionId, cancelSubscription } =
-    await pushNotificationsRepository.subscribe(sendNotificationToTelegram);
+    await pushNotificationsRepository.subscribe(async (notification) => {
+      return sendNotificationToTelegram(
+        notification,
+        pushSubscriptionsRepository
+      );
+    });
 
   logger.info(
     `[telegram] Subscribed to notifications with ID ${subscriptionId}`

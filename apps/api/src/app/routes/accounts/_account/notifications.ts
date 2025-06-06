@@ -1,7 +1,3 @@
-import {
-  NotificationModel,
-  getNotificationsByAccount,
-} from '@cowprotocol/cms-api';
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { ETHEREUM_ADDRESS_PATTERN } from '../../../schemas';
@@ -10,6 +6,12 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../utils/cache';
 import ms from 'ms';
+import {
+  NotificationModel,
+  PushSubscriptionsRepository,
+  pushSubscriptionsRepositorySymbol,
+} from '@cowprotocol/repositories';
+import { apiContainer } from '../../../inversify.config';
 
 const CACHE_SECONDS = ms('5m') / 1000;
 
@@ -29,6 +31,9 @@ const routeSchema = {
 type RouteSchema = FromSchema<typeof routeSchema>;
 
 type GetNotificationsSchema = RouteSchema;
+
+const pushSubscriptionsRepository: PushSubscriptionsRepository =
+  apiContainer.get(pushSubscriptionsRepositorySymbol);
 
 const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
   // GET /accounts/:account/notifications
@@ -51,7 +56,10 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
       );
 
       const account = request.params.account;
-      const notifications = await getNotificationsByAccount({ account });
+      const notifications =
+        await pushSubscriptionsRepository.getNotificationsByAccount({
+          account,
+        });
       reply.send(notifications);
     }
   );
