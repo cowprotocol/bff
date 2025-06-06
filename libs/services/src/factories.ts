@@ -31,7 +31,7 @@ import {
   createNewPostgresOrm,
   createTelegramBot,
   redisClient,
-  viemClients,
+  getViemClients,
 } from '@cowprotocol/repositories';
 import { createNewPostgresPool } from '@cowprotocol/repositories';
 
@@ -54,7 +54,7 @@ export function getErc20Repository(
   cacheRepository: CacheRepository
 ): Erc20Repository {
   return new Erc20RepositoryCache(
-    new Erc20RepositoryViem(viemClients),
+    new Erc20RepositoryViem(getViemClients()),
     cacheRepository,
     'erc20',
     CACHE_TOKEN_INFO_SECONDS
