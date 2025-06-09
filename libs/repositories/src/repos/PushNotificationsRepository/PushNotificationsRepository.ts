@@ -12,6 +12,10 @@ import crypto from 'node:crypto';
 const MAX_RETRIES = 3; // Maximum number of retry attempts before dropping a message
 export const NOTIFICATIONS_QUEUE = 'notifications';
 
+export const pushNotificationsRepositorySymbol = Symbol.for(
+  'PushNotificationsRepository'
+);
+
 export interface QueueSubscription {
   subscriptionId: string;
   cancelSubscription: () => void;

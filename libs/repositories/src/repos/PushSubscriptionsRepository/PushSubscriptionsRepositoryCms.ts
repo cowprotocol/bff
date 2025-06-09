@@ -1,79 +1,98 @@
-import { CmsClient, components } from '@cowprotocol/cms';
+import { getCmsClient } from '../../datasources/cms';
+import {
+  CmsNotification,
+  CmsPushNotification,
+  CmsTelegramSubscription,
+  CmsTelegramSubscriptions,
+  NotificationModel,
+} from './PushSubscriptionsRepository';
 
-type Schemas = components['schemas'];
-export type CmsNotification = Schemas['NotificationListResponseDataItem'];
-export type CmsNotificationResponse = Schemas['NotificationListResponse'];
-export type CmsTelegramSubscription = {
-  account: string;
-  chatId: string;
-};
-export type CmsTelegramSubscriptionsResponse =
-  Schemas['TelegramSubscriptionResponse'];
-
-export type CmsTelegramSubscriptions =
-  Schemas['TelegramSubscriptionResponse']['data'];
-
-export type CmsPushNotification = {
-  id: number;
-  account: string;
-  data: object;
-  createdAt: string;
-  updatedAt: string;
-  notification_template: {
-    id: null | number;
-    title: string;
-    description: string;
-    url: null | string;
-    push: boolean;
-    thumbnail: null | string;
-  };
-};
-
-// TODO: For now the CMS don't generate this type. Adding it manually for now.
-export interface NotificationModel {
-  id: number;
-  account: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  url: string | null;
-  thumbnail: string | null;
-}
-
-const cmsBaseUrl = process.env.CMS_BASE_URL;
-
-const cmsApiKey = process.env.CMS_API_KEY;
-if (!cmsApiKey) {
-  console.warn(
-    'CMS_API_KEY is not set. Some CMS integrations might not work for lack of permissions.'
-  );
-}
-
-const cmsClient = CmsClient({
-  url: cmsBaseUrl,
-  apiKey: cmsApiKey,
-});
+import { PushSubscriptionsRepository } from './PushSubscriptionsRepository';
 
 const PAGE_SIZE = 50;
+const CACHE_TIME = 30000;
 
-export async function getNotificationsByAccount({
-  account,
-}: {
-  account: string;
-}): Promise<NotificationModel[]> {
-  const { data, error, response } = await cmsClient.GET(
-    '/notification-list/' + account
-  );
+type PaginationParam = {
+  page?: number;
+  pageSize?: number;
+};
 
-  if (error) {
-    console.error(
-      `Error ${response.status} getting notifications: ${response.url}`,
-      error
-    );
-    throw error;
+/**
+ * Repository to keep track of subscribed accounts for push notifications.
+ *
+ * Uses the CMS to retrieve the subscriptions
+ */
+export class PushSubscriptionsRepositoryCms
+  implements PushSubscriptionsRepository
+{
+  private lastCheck: number | null = null;
+  private cachedAccounts: string[] | null = null;
+
+  async getAllSubscribedAccounts(): Promise<string[]> {
+    const now = Date.now();
+    if (
+      !this.cachedAccounts ||
+      !this.lastCheck ||
+      now - this.lastCheck > CACHE_TIME
+    ) {
+      this.cachedAccounts = uniqueLowercase(await getAllSubscribedAccounts());
+      this.lastCheck = now;
+      return this.cachedAccounts;
+    }
+    return this.cachedAccounts || [];
   }
 
-  return data;
+  async getAllTelegramSubscriptionsForAccounts(
+    accounts: string[]
+  ): Promise<CmsTelegramSubscription[]> {
+    return getAllPages({
+      pageSize: PAGE_SIZE,
+      getPage: (params) =>
+        getTelegramSubscriptionsForAccounts({
+          ...params,
+          accounts,
+        }),
+    });
+  }
+
+  async getPushNotifications(): Promise<CmsPushNotification[]> {
+    const { data, error, response } = await getCmsClient().GET(
+      '/push-notifications'
+    );
+
+    if (error) {
+      console.error(
+        `Error ${response.status} getting push-notifications: ${response.url}`,
+        error
+      );
+      throw error;
+    }
+
+    return data;
+  }
+
+  async getNotificationsByAccount(params: {
+    account: string;
+  }): Promise<NotificationModel[]> {
+    const { account } = params;
+    const { data, error, response } = await getCmsClient().GET(
+      '/notification-list/' + account
+    );
+
+    if (error) {
+      console.error(
+        `Error ${response.status} getting notifications: ${response.url}`,
+        error
+      );
+      throw error;
+    }
+
+    return data;
+  }
+}
+
+function uniqueLowercase(items: string[]): string[] {
+  return Array.from(new Set(items.map((item) => item.toLowerCase())));
 }
 
 export async function getAllNotifications(): Promise<CmsNotification[]> {
@@ -112,16 +131,17 @@ export async function getAllNotifications(): Promise<CmsNotification[]> {
   return allNotifications.flat();
 }
 
-type PaginationParam = {
-  page?: number;
-  pageSize?: number;
-};
-
+/**
+ * Get a page of notifications from the CMS
+ *
+ * @param params - The pagination parameters
+ * @returns The notifications
+ */
 async function getNotificationsPage({
   page = 0,
   pageSize = PAGE_SIZE,
 }: PaginationParam = {}): Promise<CmsNotification[]> {
-  const { data, error, response } = await cmsClient.GET('/notifications', {
+  const { data, error, response } = await getCmsClient().GET('/notifications', {
     'populate[0]': 'notification_template',
 
     // Pagination
@@ -144,19 +164,6 @@ export async function getAllSubscribedAccounts(): Promise<string[]> {
   return getAllPages({
     pageSize: PAGE_SIZE,
     getPage: (params) => getSubscribedAccounts(params),
-  });
-}
-
-export async function getAllTelegramSubscriptionsForAccounts(
-  accounts: string[]
-): Promise<CmsTelegramSubscription[]> {
-  return getAllPages({
-    pageSize: PAGE_SIZE,
-    getPage: (params) =>
-      getTelegramSubscriptionsForAccounts({
-        ...params,
-        accounts,
-      }),
   });
 }
 
@@ -206,7 +213,7 @@ async function getTelegramSubscriptionsForAccounts({
 }: PaginationParam & { accounts: string[] }): Promise<
   CmsTelegramSubscription[]
 > {
-  const { data, error, response } = await cmsClient.GET(
+  const { data, error, response } = await getCmsClient().GET(
     `/accounts/${accounts.join(',')}/subscriptions/telegram`,
     {
       // Pagination
@@ -229,7 +236,7 @@ async function getSubscribedAccounts({
   page = 0,
   pageSize = PAGE_SIZE,
 }: PaginationParam): Promise<string[]> {
-  const { data, error, response } = await cmsClient.GET(
+  const { data, error, response } = await getCmsClient().GET(
     `/telegram-subscriptions`,
     {
       // Pagination
@@ -255,18 +262,4 @@ async function getSubscribedAccounts({
     }
     return acc;
   }, []);
-}
-
-export async function getPushNotifications(): Promise<CmsPushNotification[]> {
-  const { data, error, response } = await cmsClient.GET('/push-notifications');
-
-  if (error) {
-    console.error(
-      `Error ${response.status} getting push-notifications: ${response.url}`,
-      error
-    );
-    throw error;
-  }
-
-  return data;
 }

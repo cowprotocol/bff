@@ -10,6 +10,7 @@ import {
 } from './schemas';
 import { POOLS_QUERY_CACHE, POOLS_RESULT_LIMIT } from './const';
 import { trimDoubleQuotes } from './utils';
+import { isDbEnabled } from '@cowprotocol/repositories';
 
 type RouteSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof poolsInfoSuccessSchema>;
@@ -17,6 +18,13 @@ type ErrorSchema = FromSchema<typeof errorSchema>;
 type BodySchema = FromSchema<typeof poolsInfoBodySchema>;
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
+  if (!isDbEnabled) {
+    fastify.log.warn(
+      'Database is disabled. /pools endpoint will not be available'
+    );
+    return;
+  }
+
   fastify.post<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;

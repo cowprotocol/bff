@@ -1,9 +1,8 @@
+import { PushNotification } from '@cowprotocol/notifications';
 import {
   CmsPushNotification,
-  getPushNotifications,
-} from '@cowprotocol/cms-api';
-import { PushNotification } from '@cowprotocol/notifications';
-import { PushNotificationsRepository } from '@cowprotocol/repositories';
+  PushNotificationsRepository,
+} from '@cowprotocol/repositories';
 import Mustache from 'mustache';
 import { Runnable } from '../../../types';
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
@@ -61,7 +60,9 @@ export class CmsNotificationProducer implements Runnable {
       await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts();
 
     // Get PUSH notifications
-    const cmsPushNotifications = (await getPushNotifications()).filter(
+    const cmsPushNotifications = (
+      await this.props.pushSubscriptionsRepository.getPushNotifications()
+    ).filter(
       // Include only the notifications for subscribed accounts
       ({ account }) => accounts.includes(account)
     );
