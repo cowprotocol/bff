@@ -1,4 +1,4 @@
-import { AllChainIds } from '@cowprotocol/shared';
+import { AllChainIds, logger } from '@cowprotocol/shared';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem';
 import {
@@ -21,25 +21,42 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.SEPOLIA]: sepolia,
 };
 
-export const viemClients = AllChainIds.reduce<
-  Record<SupportedChainId, PublicClient>
->((acc, chainId) => {
-  const chain = NETWORKS[chainId];
-  const rpcEndpoint = process.env[`RPC_URL_${chainId}`];
-  const defaultRpcUrls = getDefaultRpcUrl(chain, rpcEndpoint);
+let viemClients: Record<SupportedChainId, PublicClient> | undefined;
 
-  acc[chainId] = createPublicClient({
-    chain: {
-      ...chain,
-      rpcUrls: {
-        default: defaultRpcUrls,
-      },
+export function getViemClients(): Record<SupportedChainId, PublicClient> {
+  if (viemClients) {
+    return viemClients;
+  }
+
+  viemClients = AllChainIds.reduce<Record<SupportedChainId, PublicClient>>(
+    (acc, chainId) => {
+      const chain = NETWORKS[chainId];
+      const envVarName = `RPC_URL_${chainId}`;
+      const rpcEndpoint = process.env[envVarName];
+      if (!rpcEndpoint) {
+        logger.warn(
+          `RPC_URL_${chainId} is not set. Using default RPC URL for ${chain.name}`
+        );
+      }
+      const defaultRpcUrls = getDefaultRpcUrl(chain, rpcEndpoint);
+
+      acc[chainId] = createPublicClient({
+        chain: {
+          ...chain,
+          rpcUrls: {
+            default: defaultRpcUrls,
+          },
+        },
+        transport: defaultRpcUrls.webSocket ? webSocket() : http(),
+      });
+
+      return acc;
     },
-    transport: defaultRpcUrls.webSocket ? webSocket() : http(),
-  });
+    {} as Record<SupportedChainId, PublicClient>
+  );
 
-  return acc;
-}, {} as Record<SupportedChainId, PublicClient>);
+  return viemClients;
+}
 
 function getDefaultRpcUrl(
   chain: Chain,

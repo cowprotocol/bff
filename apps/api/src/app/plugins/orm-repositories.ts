@@ -7,8 +7,16 @@ import { logger } from '@cowprotocol/shared';
 
 import { getDatabaseParams } from '@cowprotocol/repositories';
 import { readdir } from 'fs/promises';
+import { isDbEnabled } from '@cowprotocol/repositories';
 
 export default fp(async function (fastify: FastifyInstance) {
+  if (!isDbEnabled) {
+    fastify.log.warn(
+      'Database is disabled. ORM for repositories will not be used.'
+    );
+    return;
+  }
+
   const isProduction = process.env.NODE_ENV === 'production';
 
   const migrationsDir = resolve(

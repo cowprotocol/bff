@@ -3,7 +3,7 @@ import {
   SupportedChainId,
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
-import { Erc20Repository, viemClients } from '@cowprotocol/repositories';
+import { Erc20Repository, getViemClients } from '@cowprotocol/repositories';
 import { getAddress, parseAbi } from 'viem';
 import { bigIntReplacer, logger } from '@cowprotocol/shared';
 import { fromTradeToNotification } from './fromTradeToNotification';
@@ -29,7 +29,7 @@ export async function getTradeNotifications(
   const { accounts, fromBlock, toBlock, chainId, erc20Repository, prefix } =
     params;
 
-  const client = viemClients[chainId];
+  const client = getViemClients()[chainId];
 
   const logs = await client.getLogs({
     events: EVENTS,
