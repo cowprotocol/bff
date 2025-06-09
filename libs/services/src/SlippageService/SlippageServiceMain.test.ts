@@ -1,11 +1,7 @@
-import { SlippageServiceMain } from './SlippageServiceMain';
 import fs from 'fs';
 import path from 'path';
-import {
-  ChainNames,
-  SupportedChainId,
-  toSupportedChainId,
-} from '../../../shared/src';
+import { ChainNames, toSupportedChainId } from '@cowprotocol/shared';
+import { SlippageServiceMain } from './SlippageServiceMain';
 
 const getUsdPrice = jest.fn();
 const getUsdPrices = jest.fn();

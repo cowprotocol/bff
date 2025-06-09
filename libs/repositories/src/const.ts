@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import BigNumber from 'bignumber.js';
 
 interface TokenAddressAndDecimals {
@@ -21,6 +21,16 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
   },
   [SupportedChainId.BASE]: {
     address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    decimals: 6,
+  },
+  [SupportedChainId.POLYGON]: {
+    // https://polygonscan.com/address/0x3c499c542cef5e3811e1192ce70d8cc03d5c3359
+    address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+    decimals: 6,
+  },
+  [SupportedChainId.AVALANCHE]: {
+    // https://snowtrace.io/token/0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e
+    address: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
     decimals: 6,
   },
   [SupportedChainId.SEPOLIA]: {

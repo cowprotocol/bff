@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { Container } from 'inversify';
 import ms from 'ms';
 import { NULL_ADDRESS, WETH } from '../../../test/mock';

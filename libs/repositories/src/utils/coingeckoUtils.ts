@@ -1,6 +1,9 @@
 import { isAddress } from 'viem';
-import { COINGECKO_PLATFORMS, SUPPORTED_COINGECKO_PLATFORMS } from '../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/shared';
+import {
+  COINGECKO_PLATFORMS,
+  SUPPORTED_COINGECKO_PLATFORMS,
+} from '../datasources/coingecko';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 // Invert number→slug map to slug→SupportedChainId
 const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
@@ -10,7 +13,6 @@ const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
     }
     return map;
   }, {} as Record<string, SupportedChainId>);
-
 
 export function getAddressOrPlatform(
   tokenAddress: string | undefined,
@@ -29,13 +31,17 @@ export function getAddressOrPlatform(
   return tokenAddress;
 }
 
-export function getCoingeckoPlatform(chainIdOrSlug: string): string | undefined {
+export function getCoingeckoPlatform(
+  chainIdOrSlug: string
+): string | undefined {
   // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
   return COINGECKO_PLATFORMS[+chainIdOrSlug] || chainIdOrSlug;
 }
 
-export function getSupportedCoingeckoChainId(chainIdOrSlug: string): SupportedChainId | null {
-  const chainIdAsNumber = +chainIdOrSlug
+export function getSupportedCoingeckoChainId(
+  chainIdOrSlug: string
+): SupportedChainId | null {
+  const chainIdAsNumber = +chainIdOrSlug;
   // Only SupportedChainIds are supported
   const numericId = isNaN(chainIdAsNumber)
     ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]

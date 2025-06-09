@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { erc20Abi, PublicClient } from 'viem';
 import { Erc20 } from './Erc20Repository';
 import { Erc20RepositoryViem } from './Erc20RepositoryViem';
@@ -39,6 +39,8 @@ describe('Erc20RepositoryViem', () => {
     [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
     [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
     [SupportedChainId.BASE]: mockPublicClient,
+    [SupportedChainId.POLYGON]: mockPublicClient,
+    [SupportedChainId.AVALANCHE]: mockPublicClient,
     [SupportedChainId.SEPOLIA]: mockPublicClient,
   };
 

@@ -3,7 +3,7 @@ import {
   TokenHolderPoint,
   TokenHolderRepository,
 } from './TokenHolderRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   ETHPLORER_API_KEY,
   ETHPLORER_BASE_URL,

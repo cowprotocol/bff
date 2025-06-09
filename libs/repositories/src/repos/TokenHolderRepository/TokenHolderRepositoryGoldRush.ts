@@ -3,7 +3,7 @@ import {
   TokenHolderPoint,
   TokenHolderRepository,
 } from './TokenHolderRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   GOLD_RUSH_API_BASE_URL,
   GOLD_RUSH_API_KEY,

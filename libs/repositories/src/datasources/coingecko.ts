@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 import createClient from 'openapi-fetch';
 import type { paths } from '../gen/coingecko/coingecko-pro-types';
@@ -16,6 +16,8 @@ export const SUPPORTED_COINGECKO_PLATFORMS: Record<
   [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
   [SupportedChainId.BASE]: 'base',
+  [SupportedChainId.POLYGON]: 'polygon-pos',
+  [SupportedChainId.AVALANCHE]: 'avalanche',
 };
 
 /**
@@ -57,7 +59,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [1329]: 'sei-v2',
   [13371]: 'immutable',
   [1339]: 'elysium',
-  [137]: 'polygon-pos',
   [1380012617]: 'rari',
   [14]: 'flare-network',
   [146]: 'sonic',
@@ -151,7 +152,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [42220]: 'celo',
   [42262]: 'oasis',
   [42793]: 'etherlink',
-  [43114]: 'avalanche',
   [4337]: 'beam',
   [440017]: 'graphite-network',
   [4689]: 'iotex',

@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { getCacheKey, PartialCacheKey } from '../../utils/cache';
 import {

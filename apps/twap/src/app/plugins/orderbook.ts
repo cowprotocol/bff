@@ -109,6 +109,8 @@ declare module 'fastify' {
       [SupportedChainId.SEPOLIA]: Orderbook;
       [SupportedChainId.GNOSIS_CHAIN]: Orderbook;
       [SupportedChainId.MAINNET]: Orderbook;
+      [SupportedChainId.POLYGON]: Orderbook;
+      [SupportedChainId.AVALANCHE]: Orderbook;
     };
   }
 }

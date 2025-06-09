@@ -8,7 +8,8 @@ import {
   VolatilityDetails,
 } from './SlippageService';
 import ms from 'ms';
-import { SupportedChainId, toTokenAddress } from '@cowprotocol/shared';
+import { toTokenAddress } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export const MIN_SLIPPAGE_BPS = 50;
 export const MAX_SLIPPAGE_BPS = 200;

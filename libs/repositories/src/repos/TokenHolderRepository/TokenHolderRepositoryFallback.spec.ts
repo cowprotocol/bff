@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { TokenHolderRepository } from './TokenHolderRepository';
 import { TokenHolderRepositoryFallback } from './TokenHolderRepositoryFallback';
 import { NULL_ADDRESS, WETH } from '../../../test/mock';

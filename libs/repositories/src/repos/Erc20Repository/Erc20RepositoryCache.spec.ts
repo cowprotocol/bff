@@ -1,7 +1,7 @@
 import { Erc20RepositoryCache } from './Erc20RepositoryCache';
 import { Erc20, Erc20Repository } from './Erc20Repository';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 describe('Erc20RepositoryCache', () => {
   let erc20RepositoryCache: Erc20RepositoryCache;
