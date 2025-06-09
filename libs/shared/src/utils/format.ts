@@ -1,7 +1,7 @@
 import { formatUnits } from 'viem';
 
 import { EXPLORER_NETWORK_NAMES } from '../const';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export function getExplorerUrl(chainId: SupportedChainId, orderUid: string) {
   const baseUrl = getExplorerBaseUrl(chainId);

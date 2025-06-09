@@ -5,7 +5,7 @@ import {
   NativeCurrencyAddress,
   WrappedNativeTokenAddress,
 } from '../const';
-import { SupportedChainId } from '../types';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 /**
  * Returns the token address. This function will throw if the address passed is not an Ethereum address.

@@ -1,4 +1,5 @@
-import { logger, SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { logger } from '@cowprotocol/shared';
 import {
   AssetChange,
   SimulationError,

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import {
   PricePoint,
   PriceStrategy,
@@ -6,7 +6,6 @@ import {
   deserializePricePoints,
   serializePricePoints,
 } from './UsdRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
 import { CacheRepository } from '../CacheRepository/CacheRepository';
 import { getCacheKey, PartialCacheKey } from '../../utils/cache';
 

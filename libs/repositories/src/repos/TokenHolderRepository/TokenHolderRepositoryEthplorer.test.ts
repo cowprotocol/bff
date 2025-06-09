@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import { TokenHolderRepositoryEthplorer } from './TokenHolderRepositoryEthplorer';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { WETH, NULL_ADDRESS } from '../../../test/mock';
 import { ETHPLORER_API_KEY } from '../../datasources/ethplorer';
 
@@ -58,6 +58,26 @@ describe('TokenHolderRepositoryEthplorer', () => {
       const tokenHolders =
         await tokenHolderRepositoryEthplorer.getTopTokenHolders(
           SupportedChainId.ARBITRUM_ONE,
+          WETH
+        );
+
+      expect(tokenHolders).toBeNull();
+    }, 100000);
+
+    it('should return null for polygon', async () => {
+      const tokenHolders =
+        await tokenHolderRepositoryEthplorer.getTopTokenHolders(
+          SupportedChainId.POLYGON,
+          WETH
+        );
+
+      expect(tokenHolders).toBeNull();
+    }, 100000);
+
+    it('should return null for avalanche', async () => {
+      const tokenHolders =
+        await tokenHolderRepositoryEthplorer.getTopTokenHolders(
+          SupportedChainId.AVALANCHE,
           WETH
         );
 

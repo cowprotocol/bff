@@ -45,6 +45,8 @@ export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
   [SupportedChainId.GNOSIS_CHAIN]: twapHandlerAddress,
   [SupportedChainId.ARBITRUM_ONE]: twapHandlerAddress,
   [SupportedChainId.BASE]: twapHandlerAddress,
+  [SupportedChainId.POLYGON]: twapHandlerAddress, // TODO: check
+  [SupportedChainId.AVALANCHE]: twapHandlerAddress, // TODO: check
   [SupportedChainId.SEPOLIA]: twapHandlerAddress,
 };
 

@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PricePoint, UsdRepository } from './UsdRepository';
 import { UsdRepositoryFallback } from './UsdRepositoryFallback';
 import { WETH } from '../../../test/mock';

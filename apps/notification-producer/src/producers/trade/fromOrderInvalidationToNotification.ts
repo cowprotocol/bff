@@ -1,4 +1,5 @@
-import { getExplorerUrl, logger, SupportedChainId } from '@cowprotocol/shared';
+import { getExplorerUrl, logger } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 
 export async function fromOrderInvalidationToNotification(props: {

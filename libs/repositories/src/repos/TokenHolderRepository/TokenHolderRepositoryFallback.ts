@@ -3,7 +3,7 @@ import {
   TokenHolderPoint,
   TokenHolderRepository,
 } from './TokenHolderRepository';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 @injectable()
 export class TokenHolderRepositoryFallback implements TokenHolderRepository {

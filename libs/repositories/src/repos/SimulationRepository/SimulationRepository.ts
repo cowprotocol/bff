@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { StateDiff } from './tenderlyTypes';
 
 export interface SimulationInput {

@@ -1,5 +1,5 @@
 import { PricePoint } from '@cowprotocol/repositories';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 /**
  * BPS (Basis Points)

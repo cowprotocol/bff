@@ -4,7 +4,7 @@ import {
   SimulationInput,
   SimulationData,
 } from '@cowprotocol/repositories';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { injectable, inject } from 'inversify';
 
 export const simulationServiceSymbol = Symbol.for('SimulationServiceSymbol');

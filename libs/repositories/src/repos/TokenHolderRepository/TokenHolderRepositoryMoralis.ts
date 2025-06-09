@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { injectable } from 'inversify';
 import {
   MORALIS_API_BASE_URL,

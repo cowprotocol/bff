@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import { SimulationRepositoryTenderly } from './SimulationRepositoryTenderly';
-import { SupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { WETH, NULL_ADDRESS } from '../../../test/mock';
 import {
   TENDERLY_API_KEY,
