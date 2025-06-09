@@ -43,6 +43,8 @@ const cowApiClients = {
   [SupportedChainId.ARBITRUM_ONE]: mockApi,
   [SupportedChainId.BASE]: mockApi,
   [SupportedChainId.SEPOLIA]: mockApi,
+  [SupportedChainId.POLYGON]: mockApi,
+  [SupportedChainId.AVALANCHE]: mockApi,
 };
 
 const usdRepositoryCow = new UsdRepositoryCow(
