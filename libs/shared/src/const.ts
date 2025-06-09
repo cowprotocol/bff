@@ -37,7 +37,7 @@ export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.GNOSIS_CHAIN]: 'gc',
   [SupportedChainId.ARBITRUM_ONE]: 'arb1',
   [SupportedChainId.BASE]: 'base',
-  [SupportedChainId.POLYGON]: 'matic',
+  [SupportedChainId.POLYGON]: 'pol',
   [SupportedChainId.AVALANCHE]: 'avax',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
