@@ -39,6 +39,8 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
     logger.warn(
       'CMS is not enabled. Please check CMS_ENABLED and CMS_API_KEY environment variables'
     );
+
+    return;
   }
 
   const pushSubscriptionsRepository: PushSubscriptionsRepository =
