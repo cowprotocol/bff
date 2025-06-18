@@ -29,7 +29,7 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
     decimals: 6,
   },
   [SupportedChainId.AVALANCHE]: {
-    // https://snowtrace.io/token/0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e
+    // https://snowscan.xyz/token/0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e
     address: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
     decimals: 6,
   },
