@@ -1117,10 +1117,10 @@
   resolved "https://registry.yarnpkg.com/@cowprotocol/contracts/-/contracts-1.8.0.tgz#daffbd9846231c11a74b15a186bb754627e420b0"
   integrity sha512-rMEHo1UBB6k4kRoWejHZNGggg6IBVt7vAd8x0FhEvjxhbq3zlAex61f9HpAcDExJNuvfwwDjsOc/7UGztCzhSw==
 
-"@cowprotocol/cow-sdk@6.0.0-RC.59":
-  version "6.0.0-RC.59"
-  resolved "https://registry.yarnpkg.com/@cowprotocol/cow-sdk/-/cow-sdk-6.0.0-RC.59.tgz#6981c912fff982b30b3a015df4bed3127dd59186"
-  integrity sha512-VqqtyxzfAw4jzltNXz0/1fU1rgHBRi3XQAIXcaisdZRipsVeM8G1Mt3T+TvXvUGT4lB3Dn9nU3EYyXXlC1aXXA==
+"@cowprotocol/cow-sdk@6.0.0-RC.63":
+  version "6.0.0-RC.63"
+  resolved "https://registry.yarnpkg.com/@cowprotocol/cow-sdk/-/cow-sdk-6.0.0-RC.63.tgz#b031051d6d85f35446bea094c7df7870eb7729b9"
+  integrity sha512-3oKP2fvW08eoVT3SIp2ghESLitPpmJP5xdoMRhIsO98Z54vjJ/WidGQN3YRQZuPRXF61LwJ+gFKZPtOBtF7I1g==
   dependencies:
     "@cowprotocol/app-data" "^3.1.0"
     "@cowprotocol/contracts" "^1.8.0"
@@ -1129,7 +1129,6 @@
     "@weiroll/weiroll.js" "^0.3.0"
     cross-fetch "^3.2.0"
     deepmerge "^4.3.1"
-    ethers "^5.8.0"
     exponential-backoff "^3.1.2"
     graphql "^16.11.0"
     graphql-request "^4.3.0"
@@ -5453,7 +5452,7 @@ ethereum-cryptography@^3.0.0:
     "@scure/bip32" "1.7.0"
     "@scure/bip39" "1.6.0"
 
-ethers@^5.3.1, ethers@^5.8.0:
+ethers@^5.3.1:
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.8.0.tgz#97858dc4d4c74afce83ea7562fe9493cedb4d377"
   integrity sha512-DUq+7fHrCg1aPDFCHx6UIPb3nmt2XMpM7Y/g2gLhsl3lIBqeAfOJIl1qEvRf2uq3BiKxmh6Fh5pfp2ieyek7Kg==
