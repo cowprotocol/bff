@@ -82,13 +82,12 @@ export class DuneRepositoryImpl implements DuneRepository {
         // If type assertion is provided, validate the data
         if (typeAssertion && result.result.rows.length > 0) {
           const invalidRows: Array<{ index: number; data: unknown }> = [];
-          const isValid = result.result.rows.every((row, index) => {
+          result.result.rows.forEach((row, index) => {
             if (!typeAssertion(row)) {
               invalidRows.push({ index, data: row });
-              return false;
             }
-            return true;
           });
+          const isValid = invalidRows.length === 0;
 
           if (!isValid) {
             const errorMessage = `Data validation failed for execution ${executionId}. Some rows do not match the expected type.`;
