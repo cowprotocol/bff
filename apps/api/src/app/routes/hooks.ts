@@ -8,7 +8,6 @@ import {
   BLOCKCHAIN_VALUES,
   PERIOD_VALUES,
 } from '@cowprotocol/services';
-import { PerformanceTier } from '@cowprotocol/repositories';
 import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
@@ -21,7 +20,6 @@ interface HooksQuery {
   blockchain: Blockchain;
   period: Period;
   maxWaitTimeMs?: number;
-  performance?: PerformanceTier;
 }
 
 interface LatestHooksQuery {
@@ -74,12 +72,6 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
               description:
                 'Maximum time to wait for query execution in milliseconds',
             },
-            performance: {
-              type: 'string',
-              enum: ['medium', 'large'],
-              description:
-                'Performance engine tier. Medium consumes 10 credits, large consumes 20 credits. Default is medium.',
-            },
           },
         },
         response: {
@@ -131,7 +123,6 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
           blockchain: request.query.blockchain,
           period: request.query.period,
           maxWaitTimeMs: request.query.maxWaitTimeMs,
-          performance: request.query.performance,
         });
 
         return reply.send({

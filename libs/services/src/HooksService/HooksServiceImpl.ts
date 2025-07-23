@@ -18,7 +18,7 @@ export class HooksServiceImpl implements HooksService {
   }
 
   async getHooks(params: GetHooksParams): Promise<HookData[]> {
-    const { blockchain, period, maxWaitTimeMs, performance } = params;
+    const { blockchain, period, maxWaitTimeMs } = params;
 
     // Execute the query with parameters
     const execution = await this.duneRepository.executeQuery({
@@ -27,7 +27,6 @@ export class HooksServiceImpl implements HooksService {
         blockchain,
         period,
       },
-      performance,
     });
 
     // Wait for execution to complete with type assertion

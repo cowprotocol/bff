@@ -48,7 +48,6 @@ export interface GetHooksParams {
   blockchain: Blockchain;
   period: Period;
   maxWaitTimeMs?: number;
-  performance?: PerformanceTier;
 }
 
 export interface GetLatestHooksParams {
