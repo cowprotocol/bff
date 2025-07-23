@@ -1,4 +1,3 @@
-import { DuneRepository, PerformanceTier } from '@cowprotocol/repositories';
 import { HookData } from '../HooksService';
 
 export function isHookData(data: unknown): data is HookData {
