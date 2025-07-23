@@ -44,8 +44,14 @@ export interface HookData {
   tx_hash: string;
 }
 
+export interface GetHooksParams {
+  blockchain: Blockchain;
+  period: Period;
+  maxWaitTimeMs?: number;
+}
+
 export interface HooksService {
-  getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]>;
+  getHooks(params: GetHooksParams): Promise<HookData[]>;
 }
 
 export class HooksServiceMain implements HooksService {
@@ -56,7 +62,9 @@ export class HooksServiceMain implements HooksService {
     this.duneRepository = duneRepository;
   }
 
-  async getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]> {
+  async getHooks(params: GetHooksParams): Promise<HookData[]> {
+    const { blockchain, period, maxWaitTimeMs } = params;
+
     try {
       // Execute the query with parameters
       const execution = await this.duneRepository.executeQuery({
@@ -71,6 +79,7 @@ export class HooksServiceMain implements HooksService {
       const result = await this.duneRepository.waitForExecution<HookData>({
         executionId: execution.execution_id,
         typeAssertion: this.isHookData,
+        maxWaitTimeMs,
       });
 
       // The data is already typed as HookData from the generic repository

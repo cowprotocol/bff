@@ -19,6 +19,7 @@ const CACHE_SECONDS = ms('5m') / 1000; // Cache for 5 minutes
 interface HooksQuery {
   blockchain: Blockchain;
   period: Period;
+  maxWaitTimeMs?: number;
 }
 
 interface HooksResponse {
@@ -60,6 +61,11 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
               type: 'string',
               enum: PERIOD_VALUES,
               description: 'Time period for the query',
+            },
+            maxWaitTimeMs: {
+              type: 'number',
+              description:
+                'Maximum time to wait for query execution in milliseconds',
             },
           },
         },
@@ -108,10 +114,11 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       try {
         const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
-        const hooks = await hooksService.getHooks(
-          request.query.blockchain,
-          request.query.period
-        );
+        const hooks = await hooksService.getHooks({
+          blockchain: request.query.blockchain,
+          period: request.query.period,
+          maxWaitTimeMs: request.query.maxWaitTimeMs,
+        });
 
         return reply.send({
           hooks,

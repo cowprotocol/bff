@@ -3,6 +3,7 @@ import { logger } from '@cowprotocol/shared';
 export const duneRepositorySymbol = Symbol.for('DuneRepository');
 
 const POLL_TIME = 2000;
+const MAX_WAIT_TIME = 300000;
 
 export interface DuneExecutionResponse {
   execution_id: string;
@@ -103,7 +104,11 @@ export class DuneRepositoryImpl implements DuneRepository {
   async waitForExecution<T>(
     params: WaitForExecutionParams<T>
   ): Promise<DuneResultResponse<T>> {
-    const { executionId, maxWaitTimeMs = 300000, typeAssertion } = params;
+    const {
+      executionId,
+      maxWaitTimeMs = MAX_WAIT_TIME,
+      typeAssertion,
+    } = params;
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTimeMs) {
@@ -187,6 +192,11 @@ export class DuneRepositoryImpl implements DuneRepository {
       );
     }
 
-    return response.json();
+    const json = await response.json();
+    if (logger.isLevelEnabled('debug')) {
+      logger.debug(`Dune API response:\n${JSON.stringify(json, null, 2)}`);
+    }
+
+    return json;
   }
 }

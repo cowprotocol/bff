@@ -165,7 +165,10 @@ describe('HooksService', () => {
 
   describe('getHooks', () => {
     it('should return valid hook data when Dune query succeeds', async () => {
-      const hooks = await hooksService.getHooks('mainnet', 'last 7d');
+      const hooks = await hooksService.getHooks({
+        blockchain: 'mainnet',
+        period: 'last 7d',
+      });
 
       expect(hooks).toHaveLength(2);
       expect(hooks[0]).toEqual({
@@ -211,7 +214,10 @@ describe('HooksService', () => {
         'waitForExecution'
       );
 
-      await hooksService.getHooks('arbitrum', 'last 1d');
+      await hooksService.getHooks({
+        blockchain: 'arbitrum',
+        period: 'last 1d',
+      });
 
       expect(executeQuerySpy).toHaveBeenCalledWith({
         queryId: 5302473,
@@ -230,7 +236,10 @@ describe('HooksService', () => {
     it('should handle different blockchain and period combinations', async () => {
       const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
 
-      await hooksService.getHooks('polygon', 'last 30d');
+      await hooksService.getHooks({
+        blockchain: 'polygon',
+        period: 'last 30d',
+      });
 
       expect(executeQuerySpy).toHaveBeenCalledWith({
         queryId: 5302473,
@@ -247,9 +256,12 @@ describe('HooksService', () => {
         .spyOn(mockRepository, 'executeQuery')
         .mockRejectedValue(new Error('Dune API error'));
 
-      await expect(hooksService.getHooks('mainnet', 'last 7d')).rejects.toThrow(
-        'Failed to fetch hooks data: Dune API error'
-      );
+      await expect(
+        hooksService.getHooks({
+          blockchain: 'mainnet',
+          period: 'last 7d',
+        })
+      ).rejects.toThrow('Failed to fetch hooks data: Dune API error');
     });
 
     it('should throw error when data validation fails', async () => {
@@ -305,7 +317,12 @@ describe('HooksService', () => {
         invalidResult as DuneResultResponse<HookData>
       );
 
-      await expect(hooksService.getHooks('mainnet', 'last 7d')).rejects.toThrow(
+      await expect(
+        hooksService.getHooks({
+          blockchain: 'mainnet',
+          period: 'last 7d',
+        })
+      ).rejects.toThrow(
         'Data validation failed for execution test-execution-123'
       );
     });
@@ -366,7 +383,10 @@ describe('HooksService', () => {
 
       mockRepository.setMockResult(emptyResult);
 
-      const hooks = await hooksService.getHooks('mainnet', 'last 7d');
+      const hooks = await hooksService.getHooks({
+        blockchain: 'mainnet',
+        period: 'last 7d',
+      });
       expect(hooks).toHaveLength(0);
     });
 
@@ -383,7 +403,7 @@ describe('HooksService', () => {
       for (const { blockchain, period } of testCases) {
         const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
 
-        await hooksService.getHooks(blockchain, period);
+        await hooksService.getHooks({ blockchain, period });
 
         expect(executeQuerySpy).toHaveBeenCalledWith({
           queryId: 5302473,
