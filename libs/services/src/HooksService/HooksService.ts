@@ -51,8 +51,8 @@ export interface GetHooksParams {
 }
 
 export interface GetLatestHooksParams {
-  limit: number;
-  offset: number;
+  limit?: number;
+  offset?: number;
 }
 
 export interface HooksService {

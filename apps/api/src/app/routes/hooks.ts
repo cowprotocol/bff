@@ -213,8 +213,8 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
       try {
         const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
         const hooks = await hooksService.getLatestHooks({
-          limit: request.query.limit || 100,
-          offset: request.query.offset || 0,
+          limit: request.query.limit,
+          offset: request.query.offset,
         });
 
         return reply.send({
