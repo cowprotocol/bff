@@ -56,11 +56,11 @@ export interface GetQueryResultsParams<T> extends WithTypeAssertion<T> {
 }
 
 export interface DuneRepository {
-  executeQuery(params: ExecuteQueryParams): Promise<DuneExecutionResponse>;
-
   getQueryResults<T>(
     params: GetQueryResultsParams<T>
   ): Promise<DuneResultResponse<T>>;
+
+  executeQuery(params: ExecuteQueryParams): Promise<DuneExecutionResponse>;
 
   getExecutionResults<T>(
     params: GetExecutionResultsParams
