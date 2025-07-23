@@ -17,7 +17,7 @@ describe('DuneRepositoryImpl', () => {
   });
 
   describe('executeQuery', () => {
-    it('should execute a query successfully', async () => {
+    it('should execute a query successfully with parameters', async () => {
       const mockResponse: DuneExecutionResponse = {
         execution_id: 'test-execution-123',
         state: 'QUERY_STATE_PENDING',
@@ -36,16 +36,78 @@ describe('DuneRepositoryImpl', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.dune.com/api/v1/query/12345/execute',
+        'https://api.dune.com/api/v1/query/12345/execute?query_parameters=%7B%22param1%22%3A%22value1%22%2C%22param2%22%3A42%7D',
         {
           method: 'POST',
           headers: {
             'X-DUNE-API-KEY': mockApiKey,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            parameters: { param1: 'value1', param2: 42 },
-          }),
+        }
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should execute a query with performance parameter', async () => {
+      const mockResponse: DuneExecutionResponse = {
+        execution_id: 'test-execution-456',
+        state: 'QUERY_STATE_PENDING',
+      };
+
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const result = await repository.executeQuery({
+        queryId: 12345,
+        performance: 'large',
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.dune.com/api/v1/query/12345/execute?performance=large',
+        {
+          method: 'POST',
+          headers: {
+            'X-DUNE-API-KEY': mockApiKey,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should execute a query with both parameters and performance', async () => {
+      const mockResponse: DuneExecutionResponse = {
+        execution_id: 'test-execution-789',
+        state: 'QUERY_STATE_PENDING',
+      };
+
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const result = await repository.executeQuery({
+        queryId: 12345,
+        parameters: { param1: 'value1' },
+        performance: 'large',
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.dune.com/api/v1/query/12345/execute?query_parameters=%7B%22param1%22%3A%22value1%22%7D&performance=large',
+        {
+          method: 'POST',
+          headers: {
+            'X-DUNE-API-KEY': mockApiKey,
+            'Content-Type': 'application/json',
+          },
         }
       );
 

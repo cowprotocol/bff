@@ -1,4 +1,4 @@
-import { DuneRepository } from '@cowprotocol/repositories';
+import { DuneRepository, PerformanceTier } from '@cowprotocol/repositories';
 
 export const hooksServiceSymbol = Symbol.for('HooksService');
 
@@ -48,6 +48,7 @@ export interface GetHooksParams {
   blockchain: Blockchain;
   period: Period;
   maxWaitTimeMs?: number;
+  performance?: PerformanceTier;
 }
 
 export interface HooksService {
@@ -63,7 +64,7 @@ export class HooksServiceMain implements HooksService {
   }
 
   async getHooks(params: GetHooksParams): Promise<HookData[]> {
-    const { blockchain, period, maxWaitTimeMs } = params;
+    const { blockchain, period, maxWaitTimeMs, performance } = params;
 
     try {
       // Execute the query with parameters
@@ -73,6 +74,7 @@ export class HooksServiceMain implements HooksService {
           blockchain,
           period,
         },
+        performance,
       });
 
       // Wait for execution to complete with type assertion

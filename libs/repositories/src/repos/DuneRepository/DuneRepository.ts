@@ -35,9 +35,12 @@ export interface DuneResultResponse<T> {
   };
 }
 
+export type PerformanceTier = 'medium' | 'large';
+
 export interface ExecuteQueryParams {
   queryId: number;
   parameters?: Record<string, unknown>;
+  performance?: PerformanceTier;
 }
 
 export interface GetExecutionResultsParams {
@@ -74,22 +77,33 @@ export class DuneRepositoryImpl implements DuneRepository {
   async executeQuery(
     params: ExecuteQueryParams
   ): Promise<DuneExecutionResponse> {
-    const { queryId, parameters } = params;
-    const body = parameters ? JSON.stringify({ parameters }) : undefined;
+    const { queryId, parameters, performance } = params;
+
+    // Build URL with query parameters
+    let url = `/query/${queryId}/execute`;
+    const queryParams = new URLSearchParams();
+
+    if (parameters) {
+      queryParams.append('query_parameters', JSON.stringify(parameters));
+    }
+
+    if (performance) {
+      queryParams.append('performance', performance);
+    }
+
+    if (queryParams.toString()) {
+      url += `?${queryParams.toString()}`;
+    }
 
     logger.info(
       `Executing Dune query ${queryId} with parameters: ${JSON.stringify(
         parameters
-      )}`
+      )} and performance: ${performance || 'medium'}`
     );
 
-    return this.makeRequest<DuneExecutionResponse>(
-      `/query/${queryId}/execute`,
-      {
-        method: 'POST',
-        body,
-      }
-    );
+    return this.makeRequest<DuneExecutionResponse>(url, {
+      method: 'POST',
+    });
   }
 
   async getExecutionResults<T>(
