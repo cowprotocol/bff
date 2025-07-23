@@ -1,4 +1,8 @@
+import { logger } from '@cowprotocol/shared';
+
 export const duneRepositorySymbol = Symbol.for('DuneRepository');
+
+const POLL_TIME = 2000;
 
 export interface DuneExecutionResponse {
   execution_id: string;
@@ -35,7 +39,9 @@ export interface DuneRepository {
     queryId: number,
     parameters?: Record<string, unknown>
   ): Promise<DuneExecutionResponse>;
+
   getExecutionResults<T>(executionId: string): Promise<DuneResultResponse<T>>;
+
   waitForExecution<T>(
     executionId: string,
     maxWaitTimeMs?: number,
@@ -45,58 +51,40 @@ export interface DuneRepository {
 
 export class DuneRepositoryImpl implements DuneRepository {
   private readonly apiKey: string;
-  private readonly baseUrl = 'https://api.dune.com/api/v1';
+  private readonly baseUrl: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, baseUrl = 'https://api.dune.com/api/v1') {
     this.apiKey = apiKey;
+    this.baseUrl = baseUrl;
   }
 
   async executeQuery(
     queryId: number,
     parameters?: Record<string, unknown>
   ): Promise<DuneExecutionResponse> {
-    const url = `${this.baseUrl}/query/${queryId}/execute`;
-    const options: RequestInit = {
-      method: 'POST',
-      headers: {
-        'X-DUNE-API-KEY': this.apiKey,
-        'Content-Type': 'application/json',
-      },
-    };
+    const body = parameters ? JSON.stringify({ parameters }) : undefined;
 
-    if (parameters) {
-      options.body = JSON.stringify({ parameters });
-    }
+    logger.info(
+      `Executing Dune query ${queryId} with parameters: ${JSON.stringify(
+        parameters
+      )}`
+    );
 
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to execute Dune query: ${response.status} ${response.statusText}`
-      );
-    }
-
-    return response.json();
+    return this.makeRequest<DuneExecutionResponse>(
+      `/query/${queryId}/execute`,
+      {
+        method: 'POST',
+        body,
+      }
+    );
   }
 
   async getExecutionResults<T>(
     executionId: string
   ): Promise<DuneResultResponse<T>> {
-    const url = `${this.baseUrl}/execution/${executionId}/results`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-DUNE-API-KEY': this.apiKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to get Dune execution results: ${response.status} ${response.statusText}`
-      );
-    }
-
-    return response.json();
+    return this.makeRequest<DuneResultResponse<T>>(
+      `/execution/${executionId}/results`
+    );
   }
 
   async waitForExecution<T>(
@@ -105,7 +93,6 @@ export class DuneRepositoryImpl implements DuneRepository {
     typeAssertion?: (data: unknown) => data is T
   ): Promise<DuneResultResponse<T>> {
     const startTime = Date.now();
-    const pollInterval = 2000; // Poll every 2 seconds
 
     while (Date.now() - startTime < maxWaitTimeMs) {
       const result = await this.getExecutionResults<T>(executionId);
@@ -146,11 +133,48 @@ export class DuneRepositoryImpl implements DuneRepository {
       }
 
       // Wait before polling again
-      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, POLL_TIME));
     }
 
     throw new Error(
       `Execution ${executionId} did not complete within ${maxWaitTimeMs}ms`
     );
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const defaultHeaders = {
+      'X-DUNE-API-KEY': this.apiKey,
+      'Content-Type': 'application/json',
+    };
+
+    const requestOptions: RequestInit = {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    };
+
+    logger.info(
+      `Making Dune API request: ${options.method || 'GET'} ${url}${
+        options.body ? ` with body: ${options.body}` : ''
+      }`
+    );
+
+    const response = await fetch(url, requestOptions);
+
+    logger.info(`Dune API response: ${response.status} ${response.statusText}`);
+
+    if (!response.ok) {
+      throw new Error(
+        `Dune API request failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    return response.json();
   }
 }

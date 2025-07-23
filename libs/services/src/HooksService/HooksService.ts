@@ -58,15 +58,12 @@ export class HooksServiceMain implements HooksService {
 
   async getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]> {
     try {
-      // Map blockchain to chain ID for Dune query
-      const chainId = this.getChainId(blockchain);
-
       // Execute the query with parameters
       const execution = await this.duneRepository.executeQuery(
         this.defaultQueryId,
         {
-          chain_id: chainId,
-          time_period: period,
+          blockchain,
+          period,
         }
       );
 
