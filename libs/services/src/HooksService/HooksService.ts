@@ -35,27 +35,15 @@ export class HooksServiceMain implements HooksService {
       // Execute the query
       const execution = await this.duneRepository.executeQuery(queryId);
 
-      // Wait for execution to complete
-      const result = await this.duneRepository.waitForExecution(
-        execution.execution_id
+      // Wait for execution to complete with type assertion
+      const result = await this.duneRepository.waitForExecution<HookData>(
+        execution.execution_id,
+        undefined, // maxWaitTimeMs
+        this.isHookData // type assertion function
       );
 
-      // Transform the raw data to typed HookData
-      return result.result.rows.map((row: any) => ({
-        environment: row.environment,
-        block_time: row.block_time,
-        is_bridging: row.is_bridging,
-        success: row.success,
-        app_code: row.app_code,
-        destination_chain_id: row.destination_chain_id,
-        destination_token_address: row.destination_token_address,
-        hook_type: row.hook_type,
-        app_id: row.app_id,
-        target: row.target,
-        gas_limit: row.gas_limit,
-        app_hash: row.app_hash,
-        tx_hash: row.tx_hash,
-      }));
+      // The data is already typed as HookData from the generic repository
+      return result.result.rows;
     } catch (error) {
       throw new Error(
         `Failed to fetch hooks data: ${
@@ -63,5 +51,60 @@ export class HooksServiceMain implements HooksService {
         }`
       );
     }
+  }
+
+  private isHookData(data: any): data is HookData {
+    // Check if data is an object
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+
+    // Check required string fields
+    const requiredStringFields = [
+      'environment',
+      'block_time',
+      'app_code',
+      'hook_type',
+      'target',
+      'app_hash',
+      'tx_hash',
+    ];
+    for (const field of requiredStringFields) {
+      if (typeof data[field] !== 'string') {
+        return false;
+      }
+    }
+
+    // Check required boolean fields
+    const requiredBooleanFields = ['is_bridging', 'success'];
+    for (const field of requiredBooleanFields) {
+      if (typeof data[field] !== 'boolean') {
+        return false;
+      }
+    }
+
+    // Check required number field
+    if (typeof data.gas_limit !== 'number') {
+      return false;
+    }
+
+    // Check nullable fields
+    if (
+      data.destination_chain_id !== null &&
+      typeof data.destination_chain_id !== 'number'
+    ) {
+      return false;
+    }
+    if (
+      data.destination_token_address !== null &&
+      typeof data.destination_token_address !== 'string'
+    ) {
+      return false;
+    }
+    if (data.app_id !== null && typeof data.app_id !== 'string') {
+      return false;
+    }
+
+    return true;
   }
 }

@@ -5,7 +5,7 @@ export interface DuneExecutionResponse {
   state: string;
 }
 
-export interface DuneResultResponse {
+export interface DuneResultResponse<T> {
   execution_id: string;
   query_id: number;
   is_execution_finished: boolean;
@@ -15,7 +15,7 @@ export interface DuneResultResponse {
   execution_started_at: string;
   execution_ended_at: string;
   result: {
-    rows: any[];
+    rows: T[];
     metadata: {
       column_names: string[];
       column_types: string[];
@@ -35,11 +35,12 @@ export interface DuneRepository {
     queryId: number,
     parameters?: Record<string, any>
   ): Promise<DuneExecutionResponse>;
-  getExecutionResults(executionId: string): Promise<DuneResultResponse>;
-  waitForExecution(
+  getExecutionResults<T>(executionId: string): Promise<DuneResultResponse<T>>;
+  waitForExecution<T>(
     executionId: string,
-    maxWaitTimeMs?: number
-  ): Promise<DuneResultResponse>;
+    maxWaitTimeMs?: number,
+    typeAssertion?: (data: any) => data is T
+  ): Promise<DuneResultResponse<T>>;
 }
 
 export class DuneRepositoryImpl implements DuneRepository {
@@ -78,7 +79,9 @@ export class DuneRepositoryImpl implements DuneRepository {
     return response.json();
   }
 
-  async getExecutionResults(executionId: string): Promise<DuneResultResponse> {
+  async getExecutionResults<T>(
+    executionId: string
+  ): Promise<DuneResultResponse<T>> {
     const url = `${this.baseUrl}/execution/${executionId}/results`;
     const response = await fetch(url, {
       method: 'GET',
@@ -96,17 +99,49 @@ export class DuneRepositoryImpl implements DuneRepository {
     return response.json();
   }
 
-  async waitForExecution(
+  async waitForExecution<T>(
     executionId: string,
-    maxWaitTimeMs = 300000
-  ): Promise<DuneResultResponse> {
+    maxWaitTimeMs = 300000,
+    typeAssertion?: (data: any) => data is T
+  ): Promise<DuneResultResponse<T>> {
     const startTime = Date.now();
     const pollInterval = 2000; // Poll every 2 seconds
 
     while (Date.now() - startTime < maxWaitTimeMs) {
-      const result = await this.getExecutionResults(executionId);
+      const result = await this.getExecutionResults<T>(executionId);
 
       if (result.is_execution_finished) {
+        // If type assertion is provided, validate the data
+        if (typeAssertion && result.result.rows.length > 0) {
+          const invalidRows: any[] = [];
+          const isValid = result.result.rows.every((row, index) => {
+            if (!typeAssertion(row)) {
+              invalidRows.push({ index, data: row });
+              return false;
+            }
+            return true;
+          });
+
+          if (!isValid) {
+            const errorMessage = `Data validation failed for execution ${executionId}. Some rows do not match the expected type.`;
+            const debugInfo = `\nInvalid rows found: ${invalidRows.length}/${result.result.rows.length}`;
+            const exampleData =
+              invalidRows.length > 0
+                ? `\nExample invalid row (index ${
+                    invalidRows[0].index
+                  }):\n${JSON.stringify(invalidRows[0].data, null, 2)}`
+                : '';
+            const expectedColumns = result.result.metadata?.column_names
+              ? `\nExpected columns from Dune: ${result.result.metadata.column_names.join(
+                  ', '
+                )}`
+              : '';
+
+            throw new Error(
+              errorMessage + debugInfo + exampleData + expectedColumns
+            );
+          }
+        }
         return result;
       }
 
