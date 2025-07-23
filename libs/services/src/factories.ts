@@ -4,6 +4,8 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  DuneRepository,
+  DuneRepositoryImpl,
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
@@ -182,4 +184,14 @@ export function getTelegramBot(): TelegramBot {
   }
 
   return telegramBot;
+}
+
+export function getDuneRepository(): DuneRepository {
+  const apiKey = process.env.DUNE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('DUNE_API_KEY is not set');
+  }
+
+  return new DuneRepositoryImpl(apiKey);
 }

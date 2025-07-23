@@ -54,3 +54,6 @@ export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm';
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
+
+// Dune repositories
+export * from './repos/DuneRepository/DuneRepository';
