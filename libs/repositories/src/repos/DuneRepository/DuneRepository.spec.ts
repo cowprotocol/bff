@@ -8,21 +8,21 @@ interface TestData {
 }
 
 // Type assertion function
-function isTestData(data: any): data is TestData {
+function isTestData(data: unknown): data is TestData {
   return (
     typeof data === 'object' &&
     data !== null &&
-    typeof data.id === 'number' &&
-    typeof data.name === 'string' &&
-    typeof data.active === 'boolean'
+    typeof (data as Record<string, unknown>).id === 'number' &&
+    typeof (data as Record<string, unknown>).name === 'string' &&
+    typeof (data as Record<string, unknown>).active === 'boolean'
   );
 }
 
 // Mock repository for testing
 class MockDuneRepository extends DuneRepositoryImpl {
-  private mockResult: DuneResultResponse<any>;
+  private mockResult: DuneResultResponse<unknown>;
 
-  constructor(mockResult: DuneResultResponse<any>) {
+  constructor(mockResult: DuneResultResponse<unknown>) {
     super('mock-key');
     this.mockResult = mockResult;
   }
@@ -91,7 +91,7 @@ describe('DuneRepository', () => {
     });
 
     it('should throw error when some rows do not match the expected type', async () => {
-      const invalidResult: DuneResultResponse<any> = {
+      const invalidResult: DuneResultResponse<unknown> = {
         execution_id: 'test-123',
         query_id: 123,
         is_execution_finished: true,
@@ -135,7 +135,7 @@ describe('DuneRepository', () => {
     });
 
     it('should include detailed error information in the error message', async () => {
-      const invalidResult: DuneResultResponse<any> = {
+      const invalidResult: DuneResultResponse<unknown> = {
         execution_id: 'test-123',
         query_id: 123,
         is_execution_finished: true,
@@ -191,7 +191,7 @@ describe('DuneRepository', () => {
     });
 
     it('should pass validation when no type assertion is provided', async () => {
-      const result: DuneResultResponse<any> = {
+      const result: DuneResultResponse<unknown> = {
         execution_id: 'test-123',
         query_id: 123,
         is_execution_finished: true,

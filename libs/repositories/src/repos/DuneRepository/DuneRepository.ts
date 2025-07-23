@@ -33,13 +33,13 @@ export interface DuneResultResponse<T> {
 export interface DuneRepository {
   executeQuery(
     queryId: number,
-    parameters?: Record<string, any>
+    parameters?: Record<string, unknown>
   ): Promise<DuneExecutionResponse>;
   getExecutionResults<T>(executionId: string): Promise<DuneResultResponse<T>>;
   waitForExecution<T>(
     executionId: string,
     maxWaitTimeMs?: number,
-    typeAssertion?: (data: any) => data is T
+    typeAssertion?: (data: unknown) => data is T
   ): Promise<DuneResultResponse<T>>;
 }
 
@@ -53,7 +53,7 @@ export class DuneRepositoryImpl implements DuneRepository {
 
   async executeQuery(
     queryId: number,
-    parameters?: Record<string, any>
+    parameters?: Record<string, unknown>
   ): Promise<DuneExecutionResponse> {
     const url = `${this.baseUrl}/query/${queryId}/execute`;
     const options: RequestInit = {
@@ -102,7 +102,7 @@ export class DuneRepositoryImpl implements DuneRepository {
   async waitForExecution<T>(
     executionId: string,
     maxWaitTimeMs = 300000,
-    typeAssertion?: (data: any) => data is T
+    typeAssertion?: (data: unknown) => data is T
   ): Promise<DuneResultResponse<T>> {
     const startTime = Date.now();
     const pollInterval = 2000; // Poll every 2 seconds
@@ -113,7 +113,7 @@ export class DuneRepositoryImpl implements DuneRepository {
       if (result.is_execution_finished) {
         // If type assertion is provided, validate the data
         if (typeAssertion && result.result.rows.length > 0) {
-          const invalidRows: any[] = [];
+          const invalidRows: Array<{ index: number; data: unknown }> = [];
           const isValid = result.result.rows.every((row, index) => {
             if (!typeAssertion(row)) {
               invalidRows.push({ index, data: row });

@@ -2,6 +2,32 @@ import { DuneRepository } from '@cowprotocol/repositories';
 
 export const hooksServiceSymbol = Symbol.for('HooksService');
 
+// Single source of truth - define the values once
+const BLOCKCHAIN_VALUES = [
+  'mainnet',
+  'arbitrum',
+  'avalanche',
+  'base',
+  'gnosis',
+  'polygon',
+] as const;
+const PERIOD_VALUES = [
+  'last 3h',
+  'last 1d',
+  'last 7d',
+  'last 30d',
+  'last 3m',
+  'last 6m',
+  'last 12m',
+] as const;
+
+// Derive types from the arrays
+export type Blockchain = (typeof BLOCKCHAIN_VALUES)[number];
+export type Period = (typeof PERIOD_VALUES)[number];
+
+// Export the arrays for runtime use
+export { BLOCKCHAIN_VALUES, PERIOD_VALUES };
+
 export interface HookData {
   environment: string;
   block_time: string;
@@ -19,7 +45,7 @@ export interface HookData {
 }
 
 export interface HooksService {
-  getHooks(queryId?: number): Promise<HookData[]>;
+  getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]>;
 }
 
 export class HooksServiceMain implements HooksService {
@@ -30,10 +56,19 @@ export class HooksServiceMain implements HooksService {
     this.duneRepository = duneRepository;
   }
 
-  async getHooks(queryId: number = this.defaultQueryId): Promise<HookData[]> {
+  async getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]> {
     try {
-      // Execute the query
-      const execution = await this.duneRepository.executeQuery(queryId);
+      // Map blockchain to chain ID for Dune query
+      const chainId = this.getChainId(blockchain);
+
+      // Execute the query with parameters
+      const execution = await this.duneRepository.executeQuery(
+        this.defaultQueryId,
+        {
+          chain_id: chainId,
+          time_period: period,
+        }
+      );
 
       // Wait for execution to complete with type assertion
       const result = await this.duneRepository.waitForExecution<HookData>(
@@ -53,7 +88,20 @@ export class HooksServiceMain implements HooksService {
     }
   }
 
-  private isHookData(data: any): data is HookData {
+  private getChainId(blockchain: Blockchain): number {
+    const chainIdMap: Record<Blockchain, number> = {
+      mainnet: 1,
+      arbitrum: 42161,
+      avalanche: 43114,
+      base: 8453,
+      gnosis: 100,
+      polygon: 137,
+    };
+
+    return chainIdMap[blockchain];
+  }
+
+  private isHookData(data: unknown): data is HookData {
     // Check if data is an object
     if (typeof data !== 'object' || data === null) {
       return false;
@@ -70,7 +118,7 @@ export class HooksServiceMain implements HooksService {
       'tx_hash',
     ];
     for (const field of requiredStringFields) {
-      if (typeof data[field] !== 'string') {
+      if (typeof (data as Record<string, unknown>)[field] !== 'string') {
         return false;
       }
     }
@@ -78,30 +126,31 @@ export class HooksServiceMain implements HooksService {
     // Check required boolean fields
     const requiredBooleanFields = ['is_bridging', 'success'];
     for (const field of requiredBooleanFields) {
-      if (typeof data[field] !== 'boolean') {
+      if (typeof (data as Record<string, unknown>)[field] !== 'boolean') {
         return false;
       }
     }
 
     // Check required number field
-    if (typeof data.gas_limit !== 'number') {
+    if (typeof (data as Record<string, unknown>).gas_limit !== 'number') {
       return false;
     }
 
     // Check nullable fields
+    const dataRecord = data as Record<string, unknown>;
     if (
-      data.destination_chain_id !== null &&
-      typeof data.destination_chain_id !== 'number'
+      dataRecord.destination_chain_id !== null &&
+      typeof dataRecord.destination_chain_id !== 'number'
     ) {
       return false;
     }
     if (
-      data.destination_token_address !== null &&
-      typeof data.destination_token_address !== 'string'
+      dataRecord.destination_token_address !== null &&
+      typeof dataRecord.destination_token_address !== 'string'
     ) {
       return false;
     }
-    if (data.app_id !== null && typeof data.app_id !== 'string') {
+    if (dataRecord.app_id !== null && typeof dataRecord.app_id !== 'string') {
       return false;
     }
 

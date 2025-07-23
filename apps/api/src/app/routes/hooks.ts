@@ -1,7 +1,13 @@
 import { FastifyPluginAsync } from 'fastify';
 import { apiContainer } from '../inversify.config';
 import { hooksServiceSymbol } from '@cowprotocol/services';
-import { HooksService } from '@cowprotocol/services';
+import {
+  HooksService,
+  Blockchain,
+  Period,
+  BLOCKCHAIN_VALUES,
+  PERIOD_VALUES,
+} from '@cowprotocol/services';
 import {
   CACHE_CONTROL_HEADER,
   getCacheControlHeaderValue,
@@ -11,7 +17,8 @@ import ms from 'ms';
 const CACHE_SECONDS = ms('5m') / 1000; // Cache for 5 minutes
 
 interface HooksQuery {
-  queryId?: number;
+  blockchain: Blockchain;
+  period: Period;
 }
 
 interface HooksResponse {
@@ -42,10 +49,17 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
         tags: ['hooks'],
         querystring: {
           type: 'object',
+          required: ['blockchain', 'period'],
           properties: {
-            queryId: {
-              type: 'number',
-              description: 'Dune query ID (optional, defaults to 5302473)',
+            blockchain: {
+              type: 'string',
+              enum: BLOCKCHAIN_VALUES,
+              description: 'Blockchain network to query',
+            },
+            period: {
+              type: 'string',
+              enum: PERIOD_VALUES,
+              description: 'Time period for the query',
             },
           },
         },
@@ -94,7 +108,10 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       try {
         const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
-        const hooks = await hooksService.getHooks(request.query.queryId);
+        const hooks = await hooksService.getHooks(
+          request.query.blockchain,
+          request.query.period
+        );
 
         return reply.send({
           hooks,
