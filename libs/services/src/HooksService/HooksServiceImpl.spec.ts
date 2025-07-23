@@ -3,7 +3,8 @@ import {
   DuneExecutionResponse,
   DuneResultResponse,
 } from '@cowprotocol/repositories';
-import { HooksServiceMain, HookData, Blockchain, Period } from './HooksService';
+import { HookData, Blockchain, Period } from './HooksService';
+import { HooksServiceImpl } from './HooksServiceImpl';
 
 // Mock DuneRepository for testing
 class MockDuneRepository implements DuneRepository {
@@ -14,19 +15,14 @@ class MockDuneRepository implements DuneRepository {
     this.mockResult = mockResult || this.getDefaultMockResult();
   }
 
-  async executeQuery(params: {
-    queryId: number;
-    parameters?: Record<string, unknown>;
-  }): Promise<DuneExecutionResponse> {
+  async executeQuery(): Promise<DuneExecutionResponse> {
     return {
       execution_id: this.mockExecutionId,
       state: 'QUERY_STATE_PENDING',
     };
   }
 
-  async getExecutionResults<T>(params: {
-    executionId: string;
-  }): Promise<DuneResultResponse<T>> {
+  async getExecutionResults<T>(): Promise<DuneResultResponse<T>> {
     return this.mockResult as DuneResultResponse<T>;
   }
 
@@ -156,11 +152,11 @@ class MockDuneRepository implements DuneRepository {
 
 describe('HooksService', () => {
   let mockRepository: MockDuneRepository;
-  let hooksService: HooksServiceMain;
+  let hooksService: HooksServiceImpl;
 
   beforeEach(() => {
     mockRepository = new MockDuneRepository();
-    hooksService = new HooksServiceMain(mockRepository);
+    hooksService = new HooksServiceImpl(mockRepository);
   });
 
   describe('getHooks', () => {

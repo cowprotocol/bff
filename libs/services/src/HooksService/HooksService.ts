@@ -1,4 +1,4 @@
-import { DuneRepository, PerformanceTier } from '@cowprotocol/repositories';
+import { PerformanceTier } from '@cowprotocol/repositories';
 
 export const hooksServiceSymbol = Symbol.for('HooksService');
 
@@ -51,116 +51,14 @@ export interface GetHooksParams {
   performance?: PerformanceTier;
 }
 
-export interface HooksService {
-  getHooks(params: GetHooksParams): Promise<HookData[]>;
+export interface GetLatestHooksParams {
+  limit: number;
+  offset: number;
 }
 
-export class HooksServiceMain implements HooksService {
-  private readonly duneRepository: DuneRepository;
-  private readonly defaultQueryId = 5302473; // Default query ID for hooks
+export interface HooksService {
+  getHooks(params: GetHooksParams): Promise<HookData[]>;
 
-  constructor(duneRepository: DuneRepository) {
-    this.duneRepository = duneRepository;
-  }
-
-  async getHooks(params: GetHooksParams): Promise<HookData[]> {
-    const { blockchain, period, maxWaitTimeMs, performance } = params;
-
-    try {
-      // Execute the query with parameters
-      const execution = await this.duneRepository.executeQuery({
-        queryId: this.defaultQueryId,
-        parameters: {
-          blockchain,
-          period,
-        },
-        performance,
-      });
-
-      // Wait for execution to complete with type assertion
-      const result = await this.duneRepository.waitForExecution<HookData>({
-        executionId: execution.execution_id,
-        typeAssertion: this.isHookData,
-        maxWaitTimeMs,
-      });
-
-      // The data is already typed as HookData from the generic repository
-      return result.result.rows;
-    } catch (error) {
-      throw new Error(
-        `Failed to fetch hooks data: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`
-      );
-    }
-  }
-
-  private getChainId(blockchain: Blockchain): number {
-    const chainIdMap: Record<Blockchain, number> = {
-      mainnet: 1,
-      arbitrum: 42161,
-      avalanche: 43114,
-      base: 8453,
-      gnosis: 100,
-      polygon: 137,
-    };
-
-    return chainIdMap[blockchain];
-  }
-
-  private isHookData(data: unknown): data is HookData {
-    // Check if data is an object
-    if (typeof data !== 'object' || data === null) {
-      return false;
-    }
-
-    // Check required string fields
-    const requiredStringFields = [
-      'environment',
-      'block_time',
-      'app_code',
-      'hook_type',
-      'target',
-      'app_hash',
-      'tx_hash',
-    ];
-    for (const field of requiredStringFields) {
-      if (typeof (data as Record<string, unknown>)[field] !== 'string') {
-        return false;
-      }
-    }
-
-    // Check required boolean fields
-    const requiredBooleanFields = ['is_bridging', 'success'];
-    for (const field of requiredBooleanFields) {
-      if (typeof (data as Record<string, unknown>)[field] !== 'boolean') {
-        return false;
-      }
-    }
-
-    // Check required number field
-    if (typeof (data as Record<string, unknown>).gas_limit !== 'number') {
-      return false;
-    }
-
-    // Check nullable fields
-    const dataRecord = data as Record<string, unknown>;
-    if (
-      dataRecord.destination_chain_id !== null &&
-      typeof dataRecord.destination_chain_id !== 'number'
-    ) {
-      return false;
-    }
-    if (
-      dataRecord.destination_token_address !== null &&
-      typeof dataRecord.destination_token_address !== 'string'
-    ) {
-      return false;
-    }
-    if (dataRecord.app_id !== null && typeof dataRecord.app_id !== 'string') {
-      return false;
-    }
-
-    return true;
-  }
+  // TODO: PoC: Since the getHooks params are currently not working. Delete this method after PoC.
+  getLatestHooks(params: GetLatestHooksParams): Promise<HookData[]>;
 }

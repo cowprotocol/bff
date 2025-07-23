@@ -57,3 +57,4 @@ export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCm
 
 // Dune repositories
 export * from './repos/DuneRepository/DuneRepository';
+export * from './repos/DuneRepository/DuneRepositoryImpl';
