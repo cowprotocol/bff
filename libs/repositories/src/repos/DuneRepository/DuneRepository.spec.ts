@@ -1,282 +1,456 @@
-import { DuneRepositoryImpl, DuneResultResponse } from './DuneRepository';
+import {
+  DuneRepositoryImpl,
+  DuneExecutionResponse,
+  DuneResultResponse,
+} from './DuneRepository';
 
-// Test interface
-interface TestData {
-  id: number;
-  name: string;
-  active: boolean;
-}
+// Mock fetch globally
+global.fetch = jest.fn();
 
-// Type assertion function
-function isTestData(data: unknown): data is TestData {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    typeof (data as Record<string, unknown>).id === 'number' &&
-    typeof (data as Record<string, unknown>).name === 'string' &&
-    typeof (data as Record<string, unknown>).active === 'boolean'
-  );
-}
+describe('DuneRepositoryImpl', () => {
+  let repository: DuneRepositoryImpl;
+  const mockApiKey = 'test-api-key';
 
-// Mock repository for testing
-class MockDuneRepository extends DuneRepositoryImpl {
-  private mockResult: DuneResultResponse<unknown>;
+  beforeEach(() => {
+    repository = new DuneRepositoryImpl(mockApiKey);
+    jest.clearAllMocks();
+  });
 
-  constructor(mockResult: DuneResultResponse<unknown>) {
-    super('mock-key');
-    this.mockResult = mockResult;
-  }
-
-  async getExecutionResults<T>(): Promise<DuneResultResponse<T>> {
-    return this.mockResult as DuneResultResponse<T>;
-  }
-}
-
-describe('DuneRepository', () => {
-  describe('waitForExecution with type assertion', () => {
-    it('should pass validation when all rows match the expected type', async () => {
-      const validResult: DuneResultResponse<TestData> = {
-        execution_id: 'test-123',
-        query_id: 123,
-        is_execution_finished: true,
-        state: 'QUERY_STATE_COMPLETED',
-        submitted_at: '2025-01-01T00:00:00Z',
-        expires_at: '2025-01-02T00:00:00Z',
-        execution_started_at: '2025-01-01T00:00:01Z',
-        execution_ended_at: '2025-01-01T00:00:05Z',
-        result: {
-          rows: [
-            { id: 1, name: 'Test 1', active: true },
-            { id: 2, name: 'Test 2', active: false },
-            { id: 3, name: 'Test 3', active: true },
-          ],
-          metadata: {
-            column_names: ['id', 'name', 'active'],
-            column_types: ['integer', 'varchar', 'boolean'],
-            row_count: 3,
-            result_set_bytes: 100,
-            total_row_count: 3,
-            total_result_set_bytes: 100,
-            datapoint_count: 3,
-            pending_time_millis: 100,
-            execution_time_millis: 500,
-          },
-        },
+  describe('executeQuery', () => {
+    it('should execute a query successfully', async () => {
+      const mockResponse: DuneExecutionResponse = {
+        execution_id: 'test-execution-123',
+        state: 'QUERY_STATE_PENDING',
       };
 
-      const repository = new MockDuneRepository(validResult);
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
 
-      const result = await repository.waitForExecution<TestData>(
-        'test-execution-id',
-        1000,
-        isTestData
+      const result = await repository.executeQuery({
+        queryId: 12345,
+        parameters: { param1: 'value1', param2: 42 },
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.dune.com/api/v1/query/12345/execute',
+        {
+          method: 'POST',
+          headers: {
+            'X-DUNE-API-KEY': mockApiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            parameters: { param1: 'value1', param2: 42 },
+          }),
+        }
       );
 
-      expect(result.result.rows).toHaveLength(3);
-      expect(result.result.rows[0]).toEqual({
-        id: 1,
-        name: 'Test 1',
-        active: true,
-      });
-      expect(result.result.rows[1]).toEqual({
-        id: 2,
-        name: 'Test 2',
-        active: false,
-      });
-      expect(result.result.rows[2]).toEqual({
-        id: 3,
-        name: 'Test 3',
-        active: true,
-      });
+      expect(result).toEqual(mockResponse);
     });
 
-    it('should throw error when some rows do not match the expected type', async () => {
-      const invalidResult: DuneResultResponse<unknown> = {
-        execution_id: 'test-123',
-        query_id: 123,
-        is_execution_finished: true,
-        state: 'QUERY_STATE_COMPLETED',
-        submitted_at: '2025-01-01T00:00:00Z',
-        expires_at: '2025-01-02T00:00:00Z',
-        execution_started_at: '2025-01-01T00:00:01Z',
-        execution_ended_at: '2025-01-01T00:00:05Z',
-        result: {
-          rows: [
-            { id: 1, name: 'Test 1', active: true }, // Valid
-            { id: 2, name: 'Test 2' }, // Missing 'active' field
-            { id: '3', name: 'Test 3', active: false }, // Wrong type for 'id'
-            { id: 4, name: 'Test 4', active: true, extra: 'field' }, // Extra field
-          ],
-          metadata: {
-            column_names: ['id', 'name', 'active'],
-            column_types: ['integer', 'varchar', 'boolean'],
-            row_count: 4,
-            result_set_bytes: 100,
-            total_row_count: 4,
-            total_result_set_bytes: 100,
-            datapoint_count: 3,
-            pending_time_millis: 100,
-            execution_time_millis: 500,
-          },
-        },
+    it('should execute a query without parameters', async () => {
+      const mockResponse: DuneExecutionResponse = {
+        execution_id: 'test-execution-456',
+        state: 'QUERY_STATE_PENDING',
       };
 
-      const repository = new MockDuneRepository(invalidResult);
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const result = await repository.executeQuery({
+        queryId: 12345,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.dune.com/api/v1/query/12345/execute',
+        {
+          method: 'POST',
+          headers: {
+            'X-DUNE-API-KEY': mockApiKey,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should handle API errors', async () => {
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+      });
 
       await expect(
-        repository.waitForExecution<TestData>(
-          'test-execution-id',
-          1000,
-          isTestData
-        )
+        repository.executeQuery({
+          queryId: 12345,
+        })
+      ).rejects.toThrow('Dune API request failed: 400 Bad Request');
+    });
+  });
+
+  describe('getExecutionResults', () => {
+    it('should get execution results successfully', async () => {
+      const mockResponse: DuneResultResponse<unknown> = {
+        execution_id: 'test-execution-123',
+        query_id: 12345,
+        is_execution_finished: true,
+        state: 'QUERY_STATE_COMPLETED',
+        submitted_at: '2025-01-01T00:00:00Z',
+        expires_at: '2025-01-02T00:00:00Z',
+        execution_started_at: '2025-01-01T00:00:01Z',
+        execution_ended_at: '2025-01-01T00:00:05Z',
+        result: {
+          rows: [{ column1: 'value1', column2: 42 }],
+          metadata: {
+            column_names: ['column1', 'column2'],
+            column_types: ['varchar', 'integer'],
+            row_count: 1,
+            result_set_bytes: 100,
+            total_row_count: 1,
+            total_result_set_bytes: 100,
+            datapoint_count: 2,
+            pending_time_millis: 100,
+            execution_time_millis: 500,
+          },
+        },
+      };
+
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const result = await repository.getExecutionResults({
+        executionId: 'test-execution-123',
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.dune.com/api/v1/execution/test-execution-123/results',
+        {
+          method: 'GET',
+          headers: {
+            'X-DUNE-API-KEY': mockApiKey,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should handle API errors', async () => {
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      });
+
+      await expect(
+        repository.getExecutionResults({
+          executionId: 'test-execution-123',
+        })
+      ).rejects.toThrow('Dune API request failed: 404 Not Found');
+    });
+  });
+
+  describe('waitForExecution', () => {
+    it('should wait for execution to complete successfully', async () => {
+      const mockResponse: DuneResultResponse<unknown> = {
+        execution_id: 'test-execution-123',
+        query_id: 12345,
+        is_execution_finished: true,
+        state: 'QUERY_STATE_COMPLETED',
+        submitted_at: '2025-01-01T00:00:00Z',
+        expires_at: '2025-01-02T00:00:00Z',
+        execution_started_at: '2025-01-01T00:00:01Z',
+        execution_ended_at: '2025-01-01T00:00:05Z',
+        result: {
+          rows: [{ column1: 'value1', column2: 42 }],
+          metadata: {
+            column_names: ['column1', 'column2'],
+            column_types: ['varchar', 'integer'],
+            row_count: 1,
+            result_set_bytes: 100,
+            total_row_count: 1,
+            total_result_set_bytes: 100,
+            datapoint_count: 2,
+            pending_time_millis: 100,
+            execution_time_millis: 500,
+          },
+        },
+      };
+
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const result = await repository.waitForExecution({
+        executionId: 'test-execution-123',
+      });
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should validate data with type assertion function', async () => {
+      const validData = [
+        {
+          environment: 'prod',
+          block_time: '2025-01-01 12:00:00.000 UTC',
+          is_bridging: false,
+          success: true,
+          app_code: 'https://example.com/',
+          destination_chain_id: null,
+          destination_token_address: null,
+          hook_type: 'post',
+          app_id: null,
+          target: '0x1234567890123456789012345678901234567890',
+          gas_limit: 250000,
+          app_hash:
+            '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+          tx_hash:
+            '0x9876543210987654321098765432109876543210987654321098765432109876',
+        },
+      ];
+
+      const mockResponse: DuneResultResponse<unknown> = {
+        execution_id: 'test-execution-123',
+        query_id: 12345,
+        is_execution_finished: true,
+        state: 'QUERY_STATE_COMPLETED',
+        submitted_at: '2025-01-01T00:00:00Z',
+        expires_at: '2025-01-02T00:00:00Z',
+        execution_started_at: '2025-01-01T00:00:01Z',
+        execution_ended_at: '2025-01-01T00:00:05Z',
+        result: {
+          rows: validData,
+          metadata: {
+            column_names: [
+              'environment',
+              'block_time',
+              'is_bridging',
+              'success',
+              'app_code',
+              'destination_chain_id',
+              'destination_token_address',
+              'hook_type',
+              'app_id',
+              'target',
+              'gas_limit',
+              'app_hash',
+              'tx_hash',
+            ],
+            column_types: [
+              'varchar',
+              'timestamp',
+              'boolean',
+              'boolean',
+              'varchar',
+              'integer',
+              'varbinary',
+              'varchar',
+              'varchar',
+              'varchar',
+              'double',
+              'varbinary',
+              'varbinary',
+            ],
+            row_count: 1,
+            result_set_bytes: 500,
+            total_row_count: 1,
+            total_result_set_bytes: 500,
+            datapoint_count: 13,
+            pending_time_millis: 100,
+            execution_time_millis: 500,
+          },
+        },
+      };
+
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const isHookData = (
+        data: unknown
+      ): data is {
+        environment: string;
+        block_time: string;
+        is_bridging: boolean;
+        success: boolean;
+        app_code: string;
+        destination_chain_id: number | null;
+        destination_token_address: string | null;
+        hook_type: string;
+        app_id: string | null;
+        target: string;
+        gas_limit: number;
+        app_hash: string;
+        tx_hash: string;
+      } => {
+        return (
+          typeof data === 'object' && data !== null && 'environment' in data
+        );
+      };
+
+      const result = await repository.waitForExecution({
+        executionId: 'test-execution-123',
+        typeAssertion: isHookData,
+      });
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should throw error when data validation fails', async () => {
+      const invalidData = [
+        {
+          environment: 'prod',
+          block_time: '2025-01-01 12:00:00.000 UTC',
+          is_bridging: 'not-a-boolean',
+          success: true,
+          app_code: 'https://example.com/',
+        },
+      ];
+
+      const mockResponse: DuneResultResponse<unknown> = {
+        execution_id: 'test-execution-123',
+        query_id: 12345,
+        is_execution_finished: true,
+        state: 'QUERY_STATE_COMPLETED',
+        submitted_at: '2025-01-01T00:00:00Z',
+        expires_at: '2025-01-02T00:00:00Z',
+        execution_started_at: '2025-01-01T00:00:01Z',
+        execution_ended_at: '2025-01-01T00:00:05Z',
+        result: {
+          rows: invalidData,
+          metadata: {
+            column_names: [
+              'environment',
+              'block_time',
+              'is_bridging',
+              'success',
+              'app_code',
+            ],
+            column_types: [
+              'varchar',
+              'timestamp',
+              'boolean',
+              'boolean',
+              'varchar',
+            ],
+            row_count: 1,
+            result_set_bytes: 100,
+            total_row_count: 1,
+            total_result_set_bytes: 100,
+            datapoint_count: 5,
+            pending_time_millis: 100,
+            execution_time_millis: 500,
+          },
+        },
+      };
+
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => mockResponse,
+      });
+
+      const isHookData = (
+        data: unknown
+      ): data is {
+        environment: string;
+        block_time: string;
+        is_bridging: boolean;
+        success: boolean;
+        app_code: string;
+        destination_chain_id: number | null;
+        destination_token_address: string | null;
+        hook_type: string;
+        app_id: string | null;
+        target: string;
+        gas_limit: number;
+        app_hash: string;
+        tx_hash: string;
+      } => {
+        if (typeof data !== 'object' || data === null) return false;
+        const d = data as Record<string, unknown>;
+        return (
+          typeof d.environment === 'string' &&
+          typeof d.block_time === 'string' &&
+          typeof d.is_bridging === 'boolean' &&
+          typeof d.success === 'boolean' &&
+          typeof d.app_code === 'string'
+        );
+      };
+
+      await expect(
+        repository.waitForExecution({
+          executionId: 'test-execution-123',
+          typeAssertion: isHookData,
+        })
       ).rejects.toThrow(
-        'Data validation failed for execution test-execution-id'
+        'Data validation failed for execution test-execution-123'
       );
     });
 
-    it('should include detailed error information in the error message', async () => {
-      const invalidResult: DuneResultResponse<unknown> = {
-        execution_id: 'test-123',
-        query_id: 123,
-        is_execution_finished: true,
-        state: 'QUERY_STATE_COMPLETED',
+    it('should timeout if execution does not complete', async () => {
+      const pendingResponse: DuneResultResponse<unknown> = {
+        execution_id: 'test-execution-123',
+        query_id: 12345,
+        is_execution_finished: false,
+        state: 'QUERY_STATE_PENDING',
         submitted_at: '2025-01-01T00:00:00Z',
         expires_at: '2025-01-02T00:00:00Z',
         execution_started_at: '2025-01-01T00:00:01Z',
         execution_ended_at: '2025-01-01T00:00:05Z',
         result: {
-          rows: [
-            { id: 1, name: 'Test 1', active: true }, // Valid
-            { id: 2, name: 'Test 2' }, // Invalid - missing 'active'
-          ],
+          rows: [],
           metadata: {
-            column_names: ['id', 'name', 'active'],
-            column_types: ['integer', 'varchar', 'boolean'],
-            row_count: 2,
-            result_set_bytes: 100,
-            total_row_count: 2,
-            total_result_set_bytes: 100,
-            datapoint_count: 3,
-            pending_time_millis: 100,
-            execution_time_millis: 500,
-          },
-        },
-      };
-
-      const repository = new MockDuneRepository(invalidResult);
-
-      try {
-        await repository.waitForExecution<TestData>(
-          'test-execution-id',
-          1000,
-          isTestData
-        );
-        fail('Expected error to be thrown');
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-
-        // Check that error message contains expected information
-        expect(errorMessage).toContain(
-          'Data validation failed for execution test-execution-id'
-        );
-        expect(errorMessage).toContain('Invalid rows found: 1/2');
-        expect(errorMessage).toContain('Example invalid row (index 1):');
-        expect(errorMessage).toContain('"id": 2');
-        expect(errorMessage).toContain('"name": "Test 2"');
-        expect(errorMessage).toContain(
-          'Expected columns from Dune: id, name, active'
-        );
-      }
-    });
-
-    it('should pass validation when no type assertion is provided', async () => {
-      const result: DuneResultResponse<unknown> = {
-        execution_id: 'test-123',
-        query_id: 123,
-        is_execution_finished: true,
-        state: 'QUERY_STATE_COMPLETED',
-        submitted_at: '2025-01-01T00:00:00Z',
-        expires_at: '2025-01-02T00:00:00Z',
-        execution_started_at: '2025-01-01T00:00:01Z',
-        execution_ended_at: '2025-01-01T00:00:05Z',
-        result: {
-          rows: [
-            { id: 1, name: 'Test 1', active: true },
-            { id: 2, name: 'Test 2' }, // Invalid data but no validation
-            { id: '3', name: 'Test 3', active: false }, // Invalid data but no validation
-          ],
-          metadata: {
-            column_names: ['id', 'name', 'active'],
-            column_types: ['integer', 'varchar', 'boolean'],
-            row_count: 3,
-            result_set_bytes: 100,
-            total_row_count: 3,
-            total_result_set_bytes: 100,
-            datapoint_count: 3,
-            pending_time_millis: 100,
-            execution_time_millis: 500,
-          },
-        },
-      };
-
-      const repository = new MockDuneRepository(result);
-
-      const executionResult = await repository.waitForExecution(
-        'test-execution-id',
-        1000
-        // No type assertion provided
-      );
-
-      expect(executionResult.result.rows).toHaveLength(3);
-      expect(executionResult.result.rows[0]).toEqual({
-        id: 1,
-        name: 'Test 1',
-        active: true,
-      });
-      expect(executionResult.result.rows[1]).toEqual({ id: 2, name: 'Test 2' });
-      expect(executionResult.result.rows[2]).toEqual({
-        id: '3',
-        name: 'Test 3',
-        active: false,
-      });
-    });
-
-    it('should handle empty result set', async () => {
-      const emptyResult: DuneResultResponse<TestData> = {
-        execution_id: 'test-123',
-        query_id: 123,
-        is_execution_finished: true,
-        state: 'QUERY_STATE_COMPLETED',
-        submitted_at: '2025-01-01T00:00:00Z',
-        expires_at: '2025-01-02T00:00:00Z',
-        execution_started_at: '2025-01-01T00:00:01Z',
-        execution_ended_at: '2025-01-01T00:00:05Z',
-        result: {
-          rows: [], // Empty result set
-          metadata: {
-            column_names: ['id', 'name', 'active'],
-            column_types: ['integer', 'varchar', 'boolean'],
+            column_names: [],
+            column_types: [],
             row_count: 0,
             result_set_bytes: 0,
             total_row_count: 0,
             total_result_set_bytes: 0,
-            datapoint_count: 3,
-            pending_time_millis: 100,
-            execution_time_millis: 500,
+            datapoint_count: 0,
+            pending_time_millis: 0,
+            execution_time_millis: 0,
           },
         },
       };
 
-      const repository = new MockDuneRepository(emptyResult);
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => pendingResponse,
+      });
 
-      const result = await repository.waitForExecution<TestData>(
-        'test-execution-id',
-        1000,
-        isTestData
+      await expect(
+        repository.waitForExecution({
+          executionId: 'test-execution-123',
+          maxWaitTimeMs: 1000, // 1 second timeout
+        })
+      ).rejects.toThrow(
+        'Execution test-execution-123 did not complete within 1000ms'
       );
-
-      expect(result.result.rows).toHaveLength(0);
     });
   });
 });

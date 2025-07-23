@@ -34,18 +34,30 @@ export interface DuneResultResponse<T> {
   };
 }
 
-export interface DuneRepository {
-  executeQuery(
-    queryId: number,
-    parameters?: Record<string, unknown>
-  ): Promise<DuneExecutionResponse>;
+export interface ExecuteQueryParams {
+  queryId: number;
+  parameters?: Record<string, unknown>;
+}
 
-  getExecutionResults<T>(executionId: string): Promise<DuneResultResponse<T>>;
+export interface GetExecutionResultsParams {
+  executionId: string;
+}
+
+export interface WaitForExecutionParams<T> {
+  executionId: string;
+  maxWaitTimeMs?: number;
+  typeAssertion?: (data: unknown) => data is T;
+}
+
+export interface DuneRepository {
+  executeQuery(params: ExecuteQueryParams): Promise<DuneExecutionResponse>;
+
+  getExecutionResults<T>(
+    params: GetExecutionResultsParams
+  ): Promise<DuneResultResponse<T>>;
 
   waitForExecution<T>(
-    executionId: string,
-    maxWaitTimeMs?: number,
-    typeAssertion?: (data: unknown) => data is T
+    params: WaitForExecutionParams<T>
   ): Promise<DuneResultResponse<T>>;
 }
 
@@ -59,9 +71,9 @@ export class DuneRepositoryImpl implements DuneRepository {
   }
 
   async executeQuery(
-    queryId: number,
-    parameters?: Record<string, unknown>
+    params: ExecuteQueryParams
   ): Promise<DuneExecutionResponse> {
+    const { queryId, parameters } = params;
     const body = parameters ? JSON.stringify({ parameters }) : undefined;
 
     logger.info(
@@ -80,22 +92,22 @@ export class DuneRepositoryImpl implements DuneRepository {
   }
 
   async getExecutionResults<T>(
-    executionId: string
+    params: GetExecutionResultsParams
   ): Promise<DuneResultResponse<T>> {
+    const { executionId } = params;
     return this.makeRequest<DuneResultResponse<T>>(
       `/execution/${executionId}/results`
     );
   }
 
   async waitForExecution<T>(
-    executionId: string,
-    maxWaitTimeMs = 300000,
-    typeAssertion?: (data: unknown) => data is T
+    params: WaitForExecutionParams<T>
   ): Promise<DuneResultResponse<T>> {
+    const { executionId, maxWaitTimeMs = 300000, typeAssertion } = params;
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTimeMs) {
-      const result = await this.getExecutionResults<T>(executionId);
+      const result = await this.getExecutionResults<T>({ executionId });
 
       if (result.is_execution_finished) {
         // If type assertion is provided, validate the data

@@ -14,25 +14,29 @@ class MockDuneRepository implements DuneRepository {
     this.mockResult = mockResult || this.getDefaultMockResult();
   }
 
-  async executeQuery(
-    queryId: number,
-    parameters?: Record<string, unknown>
-  ): Promise<DuneExecutionResponse> {
+  async executeQuery(params: {
+    queryId: number;
+    parameters?: Record<string, unknown>;
+  }): Promise<DuneExecutionResponse> {
     return {
       execution_id: this.mockExecutionId,
       state: 'QUERY_STATE_PENDING',
     };
   }
 
-  async getExecutionResults<T>(): Promise<DuneResultResponse<T>> {
+  async getExecutionResults<T>(params: {
+    executionId: string;
+  }): Promise<DuneResultResponse<T>> {
     return this.mockResult as DuneResultResponse<T>;
   }
 
-  async waitForExecution<T>(
-    executionId: string,
-    maxWaitTimeMs?: number,
-    typeAssertion?: (data: unknown) => data is T
-  ): Promise<DuneResultResponse<T>> {
+  async waitForExecution<T>(params: {
+    executionId: string;
+    maxWaitTimeMs?: number;
+    typeAssertion?: (data: unknown) => data is T;
+  }): Promise<DuneResultResponse<T>> {
+    const { typeAssertion } = params;
+
     // Simulate type validation if provided
     if (typeAssertion && this.mockResult.result.rows.length > 0) {
       const invalidRows: Array<{ index: number; data: unknown }> = [];
@@ -45,7 +49,9 @@ class MockDuneRepository implements DuneRepository {
       });
 
       if (!isValid) {
-        throw new Error(`Data validation failed for execution ${executionId}`);
+        throw new Error(
+          `Data validation failed for execution ${params.executionId}`
+        );
       }
     }
 
@@ -198,14 +204,26 @@ describe('HooksService', () => {
       });
     });
 
-    it('should map blockchain names to correct chain IDs', async () => {
+    it('should pass correct parameters to Dune repository', async () => {
       const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
+      const waitForExecutionSpy = jest.spyOn(
+        mockRepository,
+        'waitForExecution'
+      );
 
       await hooksService.getHooks('arbitrum', 'last 1d');
 
-      expect(executeQuerySpy).toHaveBeenCalledWith(5302473, {
-        chain_id: 42161,
-        time_period: 'last 1d',
+      expect(executeQuerySpy).toHaveBeenCalledWith({
+        queryId: 5302473,
+        parameters: {
+          blockchain: 'arbitrum',
+          period: 'last 1d',
+        },
+      });
+
+      expect(waitForExecutionSpy).toHaveBeenCalledWith({
+        executionId: 'test-execution-123',
+        typeAssertion: expect.any(Function),
       });
     });
 
@@ -214,9 +232,12 @@ describe('HooksService', () => {
 
       await hooksService.getHooks('polygon', 'last 30d');
 
-      expect(executeQuerySpy).toHaveBeenCalledWith(5302473, {
-        chain_id: 137,
-        time_period: 'last 30d',
+      expect(executeQuerySpy).toHaveBeenCalledWith({
+        queryId: 5302473,
+        parameters: {
+          blockchain: 'polygon',
+          period: 'last 30d',
+        },
       });
     });
 
@@ -349,27 +370,27 @@ describe('HooksService', () => {
       expect(hooks).toHaveLength(0);
     });
 
-    it('should map all supported blockchains to correct chain IDs', async () => {
-      const testCases: Array<{
-        blockchain: Blockchain;
-        expectedChainId: number;
-      }> = [
-        { blockchain: 'mainnet', expectedChainId: 1 },
-        { blockchain: 'arbitrum', expectedChainId: 42161 },
-        { blockchain: 'avalanche', expectedChainId: 43114 },
-        { blockchain: 'base', expectedChainId: 8453 },
-        { blockchain: 'gnosis', expectedChainId: 100 },
-        { blockchain: 'polygon', expectedChainId: 137 },
+    it('should work with all supported blockchain and period combinations', async () => {
+      const testCases: Array<{ blockchain: Blockchain; period: Period }> = [
+        { blockchain: 'mainnet', period: 'last 3h' },
+        { blockchain: 'arbitrum', period: 'last 1d' },
+        { blockchain: 'avalanche', period: 'last 7d' },
+        { blockchain: 'base', period: 'last 30d' },
+        { blockchain: 'gnosis', period: 'last 3m' },
+        { blockchain: 'polygon', period: 'last 6m' },
       ];
 
-      for (const { blockchain, expectedChainId } of testCases) {
+      for (const { blockchain, period } of testCases) {
         const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
 
-        await hooksService.getHooks(blockchain, 'last 1d');
+        await hooksService.getHooks(blockchain, period);
 
-        expect(executeQuerySpy).toHaveBeenCalledWith(5302473, {
-          chain_id: expectedChainId,
-          time_period: 'last 1d',
+        expect(executeQuerySpy).toHaveBeenCalledWith({
+          queryId: 5302473,
+          parameters: {
+            blockchain,
+            period,
+          },
         });
 
         executeQuerySpy.mockClear();

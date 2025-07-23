@@ -59,20 +59,19 @@ export class HooksServiceMain implements HooksService {
   async getHooks(blockchain: Blockchain, period: Period): Promise<HookData[]> {
     try {
       // Execute the query with parameters
-      const execution = await this.duneRepository.executeQuery(
-        this.defaultQueryId,
-        {
+      const execution = await this.duneRepository.executeQuery({
+        queryId: this.defaultQueryId,
+        parameters: {
           blockchain,
           period,
-        }
-      );
+        },
+      });
 
       // Wait for execution to complete with type assertion
-      const result = await this.duneRepository.waitForExecution<HookData>(
-        execution.execution_id,
-        undefined, // maxWaitTimeMs
-        this.isHookData // type assertion function
-      );
+      const result = await this.duneRepository.waitForExecution<HookData>({
+        executionId: execution.execution_id,
+        typeAssertion: this.isHookData,
+      });
 
       // The data is already typed as HookData from the generic repository
       return result.result.rows;
