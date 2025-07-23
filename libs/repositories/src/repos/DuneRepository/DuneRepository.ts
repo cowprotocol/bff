@@ -1,3 +1,5 @@
+export const isDuneEnabled = !!process.env.DUNE_API_KEY;
+
 export interface DuneExecutionResponse {
   execution_id: string;
   state: string;

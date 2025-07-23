@@ -13,6 +13,7 @@ import {
   getCacheControlHeaderValue,
 } from '../../utils/cache';
 import ms from 'ms';
+import { isDuneEnabled } from '@cowprotocol/repositories';
 
 const CACHE_SECONDS = ms('5m') / 1000; // Cache for 5 minutes
 
@@ -47,6 +48,11 @@ interface HooksResponse {
 }
 
 const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
+  if (!isDuneEnabled) {
+    fastify.log.warn('DUNE_API_KEY is not set. Skipping hooks endpoint.');
+    return;
+  }
+
   fastify.get<{ Querystring: HooksQuery; Reply: HooksResponse }>(
     '/hooks',
     {

@@ -21,6 +21,7 @@ import {
   cacheRepositorySymbol,
   duneRepositorySymbol,
   erc20RepositorySymbol,
+  isDuneEnabled,
   pushNotificationsRepositorySymbol,
   pushSubscriptionsRepositorySymbol,
   tenderlyRepositorySymbol,
@@ -62,7 +63,6 @@ function getApiContainer(): Container {
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
-  const duneRepository = getDuneRepository();
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -92,15 +92,19 @@ function getApiContainer(): Container {
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
     .toConstantValue(tokenHolderRepository);
 
-  apiContainer
-    .bind<DuneRepository>(duneRepositorySymbol)
-    .toConstantValue(duneRepository);
+  if (isDuneEnabled) {
+    const duneRepository = getDuneRepository();
+
+    apiContainer
+      .bind<DuneRepository>(duneRepositorySymbol)
+      .toConstantValue(duneRepository);
+
+    apiContainer
+      .bind<HooksService>(hooksServiceSymbol)
+      .toDynamicValue(() => new HooksServiceImpl(duneRepository));
+  }
 
   // Services
-  apiContainer
-    .bind<HooksService>(hooksServiceSymbol)
-    .toDynamicValue(() => new HooksServiceImpl(duneRepository));
-
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
     .to(SlippageServiceMain);
