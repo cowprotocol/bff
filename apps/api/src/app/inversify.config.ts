@@ -30,7 +30,7 @@ import {
 
 import {
   HooksService,
-  HooksServiceMain,
+  HooksServiceImpl,
   SimulationService,
   SlippageService,
   SlippageServiceMain,
@@ -99,7 +99,7 @@ function getApiContainer(): Container {
   // Services
   apiContainer
     .bind<HooksService>(hooksServiceSymbol)
-    .toDynamicValue(() => new HooksServiceMain(duneRepository));
+    .toDynamicValue(() => new HooksServiceImpl(duneRepository));
 
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)

@@ -24,6 +24,11 @@ interface HooksQuery {
   performance?: PerformanceTier;
 }
 
+interface LatestHooksQuery {
+  limit?: number;
+  offset?: number;
+}
+
 interface HooksResponse {
   hooks: Array<{
     environment: string;
@@ -135,6 +140,92 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
         });
       } catch (error) {
         fastify.log.error('Error fetching hooks:', error);
+        return reply.status(500).send({
+          hooks: [],
+          count: 0,
+        });
+      }
+    }
+  );
+
+  // Latest hooks endpoint
+  fastify.get<{ Querystring: LatestHooksQuery; Reply: HooksResponse }>(
+    '/hooks/latest',
+    {
+      schema: {
+        description: 'Get latest hooks data from Dune Analytics',
+        tags: ['hooks'],
+        querystring: {
+          type: 'object',
+          properties: {
+            limit: {
+              type: 'number',
+              default: 1000,
+              description: 'Number of hooks to return',
+            },
+            offset: {
+              type: 'number',
+              default: 0,
+              description: 'Number of hooks to skip',
+            },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              hooks: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    environment: { type: 'string' },
+                    block_time: { type: 'string' },
+                    is_bridging: { type: 'boolean' },
+                    success: { type: 'boolean' },
+                    app_code: { type: 'string' },
+                    destination_chain_id: {
+                      type: ['number', 'null'],
+                    },
+                    destination_token_address: {
+                      type: ['string', 'null'],
+                    },
+                    hook_type: { type: 'string' },
+                    app_id: {
+                      type: ['string', 'null'],
+                    },
+                    target: { type: 'string' },
+                    gas_limit: { type: 'number' },
+                    app_hash: { type: 'string' },
+                    tx_hash: { type: 'string' },
+                  },
+                },
+              },
+              count: { type: 'number' },
+            },
+          },
+        },
+      },
+    },
+    async function (request, reply) {
+      reply.header(
+        CACHE_CONTROL_HEADER,
+        getCacheControlHeaderValue(CACHE_SECONDS)
+      );
+
+      try {
+        const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
+        const hooks = await hooksService.getLatestHooks({
+          limit: request.query.limit || 100,
+          offset: request.query.offset || 0,
+        });
+
+        return reply.send({
+          hooks,
+          count: hooks.length,
+        });
+      } catch (error) {
+        fastify.log.error('Error fetching latest hooks:', error);
         return reply.status(500).send({
           hooks: [],
           count: 0,
