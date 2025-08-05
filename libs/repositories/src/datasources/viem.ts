@@ -1,14 +1,16 @@
-import { AllChainIds, logger } from '@cowprotocol/shared';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AllChainIds, logger } from '@cowprotocol/shared';
 import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem';
 import {
   arbitrum,
-  base,
-  gnosis,
-  mainnet,
-  sepolia,
-  polygon,
   avalanche,
+  base,
+  bsc,
+  gnosis,
+  lens,
+  mainnet,
+  polygon,
+  sepolia,
 } from 'viem/chains';
 
 const NETWORKS: Record<SupportedChainId, Chain> = {
@@ -18,6 +20,8 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.BASE]: base,
   [SupportedChainId.POLYGON]: polygon,
   [SupportedChainId.AVALANCHE]: avalanche,
+  [SupportedChainId.LENS]: lens,
+  [SupportedChainId.BNB]: bsc,
   [SupportedChainId.SEPOLIA]: sepolia,
 };
 
