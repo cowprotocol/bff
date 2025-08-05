@@ -1,5 +1,5 @@
 import {
-  ALL_CHAINS_IDS,
+  ALL_SUPPORTED_CHAIN_IDS,
   ALL_SUPPORTED_CHAINS,
   SupportedChainId,
   WRAPPED_NATIVE_CURRENCIES,
@@ -55,4 +55,4 @@ export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
 
-export const AllChainIds: SupportedChainId[] = ALL_CHAINS_IDS;
+export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS;
