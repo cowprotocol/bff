@@ -21,7 +21,6 @@ export const WrappedNativeTokenAddress: Record<SupportedChainId, Address> =
     return acc;
   }, {} as Record<SupportedChainId, Address>);
 
-// TODO: Get from SDK
 export const ChainNames: Record<SupportedChainId, string> = Object.values(
   ALL_SUPPORTED_CHAINS
 ).reduce((acc, curr) => {
