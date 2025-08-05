@@ -37,7 +37,7 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
-const cowApiClients = {
+const cowApiClients: Record<SupportedChainId, CowApiClient> = {
   [SupportedChainId.MAINNET]: mockApi,
   [SupportedChainId.GNOSIS_CHAIN]: mockApi,
   [SupportedChainId.ARBITRUM_ONE]: mockApi,
@@ -45,6 +45,8 @@ const cowApiClients = {
   [SupportedChainId.SEPOLIA]: mockApi,
   [SupportedChainId.POLYGON]: mockApi,
   [SupportedChainId.AVALANCHE]: mockApi,
+  [SupportedChainId.LENS]: mockApi,
+  [SupportedChainId.BNB]: mockApi,
 };
 
 const usdRepositoryCow = new UsdRepositoryCow(

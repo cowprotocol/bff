@@ -34,7 +34,7 @@ describe('Erc20RepositoryViem', () => {
       { address: tokenAddress, abi: erc20Abi, functionName: 'decimals' },
     ],
   };
-  const viemClients = {
+  const viemClients: Record<SupportedChainId, PublicClient> = {
     [SupportedChainId.MAINNET]: mockPublicClient,
     [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
     [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
@@ -42,6 +42,8 @@ describe('Erc20RepositoryViem', () => {
     [SupportedChainId.POLYGON]: mockPublicClient,
     [SupportedChainId.AVALANCHE]: mockPublicClient,
     [SupportedChainId.SEPOLIA]: mockPublicClient,
+    [SupportedChainId.LENS]: mockPublicClient,
+    [SupportedChainId.BNB]: mockPublicClient,
   };
 
   beforeEach(() => {
