@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { mapSupportedNetworks, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { erc20Abi, PublicClient } from 'viem';
 import { Erc20 } from './Erc20Repository';
 import { Erc20RepositoryViem } from './Erc20RepositoryViem';
@@ -34,17 +34,8 @@ describe('Erc20RepositoryViem', () => {
       { address: tokenAddress, abi: erc20Abi, functionName: 'decimals' },
     ],
   };
-  const viemClients: Record<SupportedChainId, PublicClient> = {
-    [SupportedChainId.MAINNET]: mockPublicClient,
-    [SupportedChainId.GNOSIS_CHAIN]: mockPublicClient,
-    [SupportedChainId.ARBITRUM_ONE]: mockPublicClient,
-    [SupportedChainId.BASE]: mockPublicClient,
-    [SupportedChainId.POLYGON]: mockPublicClient,
-    [SupportedChainId.AVALANCHE]: mockPublicClient,
-    [SupportedChainId.SEPOLIA]: mockPublicClient,
-    [SupportedChainId.LENS]: mockPublicClient,
-    [SupportedChainId.BNB]: mockPublicClient,
-  };
+  const viemClients: Record<SupportedChainId, PublicClient> =
+    mapSupportedNetworks(mockPublicClient);
 
   beforeEach(() => {
     erc20RepositoryViem = new Erc20RepositoryViem(viemClients);
