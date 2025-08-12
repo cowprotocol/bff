@@ -620,6 +620,7 @@ export interface paths {
         };
         /**
          * Get information about a solver competition.
+         * @deprecated
          * @description Returns the competition information by `auction_id`.
          *
          */
@@ -669,6 +670,7 @@ export interface paths {
         };
         /**
          * Get information about solver competition.
+         * @deprecated
          * @description Returns the competition information by `tx_hash`.
          *
          */
@@ -711,6 +713,153 @@ export interface paths {
         trace?: never;
     };
     "/api/v1/solver_competition/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about the most recent solver competition.
+         * @deprecated
+         * @description Returns the competition information for the last seen auction_id.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/{auction_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about a solver competition.
+         * @description Returns the competition information by `auction_id`.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auction_id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available for this auction id. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/by_tx_hash/{tx_hash}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about solver competition.
+         * @description Returns the competition information by `tx_hash`.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Transaction hash in which the competition was settled. */
+                    tx_hash: components["schemas"]["TransactionHash"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available for this `tx_hash`. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/latest": {
         parameters: {
             query?: never;
             header?: never;
@@ -1546,36 +1695,37 @@ export interface components {
         SolverCompetitionResponse: {
             /** @description The ID of the auction the competition info is for. */
             auctionId?: number;
-            /** @description The hash of the transaction that the winning solution of this info was submitted in. */
-            transactionHash?: (string & components["schemas"]["TransactionHash"]) | null;
-            /** @description Gas price used for ranking solutions. */
-            gasPrice?: number;
-            liquidityCollectedBlock?: number;
-            competitionSimulationBlock?: number;
+            /** @description Block that the auction started on. */
+            auctionStartBlock?: number;
+            /** @description The hashes of the transactions for the winning solutions of this competition.
+             *      */
+            transactionHashes?: components["schemas"]["TransactionHash"][];
+            /** @description The reference scores for each winning solver according to [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScores?: {
+                [key: string]: components["schemas"]["BigUint"] | undefined;
+            };
             auction?: components["schemas"]["CompetitionAuction"];
             /** @description Maps from solver name to object describing that solver's settlement. */
             solutions?: components["schemas"]["SolverSettlement"][];
         };
         SolverSettlement: {
-            /** @description Name of the solver. */
-            solver?: string;
+            /** @description Which position the solution achieved in the total ranking of the competition. */
+            ranking?: number;
             /** @description The address used by the solver to execute the settlement on-chain.
              *
              *     This field is missing for old settlements, the zero address has been
              *     used instead. */
             solverAddress?: string;
-            objective?: {
-                /** @description The total objective value used for ranking solutions. */
-                total?: number;
-                surplus?: number;
-                fees?: number;
-                cost?: number;
-                gas?: number;
-            };
             /** @description The score of the current auction as defined in [CIP-20](https://snapshot.org/#/cow.eth/proposal/0x2d3f9bd1ea72dca84b03e97dda3efc1f4a42a772c54bd2037e8b62e7d09a491f).
-             *     It is `null` for old auctions.
              *      */
-            score?: components["schemas"]["BigUint"] | null;
+            score?: components["schemas"]["BigUint"];
+            /** @description The reference score as defined in [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScore?: components["schemas"]["BigUint"] | null;
+            /** @description Transaction in which the solution was executed onchain (if available).
+             *      */
+            txHash?: components["schemas"]["TransactionHash"] | null;
             /** @description The prices of tokens for settled user orders as passed to the settlement contract.
              *      */
             clearingPrices?: {
@@ -1584,10 +1734,13 @@ export interface components {
             /** @description Touched orders. */
             orders?: {
                 id?: components["schemas"]["UID"];
-                executedAmount?: components["schemas"]["BigUint"];
+                sellAmount?: components["schemas"]["BigUint"];
+                buyAmount?: components["schemas"]["BigUint"];
             }[];
             /** @description whether the solution is a winner (received the right to get executed) or not */
             isWinner?: boolean;
+            /** @description whether the solution was filtered out according to the rules of [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967). */
+            filteredOut?: boolean;
         };
         /** @description The estimated native price for the token
          *      */

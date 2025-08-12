@@ -35,8 +35,13 @@ export class TokenHolderRepositoryMoralis implements TokenHolderRepository {
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<TokenHolderPoint[] | null> {
+    const network = MORALIS_CLIENT_NETWORK_MAPPING[chainId];
+    if (!network) {
+      return null;
+    }
+
     const response = (await fetch(
-      `${MORALIS_API_BASE_URL}/v2.2/erc20/${tokenAddress}/owners?chain=${MORALIS_CLIENT_NETWORK_MAPPING[chainId]}&order=DESC&limit=2`,
+      `${MORALIS_API_BASE_URL}/v2.2/erc20/${tokenAddress}/owners?chain=${network}&order=DESC&limit=2`,
       {
         method: 'GET',
         headers: {

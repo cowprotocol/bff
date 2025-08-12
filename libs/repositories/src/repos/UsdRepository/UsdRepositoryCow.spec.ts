@@ -1,11 +1,11 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { mapSupportedNetworks, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { UsdRepositoryCow } from './UsdRepositoryCow';
 
 import {
-  NULL_ADDRESS,
-  WETH,
   errorResponse,
+  NULL_ADDRESS,
   okResponse,
+  WETH,
 } from '../../../test/mock';
 import { USDC } from '../../const';
 import { CowApiClient } from '../../datasources/cowApi';
@@ -37,15 +37,8 @@ const mockErc20Repository = {
   },
 } as jest.Mocked<Erc20Repository>;
 
-const cowApiClients = {
-  [SupportedChainId.MAINNET]: mockApi,
-  [SupportedChainId.GNOSIS_CHAIN]: mockApi,
-  [SupportedChainId.ARBITRUM_ONE]: mockApi,
-  [SupportedChainId.BASE]: mockApi,
-  [SupportedChainId.SEPOLIA]: mockApi,
-  [SupportedChainId.POLYGON]: mockApi,
-  [SupportedChainId.AVALANCHE]: mockApi,
-};
+const cowApiClients: Record<SupportedChainId, CowApiClient> =
+  mapSupportedNetworks(mockApi);
 
 const usdRepositoryCow = new UsdRepositoryCow(
   cowApiClients,

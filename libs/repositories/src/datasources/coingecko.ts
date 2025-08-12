@@ -18,6 +18,8 @@ export const SUPPORTED_COINGECKO_PLATFORMS: Record<
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.POLYGON]: 'polygon-pos',
   [SupportedChainId.AVALANCHE]: 'avalanche',
+  [SupportedChainId.LENS]: 'lens',
+  [SupportedChainId.BNB]: 'binance-smart-chain',
 };
 
 /**
@@ -171,7 +173,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [53935]: 'defi-kingdoms-blockchain',
   [5464]: 'saga',
   [5545]: 'duckchain',
-  [56]: 'binance-smart-chain',
   [56288]: 'boba-bnb',
   [57]: 'syscoin',
   [570]: 'rollux',
