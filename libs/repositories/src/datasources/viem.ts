@@ -1,6 +1,6 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { SupportedChainId, lens as lensCoWSdk } from '@cowprotocol/cow-sdk';
 import { AllChainIds, logger } from '@cowprotocol/shared';
-import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem';
+import { Chain, ChainContract, createPublicClient, http, PublicClient, webSocket } from 'viem';
 import {
   arbitrum,
   avalanche,
@@ -20,7 +20,13 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.BASE]: base,
   [SupportedChainId.POLYGON]: polygon,
   [SupportedChainId.AVALANCHE]: avalanche,
-  [SupportedChainId.LENS]: lens,
+  [SupportedChainId.LENS]: {
+    ...lens,
+    contracts: {
+      ...lens.contracts,
+      multicall3: lensCoWSdk.contracts.multicall3 as ChainContract,
+    },
+  },
   [SupportedChainId.BNB]: bsc,
   [SupportedChainId.SEPOLIA]: sepolia,
 };
