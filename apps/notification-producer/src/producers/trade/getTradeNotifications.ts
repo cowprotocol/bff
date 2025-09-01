@@ -1,6 +1,6 @@
 import {
-  COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
-  SupportedChainId,
+  COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS, ETH_FLOW_ADDRESSES,
+  SupportedChainId
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository, getViemClients } from '@cowprotocol/repositories';
@@ -13,6 +13,8 @@ const EVENTS = parseAbi([
   'event OrderInvalidated(address indexed owner, bytes orderUid)',
   'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)',
 ]);
+
+const ethFlowAddresses = Object.values(ETH_FLOW_ADDRESSES).map(getAddress)
 
 export interface GetTradeNotificationParams {
   accounts: string[];
@@ -37,7 +39,7 @@ export async function getTradeNotifications(
     toBlock,
     address: getAddress(COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId]),
     args: {
-      owner: accounts,
+      owner: [...accounts, ...ethFlowAddresses],
     } as any,
   });
 
@@ -80,13 +82,16 @@ export async function getTradeNotifications(
             break;
           }
 
+          const isEthFlowOrder = ethFlowAddresses.includes(owner)
+
           acc.push(
             fromTradeToNotification({
               prefix,
               id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
               chainId,
               orderUid,
-              owner,
+              // TODO: get owner from orderBooksApi (onchain_placed_orders table)
+              owner: isEthFlowOrder ? '0x0000000000000000000000000000000000000000' : owner,
               sellTokenAddress,
               buyTokenAddress,
               sellAmount,
