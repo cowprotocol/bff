@@ -4,13 +4,12 @@ import {
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository, getViemClients } from '@cowprotocol/repositories';
-import { getAddress, parseAbi } from 'viem';
 import { bigIntReplacer, logger } from '@cowprotocol/shared';
+import { getAddress, parseAbi } from 'viem';
 import { fromTradeToNotification } from './fromTradeToNotification';
-import { fromOrderInvalidationToNotification } from './fromOrderInvalidationToNotification';
 
 const EVENTS = parseAbi([
-  'event OrderInvalidated(address indexed owner, bytes orderUid)',
+  // 'event OrderInvalidated(address indexed owner, bytes orderUid)', // Do not index this event
   'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)',
 ]);
 
@@ -100,32 +99,6 @@ export async function getTradeNotifications(
           break;
         }
 
-        case 'OrderInvalidated': {
-          const { orderUid, owner } = log.args;
-          if (orderUid === undefined || owner === undefined) {
-            logger.error(
-              `${prefix} Invalid OrderInvalidated event ${JSON.stringify(
-                log,
-                bigIntReplacer,
-                2
-              )}`
-            );
-            break;
-          }
-
-          // logger.info(`${this.prefix} ${message}`);
-          acc.push(
-            fromOrderInvalidationToNotification({
-              id:
-                'OrderInvalidated-' + log.transactionHash + '-' + log.logIndex,
-              chainId,
-              orderUid,
-              owner,
-              prefix: prefix,
-            })
-          );
-          break;
-        }
         default:
           logger.info(`${prefix} Unknown event ${log}`);
           break;
