@@ -4,15 +4,22 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  cowApiClients,
+  createNewPostgresPool,
+  createTelegramBot,
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryViem,
+  getViemClients,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
+  OnChainPlacedOrdersRepository,
+  OnChainPlacedOrdersRepositoryPostgres,
   PushNotificationsRepository,
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
   PushSubscriptionsRepositoryCms,
+  redisClient,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
@@ -25,13 +32,8 @@ import {
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
-  UsdRepositoryFallback,
-  cowApiClients,
-  createTelegramBot,
-  redisClient,
-  getViemClients,
+  UsdRepositoryFallback
 } from '@cowprotocol/repositories';
-import { createNewPostgresPool } from '@cowprotocol/repositories';
 
 import ms from 'ms';
 import { Pool } from 'pg';
@@ -95,7 +97,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository),
+    getUsdRepositoryCow(cacheRepository, erc20Repository)
   ]);
 }
 
@@ -128,7 +130,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository)
   ]);
 }
 
@@ -140,7 +142,7 @@ export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
   return new PushSubscriptionsRepositoryCms();
 }
 
-export function getPostgresPool(): Pool {
+function getPostgresPool(): Pool {
   if (!postgresPool) {
     postgresPool = createNewPostgresPool();
   }
@@ -152,6 +154,10 @@ export function getIndexerStateRepository(): IndexerStateRepository {
   const pool = getPostgresPool();
 
   return new IndexerStateRepositoryPostgres(pool);
+}
+
+export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
+  return new OnChainPlacedOrdersRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {

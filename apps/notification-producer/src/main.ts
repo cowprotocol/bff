@@ -2,10 +2,11 @@ import 'reflect-metadata';
 
 import {
   getCacheRepository,
+  getOnChainPlacedOrdersRepository,
   getErc20Repository,
   getIndexerStateRepository,
   getPushNotificationsRepository,
-  getPushSubscriptionsRepository,
+  getPushSubscriptionsRepository
 } from '@cowprotocol/services';
 
 import { Runnable } from '../types';
@@ -34,12 +35,14 @@ async function mainLoop() {
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
   const indexerStateRepository = getIndexerStateRepository();
+  const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository();
 
   const repositories = {
     pushNotificationsRepository,
     pushSubscriptionsRepository,
     indexerStateRepository,
     erc20Repository,
+    onChainPlacedOrdersRepository,
   };
 
   // Create all producers

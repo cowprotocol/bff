@@ -1,9 +1,6 @@
-import {
-  COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS, ETH_FLOW_ADDRESSES,
-  SupportedChainId
-} from '@cowprotocol/cow-sdk';
+import { COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
-import { Erc20Repository, getViemClients } from '@cowprotocol/repositories';
+import { Erc20Repository, getViemClients, OnChainPlacedOrdersRepository } from '@cowprotocol/repositories';
 import { getAddress, parseAbi } from 'viem';
 import { bigIntReplacer, logger } from '@cowprotocol/shared';
 import { fromTradeToNotification } from './fromTradeToNotification';
@@ -11,10 +8,10 @@ import { fromOrderInvalidationToNotification } from './fromOrderInvalidationToNo
 
 const EVENTS = parseAbi([
   'event OrderInvalidated(address indexed owner, bytes orderUid)',
-  'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)',
+  'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)'
 ]);
 
-const ethFlowAddresses = Object.values(ETH_FLOW_ADDRESSES).map(getAddress)
+const ethFlowAddresses = Object.values(ETH_FLOW_ADDRESSES).map(getAddress);
 
 export interface GetTradeNotificationParams {
   accounts: string[];
@@ -22,13 +19,14 @@ export interface GetTradeNotificationParams {
   toBlock: bigint;
   chainId: SupportedChainId;
   erc20Repository: Erc20Repository;
+  onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
   prefix: string;
 }
 
 export async function getTradeNotifications(
   params: GetTradeNotificationParams
 ) {
-  const { accounts, fromBlock, toBlock, chainId, erc20Repository, prefix } =
+  const { accounts, fromBlock, toBlock, chainId, erc20Repository, onChainPlacedOrdersRepository, prefix } =
     params;
 
   const client = getViemClients()[chainId];
@@ -39,8 +37,8 @@ export async function getTradeNotifications(
     toBlock,
     address: getAddress(COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId]),
     args: {
-      owner: [...accounts, ...ethFlowAddresses],
-    } as any,
+      owner: [...accounts, ...ethFlowAddresses]
+    } as any
   });
 
   // Return empty array if no events
@@ -49,6 +47,20 @@ export async function getTradeNotifications(
   }
 
   logger.debug(`${prefix} Found ${logs.length} events`);
+
+  const ethFlowOrderIds = logs.reduce<string[]>((acc, log) => {
+    const { owner, orderUid } = log.args;
+
+    if (log.eventName !== 'Trade') return acc;
+    if (!orderUid) return acc;
+    if (!owner || !ethFlowAddresses.includes(owner)) return acc;
+
+    acc.push(orderUid);
+
+    return acc;
+  }, []);
+
+  const ethFlowOrderOwners = await onChainPlacedOrdersRepository.getAccountsForOrders(chainId, ethFlowOrderIds);
 
   const notificationPromises = logs.reduce<Promise<PushNotification>[]>(
     (acc, log) => {
@@ -61,7 +73,7 @@ export async function getTradeNotifications(
             buyToken: buyTokenAddress,
             sellAmount,
             buyAmount,
-            feeAmount,
+            feeAmount
           } = log.args;
           if (
             owner === undefined ||
@@ -82,26 +94,35 @@ export async function getTradeNotifications(
             break;
           }
 
-          const isEthFlowOrder = ethFlowAddresses.includes(owner)
+          const isEthFlowOrder = ethFlowAddresses.includes(owner);
 
-          acc.push(
-            fromTradeToNotification({
-              prefix,
-              id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
-              chainId,
-              orderUid,
-              // TODO: get owner from orderBooksApi (onchain_placed_orders table)
-              owner: isEthFlowOrder ? '0x0000000000000000000000000000000000000000' : owner,
-              sellTokenAddress,
-              buyTokenAddress,
-              sellAmount,
-              buyAmount,
-              feeAmount,
-              erc20Repository,
-              transactionHash: log.transactionHash,
-              logIndex: log.logIndex,
+          const orderOwner = isEthFlowOrder
+            ? Object.keys(ethFlowOrderOwners).find(key => {
+              const orderUids = ethFlowOrderOwners[key];
+
+              return orderUids.includes(orderUid.toLowerCase());
             })
-          );
+            : owner;
+
+          if (orderOwner) {
+            acc.push(
+              fromTradeToNotification({
+                prefix,
+                id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
+                chainId,
+                orderUid,
+                owner: getAddress(orderOwner),
+                sellTokenAddress,
+                buyTokenAddress,
+                sellAmount,
+                buyAmount,
+                feeAmount,
+                erc20Repository,
+                transactionHash: log.transactionHash,
+                logIndex: log.logIndex
+              })
+            );
+          }
           break;
         }
 
@@ -126,7 +147,7 @@ export async function getTradeNotifications(
               chainId,
               orderUid,
               owner,
-              prefix: prefix,
+              prefix: prefix
             })
           );
           break;

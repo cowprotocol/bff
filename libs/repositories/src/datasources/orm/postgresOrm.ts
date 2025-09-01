@@ -1,4 +1,3 @@
-// import { ensureEnvs } from '@cowprotocol/shared';
 import { DataSource } from 'typeorm';
 
 import assert from 'assert';

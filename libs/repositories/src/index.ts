@@ -11,6 +11,7 @@ export * from './datasources/orm/postgresOrm';
 export * from './datasources/rabbitMq';
 export * from './datasources/telegram';
 export * from './datasources/cms';
+export * from './datasources/orderBookDbPool';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
@@ -49,6 +50,10 @@ export * from './repos/SimulationRepository/tenderlyTypes';
 export * from './repos/IndexerStateRepository/IndexerStateRepository';
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryPostgres';
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm';
+
+// OnChainPlacedOrdersRepository
+export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepository';
+export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepositoryPostgres';
 
 // Notifications repositories
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
