@@ -31,14 +31,12 @@ import {
   UsdRepositoryCow,
   UsdRepositoryFallback,
   cowApiClients,
-  createNewPostgresOrm,
   createNewPostgresPool,
   createTelegramBot,
   getViemClients,
-  redisClient,
+  redisClient
 } from '@cowprotocol/repositories';
 
-import { logger } from '@cowprotocol/shared';
 import ms from 'ms';
 import { Pool } from 'pg';
 import { DataSource } from 'typeorm';

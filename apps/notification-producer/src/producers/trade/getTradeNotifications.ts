@@ -1,6 +1,6 @@
 import { COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
-import { Erc20Repository, getViemClients } from '@cowprotocol/repositories';
+import { Erc20Repository, getViemClients, OnChainPlacedOrdersRepository } from '@cowprotocol/repositories';
 import { bigIntReplacer, logger } from '@cowprotocol/shared';
 import { getAddress, parseAbi } from 'viem';
 import { fromTradeToNotification } from './fromTradeToNotification';
