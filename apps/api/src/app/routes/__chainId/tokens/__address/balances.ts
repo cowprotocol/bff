@@ -23,7 +23,7 @@ const successSchema = {
   properties: {
     balances: {
       type: 'object',
-      additionalProperties: { type: 'string' }, // or 'number', etc.
+      additionalProperties: { type: 'string' },
     },
   },
 } as const satisfies JSONSchema;
@@ -79,6 +79,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       if (balances) {
         reply.send({ balances });
       } else {
+        // todo add error handling
         reply.send({ balances: {} });
       }
     }
