@@ -40,6 +40,9 @@ export * from './repos/TokenHolderRepository/TokenHolderRepositoryCache';
 export * from './repos/TokenHolderRepository/TokenHolderRepositoryFallback';
 export * from './repos/TokenHolderRepository/TokenHolderRepositoryMoralis';
 
+export * from './repos/TokenBalancesRepository/TokenBalancesRepository';
+export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryMoralis';
+
 // Simulation repositories
 export * from './repos/SimulationRepository/SimulationRepository';
 export * from './repos/SimulationRepository/SimulationRepositoryTenderly';

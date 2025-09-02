@@ -22,6 +22,8 @@ import {
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
   TokenHolderRepositoryMoralis,
+  TokenBalancesRepositoryMoralis,
+  TokenBalancesRepository,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -135,6 +137,10 @@ export function getTokenHolderRepository(
     getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
+}
+
+export function getTokenBalancesRepository(): TokenBalancesRepository {
+  return new TokenBalancesRepositoryMoralis()
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {
