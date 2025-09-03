@@ -1,4 +1,10 @@
-async function fetchTokensFromCoinGecko(chainName: string) {
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { TokenFromAPI } from './types';
+
+async function fetchTokensFromCoinGecko(
+  chainName: string,
+  chainId: SupportedChainId
+): Promise<TokenFromAPI[]> {
   const tokenSource = `https://tokens.coingecko.com/${chainName}/all.json`;
 
   console.log(`Fetching tokens for ${chainName}`);
@@ -21,9 +27,15 @@ async function fetchTokensFromCoinGecko(chainName: string) {
 
   console.log(`Fetched ${data.tokens.length} tokens for ${chainName}`);
 
-  return data.tokens;
+  return data.tokens.map((token: TokenFromAPI) => ({
+    ...token,
+    chainId,
+  }));
 }
 
-export async function getTokensByChainName(chainName: string) {
-  return fetchTokensFromCoinGecko(chainName);
+export async function getTokensByChainName(
+  chainName: string,
+  chainId: SupportedChainId
+): Promise<TokenFromAPI[]> {
+  return fetchTokensFromCoinGecko(chainName, chainId);
 }

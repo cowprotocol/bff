@@ -62,3 +62,6 @@ export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersReposito
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
+
+// Token cache repositories
+export * from './repos/TokenCacheRepository';

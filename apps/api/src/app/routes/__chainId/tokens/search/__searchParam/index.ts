@@ -29,7 +29,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const { chainId, searchParam } = request.params;
 
       try {
-        const tokens = getTokenListBySearchParam(chainId, searchParam);
+        const tokens = await getTokenListBySearchParam(chainId, searchParam);
 
         fastify.log.info(
           `Token search for "${searchParam}" on chain ${chainId}: ${tokens.length} tokens found`

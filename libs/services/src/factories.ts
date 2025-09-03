@@ -20,6 +20,8 @@ import {
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
+  TokenCacheRepository,
+  TokenCacheRepositoryRedis,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -68,6 +70,7 @@ export function getErc20Repository(
 
 export function getCacheRepository(): CacheRepository {
   if (redisClient) {
+    console.log('redisClient', redisClient.auth);
     return new CacheRepositoryRedis(redisClient);
   }
 
@@ -178,4 +181,14 @@ export function getTelegramBot(): TelegramBot {
   }
 
   return telegramBot;
+}
+
+export function getTokenCacheRepository(): TokenCacheRepository {
+  if (!redisClient) {
+    throw new Error(
+      'Redis client is required for TokenCacheRepository. Please configure Redis.'
+    );
+  }
+
+  return new TokenCacheRepositoryRedis(redisClient);
 }
