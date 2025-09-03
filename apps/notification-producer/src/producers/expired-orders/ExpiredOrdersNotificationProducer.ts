@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk';
 import {
   Erc20Repository,
   ExpiredOrdersRepository,
@@ -12,6 +12,7 @@ import {
 import { Runnable } from '../../../types';
 import { doForever, logger } from '@cowprotocol/shared';
 import { getExpiredOrderNotification } from './getExpiredOrderNotification';
+import { isTruthy } from '../../utils/commonUtils';
 
 async function wait(time: number) {
   return new Promise((res) => setTimeout(res, time))
@@ -85,7 +86,8 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       indexerStateRepository,
       pushSubscriptionsRepository,
       expiredOrdersRepository,
-      pushNotificationsRepository
+      pushNotificationsRepository,
+      onChainPlacedOrdersRepository
     } = this.props;
 
     const nowTimestamp = Math.ceil(Date.now() / 1000);
@@ -101,28 +103,45 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw);
 
-      // TODO: support ethFlowAddresses as well
+      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(t => t.toLowerCase());
+
       const accounts =
         await pushSubscriptionsRepository.getAllSubscribedAccounts();
 
       const expiredOrders = await expiredOrdersRepository.fetchExpiredOrdersForAccounts({
         chainId,
-        accounts,
+        accounts: [...accounts, ...ethFlowAddresses],
         lastCheckTimestamp,
         nowTimestamp
       });
+
+      const ethFlowOrderOwners = expiredOrders.length
+        ? await onChainPlacedOrdersRepository.getAccountsForOrders(chainId, expiredOrders.map(o => o.uid))
+        : {};
 
       logger.debug(
         `${this.prefix} got ${expiredOrders.length} expired orders of ${accounts.length} accounts, lastCheckTimestamp=${lastCheckTimestamp}`
       );
 
       const notifications = await Promise.all(expiredOrders.map(order => {
+        const isEthFlowOrder = ethFlowAddresses.includes(order.owner.toLowerCase());
+
+        const orderOwner = isEthFlowOrder
+          ? Object.keys(ethFlowOrderOwners).find(key => {
+            const orderUids = ethFlowOrderOwners[key];
+
+            return orderUids.includes(order.uid.toLowerCase());
+          })
+          : order.owner.toLowerCase();
+
+        if (!orderOwner) return Promise.resolve(undefined);
+
         return getExpiredOrderNotification(order, {
           chainId,
           nowTimestamp,
           lastCheckTimestamp,
-          isEthFlowOrder: false, // TODO: add eth-flow orders support
-          owner: order.owner, // TODO: add eth-flow orders support
+          isEthFlowOrder,
+          owner: orderOwner,
           erc20Repository
         });
       }));
@@ -135,7 +154,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         );
 
         // Post notifications to queue
-        pushNotificationsRepository.send(notifications);
+        pushNotificationsRepository.send(notifications.filter(isTruthy));
       }
     }
 
