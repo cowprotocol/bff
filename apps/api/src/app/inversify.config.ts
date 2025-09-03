@@ -5,6 +5,7 @@ import {
   getPushSubscriptionsRepository,
   getSimulationRepository,
   getTokenHolderRepository,
+  getUserBalanceRepository,
   getUsdRepository,
 } from '@cowprotocol/services';
 
@@ -15,6 +16,7 @@ import {
   PushSubscriptionsRepository,
   SimulationRepository,
   TokenHolderRepository,
+  UserBalanceRepository,
   UsdRepository,
   cacheRepositorySymbol,
   erc20RepositorySymbol,
@@ -22,19 +24,26 @@ import {
   pushSubscriptionsRepositorySymbol,
   tenderlyRepositorySymbol,
   tokenHolderRepositorySymbol,
+  userBalanceRepositorySymbol,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
 
 import {
+  BalanceTrackingService,
+  BalanceTrackingServiceMain,
   SimulationService,
   SlippageService,
   SlippageServiceMain,
+  SSEService,
+  SSEServiceMain,
   TokenHolderService,
   TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
+  balanceTrackingServiceSymbol,
   simulationServiceSymbol,
   slippageServiceSymbol,
+  sseServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
 } from '@cowprotocol/services';
@@ -53,6 +62,7 @@ function getApiContainer(): Container {
   const erc20Repository = getErc20Repository(cacheRepository);
   const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
+  const userBalanceRepository = getUserBalanceRepository(cacheRepository);
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
@@ -85,6 +95,10 @@ function getApiContainer(): Container {
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
     .toConstantValue(tokenHolderRepository);
 
+  apiContainer
+    .bind<UserBalanceRepository>(userBalanceRepositorySymbol)
+    .toConstantValue(userBalanceRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
@@ -99,6 +113,16 @@ function getApiContainer(): Container {
   apiContainer
     .bind<SimulationService>(simulationServiceSymbol)
     .to(SimulationService);
+
+  apiContainer
+    .bind<BalanceTrackingService>(balanceTrackingServiceSymbol)
+    .to(BalanceTrackingServiceMain)
+    .inSingletonScope();
+
+  apiContainer
+    .bind<SSEService>(sseServiceSymbol)
+    .to(SSEServiceMain)
+    .inSingletonScope();
 
   return apiContainer;
 }
