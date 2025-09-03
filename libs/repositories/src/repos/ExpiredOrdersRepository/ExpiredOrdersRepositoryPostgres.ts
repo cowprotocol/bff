@@ -41,13 +41,28 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
     if (accounts.length === 0) return null;
 
     const query = `
-        SELECT uid, owner, valid_to, sell_token, buy_token, sell_amount, buy_amount
-        FROM orders
-        WHERE valid_to > ${lastCheckTimestamp}
-          AND valid_to <= ${nowTimestamp}
-        ORDER BY valid_to ASC
-        LIMIT 1000
-    `;
+      WITH trade_sums AS (
+        SELECT
+          order_uid,
+          COALESCE(SUM(sell_amount), 0) AS filled_sell,
+          COALESCE(SUM(buy_amount), 0)  AS filled_buy
+        FROM trades
+        GROUP BY order_uid
+      )
+      SELECT o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+      FROM orders o
+      LEFT JOIN trade_sums t ON o.uid = t.order_uid
+      WHERE
+        o.valid_to > ${lastCheckTimestamp}
+        AND o.valid_to <= ${nowTimestamp}
+        AND (
+          (o.kind = 'sell' AND (t.filled_sell < o.sell_amount OR t.filled_sell IS NULL))
+              OR
+          (o.kind = 'buy'  AND (t.filled_buy  < o.buy_amount  OR t.filled_buy IS NULL))
+        )
+      ORDER BY o.valid_to ASC
+      LIMIT 1000;
+    `
 
     return db.query(query);
   }

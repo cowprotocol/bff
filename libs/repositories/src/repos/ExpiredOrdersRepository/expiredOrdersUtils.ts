@@ -4,6 +4,7 @@ import { bytesToHexString } from '../../utils/bytesUtils';
 export function parseExpiredOrder(order: ExpiredOrder): ParsedExpiredOrder {
   return {
     uid: bytesToHexString(order.uid),
+    kind: order.kind,
     validTo: order.valid_to,
     owner: bytesToHexString(order.owner),
     sellTokenAddress: bytesToHexString(order.sell_token),
