@@ -6,6 +6,11 @@ import {
   TokenBalancesService,
   tokenBalancesServiceSymbol,
 } from '@cowprotocol/services';
+import ms from 'ms';
+import {
+  CACHE_CONTROL_HEADER,
+  getCacheControlHeaderValue,
+} from '../../../../../utils/cache';
 
 const paramsSchema = {
   type: 'object',
@@ -37,7 +42,7 @@ const errorSchema = {
       title: 'Message',
       description: 'Message describing the error.',
       type: 'string',
-      examples: ['Price not found'],
+      examples: ['Balance not found'],
     },
   },
 } as const satisfies JSONSchema;
@@ -50,8 +55,10 @@ const tokenBalancesService: TokenBalancesService = apiContainer.get(
   tokenBalancesServiceSymbol
 );
 
+const CACHE_SECONDS = ms('5s') / 1000;
+
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/balances
+  // example: GET: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/balances
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
@@ -65,11 +72,17 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         params: paramsSchema,
         response: {
           '2XX': successSchema,
-          '404': errorSchema,
+          '4XX': errorSchema,
+          '5XX': errorSchema,
         },
       },
     },
     async function (request, reply) {
+      reply.header(
+        CACHE_CONTROL_HEADER,
+        getCacheControlHeaderValue(CACHE_SECONDS)
+      );
+
       const { chainId, address } = request.params;
 
       try {
@@ -87,13 +100,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           `Error fetching balances for address ${address} on chain ${chainId}: ${e}`
         );
 
-        if (e instanceof Error) {
-          reply
-            .code(500)
-            .send({ message: e.message || 'Internal Server Error' });
-        } else {
-          reply.code(500).send({ message: 'Internal Server Error' });
-        }
+        const errorMessage =
+          e instanceof Error ? e.message : 'Internal Server Error';
+        reply.code(500).send({ message: errorMessage });
       }
     }
   );
