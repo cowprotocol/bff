@@ -38,30 +38,23 @@ export class TokenBalancesRepositoryMoralis implements TokenBalancesRepository {
   }: TokenBalanceParams): Promise<TokenBalancesResponse> {
     const network = MORALIS_CLIENT_NETWORK_MAPPING[chainId];
     if (!network) {
-      return null;
+      throw new Error('Unsupported chain');
     }
 
-    try {
-      const url = `${MORALIS_API_BASE_URL}/v2.2/wallets/${address}/tokens?chain=${network}&order=DESC`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          'X-API-Key': `${MORALIS_API_KEY}`,
-        },
-      });
+    const url = `${MORALIS_API_BASE_URL}/v2.2/wallets/${address}/tokens?chain=${network}&order=DESC`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        'X-API-Key': `${MORALIS_API_KEY}`,
+      },
+    });
 
-      const asJson = (await response.json()) as MoralisBalanceResponse;
-      return asJson.result.reduce((acc, tokenBalanceItem) => {
-        acc[tokenBalanceItem.token_address.toLowerCase()] =
-          tokenBalanceItem.balance;
-        return acc;
-      }, {} as Record<string, string>);
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-
-    return null;
+    const asJson = (await response.json()) as MoralisBalanceResponse;
+    return asJson.result.reduce((acc, tokenBalanceItem) => {
+      acc[tokenBalanceItem.token_address.toLowerCase()] =
+        tokenBalanceItem.balance;
+      return acc;
+    }, {} as Record<string, string>);
   }
 }

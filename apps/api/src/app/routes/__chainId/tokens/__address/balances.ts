@@ -72,14 +72,28 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, address } = request.params;
 
-      const balances = await tokenBalancesService.getTokenBalances({
-        address,
-        chainId,
-      });
-      if (balances) {
-        reply.send({ balances });
-      } else {
-        reply.code(400).send({ message: 'Balances not found' });
+      try {
+        const balances = await tokenBalancesService.getTokenBalances({
+          address,
+          chainId,
+        });
+        if (balances) {
+          reply.send({ balances });
+        } else {
+          reply.code(400).send({ message: 'Balances not found' });
+        }
+      } catch (e: unknown) {
+        fastify.log.error(
+          `Error fetching balances for address ${address} on chain ${chainId}: ${e}`
+        );
+
+        if (e instanceof Error) {
+          reply
+            .code(500)
+            .send({ message: e.message || 'Internal Server Error' });
+        } else {
+          reply.code(500).send({ message: 'Internal Server Error' });
+        }
       }
     }
   );
