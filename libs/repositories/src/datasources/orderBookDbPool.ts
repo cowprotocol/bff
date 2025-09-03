@@ -14,7 +14,7 @@ const chainToDbNameMap: Record<SupportedChainId, string> = {
   [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.POLYGON]: 'polygon',
-  [SupportedChainId.AVALANCHE]: 'avalance',
+  [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
   [SupportedChainId.BNB]: 'bnb',
   [SupportedChainId.LENS]: 'lens',
