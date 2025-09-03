@@ -6,6 +6,7 @@ import {
   getSimulationRepository,
   getTokenBalancesRepository,
   getTokenHolderRepository,
+  getUserBalanceRepository,
   getUsdRepository,
   SimulationService,
   simulationServiceSymbol,
@@ -37,10 +38,21 @@ import {
   TokenBalancesRepository,
   tokenBalancesRepositorySymbol,
   TokenHolderRepository,
+  UserBalanceRepository,
+  userBalanceRepositorySymbol,
   tokenHolderRepositorySymbol,
   UsdRepository,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
+
+import {
+  BalanceTrackingService,
+  BalanceTrackingServiceMain,
+  SSEService,
+  SSEServiceMain,
+  balanceTrackingServiceSymbol,
+  sseServiceSymbol,
+} from '@cowprotocol/services';
 
 import { Container } from 'inversify';
 import { Logger, logger } from '@cowprotocol/shared';
@@ -57,6 +69,7 @@ function getApiContainer(): Container {
   const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
   const tokenBalancesRepository = getTokenBalancesRepository();
+  const userBalanceRepository = getUserBalanceRepository(cacheRepository);
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
@@ -93,6 +106,10 @@ function getApiContainer(): Container {
     .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
     .toConstantValue(tokenBalancesRepository);
 
+  apiContainer
+    .bind<UserBalanceRepository>(userBalanceRepositorySymbol)
+    .toConstantValue(userBalanceRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
@@ -111,6 +128,16 @@ function getApiContainer(): Container {
   apiContainer
     .bind<SimulationService>(simulationServiceSymbol)
     .to(SimulationService);
+
+  apiContainer
+    .bind<BalanceTrackingService>(balanceTrackingServiceSymbol)
+    .to(BalanceTrackingServiceMain)
+    .inSingletonScope();
+
+  apiContainer
+    .bind<SSEService>(sseServiceSymbol)
+    .to(SSEServiceMain)
+    .inSingletonScope();
 
   return apiContainer;
 }
