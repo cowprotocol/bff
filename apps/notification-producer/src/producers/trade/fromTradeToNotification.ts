@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { ALL_SUPPORTED_CHAINS_MAP, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { getAddress } from 'viem';
@@ -13,6 +13,7 @@ import {
 export async function fromTradeToNotification(props: {
   prefix: string;
   id: string;
+  isEthFlowOrder: boolean;
   chainId: SupportedChainId;
   orderUid: string;
   owner: string;
@@ -29,6 +30,7 @@ export async function fromTradeToNotification(props: {
     id,
     chainId,
     owner,
+    isEthFlowOrder,
     sellTokenAddress,
     buyTokenAddress,
     sellAmount,
@@ -37,13 +39,15 @@ export async function fromTradeToNotification(props: {
     prefix,
     orderUid,
     transactionHash,
-    logIndex,
+    logIndex
   } = props;
 
-  const sellToken = await erc20Repository.get(
-    chainId,
-    getAddress(sellTokenAddress)
-  );
+  const sellToken = isEthFlowOrder
+    ? ALL_SUPPORTED_CHAINS_MAP[chainId].nativeCurrency
+    : await erc20Repository.get(
+      chainId,
+      getAddress(sellTokenAddress)
+    );
 
   const buyToken = await erc20Repository.get(
     chainId,

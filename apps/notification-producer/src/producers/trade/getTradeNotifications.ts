@@ -115,6 +115,7 @@ export async function getTradeNotifications(
             acc.push(
               fromTradeToNotification({
                 prefix,
+                isEthFlowOrder,
                 id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
                 chainId,
                 orderUid,
