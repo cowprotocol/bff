@@ -1,7 +1,7 @@
 {
   "name": "@cowprotocol/root",
   "description": "Backend for frontend is a series of backend services and libraries that enhance user experience for the frontend",
-  "version": "0.0.0",
+  "version": "0.17.0",
   "license": "MIT",
   "scripts": {
     "start": "yarn start:api",
