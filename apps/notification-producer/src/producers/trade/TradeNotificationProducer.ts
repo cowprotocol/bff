@@ -204,10 +204,10 @@ export class TradeNotificationProducer implements Runnable {
         `${this.prefix} Sending ${notifications.length} notifications`,
         JSON.stringify(notifications, null, 2)
       );
-    }
 
-    // Post notifications to queue
-    this.props.pushNotificationsRepository.send(notifications);
+      // Post notifications to queue
+      this.props.pushNotificationsRepository.send(notifications);
+    }
 
     // Update state
     await indexerStateRepository.upsert<TradeNotificationProducerState>(

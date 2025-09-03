@@ -109,7 +109,7 @@ export async function getTradeNotifications(
 
               return orderUids.includes(orderUid.toLowerCase());
             })
-            : owner;
+            : owner.toLowerCase();
 
           if (orderOwner) {
             acc.push(
@@ -119,7 +119,7 @@ export async function getTradeNotifications(
                 id: 'Trade-' + log.transactionHash + '-' + log.logIndex,
                 chainId,
                 orderUid,
-                owner: getAddress(orderOwner),
+                owner: orderOwner,
                 sellTokenAddress,
                 buyTokenAddress,
                 sellAmount,

@@ -34,12 +34,13 @@ import {
   createNewPostgresPool,
   createTelegramBot,
   getViemClients,
-  redisClient
+  redisClient,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
 import { Pool } from 'pg';
-import { DataSource } from 'typeorm';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
@@ -166,6 +167,10 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 
 export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
   return new OnChainPlacedOrdersRepositoryPostgres();
+}
+
+export function getExpiredOrdersRepository(): ExpiredOrdersRepository {
+  return new ExpiredOrdersRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {
