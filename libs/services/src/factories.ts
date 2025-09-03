@@ -25,6 +25,9 @@ import {
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
   TokenHolderRepositoryMoralis,
+  UserBalanceRepository,
+  UserBalanceRepositoryCache,
+  UserBalanceRepositoryViem,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -140,6 +143,17 @@ export function getTokenHolderRepository(
     getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository)
   ]);
+}
+
+export function getUserBalanceRepository(
+  cacheRepository: CacheRepository
+): UserBalanceRepository {
+  return new UserBalanceRepositoryCache(
+    new UserBalanceRepositoryViem(getViemClients()),
+    cacheRepository,
+    'user_balance',
+    DEFAULT_CACHE_VALUE_SECONDS
+  );
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {
