@@ -1,4 +1,3 @@
-// import { ensureEnvs } from '@cowprotocol/shared';
 import { DataSource } from 'typeorm';
 
 import assert from 'assert';
@@ -22,13 +21,11 @@ export function getDatabaseParams() {
 }
 
 export function createNewPostgresOrm(): DataSource {
-  const dataSource = new DataSource({
+  return new DataSource({
     type: 'postgres',
     ...getDatabaseParams(),
     entities: [IndexerState],
     migrations: ['src/migrations/*.ts'],
     migrationsTableName: 'migrations_repositories',
   });
-
-  return dataSource;
 }

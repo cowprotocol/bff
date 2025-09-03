@@ -4,6 +4,7 @@ import {
   getViemClients,
   IndexerStateValue,
   PushNotificationsRepository,
+  OnChainPlacedOrdersRepository,
 } from '@cowprotocol/repositories';
 
 import { Runnable } from '../../../types';
@@ -25,6 +26,7 @@ export type TradeNotificationProducerProps = {
   pushSubscriptionsRepository: PushSubscriptionsRepository;
   indexerStateRepository: IndexerStateRepository;
   erc20Repository: Erc20Repository;
+  onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
 };
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
@@ -172,6 +174,7 @@ export class TradeNotificationProducer implements Runnable {
       pushSubscriptionsRepository,
       indexerStateRepository,
       erc20Repository,
+      onChainPlacedOrdersRepository
     } = this.props;
 
     // Get all accounts subscribed to PUSH notifications
@@ -185,6 +188,7 @@ export class TradeNotificationProducer implements Runnable {
       toBlock,
       chainId,
       erc20Repository,
+      onChainPlacedOrdersRepository,
       prefix: this.prefix,
     });
 

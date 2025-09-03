@@ -11,7 +11,8 @@ import {
   Erc20RepositoryViem,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
-  // IndexerStateRepositoryTypeOrm,
+  OnChainPlacedOrdersRepository,
+  OnChainPlacedOrdersRepositoryPostgres,
   PushNotificationsRepository,
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
@@ -30,14 +31,12 @@ import {
   UsdRepositoryCow,
   UsdRepositoryFallback,
   cowApiClients,
-  createNewPostgresOrm,
   createNewPostgresPool,
   createTelegramBot,
   getViemClients,
-  redisClient,
+  redisClient
 } from '@cowprotocol/repositories';
 
-import { logger } from '@cowprotocol/shared';
 import ms from 'ms';
 import { Pool } from 'pg';
 import { DataSource } from 'typeorm';
@@ -49,7 +48,6 @@ const CACHE_TOKEN_INFO_SECONDS = ms('24h') / 1000; // 24h
 
 // Singleton instances
 let postgresPool: Pool | undefined = undefined;
-let ormDataSource: DataSource | undefined = undefined;
 let telegramBot: TelegramBot | undefined = undefined;
 
 export function getErc20Repository(
@@ -107,7 +105,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository),
+    getUsdRepositoryCow(cacheRepository, erc20Repository)
   ]);
 }
 
@@ -140,7 +138,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository)
   ]);
 }
 
@@ -152,7 +150,7 @@ export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
   return new PushSubscriptionsRepositoryCms();
 }
 
-export function getPostgresPool(): Pool {
+function getPostgresPool(): Pool {
   if (!postgresPool) {
     postgresPool = createNewPostgresPool();
   }
@@ -160,23 +158,14 @@ export function getPostgresPool(): Pool {
   return postgresPool;
 }
 
-export function getOrmDataSource(): DataSource {
-  if (!ormDataSource) {
-    ormDataSource = createNewPostgresOrm();
-    ormDataSource.initialize().catch((error) => {
-      logger.error('Error initializing ORM data source', error);
-      throw error;
-    });
-  }
-  return ormDataSource;
-}
-
 export function getIndexerStateRepository(): IndexerStateRepository {
   const pool = getPostgresPool();
-  return new IndexerStateRepositoryPostgres(pool);
 
-  // const ormDataSource = getOrmDataSource();
-  // return new IndexerStateRepositoryTypeOrm(ormDataSource);
+  return new IndexerStateRepositoryPostgres(pool);
+}
+
+export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
+  return new OnChainPlacedOrdersRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {
