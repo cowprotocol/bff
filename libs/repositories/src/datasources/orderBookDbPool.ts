@@ -7,7 +7,6 @@ const REQUIRED_ENVS = [
   'ORDERBOOK_DATABASE_PORT',
   'ORDERBOOK_DATABASE_USERNAME',
   'ORDERBOOK_DATABASE_PASSWORD',
-  'ORDERBOOK_DATABASE_DB_NAME',
 ];
 
 const chainToDbNameMap: Record<SupportedChainId, string> = {
@@ -29,10 +28,10 @@ function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainI
 
   const pool = new Pool({
     user: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_USERNAME`],
-    host: process.env[`${ENV_PREFIX}ORDERBOOK_DATABASE_HOST`],
+    host: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_HOST`],
     database: chainToDbNameMap[chainId],
-    password: process.env[`${ENV_PREFIX}ORDERBOOK_DATABASE_PASSWORD`],
-    port: Number(process.env[`${ENV_PREFIX}ORDERBOOK_DATABASE_PORT`]),
+    password: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PASSWORD`],
+    port: Number(process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PORT`]),
     keepAlive: true,
   });
 

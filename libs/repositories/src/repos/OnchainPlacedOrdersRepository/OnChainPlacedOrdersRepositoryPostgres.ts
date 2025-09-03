@@ -17,11 +17,11 @@ export class OnChainPlacedOrdersRepositoryPostgres implements OnChainPlacedOrder
     const prodDb = getOrderBookDbPool('prod', chainId);
     const prodOrders = await this.fetchOnChainPlacedOrdersFromDb(uids, prodDb);
 
-    if (!prodOrders.rows) {
+    if (!prodOrders?.rowCount) {
       const barnDb = getOrderBookDbPool('barn', chainId);
       const barnOrders = await this.fetchOnChainPlacedOrdersFromDb(uids, barnDb);
 
-      if (barnOrders.rows) {
+      if (barnOrders?.rowCount) {
         orders.push(...barnOrders.rows);
       }
     } else {
@@ -39,14 +39,17 @@ export class OnChainPlacedOrdersRepositoryPostgres implements OnChainPlacedOrder
     }, {});
   }
 
-  private fetchOnChainPlacedOrdersFromDb(uids: string[], db: Pool): Promise<QueryResult<OnChainPlacedOrder>> {
+  private async fetchOnChainPlacedOrdersFromDb(uids: string[], db: Pool): Promise<QueryResult<OnChainPlacedOrder> | null> {
+    if (uids.length === 0) return null
+
     const query = `
         SELECT sender, uid
         FROM onchain_placed_orders
-        WHERE uid = ANY ($1::bytea[]) LIMIT 1000
+        WHERE uid = ANY($1) LIMIT 1000
     `;
-    const params = uids.map(uid => Buffer.from(uid.slice(2), 'hex'));
 
-    return db.query(query, params);
+    const params = uids.map(hex => Buffer.from(hex.slice(2), 'hex'));
+
+    return db.query(query, [params]);
   }
 }
