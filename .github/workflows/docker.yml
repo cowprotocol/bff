@@ -20,40 +20,47 @@ jobs:
           - apps/telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          node-version: ${{ matrix.node-version }}
+          persist-credentials: false
+
+      - name: Use Node.js LTS
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: lts/*
       - run: yarn install
 
       - name: Write commit hash in the assets directory
-        run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
+        run: echo -n "$SHA" > assets/git-commit-hash.txt
+        env:
+          SHA: ${{ github.sha }}
 
       - run: yarn build
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        id: setup-buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract package name
-        run: echo "PACKAGE_NAME=$(basename ${{ matrix.package }})" >> $GITHUB_ENV
+        run: echo "PACKAGE_NAME=$(basename $PACKAGE)" >> $GITHUB_ENV
+        env:
+          PACKAGE: ${{ matrix.package }}
 
       - name: 'Image metadata for ${{ env.PACKAGE_NAME }}'
         id: image_meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
         with:
           images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           file: ${{ matrix.package }}/Dockerfile
@@ -63,7 +70,7 @@ jobs:
           builder: ${{ steps.setup-buildx.outputs.name }}
           platforms: linux/amd64
 
-      - uses: cowprotocol/autodeploy-action@v2
+      - uses: cowprotocol/autodeploy-action@0c950eb2856af4f520a652b59e786bd349516480 # v2
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           images: ghcr.io/cowprotocol/bff/${{ env.PACKAGE_NAME }}:main
