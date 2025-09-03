@@ -188,6 +188,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           '2XX': successSchema,
           '400': errorSchema,
         },
+        tags: ['simulation'],
       },
     },
     async function (request, reply) {
