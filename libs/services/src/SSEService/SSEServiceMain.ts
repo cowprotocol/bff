@@ -29,10 +29,11 @@ export class SSEServiceMain implements SSEService {
     chainId: SupportedChainId,
     userAddress: string
   ): SSEClient[] {
+    const userAddressLowerCase = userAddress.toLowerCase();
     return Array.from(this.clients.values()).filter(
       (client) =>
         client.chainId === chainId &&
-        client.userAddress.toLowerCase() === userAddress.toLowerCase()
+        client.userAddress.toLowerCase() === userAddressLowerCase
     );
   }
 
