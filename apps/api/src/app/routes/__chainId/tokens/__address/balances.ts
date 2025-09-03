@@ -79,7 +79,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       if (balances) {
         reply.send({ balances });
       } else {
-        // todo add error handling
         reply.send({ balances: {} });
       }
     }
