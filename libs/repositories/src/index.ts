@@ -11,6 +11,7 @@ export * from './datasources/orm/postgresOrm';
 export * from './datasources/rabbitMq';
 export * from './datasources/telegram';
 export * from './datasources/cms';
+export * from './datasources/tokenSearch';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';

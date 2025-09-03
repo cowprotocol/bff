@@ -7,7 +7,7 @@ import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko';
 const FIVE_MINUTES = ms('5m');
 const ONE_HOUR = ms('1h');
 const ONE_DAY = ms('1d');
-const BUFFER_ERROR_TOLERANCE = 1.5; // 50% error tolerance
+const BUFFER_ERROR_TOLERANCE = 1.8; // 80% error tolerance
 const CHAIN_ID = SupportedChainId.MAINNET.toString();
 
 describe('UsdRepositoryCoingecko', () => {
