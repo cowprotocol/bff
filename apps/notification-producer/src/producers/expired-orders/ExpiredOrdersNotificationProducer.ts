@@ -19,7 +19,7 @@ async function wait(time: number) {
 }
 
 const WAIT_TIME = 10_000;
-const POLLING_INTERVAL = 14_000;
+const POLLING_INTERVAL = 120_000; // 2 minutes
 const PRODUCER_NAME = 'expired_orders_notification_producer';
 
 export type ExpiredOrdersNotificationProducerProps = {
