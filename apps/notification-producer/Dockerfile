@@ -19,6 +19,6 @@ RUN chown -R notification-producer:notification-producer .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN npm --prefix notification-producer --omit=dev -f install
+RUN yarn --cwd notification-producer install --production --force
 
 CMD [ "node", "notification-producer" ]

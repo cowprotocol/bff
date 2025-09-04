@@ -36,7 +36,9 @@ import {
   getViemClients,
   redisClient,
   ExpiredOrdersRepository,
-  ExpiredOrdersRepositoryPostgres
+  ExpiredOrdersRepositoryPostgres,
+  OrdersAppDataRepositoryPostgres,
+  OrdersAppDataRepository
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -171,6 +173,10 @@ export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepositor
 
 export function getExpiredOrdersRepository(): ExpiredOrdersRepository {
   return new ExpiredOrdersRepositoryPostgres();
+}
+
+export function getOrdersAppDataRepository(): OrdersAppDataRepository {
+  return new OrdersAppDataRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {

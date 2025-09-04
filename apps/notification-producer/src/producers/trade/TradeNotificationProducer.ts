@@ -5,6 +5,7 @@ import {
   IndexerStateValue,
   PushNotificationsRepository,
   OnChainPlacedOrdersRepository,
+  OrdersAppDataRepository
 } from '@cowprotocol/repositories';
 
 import { Runnable } from '../../../types';
@@ -27,6 +28,7 @@ export type TradeNotificationProducerProps = {
   indexerStateRepository: IndexerStateRepository;
   erc20Repository: Erc20Repository;
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
+  ordersAppDataRepository: OrdersAppDataRepository;
 };
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
@@ -174,7 +176,8 @@ export class TradeNotificationProducer implements Runnable {
       pushSubscriptionsRepository,
       indexerStateRepository,
       erc20Repository,
-      onChainPlacedOrdersRepository
+      onChainPlacedOrdersRepository,
+      ordersAppDataRepository
     } = this.props;
 
     // Get all accounts subscribed to PUSH notifications
@@ -189,6 +192,7 @@ export class TradeNotificationProducer implements Runnable {
       chainId,
       erc20Repository,
       onChainPlacedOrdersRepository,
+      ordersAppDataRepository,
       prefix: this.prefix,
     });
 
