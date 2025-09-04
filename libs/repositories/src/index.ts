@@ -61,6 +61,10 @@ export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersReposito
 export * from './repos/ExpiredOrdersRepository/ExpiredOrdersRepository';
 export * from './repos/ExpiredOrdersRepository/ExpiredOrdersRepositoryPostgres';
 
+// OrdersAppDataRepository
+export * from './repos/OrdersAppDataRepository/OrdersAppDataRepository';
+export * from './repos/OrdersAppDataRepository/OrdersAppDataRepositoryPostgres';
+
 // Notifications repositories
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
