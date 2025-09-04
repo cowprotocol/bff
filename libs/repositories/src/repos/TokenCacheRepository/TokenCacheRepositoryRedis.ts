@@ -21,28 +21,49 @@ export class TokenCacheRepositoryRedis implements TokenCacheRepository {
     ttlSeconds: number = this.defaultTtl
   ): Promise<void> {
     const key = this.getKey(chainId);
-    const serializedTokens = JSON.stringify(tokens);
 
-    await this.redisClient.set(key, serializedTokens, 'EX', ttlSeconds);
+    // Clear existing hash if it exists
+    await this.redisClient.del(key);
+
+    if (tokens.length === 0) {
+      return;
+    }
+
+    const hashData: Record<string, string> = {};
+    for (const token of tokens) {
+      hashData[token.address.toLowerCase()] = JSON.stringify(token);
+    }
+
+    await this.redisClient.hset(key, hashData);
+
+    await this.redisClient.expire(key, ttlSeconds);
   }
 
   async getTokenList(
     chainId: SupportedChainId
   ): Promise<TokenFromAPI[] | null> {
     const key = this.getKey(chainId);
-    const serializedTokens = await this.redisClient.get(key);
+    const hashData = await this.redisClient.hgetall(key);
 
-    if (!serializedTokens) {
+    if (!hashData || Object.keys(hashData).length === 0) {
       return null;
     }
 
-    try {
-      return JSON.parse(serializedTokens) as TokenFromAPI[];
-    } catch (error) {
-      // If parsing fails, clear the corrupted data
-      await this.clearTokenList(chainId);
-      return null;
+    const tokens: TokenFromAPI[] = [];
+
+    for (const [address, serializedToken] of Object.entries(hashData)) {
+      try {
+        const token = JSON.parse(serializedToken) as TokenFromAPI;
+        tokens.push(token);
+      } catch (error) {
+        await this.redisClient.hdel(key, address);
+        console.warn(
+          `Failed to parse token data for address ${address}, removed from cache`
+        );
+      }
     }
+
+    return tokens.length > 0 ? tokens : null;
   }
 
   async searchTokens(
