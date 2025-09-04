@@ -73,8 +73,8 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
             )
         GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         HAVING (
-                   (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount)
-                   OR (o.kind = 'buy' AND COALESCE(SUM(t.buy_amount), 0)  < o.buy_amount)
+                   (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount * 0.999)
+                   OR (o.kind = 'buy' AND COALESCE(SUM(t.buy_amount), 0)  < o.buy_amount * 0.999)
                )
         LIMIT $3;
     `
