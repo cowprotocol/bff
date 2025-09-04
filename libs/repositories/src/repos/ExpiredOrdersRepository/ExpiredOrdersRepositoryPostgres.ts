@@ -10,7 +10,7 @@ import { bytesToHexString } from '../../utils/bytesUtils';
 import { parseExpiredOrder } from './expiredOrdersUtils';
 
 const LIMIT = 1000;
-const ORDER_EXPIRATION_THRESHOLD = 2; // 2 seconds
+const ORDER_EXPIRATION_THRESHOLD = 60; // 1 minute
 
 export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository {
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
