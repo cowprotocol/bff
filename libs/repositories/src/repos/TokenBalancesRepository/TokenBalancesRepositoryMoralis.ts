@@ -37,7 +37,7 @@ function isMoralisBalanceResponse(
     return false;
   }
 
-  const response = data as any;
+  const response = data as MoralisBalanceResponse;
 
   if (!Array.isArray(response.result)) {
     return false;
