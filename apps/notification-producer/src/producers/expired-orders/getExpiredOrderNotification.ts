@@ -38,7 +38,7 @@ export async function getExpiredOrderNotification(
   const url = getExplorerUrl(chainId, expiredOrder.uid);
 
   return {
-    id: 'OrderExpired-' + expiredOrder.validTo + '-' + lastCheckTimestamp,
+    id: 'OrderExpired-' + expiredOrder.uid + '-' + expiredOrder.validTo + '-' + lastCheckTimestamp,
     account: expiredOrder.owner.toLowerCase(),
     title,
     message,
