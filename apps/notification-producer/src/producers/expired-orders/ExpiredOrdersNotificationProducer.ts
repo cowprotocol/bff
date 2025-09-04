@@ -45,7 +45,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
   }
 
   /**
-   * Main loop: Run the CMS notification producer. This method runs indefinitely,
+   * Main loop: Run the Expired orders notification producer. This method runs indefinitely,
    * fetching notifications and sending them to the queue.
    *
    * The method should not throw or finish.
