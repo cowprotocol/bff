@@ -43,7 +43,7 @@ function isMoralisBalanceResponse(
     return false;
   }
 
-  return response.result;
+  return !!response.result;
 }
 
 @injectable()
