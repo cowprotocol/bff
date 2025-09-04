@@ -67,6 +67,7 @@
     "tslib": "^2.3.0",
     "typeorm": "^0.3.17",
     "typeorm-fastify-plugin": "^1.0.5",
+    "uuid": "^11.1.0",
     "viem": "^2.33.2"
   },
   "devDependencies": {
@@ -89,6 +90,7 @@
     "@types/node-telegram-bot-api": "^0.64.6",
     "@types/pg": "^8.11.13",
     "@types/tap": "^15.0.5",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "concurrently": "^7.0.0",

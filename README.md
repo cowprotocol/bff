@@ -186,3 +186,17 @@ To revert the last migration, run:
 ```bash
 yarn migration:revert
 ```
+
+## Balances SSE Test
+To test the balances SSE endpoint, you can start the API server:
+```bash
+yarn start
+```
+
+This will start a local server at `http://localhost:3001/tests/balances`
+
+
+Alternatively you can use `curl`:
+```bash
+curl -X GET "http://localhost:3001/1/accounts/0x87A04752E516548B0d5d4DF97384C0b22B649179/balances/sse?tokens=0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8%2C0x6b175474e89094c44da98b954eedeac495271d0f%2C0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" -H "accept: text/event-stream" 
+```
