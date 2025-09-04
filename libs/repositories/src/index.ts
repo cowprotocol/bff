@@ -4,6 +4,7 @@ export * from './utils/isDbEnabled';
 
 // Data-sources
 export * from './datasources/cms';
+export * from './datasources/tokenSearch';
 export * from './datasources/cowApi';
 export * from './datasources/orm/postgresOrm';
 export * from './datasources/postgresPlain';
@@ -61,3 +62,6 @@ export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersReposito
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
+
+// Token cache repositories
+export * from './repos/TokenCacheRepository';

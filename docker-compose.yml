@@ -157,6 +157,19 @@ services:
       - queue
         # condition: service_healthy
 
+  token-list-updater:
+    container_name: token-list-updater
+    build:
+      context: .
+      dockerfile: ./apps/token-list-updater/Dockerfile
+    restart: unless-stopped
+    env_file: .env.docker
+    networks:
+      - bff-network
+    depends_on:
+      - api
+      - redis
+
 volumes:
   data-postgres:
   data-rabbitmq:

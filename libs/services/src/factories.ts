@@ -20,6 +20,8 @@ import {
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
+  TokenCacheRepository,
+  TokenCacheRepositoryRedis,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -34,12 +36,11 @@ import {
   createNewPostgresPool,
   createTelegramBot,
   getViemClients,
-  redisClient
+  redisClient,
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
 import { Pool } from 'pg';
-import { DataSource } from 'typeorm';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
@@ -105,7 +106,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -138,7 +139,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
@@ -178,4 +179,20 @@ export function getTelegramBot(): TelegramBot {
   }
 
   return telegramBot;
+}
+
+let tokenCacheRepository: TokenCacheRepository | null = null;
+
+export function getTokenCacheRepository(): TokenCacheRepository {
+  if (!redisClient) {
+    throw new Error(
+      'Redis client is required for TokenCacheRepository. Please configure Redis.'
+    );
+  }
+
+  if (!tokenCacheRepository) {
+    tokenCacheRepository = new TokenCacheRepositoryRedis(redisClient);
+  }
+
+  return tokenCacheRepository;
 }

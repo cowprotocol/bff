@@ -14,6 +14,7 @@
     "migration:revert": "nx run repositories:migration:revert",
     "producer": "nx run notification-producer:start",
     "telegram": "nx run telegram:start",
+    "token-list-updater": "nx run token-list-updater:start",
     "build": "nx run-many --all --target=build",
     "test": "nx run-many --all --target=test",
     "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
