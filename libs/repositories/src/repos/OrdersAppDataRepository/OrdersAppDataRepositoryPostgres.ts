@@ -49,11 +49,9 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
       return this.mergeUidToAppDataMaps(acc, result.uidToAppData);
     }, new Map<string, LatestAppDataDocVersion>());
 
-    const totalUidToAppData = this.mergeUidToAppDataMaps(prodUidToAppData, cachedResults);
+    const totalUidToAppData = this.mergeUidToAppDataMaps(cachedResults, prodUidToAppData);
 
     if (!missingAppDataUidsOnProd.length) {
-      this.mergeUidToAppDataMaps(uidToAppDataCache, totalUidToAppData);
-
       return totalUidToAppData;
     }
 
@@ -75,17 +73,16 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
     return results;
   }
 
-  private async fetchAppDataFromDb(_uids: string[], db: Pool): Promise<AppDataFromDbResult> {
-    if (!_uids.length) return { missingAppDataUids: [], uidToAppData: new Map() };
+  private async fetchAppDataFromDb(uids: string[], db: Pool): Promise<AppDataFromDbResult> {
+    if (!uids.length) return { missingAppDataUids: [], uidToAppData: new Map() };
 
-    const uids = _uids.map((u) => u.toLowerCase());
     const byteaUids = uids.map(hexStringToBytes);
 
     const query = `
         SELECT o.uid, a.full_app_data
         FROM orders o
-                 JOIN app_data a ON o.app_data = a.contract_app_data
-        WHERE o.uid = ANY ($1) LIMIT ${LIMIT}
+          JOIN app_data a ON o.app_data = a.contract_app_data
+        WHERE o.uid = ANY($1) LIMIT ${LIMIT}
     `;
 
     const result = await db.query(query, [byteaUids]);
@@ -106,7 +103,7 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
       }
     }
 
-    const missingAppDataUids = uids.filter(id => uidToAppData.has(id));
+    const missingAppDataUids = uids.filter(id => !uidToAppData.has(id.toLowerCase()));
 
     return { uidToAppData, missingAppDataUids };
   }

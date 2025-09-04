@@ -7,7 +7,8 @@ import {
   getIndexerStateRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
-  getExpiredOrdersRepository
+  getExpiredOrdersRepository,
+  getOrdersAppDataRepository
 } from '@cowprotocol/services';
 
 import { Runnable } from '../types';
@@ -41,6 +42,7 @@ async function mainLoop() {
   const indexerStateRepository = getIndexerStateRepository();
   const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository();
   const expiredOrdersRepository = getExpiredOrdersRepository();
+  const ordersAppDataRepository = getOrdersAppDataRepository();
 
   const repositories = {
     pushNotificationsRepository,
@@ -59,6 +61,7 @@ async function mainLoop() {
     ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
+        ordersAppDataRepository,
         chainId,
       });
     }),
