@@ -9,6 +9,9 @@ import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
 import { bytesToHexString } from '../../utils/bytesUtils';
 import { parseExpiredOrder } from './expiredOrdersUtils';
 
+const LIMIT = 1000;
+const ORDER_EXPIRATION_THRESHOLD = 2; // 2 seconds
+
 export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository {
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
     const { chainId, accounts } = context;
@@ -53,17 +56,21 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
       FROM orders o
       LEFT JOIN trade_sums t ON o.uid = t.order_uid
       WHERE
-        o.valid_to > ${lastCheckTimestamp}
-        AND o.valid_to <= ${nowTimestamp}
+        o.valid_to > $1
+        AND o.valid_to <= $2
         AND (
           (o.kind = 'sell' AND (t.filled_sell < o.sell_amount OR t.filled_sell IS NULL))
               OR
           (o.kind = 'buy'  AND (t.filled_buy  < o.buy_amount  OR t.filled_buy IS NULL))
         )
       ORDER BY o.valid_to ASC
-      LIMIT 1000;
+      LIMIT $3;
     `
 
-    return db.query(query);
+    return db.query(query, [
+      lastCheckTimestamp,
+      nowTimestamp + ORDER_EXPIRATION_THRESHOLD,
+      LIMIT
+    ]);
   }
 }
