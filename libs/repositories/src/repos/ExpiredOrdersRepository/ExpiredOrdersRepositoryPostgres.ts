@@ -44,27 +44,23 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
     if (accounts.length === 0) return null;
 
     const query = `
-      WITH trade_sums AS (
-        SELECT
-          order_uid,
-          COALESCE(SUM(sell_amount), 0) AS filled_sell,
-          COALESCE(SUM(buy_amount), 0)  AS filled_buy
-        FROM trades
-        GROUP BY order_uid
-      )
-      SELECT o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
-      FROM orders o
-      LEFT JOIN trade_sums t ON o.uid = t.order_uid
-      WHERE
-        o.valid_to > $1
-        AND o.valid_to <= $2
-        AND (
-          (o.kind = 'sell' AND (t.filled_sell < o.sell_amount OR t.filled_sell IS NULL))
-              OR
-          (o.kind = 'buy'  AND (t.filled_buy  < o.buy_amount  OR t.filled_buy IS NULL))
+        WITH filtered_orders AS (
+            SELECT *
+            FROM orders o
+            WHERE o.valid_to > $1
+              AND o.valid_to <= $2
         )
-      ORDER BY o.valid_to ASC
-      LIMIT $3;
+        SELECT
+            o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+        FROM filtered_orders o
+                 LEFT JOIN trades t
+                           ON t.order_uid = o.uid
+        GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+        HAVING (
+                   (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount)
+                   OR (o.kind = 'buy' AND COALESCE(SUM(t.buy_amount), 0)  < o.buy_amount)
+               )
+        LIMIT $3;
     `
 
     return db.query(query, [
