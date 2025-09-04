@@ -81,7 +81,7 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
 
     return db.query(query, [
       lastCheckTimestamp,
-      nowTimestamp + ORDER_EXPIRATION_THRESHOLD,
+      nowTimestamp - ORDER_EXPIRATION_THRESHOLD,
       LIMIT
     ]);
   }
