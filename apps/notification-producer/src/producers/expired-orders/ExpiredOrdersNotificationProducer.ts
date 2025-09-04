@@ -146,7 +146,6 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         });
       }));
 
-      // Return early if there are no notifications
       if (notifications.length > 0) {
         logger.info(
           `${this.prefix} Sending ${notifications.length} notifications`,

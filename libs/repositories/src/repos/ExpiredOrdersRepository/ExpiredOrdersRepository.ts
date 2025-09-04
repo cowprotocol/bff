@@ -1,4 +1,4 @@
-import type { SupportedChainId } from '@cowprotocol/cow-sdk';
+import type { OrderKind, SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export interface ExpiredOrdersContext {
   chainId: SupportedChainId;
@@ -15,7 +15,7 @@ export interface ExpiredOrder<T = Buffer> {
   buy_token: T;
   sell_amount: string;
   buy_amount: string;
-  kind: 'sell' | 'buy';
+  kind: OrderKind;
 }
 
 export interface ParsedExpiredOrder {
@@ -26,7 +26,7 @@ export interface ParsedExpiredOrder {
   buyTokenAddress: string;
   sellAmount: string;
   buyAmount: string;
-  kind: 'sell' | 'buy';
+  kind: OrderKind;
 }
 
 export interface ExpiredOrdersRepository {
