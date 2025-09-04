@@ -21,13 +21,13 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
 
     const allExpiredOrders = [...(prodExpiredOrdersResult?.rows || []), ...(barnExpiredOrdersResult?.rows || [])];
 
-    const accountsMap = accounts.reduce<Record<string, 1 | undefined>>((acc, account) => {
-      acc[account.toLowerCase()] = 1;
+    const accountsMap = accounts.reduce<Set<string>>((acc, account) => {
+      acc.add(account.toLowerCase());
       return acc
-    }, {})
+    }, new Set())
 
     return allExpiredOrders.reduce<ParsedExpiredOrder[]>((acc, order) => {
-      if (accountsMap[bytesToHexString(order.owner).toLowerCase()]) {
+      if (accountsMap.has(bytesToHexString(order.owner).toLowerCase())) {
         acc.push(parseExpiredOrder(order))
       }
 
