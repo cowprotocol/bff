@@ -28,23 +28,16 @@ async function mainLoop() {
 
   const tokenCacheRepository = getTokenCacheRepository();
 
-  // const updaters: Runnable[] = [
-  //   // TokenListUpdater: update token list for each chain
-  //   ...chainIds
-  //     .filter((chainId) => chainId === SupportedChainId.MAINNET)
-  //     .map((chainId) => {
-  //       return new TokenListUpdater({
-  //         tokenCacheRepository,
-  //         chainId,
-  //       });
-  //     }),
-  // ];
-
   const updaters: Runnable[] = [
-    new TokenListUpdater({
-      chainId: SupportedChainId.MAINNET,
-      tokenCacheRepository,
-    }),
+    // TokenListUpdater: update token list for each chain
+    ...chainIds
+      .filter((chainId) => chainId !== SupportedChainId.SEPOLIA)
+      .map((chainId) => {
+        return new TokenListUpdater({
+          tokenCacheRepository,
+          chainId,
+        });
+      }),
   ];
 
   // Run all updaters in the background
