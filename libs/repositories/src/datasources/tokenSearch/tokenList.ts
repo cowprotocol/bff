@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { logger } from '@cowprotocol/shared';
 import { TokenCacheRepository } from '../../repos/TokenCacheRepository';
 import { SUPPORTED_COINGECKO_PLATFORMS } from '../coingecko';
 import { getTokensByChainName } from './getTokensByChain';
@@ -30,13 +31,11 @@ export async function initTokenList(
     throw new Error(`Chain ${chainId} is not supported by CoinGecko`);
   }
 
-  await repository.clearTokenList(chainId);
-
-  console.log(`Initializing token list for chain ${chainId}`);
+  logger.info(`Initializing token list for chain ${chainId}`);
   const tokens = await getTokensByChainName(chainName, chainId);
 
   await repository.initTokenList(chainId, tokens);
-  console.log(`Cached ${tokens.length} tokens for chain ${chainId}`);
+  logger.info(`Cached ${tokens.length} tokens for chain ${chainId}`);
 }
 
 export async function getTokenListBySearchParam(

@@ -21,7 +21,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         params: paramsSchema,
         response: {
           '2XX': successSchema,
-          '404': errorSchema,
+          '500': errorSchema,
         },
       },
     },

@@ -69,7 +69,6 @@ export function getErc20Repository(
 
 export function getCacheRepository(): CacheRepository {
   if (redisClient) {
-    console.log('redisClient', redisClient.auth);
     return new CacheRepositoryRedis(redisClient);
   }
 

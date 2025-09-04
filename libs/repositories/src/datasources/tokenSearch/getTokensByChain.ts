@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { logger } from '@cowprotocol/shared';
 import { TokenFromAPI } from './types';
 
 async function fetchTokensFromCoinGecko(
@@ -7,7 +8,7 @@ async function fetchTokensFromCoinGecko(
 ): Promise<TokenFromAPI[]> {
   const tokenSource = `https://tokens.coingecko.com/${chainName}/all.json`;
 
-  console.log(`Fetching tokens for ${chainName}`);
+  logger.info(`Fetching tokens for ${chainName}`);
 
   const response = await fetch(tokenSource);
 
@@ -25,7 +26,7 @@ async function fetchTokensFromCoinGecko(
     );
   }
 
-  console.log(`Fetched ${data.tokens.length} tokens for ${chainName}`);
+  logger.info(`Fetched ${data.tokens.length} tokens for ${chainName}`);
 
   return data.tokens.map((token: TokenFromAPI) => ({
     ...token,

@@ -21,4 +21,4 @@ RUN chown -R token-list-updater:token-list-updater .
 # The bundled output will include external dependencies.
 RUN npm --prefix token-list-updater --omit=dev -f install
 
-CMD [ "node", "token-list-updater" ]
+CMD [ "node", "token-list-updater/main.js" ]
