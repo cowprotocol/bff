@@ -53,8 +53,24 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
         SELECT
             o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         FROM filtered_orders o
-                 LEFT JOIN trades t
-                           ON t.order_uid = o.uid
+            LEFT JOIN trades t ON t.order_uid = o.uid
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM invalidations i
+                WHERE i.order_uid = o.uid
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM onchain_order_invalidations oi
+                WHERE oi.uid = o.uid
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM presignature_events pe
+                WHERE pe.order_uid = o.uid
+                  AND o.signing_scheme = 'presign'
+                  AND pe.signed = false
+            )
         GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         HAVING (
                    (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount)
