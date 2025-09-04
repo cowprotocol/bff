@@ -4,11 +4,15 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  cowApiClients,
+  createNewPostgresPool,
+  createTelegramBot,
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  getViemClients,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
   OnChainPlacedOrdersRepository,
@@ -17,31 +21,26 @@ import {
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
   PushSubscriptionsRepositoryCms,
+  redisClient,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
+  TokenBalancesRepository,
+  TokenBalancesRepositoryMoralis,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
   TokenHolderRepositoryMoralis,
-  TokenBalancesRepositoryMoralis,
-  TokenBalancesRepository,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   UsdRepositoryFallback,
-  cowApiClients,
-  createNewPostgresPool,
-  createTelegramBot,
-  getViemClients,
-  redisClient
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
 import { Pool } from 'pg';
-import { DataSource } from 'typeorm';
 
 const DEFAULT_CACHE_VALUE_SECONDS = ms('2min') / 1000; // 2min cache time by default for values
 const DEFAULT_CACHE_NULL_SECONDS = ms('30min') / 1000; // 30min cache time by default for NULL values (when the repository isn't known)
@@ -107,7 +106,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -140,12 +139,12 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
 export function getTokenBalancesRepository(): TokenBalancesRepository {
-  return new TokenBalancesRepositoryMoralis()
+  return new TokenBalancesRepositoryMoralis();
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {

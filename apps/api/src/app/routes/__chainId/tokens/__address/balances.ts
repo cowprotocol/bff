@@ -93,7 +93,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         if (balances) {
           reply.send({ balances });
         } else {
-          reply.code(400).send({ message: 'Balances not found' });
+          reply.code(404).send({ message: 'Balances not found' });
         }
       } catch (e: unknown) {
         fastify.log.error(
