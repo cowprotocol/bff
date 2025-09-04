@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { OrdersAppDataRepository } from './OrdersAppDataRepository';
-import { LatestAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
 import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils';
 import { logger } from '@cowprotocol/shared';
@@ -8,14 +8,14 @@ import { chunkArray } from '../../utils/chunkArray';
 
 const LIMIT = 100;
 
-type UidToAppData = Map<string, LatestAppDataDocVersion>;
+type UidToAppData = Map<string, AnyAppDataDocVersion>;
 
 interface AppDataFromDbResult {
   uidToAppData: UidToAppData;
   missingAppDataUids: string[];
 }
 
-const uidToAppDataCache = new Map<string, LatestAppDataDocVersion>();
+const uidToAppDataCache = new Map<string, AnyAppDataDocVersion>();
 
 export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository {
   async getAppDataForOrders(chainId: SupportedChainId, uids: string[]): Promise<UidToAppData> {
@@ -26,7 +26,7 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
       if (cached) acc.set(uid, cached);
 
       return acc;
-    }, new Map<string, LatestAppDataDocVersion>());
+    }, new Map<string, AnyAppDataDocVersion>());
 
     if (cachedResults.size === uids.length) return cachedResults;
 
@@ -47,7 +47,7 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
 
     const prodUidToAppData = prodResults.reduce<UidToAppData>((acc, result) => {
       return this.mergeUidToAppDataMaps(acc, result.uidToAppData);
-    }, new Map<string, LatestAppDataDocVersion>());
+    }, new Map<string, AnyAppDataDocVersion>());
 
     const totalUidToAppData = this.mergeUidToAppDataMaps(cachedResults, prodUidToAppData);
 
@@ -64,7 +64,7 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
 
     const barnUidToAppData = barnResults.reduce<UidToAppData>((acc, result) => {
       return this.mergeUidToAppDataMaps(acc, result.uidToAppData);
-    }, new Map<string, LatestAppDataDocVersion>());
+    }, new Map<string, AnyAppDataDocVersion>());
 
     const results = this.mergeUidToAppDataMaps(totalUidToAppData, barnUidToAppData);
 
@@ -82,10 +82,10 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
         SELECT o.uid, a.full_app_data
         FROM orders o
           JOIN app_data a ON o.app_data = a.contract_app_data
-        WHERE o.uid = ANY($1) LIMIT ${LIMIT}
+        WHERE o.uid = ANY($1) LIMIT $2
     `;
 
-    const result = await db.query(query, [byteaUids]);
+    const result = await db.query(query, [byteaUids, LIMIT]);
 
     const uidToAppData = new Map();
 

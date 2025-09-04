@@ -1,5 +1,5 @@
-import { LatestAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export interface OrdersAppDataRepository {
-  getAppDataForOrders(chainId: SupportedChainId, uids: string[]): Promise<Map<string, LatestAppDataDocVersion>>;
+  getAppDataForOrders(chainId: SupportedChainId, uids: string[]): Promise<Map<string, AnyAppDataDocVersion>>;
 }

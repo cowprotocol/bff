@@ -2,7 +2,8 @@ import {
   BARN_ETH_FLOW_ADDRESSES,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
   ETH_FLOW_ADDRESSES,
-  SupportedChainId
+  SupportedChainId,
+  LatestAppDataDocVersion
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import {
@@ -131,7 +132,7 @@ export async function getTradeNotifications(
           const orderUidLower = orderUid.toLowerCase();
           const isEthFlowOrder = ethFlowAddresses.includes(owner.toLowerCase());
           const appData = ordersAppData.get(orderUidLower);
-          const isBridgingOrder = !!appData?.metadata.bridging
+          const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find(key => {
