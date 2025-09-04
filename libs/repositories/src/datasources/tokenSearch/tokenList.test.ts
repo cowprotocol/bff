@@ -11,7 +11,6 @@ const mockTokenCacheRepository: jest.Mocked<TokenCacheRepository> = {
   initTokenList: jest.fn(),
   getTokenList: jest.fn(),
   searchTokens: jest.fn(),
-  hasTokenList: jest.fn(),
   clearTokenList: jest.fn(),
 };
 
@@ -51,8 +50,6 @@ describe('tokenList', () => {
 
   describe('initTokenList', () => {
     it('should fetch tokens and cache them when not already cached', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
-
       // Setup mock responses
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -61,9 +58,6 @@ describe('tokenList', () => {
 
       await initTokenList(SupportedChainId.MAINNET);
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
         'https://tokens.coingecko.com/ethereum/all.json'
@@ -81,34 +75,17 @@ describe('tokenList', () => {
       );
     });
 
-    it('should skip fetching when tokens are already cached', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(true);
-
-      await initTokenList(SupportedChainId.MAINNET);
-
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
-      expect(mockFetch).not.toHaveBeenCalled();
-      expect(mockTokenCacheRepository.initTokenList).not.toHaveBeenCalled();
-    });
-
     it('should handle fetch errors gracefully', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(initTokenList(SupportedChainId.MAINNET)).rejects.toThrow(
         'Network error'
       );
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockTokenCacheRepository.initTokenList).not.toHaveBeenCalled();
     });
 
     it('should handle invalid JSON responses', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.reject(new Error('Invalid JSON')),
@@ -118,14 +95,10 @@ describe('tokenList', () => {
         'Invalid JSON'
       );
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockTokenCacheRepository.initTokenList).not.toHaveBeenCalled();
     });
 
     it('should handle responses without tokens array', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ invalidStructure: true }),
@@ -135,14 +108,10 @@ describe('tokenList', () => {
         'Invalid token list format from https://tokens.coingecko.com/ethereum/all.json: missing or invalid tokens array'
       );
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockTokenCacheRepository.initTokenList).not.toHaveBeenCalled();
     });
 
     it('should handle HTTP errors', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -153,14 +122,10 @@ describe('tokenList', () => {
         'Failed to fetch tokens from https://tokens.coingecko.com/ethereum/all.json: 404 Not Found'
       );
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockTokenCacheRepository.initTokenList).not.toHaveBeenCalled();
     });
 
     it('should cache empty token arrays when fetch returns no tokens', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
       mockFetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ tokens: [] }),
@@ -168,9 +133,6 @@ describe('tokenList', () => {
 
       await initTokenList(SupportedChainId.MAINNET);
 
-      expect(mockTokenCacheRepository.hasTokenList).toHaveBeenCalledWith(
-        SupportedChainId.MAINNET
-      );
       expect(mockTokenCacheRepository.initTokenList).toHaveBeenCalledWith(
         SupportedChainId.MAINNET,
         []
@@ -283,8 +245,6 @@ describe('tokenList', () => {
 
   describe('integration with real token data structure', () => {
     it('should properly process token data with all required fields', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
-
       const completeTokenResponse = {
         tokens: [
           {
@@ -335,8 +295,6 @@ describe('tokenList', () => {
     });
 
     it('should handle token data with optional fields missing', async () => {
-      mockTokenCacheRepository.hasTokenList.mockResolvedValue(false);
-
       const minimalTokenResponse = {
         tokens: [
           {

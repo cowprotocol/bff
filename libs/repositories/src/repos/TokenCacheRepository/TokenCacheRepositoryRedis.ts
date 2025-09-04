@@ -65,12 +65,6 @@ export class TokenCacheRepositoryRedis implements TokenCacheRepository {
     );
   }
 
-  async hasTokenList(chainId: SupportedChainId): Promise<boolean> {
-    const key = this.getKey(chainId);
-    const exists = await this.redisClient.exists(key);
-    return exists === 1;
-  }
-
   async clearTokenList(chainId: SupportedChainId): Promise<void> {
     const key = this.getKey(chainId);
     await this.redisClient.del(key);

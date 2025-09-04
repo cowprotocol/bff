@@ -35,13 +35,6 @@ export interface TokenCacheRepository {
   ): Promise<TokenFromAPI[]>;
 
   /**
-   * Check if token list exists for a chain
-   * @param chainId - The chain ID to check
-   * @returns True if token list exists and is not expired
-   */
-  hasTokenList(chainId: SupportedChainId): Promise<boolean>;
-
-  /**
    * Clear token list for a specific chain
    * @param chainId - The chain ID to clear
    */

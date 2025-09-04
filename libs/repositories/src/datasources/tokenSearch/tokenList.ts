@@ -30,12 +30,7 @@ export async function initTokenList(
     throw new Error(`Chain ${chainId} is not supported by CoinGecko`);
   }
 
-  // Check if tokens are already cached
-  const hasTokens = await repository.hasTokenList(chainId);
-  if (hasTokens) {
-    console.log(`Token list already cached for chain ${chainId}`);
-    return;
-  }
+  await repository.clearTokenList(chainId);
 
   console.log(`Initializing token list for chain ${chainId}`);
   const tokens = await getTokensByChainName(chainName, chainId);
