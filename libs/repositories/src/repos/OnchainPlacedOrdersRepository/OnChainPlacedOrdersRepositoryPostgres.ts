@@ -2,6 +2,7 @@ import { Pool, QueryResult } from 'pg';
 import { OnChainPlacedOrdersRepository } from './OnChainPlacedOrdersRepository';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
+import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils';
 
 interface OnChainPlacedOrder {
   sender: Buffer;
@@ -29,11 +30,11 @@ export class OnChainPlacedOrdersRepositoryPostgres implements OnChainPlacedOrder
     }
 
     return orders.reduce<AccountsForOrders>((acc, row) => {
-      const owner = '0x' + row.sender.toString('hex').toLowerCase();
+      const owner = bytesToHexString(row.sender).toLowerCase();
 
       acc[owner] = acc[owner] || [];
 
-      acc[owner].push('0x' + row.uid.toString('hex').toLowerCase());
+      acc[owner].push(bytesToHexString(row.uid).toLowerCase());
 
       return acc;
     }, {});
@@ -48,7 +49,8 @@ export class OnChainPlacedOrdersRepositoryPostgres implements OnChainPlacedOrder
         WHERE uid = ANY($1) LIMIT 1000
     `;
 
-    const params = uids.map(hex => Buffer.from(hex.slice(2), 'hex'));
+    // TODO: do we need batching for uids? What if there are 20000000 uids?
+    const params = uids.map(hexStringToBytes);
 
     return db.query(query, [params]);
   }
