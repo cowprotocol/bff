@@ -3,7 +3,10 @@ import { logger } from '@cowprotocol/shared';
 import { Pool } from 'pg';
 import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
 import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils';
+import { chunkArray } from '../../utils/chunkArray';
 import { OrdersRepository } from './OrdersRepository';
+
+const LIMIT = 100;
 
 export class OrdersRepositoryPostgres implements OrdersRepository {
   async getOrders(
@@ -11,20 +14,44 @@ export class OrdersRepositoryPostgres implements OrdersRepository {
     uids: string[]
   ): Promise<Map<string, Partial<Order>>> {
     const prodDb = getOrderBookDbPool('prod', chainId);
-    const prodOrders = await this.fetchOrdersFromDb(uids, prodDb);
-    const orders: Partial<Order>[] = prodOrders || [];
+
+    const prodChunks = chunkArray(uids, LIMIT);
+
+    const prodOrders = await Promise.all(
+      prodChunks.map((chunk) => {
+        return this.fetchOrdersFromDb(chunk, prodDb);
+      })
+    );
+
+    const orders: Partial<Order>[] = prodOrders.reduce<Partial<Order>[]>(
+      (acc, orders) => {
+        if (orders) {
+          acc.push(...orders);
+        }
+        return acc;
+      },
+      []
+    );
 
     logger.info(`Prod orders: ${JSON.stringify(prodOrders, null, 2)}`);
 
-    if (prodOrders?.length !== uids.length) {
+    if (orders.length !== uids.length) {
       const barnDb = getOrderBookDbPool('barn', chainId);
-      const barnOrders = await this.fetchOrdersFromDb(uids, barnDb);
+
+      const barnChunks = chunkArray(uids, LIMIT);
+
+      const barnOrders = await Promise.all(
+        barnChunks.map((chunk) => {
+          return this.fetchOrdersFromDb(chunk, barnDb);
+        })
+      );
+      barnOrders?.forEach((orders) => {
+        if (orders) {
+          orders.push(...orders);
+        }
+      });
 
       logger.info(`Barn orders: ${JSON.stringify(barnOrders, null, 2)}`);
-
-      if (barnOrders?.length) {
-        orders.push(...barnOrders);
-      }
     }
 
     logger.info(`Orders: ${JSON.stringify(orders, null, 2)}`);
@@ -44,7 +71,7 @@ export class OrdersRepositoryPostgres implements OrdersRepository {
     const byteaUids = uids.map(hexStringToBytes);
     // Note: add more fields as needed
     const query = `
-      SELECT uid, partially_fillable FROM orders WHERE uid = ANY($1) LIMIT 1000
+      SELECT uid, partially_fillable FROM orders WHERE uid = ANY($1) LIMIT ${LIMIT}
     `;
 
     const result = await db.query(query, [byteaUids]);
