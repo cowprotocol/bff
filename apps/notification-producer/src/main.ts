@@ -2,24 +2,23 @@ import 'reflect-metadata';
 
 import {
   getCacheRepository,
-  getOnChainPlacedOrdersRepository,
   getErc20Repository,
+  getExpiredOrdersRepository,
   getIndexerStateRepository,
+  getOnChainPlacedOrdersRepository,
+  getOrdersAppDataRepository,
+  getOrdersRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
-  getExpiredOrdersRepository,
-  getOrdersAppDataRepository
 } from '@cowprotocol/services';
 
-import { Runnable } from '../types';
-import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
-import {
-  ExpiredOrdersNotificationProducer
-} from './producers/expired-orders/ExpiredOrdersNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
-import ms from 'ms';
-import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer';
 import { logger } from '@cowprotocol/shared';
+import ms from 'ms';
+import { Runnable } from '../types';
+import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer';
+import { ExpiredOrdersNotificationProducer } from './producers/expired-orders/ExpiredOrdersNotificationProducer';
+import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`);
 
@@ -43,6 +42,7 @@ async function mainLoop() {
   const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository();
   const expiredOrdersRepository = getExpiredOrdersRepository();
   const ordersAppDataRepository = getOrdersAppDataRepository();
+  const ordersRepository = getOrdersRepository();
 
   const repositories = {
     pushNotificationsRepository,
@@ -50,6 +50,8 @@ async function mainLoop() {
     indexerStateRepository,
     erc20Repository,
     onChainPlacedOrdersRepository,
+    ordersAppDataRepository,
+    ordersRepository,
   };
 
   // Create all producers
@@ -61,7 +63,6 @@ async function mainLoop() {
     ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
-        ordersAppDataRepository,
         chainId,
       });
     }),
@@ -71,7 +72,7 @@ async function mainLoop() {
       return new ExpiredOrdersNotificationProducer({
         chainId,
         ...repositories,
-        expiredOrdersRepository
+        expiredOrdersRepository,
       });
     }),
   ];

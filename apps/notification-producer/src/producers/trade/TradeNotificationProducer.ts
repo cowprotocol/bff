@@ -3,15 +3,18 @@ import {
   Erc20Repository,
   getViemClients,
   IndexerStateValue,
-  PushNotificationsRepository,
   OnChainPlacedOrdersRepository,
-  OrdersAppDataRepository
+  OrdersAppDataRepository,
+  OrdersRepository,
+  PushNotificationsRepository,
 } from '@cowprotocol/repositories';
 
-import { Runnable } from '../../../types';
-import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
-import { IndexerStateRepository } from '@cowprotocol/repositories';
+import {
+  IndexerStateRepository,
+  PushSubscriptionsRepository,
+} from '@cowprotocol/repositories';
 import { doForever, logger } from '@cowprotocol/shared';
+import { Runnable } from '../../../types';
 import { getTradeNotifications } from './getTradeNotifications';
 
 const WAIT_TIME = 10000;
@@ -29,6 +32,7 @@ export type TradeNotificationProducerProps = {
   erc20Repository: Erc20Repository;
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
   ordersAppDataRepository: OrdersAppDataRepository;
+  ordersRepository: OrdersRepository;
 };
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
@@ -177,7 +181,8 @@ export class TradeNotificationProducer implements Runnable {
       indexerStateRepository,
       erc20Repository,
       onChainPlacedOrdersRepository,
-      ordersAppDataRepository
+      ordersAppDataRepository,
+      ordersRepository,
     } = this.props;
 
     // Get all accounts subscribed to PUSH notifications
@@ -193,6 +198,7 @@ export class TradeNotificationProducer implements Runnable {
       erc20Repository,
       onChainPlacedOrdersRepository,
       ordersAppDataRepository,
+      ordersRepository,
       prefix: this.prefix,
     });
 

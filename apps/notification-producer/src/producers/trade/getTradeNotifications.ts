@@ -1,16 +1,18 @@
 import {
+  AnyAppDataDocVersion,
   BARN_ETH_FLOW_ADDRESSES,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
   ETH_FLOW_ADDRESSES,
+  LatestAppDataDocVersion,
   SupportedChainId,
-  LatestAppDataDocVersion
 } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import {
   Erc20Repository,
   getViemClients,
   OnChainPlacedOrdersRepository,
-  OrdersAppDataRepository
+  OrdersAppDataRepository,
+  OrdersRepository,
 } from '@cowprotocol/repositories';
 import { bigIntReplacer, logger } from '@cowprotocol/shared';
 import { getAddress, parseAbi } from 'viem';
@@ -18,7 +20,7 @@ import { fromTradeToNotification } from './fromTradeToNotification';
 
 const EVENTS = parseAbi([
   // 'event OrderInvalidated(address indexed owner, bytes orderUid)', // Do not index this event
-  'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)'
+  'event Trade(address indexed owner, address sellToken, address buyToken, uint256 sellAmount, uint256 buyAmount, uint256 feeAmount, bytes orderUid)',
 ]);
 
 export interface GetTradeNotificationParams {
@@ -29,6 +31,7 @@ export interface GetTradeNotificationParams {
   erc20Repository: Erc20Repository;
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
   ordersAppDataRepository: OrdersAppDataRepository;
+  ordersRepository: OrdersRepository;
   prefix: string;
 }
 
@@ -43,13 +46,16 @@ export async function getTradeNotifications(
     erc20Repository,
     onChainPlacedOrdersRepository,
     ordersAppDataRepository,
-    prefix
-  } =
-    params;
+    ordersRepository,
+    prefix,
+  } = params;
 
   const client = getViemClients()[chainId];
 
-  const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(t => t.toLowerCase());
+  const ethFlowAddresses = [
+    ETH_FLOW_ADDRESSES[chainId],
+    BARN_ETH_FLOW_ADDRESSES[chainId],
+  ].map((t) => t.toLowerCase());
 
   const logs = await client.getLogs({
     events: EVENTS,
@@ -57,8 +63,8 @@ export async function getTradeNotifications(
     toBlock,
     address: getAddress(COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId]),
     args: {
-      owner: [...accounts, ...ethFlowAddresses]
-    } as any
+      owner: [...accounts, ...ethFlowAddresses],
+    } as any,
   });
 
   // Return empty array if no events
@@ -91,10 +97,18 @@ export async function getTradeNotifications(
   }, []);
 
   const ethFlowOrderOwners = ethFlowOrderIds.length
-    ? await onChainPlacedOrdersRepository.getAccountsForOrders(chainId, ethFlowOrderIds)
+    ? await onChainPlacedOrdersRepository.getAccountsForOrders(
+        chainId,
+        ethFlowOrderIds
+      )
     : {};
 
-  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(chainId, orderUids);
+  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(
+    chainId,
+    orderUids
+  );
+
+  const orders = await ordersRepository.getOrders(chainId, orderUids);
 
   const notificationPromises = logs.reduce<Promise<PushNotification>[]>(
     (acc, log) => {
@@ -107,7 +121,7 @@ export async function getTradeNotifications(
             buyToken: buyTokenAddress,
             sellAmount,
             buyAmount,
-            feeAmount
+            feeAmount,
           } = log.args;
 
           if (
@@ -130,16 +144,17 @@ export async function getTradeNotifications(
           }
 
           const orderUidLower = orderUid.toLowerCase();
+          const order = orders.get(orderUidLower);
           const isEthFlowOrder = ethFlowAddresses.includes(owner.toLowerCase());
           const appData = ordersAppData.get(orderUidLower);
-          const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
+          const isBridgingOrder = getIsBridgingOrder(appData);
 
           const orderOwner = isEthFlowOrder
-            ? Object.keys(ethFlowOrderOwners).find(key => {
-              const orderUids = ethFlowOrderOwners[key];
+            ? Object.keys(ethFlowOrderOwners).find((key) => {
+                const orderUids = ethFlowOrderOwners[key];
 
-              return orderUids.includes(orderUidLower);
-            })
+                return orderUids.includes(orderUidLower);
+              })
             : owner.toLowerCase();
 
           if (orderOwner && !isBridgingOrder) {
@@ -158,7 +173,9 @@ export async function getTradeNotifications(
                 feeAmount,
                 erc20Repository,
                 transactionHash: log.transactionHash,
-                logIndex: log.logIndex
+                logIndex: log.logIndex,
+                isPartiallyFillable: order?.partiallyFillable ?? false,
+                appData: appData,
               })
             );
           }
@@ -180,4 +197,8 @@ export async function getTradeNotifications(
   }
 
   return Promise.all(notificationPromises);
+}
+
+function getIsBridgingOrder(appData: AnyAppDataDocVersion | undefined) {
+  return !!(appData as LatestAppDataDocVersion)?.metadata?.bridging;
 }

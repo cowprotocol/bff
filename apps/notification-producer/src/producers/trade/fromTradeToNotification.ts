@@ -1,8 +1,9 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository } from '@cowprotocol/repositories';
 import { getExplorerUrl, logger } from '@cowprotocol/shared';
 import { getNotificationSummary } from '../../utils/getNotificationSummary';
+import { getOrderTitle } from '../../utils/getOrderTitle';
 
 export async function fromTradeToNotification(props: {
   prefix: string;
@@ -19,6 +20,8 @@ export async function fromTradeToNotification(props: {
   erc20Repository: Erc20Repository;
   transactionHash: string;
   logIndex: number;
+  isPartiallyFillable: boolean;
+  appData?: AnyAppDataDocVersion;
 }): Promise<PushNotification> {
   const {
     id,
@@ -33,7 +36,9 @@ export async function fromTradeToNotification(props: {
     prefix,
     orderUid,
     transactionHash,
-    logIndex
+    logIndex,
+    appData,
+    isPartiallyFillable,
   } = props;
 
   const summary = await getNotificationSummary({
@@ -43,25 +48,27 @@ export async function fromTradeToNotification(props: {
     sellTokenAddress,
     buyTokenAddress,
     sellAmount,
-    buyAmount
+    buyAmount,
   });
 
-  const title = `Trade ${summary}`;
+  const title = getOrderTitle(appData, isPartiallyFillable);
+
+  const fullMessage = `${title} ${summary}`;
   const message = `Account: ${owner}`;
 
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
   logger.info(
-    `${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}`
+    `${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}, ${fullMessage}`
   );
   return {
     id,
     account: owner,
-    title,
+    title: fullMessage,
     message,
     url,
     context: {
       transactionHash,
-      logIndex: logIndex.toString()
-    }
+      logIndex: logIndex.toString(),
+    },
   };
 }
