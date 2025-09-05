@@ -1,4 +1,5 @@
 import {
+  AnyAppDataDocVersion,
   BARN_ETH_FLOW_ADDRESSES,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING,
@@ -15,6 +16,7 @@ import {
   getViemClients,
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository,
+  OrdersRepository,
 } from '@cowprotocol/repositories'
 import { bigIntReplacer, EvmChainId, logger } from '@cowprotocol/shared'
 import { getAddress, parseAbi } from 'viem'
@@ -33,6 +35,7 @@ export interface GetTradeNotificationParams {
   erc20Repository: Erc20Repository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
   ordersAppDataRepository: OrdersAppDataRepository
+  ordersRepository: OrdersRepository
   prefix: string
 }
 
@@ -45,6 +48,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
     erc20Repository,
     onChainPlacedOrdersRepository,
     ordersAppDataRepository,
+    ordersRepository,
     prefix,
   } = params
 
@@ -108,10 +112,18 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   }, [])
 
   const ethFlowOrderOwners = ethFlowOrderIds.length
-    ? await onChainPlacedOrdersRepository.getAccountsForOrders(chainId, ethFlowOrderIds)
+    ? await onChainPlacedOrdersRepository.getAccountsForOrders(
+        chainId,
+        ethFlowOrderIds
+      )
     : {}
 
-  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(chainId, orderUids)
+  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(
+    chainId,
+    orderUids
+  );
+
+  const orders = await ordersRepository.getOrders(chainId, orderUids)
 
   const notificationPromises = logs.reduce<Promise<PushNotification>[]>((acc, log) => {
     switch (log.eventName) {
@@ -141,16 +153,17 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
+        const order = orders.get(orderUidLower);
+          const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
-        const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
+        const isBridgingOrder = getIsBridgingOrder(appData);
 
         const orderOwner = isEthFlowOrder
           ? Object.keys(ethFlowOrderOwners).find((key) => {
-              const orderUids = ethFlowOrderOwners[key]
+                const orderUids = ethFlowOrderOwners[key]
 
-              return orderUids.includes(orderUidLower)
-            })
+                return orderUids.includes(orderUidLower)
+              })
           : getAddressKey(owner)
 
         if (!orderOwner) {
@@ -178,7 +191,8 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
               erc20Repository,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
-            })
+            isPartiallyFillable: order?.partiallyFillable ?? false,
+                appData: appData,})
           )
         }
         break
@@ -197,4 +211,8 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   }
 
   return Promise.all(notificationPromises)
+}
+
+function getIsBridgingOrder(appData: AnyAppDataDocVersion | undefined) {
+  return !!(appData as LatestAppDataDocVersion)?.metadata?.bridging;
 }

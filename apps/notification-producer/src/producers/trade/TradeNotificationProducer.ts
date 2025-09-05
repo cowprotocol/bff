@@ -3,15 +3,18 @@ import {
   Erc20Repository,
   getViemClients,
   IndexerStateValue,
-  PushNotificationsRepository,
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository,
+  OrdersRepository,
+  PushNotificationsRepository,
 } from '@cowprotocol/repositories'
 import { BlockNotFoundError } from 'viem'
 
+import {
+  IndexerStateRepository,
+  PushSubscriptionsRepository,
+} from '@cowprotocol/repositories'
 import { Runnable } from '../../../types'
-import { PushSubscriptionsRepository } from '@cowprotocol/repositories'
-import { IndexerStateRepository } from '@cowprotocol/repositories'
 import { doForever, EvmChainId, logger } from '@cowprotocol/shared'
 import { getTradeNotifications } from './getTradeNotifications'
 
@@ -30,6 +33,7 @@ export type TradeNotificationProducerProps = {
   erc20Repository: Erc20Repository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
   ordersAppDataRepository: OrdersAppDataRepository
+  ordersRepository: OrdersRepository;
 }
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
@@ -174,6 +178,7 @@ export class TradeNotificationProducer implements Runnable {
       erc20Repository,
       onChainPlacedOrdersRepository,
       ordersAppDataRepository,
+      ordersRepository,
     } = this.props
 
     // Get all accounts subscribed to PUSH notifications
@@ -193,6 +198,7 @@ export class TradeNotificationProducer implements Runnable {
       erc20Repository,
       onChainPlacedOrdersRepository,
       ordersAppDataRepository,
+      ordersRepository,
       prefix: this.prefix,
     })
 

@@ -2,13 +2,14 @@ import 'reflect-metadata'
 
 import {
   getCacheRepository,
-  getOnChainPlacedOrdersRepository,
   getErc20Repository,
+  getExpiredOrdersRepository,
   getIndexerStateRepository,
+  getOnChainPlacedOrdersRepository,
+  getOrdersAppDataRepository,
+  getOrdersRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
-  getExpiredOrdersRepository,
-  getOrdersAppDataRepository,
 } from '@cowprotocol/services'
 
 import { Runnable } from '../types'
@@ -36,6 +37,7 @@ async function mainLoop() {
   const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository()
   const expiredOrdersRepository = getExpiredOrdersRepository()
   const ordersAppDataRepository = getOrdersAppDataRepository()
+  const ordersRepository = getOrdersRepository()
 
   const repositories = {
     pushNotificationsRepository,
@@ -43,6 +45,8 @@ async function mainLoop() {
     indexerStateRepository,
     erc20Repository,
     onChainPlacedOrdersRepository,
+    ordersAppDataRepository,
+    ordersRepository,
   }
 
   // Create all producers
@@ -54,7 +58,6 @@ async function mainLoop() {
     ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
-        ordersAppDataRepository,
         chainId,
       })
     }),
