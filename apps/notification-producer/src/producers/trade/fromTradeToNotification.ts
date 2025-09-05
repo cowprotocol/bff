@@ -53,7 +53,7 @@ export async function fromTradeToNotification(props: {
 
   const title = getOrderTitle(appData, isPartiallyFillable);
 
-  const fullMessage = `${title} ${summary}`;
+  const fullMessage = `${title}: ${summary}`;
   const message = `Account: ${owner}`;
 
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
