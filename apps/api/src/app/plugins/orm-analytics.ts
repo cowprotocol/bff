@@ -1,9 +1,9 @@
-import 'reflect-metadata';
-import { FastifyInstance } from 'fastify';
-import typeORMPlugin from 'typeorm-fastify-plugin';
-import fp from 'fastify-plugin';
-import { PoolInfo } from '../data/poolInfo';
 import { isDbEnabled } from '@cowprotocol/repositories';
+import { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
+import 'reflect-metadata';
+import typeORMPlugin from 'typeorm-fastify-plugin';
+import { PoolInfo } from '../data/poolInfo';
 
 export default fp(async function (fastify: FastifyInstance) {
   if (!isDbEnabled) {
@@ -26,7 +26,7 @@ export default fp(async function (fastify: FastifyInstance) {
   );
 
   if (dbParamsAreInvalid) {
-    console.error(
+    console.warn(
       'Invalid CoW Analytics database parameters, please check COW_ANALYTICS_* env vars'
     );
     return;

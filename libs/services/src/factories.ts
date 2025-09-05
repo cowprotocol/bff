@@ -9,10 +9,16 @@ import {
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
   OnChainPlacedOrdersRepository,
   OnChainPlacedOrdersRepositoryPostgres,
+  OrdersAppDataRepository,
+  OrdersAppDataRepositoryPostgres,
+  OrdersRepository,
+  OrdersRepositoryPostgres,
   PushNotificationsRepository,
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
@@ -35,10 +41,6 @@ import {
   createTelegramBot,
   getViemClients,
   redisClient,
-  ExpiredOrdersRepository,
-  ExpiredOrdersRepositoryPostgres,
-  OrdersAppDataRepositoryPostgres,
-  OrdersAppDataRepository
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -108,7 +110,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -141,7 +143,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
@@ -169,6 +171,10 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 
 export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
   return new OnChainPlacedOrdersRepositoryPostgres();
+}
+
+export function getOrdersRepository(): OrdersRepository {
+  return new OrdersRepositoryPostgres();
 }
 
 export function getExpiredOrdersRepository(): ExpiredOrdersRepository {

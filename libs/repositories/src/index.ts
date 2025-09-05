@@ -5,13 +5,13 @@ export * from './utils/isDbEnabled';
 // Data-sources
 export * from './datasources/cms';
 export * from './datasources/cowApi';
+export * from './datasources/orderBookDbPool';
 export * from './datasources/orm/postgresOrm';
 export * from './datasources/postgresPlain';
 export * from './datasources/rabbitMq';
 export * from './datasources/redis';
 export * from './datasources/telegram';
 export * from './datasources/viem';
-export * from './datasources/orderBookDbPool';
 
 // Data sources
 export { COINGECKO_PRO_BASE_URL } from './datasources/coingecko';
@@ -52,6 +52,10 @@ export * from './repos/SimulationRepository/tenderlyTypes';
 export * from './repos/IndexerStateRepository/IndexerStateRepository';
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm';
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryPostgres';
+
+// OrdersRepository
+export * from './repos/OrdersRepository/OrdersRepository';
+export * from './repos/OrdersRepository/OrdersRepositoryPostgres';
 
 // OnChainPlacedOrdersRepository
 export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepository';
