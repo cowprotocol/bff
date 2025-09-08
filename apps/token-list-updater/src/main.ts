@@ -32,10 +32,11 @@ async function mainLoop() {
     // TokenListUpdater: update token list for each chain
     ...chainIds
       .filter((chainId) => chainId !== SupportedChainId.SEPOLIA)
-      .map((chainId) => {
+      .map((chainId, index) => {
         return new TokenListUpdater({
           tokenCacheRepository,
           chainId,
+          delayInMilliseconds: index * 20 * 1000, // every 20 seconds
         });
       }),
   ];

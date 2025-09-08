@@ -1,5 +1,5 @@
 import { initTokenList, TokenCacheRepository } from '@cowprotocol/repositories';
-import { logger, doForever } from '@cowprotocol/shared';
+import { logger, doForever, sleep } from '@cowprotocol/shared';
 import { Runnable } from '../../types';
 
 const WAIT_TIME = 1000 * 60 * 60 * 6; // 6 hours
@@ -7,6 +7,7 @@ const WAIT_TIME = 1000 * 60 * 60 * 6; // 6 hours
 export type TokenListUpdaterProps = {
   chainId: number;
   tokenCacheRepository: TokenCacheRepository;
+  delayInMilliseconds?: number;
 };
 
 export class TokenListUpdater implements Runnable {
@@ -29,7 +30,10 @@ export class TokenListUpdater implements Runnable {
           return;
         }
         logger.info(`Updating token list for chain id: ${this.props.chainId}`);
-        await this.updateTokenList();
+        await (async () => {
+          await sleep(this.props.delayInMilliseconds || 0);
+          await this.updateTokenList();
+        })();
       },
       waitTimeMilliseconds: WAIT_TIME,
       logger,
