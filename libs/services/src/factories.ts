@@ -37,6 +37,8 @@ import {
   createTelegramBot,
   getViemClients,
   redisClient,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres,
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -167,6 +169,10 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 
 export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
   return new OnChainPlacedOrdersRepositoryPostgres();
+}
+
+export function getExpiredOrdersRepository(): ExpiredOrdersRepository {
+  return new ExpiredOrdersRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {

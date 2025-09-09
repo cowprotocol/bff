@@ -6,11 +6,15 @@ import {
   getErc20Repository,
   getIndexerStateRepository,
   getPushNotificationsRepository,
-  getPushSubscriptionsRepository
+  getPushSubscriptionsRepository,
+  getExpiredOrdersRepository
 } from '@cowprotocol/services';
 
 import { Runnable } from '../types';
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
+import {
+  ExpiredOrdersNotificationProducer
+} from './producers/expired-orders/ExpiredOrdersNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
 import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer';
@@ -36,6 +40,7 @@ async function mainLoop() {
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
   const indexerStateRepository = getIndexerStateRepository();
   const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository();
+  const expiredOrdersRepository = getExpiredOrdersRepository();
 
   const repositories = {
     pushNotificationsRepository,
@@ -55,6 +60,15 @@ async function mainLoop() {
       return new TradeNotificationProducer({
         ...repositories,
         chainId,
+      });
+    }),
+
+    // Expired order producer
+    ...chainIds.map((chainId) => {
+      return new ExpiredOrdersNotificationProducer({
+        chainId,
+        ...repositories,
+        expiredOrdersRepository
       });
     }),
   ];

@@ -44,7 +44,7 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   /**
-   * Main loop: Run the CMS notification producer. This method runs indefinitely,
+   * Main loop: Run the Trade notification producer. This method runs indefinitely,
    * fetching notifications and sending them to the queue.
    *
    * The method should not throw or finish.
@@ -204,10 +204,10 @@ export class TradeNotificationProducer implements Runnable {
         `${this.prefix} Sending ${notifications.length} notifications`,
         JSON.stringify(notifications, null, 2)
       );
-    }
 
-    // Post notifications to queue
-    this.props.pushNotificationsRepository.send(notifications);
+      // Post notifications to queue
+      this.props.pushNotificationsRepository.send(notifications);
+    }
 
     // Update state
     await indexerStateRepository.upsert<TradeNotificationProducerState>(

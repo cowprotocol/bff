@@ -58,6 +58,10 @@ export * from './repos/IndexerStateRepository/IndexerStateRepositoryPostgres';
 export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepository';
 export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepositoryPostgres';
 
+// ExpiredOrdersRepository
+export * from './repos/ExpiredOrdersRepository/ExpiredOrdersRepository';
+export * from './repos/ExpiredOrdersRepository/ExpiredOrdersRepositoryPostgres';
+
 // Notifications repositories
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
