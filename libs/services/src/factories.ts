@@ -12,6 +12,8 @@ import {
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres,
   getViemClients,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
@@ -37,13 +39,6 @@ import {
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   UsdRepositoryFallback,
-  cowApiClients,
-  createNewPostgresPool,
-  createTelegramBot,
-  getViemClients,
-  redisClient,
-  ExpiredOrdersRepository,
-  ExpiredOrdersRepositoryPostgres
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -113,7 +108,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -146,7 +141,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
