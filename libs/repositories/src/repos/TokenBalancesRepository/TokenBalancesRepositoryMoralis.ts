@@ -52,6 +52,12 @@ export class TokenBalancesRepositoryMoralis implements TokenBalancesRepository {
     address,
     chainId,
   }: TokenBalanceParams): Promise<TokenBalancesResponse> {
+    // todo
+    // Right now this mapping only has the supported chains.
+    // Would be great to implement it like the usd estimation endpoint,
+    // where chains other than supported ones are supported.
+    // This will allow us to enable balance checking for target chains that we don't support as swap chains,
+    // such as BTC, Solana etc
     const network = MORALIS_CLIENT_NETWORK_MAPPING[chainId];
     if (!network) {
       throw new Error('Unsupported chain');

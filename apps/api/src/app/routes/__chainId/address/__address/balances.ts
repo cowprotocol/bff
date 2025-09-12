@@ -58,7 +58,7 @@ const tokenBalancesService: TokenBalancesService = apiContainer.get(
 const CACHE_SECONDS = ms('5s') / 1000;
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  // example: GET: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/balances
+  // example: GET: http://localhost:3010/1/address/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/balances
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
