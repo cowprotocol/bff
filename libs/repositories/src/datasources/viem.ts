@@ -57,7 +57,11 @@ export function getViemClients(): Record<SupportedChainId, PublicClient> {
             default: defaultRpcUrls,
           },
         },
-        transport: defaultRpcUrls.webSocket ? webSocket() : http(),
+        transport: defaultRpcUrls.webSocket ? webSocket(undefined, {
+          retryDelay: 5_000, // 5sec
+          retryCount: 3,
+          reconnect: true,
+        }) : http(),
       });
 
       return acc;
