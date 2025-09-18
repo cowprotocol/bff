@@ -1504,7 +1504,7 @@ export interface components {
         /** @description The reference prices for all traded tokens in the auction as a mapping from token addresses to a price denominated in native token (i.e. 1e18 represents a token that trades one to one with the native token). These prices are used for solution competition for computing surplus and converting fees to native token.
          *      */
         AuctionPrices: {
-            [key: string]: components["schemas"]["BigUint"] | undefined;
+            [key: string]: components["schemas"]["BigUint"];
         };
         /** @description EIP-712 signature of struct OrderCancellations { orderUid: bytes[] } from the order's owner.
          *      */
@@ -1703,7 +1703,7 @@ export interface components {
             /** @description The reference scores for each winning solver according to [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
              *      */
             referenceScores?: {
-                [key: string]: components["schemas"]["BigUint"] | undefined;
+                [key: string]: components["schemas"]["BigUint"];
             };
             auction?: components["schemas"]["CompetitionAuction"];
             /** @description Maps from solver name to object describing that solver's settlement. */
@@ -1729,7 +1729,7 @@ export interface components {
             /** @description The prices of tokens for settled user orders as passed to the settlement contract.
              *      */
             clearingPrices?: {
-                [key: string]: components["schemas"]["BigUint"] | undefined;
+                [key: string]: components["schemas"]["BigUint"];
             };
             /** @description Touched orders. */
             orders?: {
