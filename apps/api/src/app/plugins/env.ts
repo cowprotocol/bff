@@ -17,6 +17,12 @@ const schema = {
     PROXY_UPSTREAM: {
       type: 'string',
     },
+    SOCKET_API_KEY: {
+      type: 'string',
+    },
+    SOCKET_BASE_URL: {
+      type: 'string',
+    },
     TWAP_BASE_URL: {
       type: 'string',
     },
