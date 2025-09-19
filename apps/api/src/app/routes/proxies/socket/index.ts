@@ -1,10 +1,10 @@
 import httpProxy from '@fastify/http-proxy';
 import { FastifyPluginAsync } from 'fastify';
 
-const SOCKET_BASE_URL =
-  process.env.SOCKET_BASE_URL || 'https://dedicated-backend.bungee.exchange';
+const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange';
 
 const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+  const upstream = fastify.config.SOCKET_BASE_URL || DEFAULT_SOCKET_BASE_URL;
   const apiKey = fastify.config.SOCKET_API_KEY;
   if (!apiKey) {
     fastify.log.warn('SOCKET_API_KEY is not set. Skipping proxy.');
@@ -36,7 +36,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   });
 
   fastify.register(httpProxy, {
-    upstream: SOCKET_BASE_URL,
+    upstream,
     httpMethods: ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'],
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
