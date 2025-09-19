@@ -45,7 +45,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       }),
     },
     preHandler: async (request) => {
-      fastify.log.info(
+      fastify.log.debug(
         { url: request.url, method: request.method },
         `Request socket proxy`
       );
