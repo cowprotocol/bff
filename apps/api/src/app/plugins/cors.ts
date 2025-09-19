@@ -12,7 +12,10 @@ export default fp(async (fastify, opts) => {
       };
 
       const origin = req.headers.origin as string | undefined;
-      if (origin && /^http:\/\/localhost/.test(origin)) {
+      if (
+        origin &&
+        /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(origin)
+      ) {
         corsOptions.origin = true;
       }
 

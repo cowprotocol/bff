@@ -31,7 +31,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         acrh || 'authorization, content-type, x-requested-with'
       )
       .header('Access-Control-Max-Age', '600')
-      .status(200)
+      .status(204)
       .send();
   });
 
@@ -47,7 +47,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     preHandler: async (request) => {
       fastify.log.debug(
         { url: request.url, method: request.method },
-        `Request socket proxy`
+        `Proxying request to socket ${upstream}`
       );
     },
   });
