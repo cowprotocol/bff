@@ -4,21 +4,23 @@ import fp from 'fastify-plugin';
 export default fp(async (fastify, opts) => {
   const options: FastifyCorsOptions = {
     ...opts,
-    origin: false,
-    delegator: (req, callback) => {
-      const corsOptions = {
-        origin: false,
-      };
-
-      // do not include CORS headers for requests from localhost
-      const origin = req.headers.origin;
-      if (origin && /^http:\/\/localhost/.test(origin)) {
-        corsOptions.origin = true;
-      }
-
-      // callback expects two parameters: error and options
-      callback(null, corsOptions);
-    },
+    hook: 'onRequest',
+    preflight: true,
+    strictPreflight: false,
+    origin: true, // reflect request origin
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+      'authorization',
+      'content-type',
+      'x-requested-with',
+      'affiliate',
+      'baggage',
+      'sentry-trace',
+    ],
+    exposedHeaders: ['content-length', 'content-type'],
+    maxAge: 600,
   };
+
   fastify.register(cors, options);
 });

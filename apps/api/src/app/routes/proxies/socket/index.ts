@@ -13,6 +13,8 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
   fastify.register(httpProxy, {
     upstream: SOCKET_BASE_URL,
+    // Avoid registering OPTIONS; CORS preflight is handled by cors plugin
+    httpMethods: ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'],
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
         ...headers,
