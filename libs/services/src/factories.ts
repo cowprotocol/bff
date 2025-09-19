@@ -4,11 +4,17 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  cowApiClients,
+  createNewPostgresPool,
+  createTelegramBot,
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres,
+  getViemClients,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
   OnChainPlacedOrdersRepository,
@@ -17,11 +23,14 @@ import {
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
   PushSubscriptionsRepositoryCms,
+  redisClient,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
   TokenCacheRepository,
   TokenCacheRepositoryRedis,
+  TokenBalancesRepository,
+  TokenBalancesRepositoryMoralis,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -32,13 +41,6 @@ import {
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
   UsdRepositoryFallback,
-  cowApiClients,
-  createNewPostgresPool,
-  createTelegramBot,
-  getViemClients,
-  redisClient,
-  ExpiredOrdersRepository,
-  ExpiredOrdersRepositoryPostgres,
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -143,6 +145,10 @@ export function getTokenHolderRepository(
     getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
+}
+
+export function getTokenBalancesRepository(): TokenBalancesRepository {
+  return new TokenBalancesRepositoryMoralis();
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {

@@ -5,42 +5,45 @@ import {
   getPushSubscriptionsRepository,
   getSimulationRepository,
   getTokenCacheRepository,
+  getTokenBalancesRepository,
   getTokenHolderRepository,
   getUsdRepository,
+  SimulationService,
+  simulationServiceSymbol,
+  SlippageService,
+  SlippageServiceMain,
+  slippageServiceSymbol,
+  TokenBalancesService,
+  TokenBalancesServiceMain,
+  tokenBalancesServiceSymbol,
+  TokenHolderService,
+  TokenHolderServiceMain,
+  tokenHolderServiceSymbol,
+  UsdService,
+  UsdServiceMain,
+  usdServiceSymbol,
 } from '@cowprotocol/services';
 
 import {
   CacheRepository,
-  Erc20Repository,
-  PushNotificationsRepository,
-  PushSubscriptionsRepository,
-  SimulationRepository,
-  TokenCacheRepository,
-  TokenHolderRepository,
-  UsdRepository,
   cacheRepositorySymbol,
+  Erc20Repository,
   erc20RepositorySymbol,
+  PushNotificationsRepository,
   pushNotificationsRepositorySymbol,
+  PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
+  SimulationRepository,
   tenderlyRepositorySymbol,
+  TokenBalancesRepository,
+  tokenBalancesRepositorySymbol,
+  TokenCacheRepository,
   tokenCacheRepositorySymbol,
+  TokenHolderRepository,
   tokenHolderRepositorySymbol,
+  UsdRepository,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
-
-import {
-  SimulationService,
-  SlippageService,
-  SlippageServiceMain,
-  TokenHolderService,
-  TokenHolderServiceMain,
-  UsdService,
-  UsdServiceMain,
-  simulationServiceSymbol,
-  slippageServiceSymbol,
-  tokenHolderServiceSymbol,
-  usdServiceSymbol,
-} from '@cowprotocol/services';
 
 import { Container } from 'inversify';
 import { Logger, logger } from '@cowprotocol/shared';
@@ -57,6 +60,7 @@ function getApiContainer(): Container {
   const simulationRepository = getSimulationRepository();
   const tokenCacheRepository = getTokenCacheRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
+  const tokenBalancesRepository = getTokenBalancesRepository();
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
@@ -93,6 +97,10 @@ function getApiContainer(): Container {
     .bind<TokenCacheRepository>(tokenCacheRepositorySymbol)
     .toConstantValue(tokenCacheRepository);
 
+  apiContainer
+    .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
+    .toConstantValue(tokenBalancesRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
@@ -101,6 +109,10 @@ function getApiContainer(): Container {
   apiContainer
     .bind<TokenHolderService>(tokenHolderServiceSymbol)
     .to(TokenHolderServiceMain);
+
+  apiContainer
+    .bind<TokenBalancesService>(tokenBalancesServiceSymbol)
+    .to(TokenBalancesServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
 
