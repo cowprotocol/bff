@@ -27,6 +27,8 @@ import {
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
+  TokenCacheRepository,
+  TokenCacheRepositoryRedis,
   TokenBalancesRepository,
   TokenBalancesRepositoryMoralis,
   TokenHolderRepository,
@@ -189,4 +191,20 @@ export function getTelegramBot(): TelegramBot {
   }
 
   return telegramBot;
+}
+
+let tokenCacheRepository: TokenCacheRepository | null = null;
+
+export function getTokenCacheRepository(): TokenCacheRepository {
+  if (!redisClient) {
+    throw new Error(
+      'Redis client is required for TokenCacheRepository. Please configure Redis.'
+    );
+  }
+
+  if (!tokenCacheRepository) {
+    tokenCacheRepository = new TokenCacheRepositoryRedis(redisClient);
+  }
+
+  return tokenCacheRepository;
 }

@@ -4,6 +4,7 @@ import {
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
   getSimulationRepository,
+  getTokenCacheRepository,
   getTokenBalancesRepository,
   getTokenHolderRepository,
   getUsdRepository,
@@ -36,6 +37,8 @@ import {
   tenderlyRepositorySymbol,
   TokenBalancesRepository,
   tokenBalancesRepositorySymbol,
+  TokenCacheRepository,
+  tokenCacheRepositorySymbol,
   TokenHolderRepository,
   tokenHolderRepositorySymbol,
   UsdRepository,
@@ -55,6 +58,7 @@ function getApiContainer(): Container {
   const cacheRepository = getCacheRepository();
   const erc20Repository = getErc20Repository(cacheRepository);
   const simulationRepository = getSimulationRepository();
+  const tokenCacheRepository = getTokenCacheRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
   const tokenBalancesRepository = getTokenBalancesRepository();
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
@@ -88,6 +92,10 @@ function getApiContainer(): Container {
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
     .toConstantValue(tokenHolderRepository);
+
+  apiContainer
+    .bind<TokenCacheRepository>(tokenCacheRepositorySymbol)
+    .toConstantValue(tokenCacheRepository);
 
   apiContainer
     .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
