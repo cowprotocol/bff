@@ -21,7 +21,10 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
     reply
       .header('Access-Control-Allow-Origin', origin)
-      .header('Vary', 'Origin')
+      .header(
+        'Vary',
+        'Origin, Access-Control-Request-Method, Access-Control-Request-Headers'
+      )
       .header(
         'Access-Control-Allow-Methods',
         acrm || 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
