@@ -37,6 +37,8 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
   fastify.register(httpProxy, {
     upstream,
+    // The route file is mounted under '/proxies/socket', rewrite that prefix to '/'
+    rewritePrefix: '/',
     httpMethods: ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'],
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
