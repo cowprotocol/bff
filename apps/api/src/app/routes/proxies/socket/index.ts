@@ -50,8 +50,8 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       }),
     },
     preHandler: async (request) => {
-      fastify.log.debug(
-        { url: request.url, method: request.method },
+      fastify.log.info(
+        { url: request.url, method: request.method, headers: request.headers },
         `Proxying request to socket ${upstream}`
       );
     },
