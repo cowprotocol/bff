@@ -4,11 +4,17 @@ import {
   CacheRepository,
   CacheRepositoryMemory,
   CacheRepositoryRedis,
+  cowApiClients,
+  createNewPostgresPool,
+  createTelegramBot,
   Erc20Repository,
   Erc20RepositoryCache,
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  ExpiredOrdersRepository,
+  ExpiredOrdersRepositoryPostgres,
+  getViemClients,
   IndexerStateRepository,
   IndexerStateRepositoryPostgres,
   OnChainPlacedOrdersRepository,
@@ -17,9 +23,12 @@ import {
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
   PushSubscriptionsRepositoryCms,
+  redisClient,
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
+  TokenBalancesRepository,
+  TokenBalancesRepositoryMoralis,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -108,7 +117,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -141,8 +150,12 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
+}
+
+export function getTokenBalancesRepository(): TokenBalancesRepository {
+  return new TokenBalancesRepositoryMoralis();
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {

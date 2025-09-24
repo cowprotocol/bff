@@ -5,18 +5,20 @@ export default fp(async (fastify, opts) => {
   const options: FastifyCorsOptions = {
     ...opts,
     origin: false,
+    preflight: false, // let routes handle OPTIONS explicitly
     delegator: (req, callback) => {
-      const corsOptions = {
+      const corsOptions: FastifyCorsOptions = {
         origin: false,
       };
 
-      // do not include CORS headers for requests from localhost
-      const origin = req.headers.origin;
-      if (origin && /^http:\/\/localhost/.test(origin)) {
+      const origin = req.headers.origin as string | undefined;
+      if (
+        origin &&
+        /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(origin)
+      ) {
         corsOptions.origin = true;
       }
 
-      // callback expects two parameters: error and options
       callback(null, corsOptions);
     },
   };
