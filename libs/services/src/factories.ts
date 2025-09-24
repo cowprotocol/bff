@@ -19,6 +19,8 @@ import {
   IndexerStateRepositoryPostgres,
   OnChainPlacedOrdersRepository,
   OnChainPlacedOrdersRepositoryPostgres,
+  OrdersAppDataRepository,
+  OrdersAppDataRepositoryPostgres,
   PushNotificationsRepository,
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
@@ -38,7 +40,7 @@ import {
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
-  UsdRepositoryFallback,
+  UsdRepositoryFallback
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -108,7 +110,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository),
+    getUsdRepositoryCow(cacheRepository, erc20Repository)
   ]);
 }
 
@@ -141,7 +143,7 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository),
+    getTokenHolderRepositoryEthplorer(cacheRepository)
   ]);
 }
 
@@ -177,6 +179,10 @@ export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepositor
 
 export function getExpiredOrdersRepository(): ExpiredOrdersRepository {
   return new ExpiredOrdersRepositoryPostgres();
+}
+
+export function getOrdersAppDataRepository(): OrdersAppDataRepository {
+  return new OrdersAppDataRepositoryPostgres();
 }
 
 export function getSimulationRepository(): SimulationRepository {

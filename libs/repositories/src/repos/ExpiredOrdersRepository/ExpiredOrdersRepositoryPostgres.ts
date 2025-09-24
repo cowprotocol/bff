@@ -66,10 +66,15 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
             )
             AND NOT EXISTS (
                 SELECT 1
-                FROM presignature_events pe
-                WHERE pe.order_uid = o.uid
-                  AND o.signing_scheme = 'presign'
-                  AND pe.signed = false
+                FROM (
+                         SELECT pe.signed
+                         FROM presignature_events pe
+                         WHERE pe.order_uid = o.uid
+                         ORDER BY pe.block_number DESC
+                             LIMIT 1
+                     ) latest_pe
+                WHERE o.signing_scheme = 'presign'
+                  AND latest_pe.signed = false
             )
         GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         HAVING (
