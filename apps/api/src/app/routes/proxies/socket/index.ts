@@ -45,8 +45,8 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     httpMethods: ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'],
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
-        ...headers,
         'x-api-key': apiKey,
+        origin: 'https://swap.cow.fi',
       }),
     },
     preHandler: async (request) => {
