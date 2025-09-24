@@ -18,6 +18,7 @@ jobs:
           - apps/twap
           - apps/notification-producer
           - apps/telegram
+          - apps/token-list-updater
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
 import { logger } from '@cowprotocol/shared';
+import { getTokenCacheRepository } from '@cowprotocol/services';
+import { setTokenCacheRepository } from '@cowprotocol/repositories';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -9,6 +11,9 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 export const server = Fastify({
   logger,
 });
+
+const tokenCacheRepository = getTokenCacheRepository();
+setTokenCacheRepository(tokenCacheRepository);
 
 // Register your application as a normal plugin.
 server.register(app);
