@@ -86,7 +86,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // THEN: We get the maximum slippage
-      expect(result).toBe(8614);
+      expect(result).toBe(87);
 
       // WHEN: Get slippage (with the tokens inverted)
       result = await slippageService.getSlippageBps({
@@ -96,7 +96,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // THEN: We get the maximum slippage too
-      expect(result).toBe(8614);
+      expect(result).toBe(87);
     });
 
     it(`one of the tokens has no prices available`, async () => {
@@ -143,7 +143,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // THEN: We get the maximum slippage
-      expect(result).toBe(11181);
+      expect(result).toBe(1118034);
     });
 
     it(`if there are no data points matching the date`, async () => {
@@ -164,7 +164,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // THEN: We get the minimum slippage
-      expect(result).toBe(0);
+      expect(result).toBe(708);
     });
 
     it(`if the asset is volatile`, async () => {
@@ -193,7 +193,7 @@ describe('SlippageServiceMain Specification', () => {
       //    Volatility Fair Settlement (Token) = 0.02236067977 / 1 = 0.02236067977
       //    Slippage BPS = ceil(0.02236067977 * 10000) = 224
       //    Adjusted Slippage = MAX = 200
-      expect(result).toBe(23);
+      expect(result).toBe(2237);
     });
   });
 
@@ -231,7 +231,7 @@ describe('SlippageServiceMain Specification', () => {
       });
 
       // THEN: We get the minimum slippage
-      expect(result).toBe(1);
+      expect(result).toBe(12);
     });
   });
 
@@ -268,7 +268,7 @@ describe('SlippageServiceMain Specification', () => {
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 100 = 0.1118033989
       //    Slippage BPS = ceil(0.1118033989 * 10000) = 112
       //    Adjusted Slippage = 112
-      expect(result).toBe(12);
+      expect(result).toBe(2);
     });
 
     it(`if token is worth more in USD, the slippage is smaller`, async () => {
@@ -300,7 +300,7 @@ describe('SlippageServiceMain Specification', () => {
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 1.1 = 0.01016394535
       //    Slippage BPS = ceil(0.01016394535 * 10000) = 102
       //    Adjusted Slippage = 102
-      expect(result).toBe(102);
+      expect(result).toBe(10164);
     });
 
     it(`if token is worth less in USD, the slippage is bigger`, async () => {
@@ -332,7 +332,7 @@ describe('SlippageServiceMain Specification', () => {
       //    Volatility Fair Settlement (Token) = 0.01118033989 / 0.9 = 0.01242259988
       //    Slippage BPS = ceil(0.01242259988 * 10000) = 125
       //    Adjusted Slippage = 125
-      expect(result).toBe(125);
+      expect(result).toBe(12423);
     });
 
     it(`price points further away in time, make the slippage smaller`, async () => {

@@ -22,15 +22,24 @@ export class SlippageServiceMain implements SlippageService {
   ) {}
 
   async getSlippageBps(params: GetSlippageBpsParams): Promise<Bps> {
-    const volatility = await this.getRelativeVolatilityOnSettlement(params);
+    // Try relative volatility first
+    const relativeVolatility = await this.getRelativeVolatilityOnSettlement(params);
+
+    // If relative volatility is available, use it
+    if (relativeVolatility !== null) {
+      return this.getSlippageBpsFromVolatility(relativeVolatility);
+    }
+
+    // Fall back to max volatility if relative volatility cannot be calculated
+    const maxVolatility = await this.getMaxVolatilityOnSettlement(params);
 
     // If volatility is unknown, we return 0
-    if (volatility === null) {
+    if (maxVolatility === null) {
       return 0;
     }
 
     // Return the slippage based on the volatility
-    return this.getSlippageBpsFromVolatility(volatility);
+    return this.getSlippageBpsFromVolatility(maxVolatility);
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
@@ -181,13 +190,6 @@ export class SlippageServiceMain implements SlippageService {
       return null;
     }
 
-    const { prices: _, ...base } = volatilityBase;
-    const { prices: __, ...quote } = volatilityQuote;
-    console.log(`getMaxVolatilityOnSettlement`, {
-      base,
-      quote,
-    });
-
     return Math.max(
       volatilityQuote.volatilityInTokens,
       volatilityBase.volatilityInTokens
@@ -215,6 +217,11 @@ export class SlippageServiceMain implements SlippageService {
   }
 
   private calculateVolatility(prices: PricePoint[]): number {
+    // Return 0 for empty arrays or arrays with insufficient data
+    if (prices.length === 0) {
+      return 0;
+    }
+
     // Calculate the average of the prices (in USD)
     const averagePrice =
       prices.reduce((acc, price) => acc + price.price, 0) / prices.length;
@@ -234,6 +241,11 @@ export class SlippageServiceMain implements SlippageService {
 
     // Calculate the standard deviation
     const standardDeviation = Math.sqrt(variance);
+
+    // For single data point, we can't calculate time difference, return standard deviation
+    if (prices.length === 1) {
+      return standardDeviation;
+    }
 
     // Average time between each data point
     const averageTimeBetweenDataPoints =
