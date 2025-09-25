@@ -13,7 +13,9 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a new order. In order to replace an existing order with a new one, the appData must contain a [valid replacement order UID](https://github.com/cowprotocol/app-data/blob/main/src/schemas/v1.1.0.json#L62), then the indicated order is cancelled, and a new one placed. This allows an old order to be cancelled AND a new order to be created in an atomic operation with a single signature. This may be useful for replacing orders when on-chain prices move outside of the original order's limit price. */
+        /** Create a new order. In order to replace an existing order with a new one, the appData must contain a [valid replacement order UID](https://github.com/cowprotocol/app-data/blob/main/src/schemas/v1.1.0.json#L62), then the indicated order is cancelled, and a new one placed.
+         *     This allows an old order to be cancelled AND a new order to be created in an atomic operation with a single signature.
+         *     This may be useful for replacing orders when on-chain prices move outside of the original order's limit price. */
         post: {
             parameters: {
                 query?: never;
@@ -78,11 +80,7 @@ export interface paths {
         };
         /**
          * Cancel multiple orders by marking them invalid with a timestamp.
-         * @description This is a *best effort* cancellation, and might not prevent solvers from
-         *     settling the orders (if the order is part of an in-flight settlement
-         *     transaction for example). Authentication must be provided by an
-         *     [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
-         *     signature of an `OrderCancellations(bytes[] orderUids)` message.
+         * @description This is a *best effort* cancellation, and might not prevent solvers from settling the orders (if the order is part of an in-flight settlement transaction for example). Authentication must be provided by an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an `OrderCancellations(bytes[] orderUids)` message.
          *
          */
         delete: {
@@ -178,11 +176,12 @@ export interface paths {
         /**
          * Cancel an order by marking it invalid with a timestamp.
          * @deprecated
-         * @description The successful deletion might not prevent solvers from settling the order.
+         * @description The successful deletion might not prevent solvers from settling the
+         *     order.
+         *
          *     Authentication must be provided by providing an
          *     [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an
          *     `OrderCancellation(bytes orderUid)` message.
-         *
          */
         delete: {
             parameters: {
@@ -343,9 +342,9 @@ export interface paths {
                  *
                  *     ### If `orderUid` is specified:
                  *
-                 *     Return all trades related to that `orderUid`. Given that an order may be partially
-                 *     fillable, it is possible that an individual order may have *multiple* trades.
-                 *      */
+                 *     Return all trades related to that `orderUid`. Given that an order
+                 *     may be partially fillable, it is possible that an individual order
+                 *     may have *multiple* trades. */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -373,12 +372,15 @@ export interface paths {
         };
         /**
          * Get the current batch auction.
-         * @description The current batch auction that solvers should be solving right now. This includes:
+         * @description The current batch auction that solvers should be solving right now. This
+         *     includes:
          *
-         *     * A list of solvable orders.
-         *     * The block on which the batch was created.
-         *     * Prices for all tokens being traded (used for objective value computation).
+         *     * A list of solvable orders. * The block on which the batch was created.
+         *     * Prices for all tokens being traded (used for objective value
+         *     computation).
          *
+         *     **Note: This endpoint is currently permissioned. Reach out in discord if
+         *     you need access.**
          */
         get: {
             parameters: {
@@ -417,11 +419,12 @@ export interface paths {
         };
         /**
          * Get orders of one user paginated.
-         * @description The orders are sorted by their creation date descending (newest orders first).
-         *     To enumerate all orders start with `offset` 0 and keep increasing the `offset` by the total
-         *     number of returned results. When a response contains less than `limit` the last page has
-         *     been reached.
+         * @description The orders are sorted by their creation date descending (newest orders
+         *     first).
          *
+         *     To enumerate all orders start with `offset` 0 and keep increasing the
+         *     `offset` by the total number of returned results. When a response
+         *     contains less than `limit` the last page has been reached.
          */
         get: {
             parameters: {
@@ -476,9 +479,11 @@ export interface paths {
         };
         /**
          * Get native price for the given token.
-         * @description Price is the exchange rate between the specified token and the network's native currency.
-         *     It represents the amount of native token atoms needed to buy 1 atom of the specified token.
+         * @description Price is the exchange rate between the specified token and the network's
+         *     native currency.
          *
+         *     It represents the amount of native token atoms needed to buy 1 atom of
+         *     the specified token.
          */
         get: {
             parameters: {
@@ -542,9 +547,7 @@ export interface paths {
         put?: never;
         /**
          * Quote a price and fee for the specified order parameters.
-         * @description Given a partial order compute the minimum fee and a price estimate for the order. Return a
-         *     full order that can be used directly for signing, and with an included signature, passed
-         *     directly to the order creation endpoint.
+         * @description Given a partial order compute the minimum fee and a price estimate for the order. Return a full order that can be used directly for signing, and with an included signature, passed directly to the order creation endpoint.
          *
          */
         post: {
@@ -617,6 +620,7 @@ export interface paths {
         };
         /**
          * Get information about a solver competition.
+         * @deprecated
          * @description Returns the competition information by `auction_id`.
          *
          */
@@ -666,6 +670,7 @@ export interface paths {
         };
         /**
          * Get information about solver competition.
+         * @deprecated
          * @description Returns the competition information by `tx_hash`.
          *
          */
@@ -708,6 +713,153 @@ export interface paths {
         trace?: never;
     };
     "/api/v1/solver_competition/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about the most recent solver competition.
+         * @deprecated
+         * @description Returns the competition information for the last seen auction_id.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/{auction_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about a solver competition.
+         * @description Returns the competition information by `auction_id`.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    auction_id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available for this auction id. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/by_tx_hash/{tx_hash}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about solver competition.
+         * @description Returns the competition information by `tx_hash`.
+         *
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Transaction hash in which the competition was settled. */
+                    tx_hash: components["schemas"]["TransactionHash"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Competition */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolverCompetitionResponse"];
+                    };
+                };
+                /** @description No competition information available for this `tx_hash`. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/latest": {
         parameters: {
             query?: never;
             header?: never;
@@ -833,8 +985,7 @@ export interface paths {
         };
         /**
          * Registers a full `appData` so it can be referenced by `appDataHash`.
-         * @description Uploads a full `appData` to orderbook so that orders created with the
-         *     corresponding `appDataHash` can be linked to the original full `appData`.
+         * @description Uploads a full `appData` to orderbook so that orders created with the corresponding `appDataHash` can be linked to the original full `appData`.
          *
          */
         put: {
@@ -973,8 +1124,8 @@ export interface paths {
          * Get the total surplus earned by the user. [UNSTABLE]
          * @description ### Caution
          *
-         *     This endpoint is under active development and should NOT be considered stable.
-         *
+         *     This endpoint is under active development and should NOT be considered
+         *     stable.
          */
         get: {
             parameters: {
@@ -1055,15 +1206,11 @@ export interface components {
          */
         TokenAmount: string;
         OnchainOrderData: {
-            /** @description If orders are placed as on-chain orders, the owner of the order might
-             *     be a smart contract, but not the user placing the order. The
-             *     actual user will be provided in this field.
+            /** @description If orders are placed as on-chain orders, the owner of the order might be a smart contract, but not the user placing the order. The actual user will be provided in this field.
              *      */
             sender: components["schemas"]["Address"];
             /**
-             * @description Describes the error, if the order placement was not successful. This could
-             *     happen, for example, if the `validTo` is too high, or no valid quote was
-             *     found or generated.
+             * @description Describes the error, if the order placement was not successful. This could happen, for example, if the `validTo` is too high, or no valid quote was found or generated.
              *
              * @enum {string}
              */
@@ -1107,10 +1254,11 @@ export interface components {
          *
          *     Fast: The price estimate is chosen among the fastest N price estimates.
          *     Optimal: The price estimate is chosen among all price estimates.
-         *     Verified: The price estimate is chosen among all verified/simulated price estimates.
+         *     Verified: The price estimate is chosen among all verified/simulated
+         *     price estimates.
          *
-         *     **NOTE**: Orders are supposed to be created from `verified` or `optimal` price estimates.
-         *
+         *     **NOTE**: Orders are supposed to be created from `verified` or `optimal`
+         *     price estimates.
          * @enum {string}
          */
         PriceQuality: "fast" | "optimal" | "verified";
@@ -1125,8 +1273,7 @@ export interface components {
             sellToken: components["schemas"]["Address"];
             /** @description ERC-20 token to be bought. */
             buyToken: components["schemas"]["Address"];
-            /** @description An optional Ethereum address to receive the proceeds of the trade instead
-             *     of the owner (i.e. the order signer).
+            /** @description An optional Ethereum address to receive the proceeds of the trade instead of the owner (i.e. the order signer).
              *      */
             receiver?: components["schemas"]["Address"] | null;
             /** @description Amount of `sellToken` to be sold in atoms. */
@@ -1136,7 +1283,7 @@ export interface components {
             /** @description Unix timestamp (`uint32`) until which the order is valid. */
             validTo: number;
             appData: components["schemas"]["AppDataHash"];
-            /** @description feeRatio * sellAmount + minimal_fee in atoms. */
+            /** @description sellAmount in atoms to cover network fees. Needs to be zero (and incorporated into the limit price) when placing the order */
             feeAmount: components["schemas"]["TokenAmount"];
             /** @description The kind is either a buy or sell order. */
             kind: components["schemas"]["OrderKind"];
@@ -1181,30 +1328,20 @@ export interface components {
             buyTokenBalance: components["schemas"]["BuyTokenDestination"];
             signingScheme: components["schemas"]["SigningScheme"];
             signature: components["schemas"]["Signature"];
-            /** @description If set, the backend enforces that this address matches what is decoded as the *signer* of
-             *     the signature. This helps catch errors with invalid signature encodings as the backend
-             *     might otherwise silently work with an unexpected address that for example does not have
-             *     any balance.
+            /** @description If set, the backend enforces that this address matches what is decoded as the *signer* of the signature. This helps catch errors with invalid signature encodings as the backend might otherwise silently work with an unexpected address that for example does not have any balance.
              *      */
             from?: components["schemas"]["Address"] | null;
-            /** @description Orders can optionally include a quote ID. This way the order can be linked to a quote
-             *     and enable providing more metadata when analysing order slippage.
+            /** @description Orders can optionally include a quote ID. This way the order can be linked to a quote and enable providing more metadata when analysing order slippage.
              *      */
             quoteId?: number | null;
-            /** @description This field comes in two forms for backward compatibility. The hash form will eventually
-             *     stop being accepted.
+            /** @description This field comes in two forms for backward compatibility. The hash form will eventually stop being accepted.
              *      */
             appData: (string & components["schemas"]["AppData"]) | components["schemas"]["AppDataHash"];
-            /** @description May be set for debugging purposes. If set, this field is compared to what the backend
-             *     internally calculates as the app data hash based on the contents of `appData`. If the
-             *     hash does not match, an error is returned. If this field is set, then `appData` **MUST** be
-             *     a string encoding of a JSON object.
+            /** @description May be set for debugging purposes. If set, this field is compared to what the backend internally calculates as the app data hash based on the contents of `appData`. If the hash does not match, an error is returned. If this field is set, then `appData` **MUST** be a string encoding of a JSON object.
              *      */
             appDataHash?: components["schemas"]["AppDataHash"] | null;
         };
-        ProtocolAppData: Record<string, never>;
-        /** @description Extra order data that is returned to users when querying orders but not provided by users
-         *     when creating orders.
+        /** @description Extra order data that is returned to users when querying orders but not provided by users when creating orders.
          *      */
         OrderMetaData: {
             /**
@@ -1221,49 +1358,47 @@ export interface components {
              *
              */
             availableBalance?: components["schemas"]["TokenAmount"] | null;
-            /** @description The total amount of `sellToken` that has been executed for this order including fees.
+            /** @description The total amount of `sellToken` that has been transferred from the user for this order so far.
              *      */
             executedSellAmount: components["schemas"]["BigUint"];
-            /** @description The total amount of `sellToken` that has been executed for this order without fees.
+            /** @description The total amount of `sellToken` that has been transferred from the user for this order so far minus tokens that were transferred as part of the signed `fee` of the order. This is only relevant for old orders because now all orders have a signed `fee` of 0 and solvers compute an appropriate fee dynamically at the time of the order execution.
              *      */
             executedSellAmountBeforeFees: components["schemas"]["BigUint"];
             /** @description The total amount of `buyToken` that has been executed for this order.
              *      */
             executedBuyAmount: components["schemas"]["BigUint"];
-            /** @description The total amount of fees that have been executed for this order. */
+            /** @description [DEPRECATED] The total amount of the user signed `fee` that have been executed for this order. This value is only non-negative for very old orders.
+             *      */
             executedFeeAmount: components["schemas"]["BigUint"];
             /** @description Has this order been invalidated? */
             invalidated: boolean;
             /** @description Order status. */
             status: components["schemas"]["OrderStatus"];
-            /** @description Amount that the signed fee would be without subsidies. */
-            fullFeeAmount?: components["schemas"]["TokenAmount"];
-            /** @description Liquidity orders are functionally the same as normal smart contract orders but are not
-             *     placed with the intent of actively getting traded. Instead they facilitate the
-             *     trade of normal orders by allowing them to be matched against liquidity orders which
-             *     uses less gas and can have better prices than external liquidity.
+            /** @description Liquidity orders are functionally the same as normal smart contract
+             *     orders but are not placed with the intent of actively getting
+             *     traded. Instead they facilitate the trade of normal orders by
+             *     allowing them to be matched against liquidity orders which uses less
+             *     gas and can have better prices than external liquidity.
              *
-             *     As such liquidity orders will only be used in order to improve settlement of normal
-             *     orders. They should not be expected to be traded otherwise and should not expect to get
-             *     surplus.
-             *      */
+             *     As such liquidity orders will only be used in order to improve
+             *     settlement of normal orders. They should not be expected to be
+             *     traded otherwise and should not expect to get surplus. */
             isLiquidityOrder?: boolean;
             ethflowData?: components["schemas"]["EthflowData"];
             /** @description This represents the actual trader of an on-chain order.
-             *
              *     ### ethflow orders
-             *
              *     In this case, the `owner` would be the `EthFlow` contract and *not* the actual trader.
              *      */
             onchainUser?: components["schemas"]["Address"];
-            /** @description There is some data only available for orders that are placed on-chain. This data
-             *     can be found in this object.
+            /** @description There is some data only available for orders that are placed on-chain. This data can be found in this object.
              *      */
             onchainOrderData?: components["schemas"]["OnchainOrderData"];
-            /** @description Surplus fee that the limit order was executed with. */
-            executedSurplusFee?: components["schemas"]["BigUint"] | null;
-            /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation`
-             *     for more information.
+            /** @description Total fee charged for execution of the order. Contains network fee and protocol fees. This takes into account the historic static fee signed by the user and the new dynamic fee computed by solvers.
+             *      */
+            executedFee?: components["schemas"]["BigUint"];
+            /** @description Token the executed fee was captured in. */
+            executedFeeToken?: components["schemas"]["Address"];
+            /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
         };
@@ -1329,16 +1464,9 @@ export interface components {
             /** @description The unique identifier of the auction. Increment whenever the backend creates a new auction.
              *      */
             id?: number;
-            /** @description The block number for the auction. Orders and prices are guaranteed to be valid on this
-             *     block. Proposed settlements should be valid for this block as well.
+            /** @description The block number for the auction. Orders and prices are guaranteed to be valid on this block. Proposed settlements should be valid for this block as well.
              *      */
             block?: number;
-            /** @description The latest block on which a settlement has been processed.
-             *
-             *     **NOTE**: Under certain conditions it is possible for a settlement to have been mined as
-             *     part of `block` but not have yet been processed.
-             *      */
-            latestSettlementBlock?: number;
             /** @description The solvable orders included in the auction.
              *      */
             orders?: components["schemas"]["AuctionOrder"][];
@@ -1362,19 +1490,18 @@ export interface components {
         CompetitionOrderStatus: {
             /** @enum {string} */
             type: "open" | "scheduled" | "active" | "solved" | "executing" | "traded" | "cancelled";
-            /** @description A list of solvers who participated in the latest competition, sorted by score in ascending order, where the last element is the winner.
-             *     The presence of executed amounts defines whether the solver provided a solution for the desired order.
-             *      */
+            /** @description A list of solvers who participated in the latest competition, sorted
+             *     by score in ascending order, where the last element is the winner.
+             *
+             *     The presence of executed amounts defines whether the solver provided
+             *     a solution for the desired order. */
             value?: {
                 /** @description Name of the solver. */
                 solver: string;
                 executedAmounts?: components["schemas"]["ExecutedAmounts"];
             }[];
         };
-        /** @description The reference prices for all traded tokens in the auction as a mapping from token
-         *     addresses to a price denominated in native token (i.e. 1e18 represents a token that
-         *     trades one to one with the native token). These prices are used for solution competition
-         *     for computing surplus and converting fees to native token.
+        /** @description The reference prices for all traded tokens in the auction as a mapping from token addresses to a price denominated in native token (i.e. 1e18 represents a token that trades one to one with the native token). These prices are used for solution competition for computing surplus and converting fees to native token.
          *      */
         AuctionPrices: {
             [key: string]: components["schemas"]["BigUint"] | undefined;
@@ -1424,10 +1551,11 @@ export interface components {
             executedProtocolFees?: components["schemas"]["ExecutedProtocolFee"][];
         };
         /**
-         * @description Unique identifier for the order: 56 bytes encoded as hex with `0x` prefix.
-         *     Bytes 0..32 are the order digest, bytes 30..52 the owner address and bytes
-         *     52..56 the expiry (`validTo`) as a `uint32` unix epoch timestamp.
+         * @description Unique identifier for the order: 56 bytes encoded as hex with `0x`
+         *     prefix.
          *
+         *     Bytes 0..32 are the order digest, bytes 30..52 the owner address and
+         *     bytes 52..56 the expiry (`validTo`) as a `uint32` unix epoch timestamp.
          * @example 0xff2e2e54d178997f173266817c1e9ed6fee1a1aae4b43971c53b543cffcc2969845c6f5599fbb25dbdd1b9b013daf85c03f3c63763e4bc4a
          */
         UID: string;
@@ -1455,7 +1583,7 @@ export interface components {
         PreSignature: string;
         OrderPostError: {
             /** @enum {string} */
-            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppdataFromMismatch";
+            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppdataFromMismatch" | "OldOrderActivelyBidOn";
             description: string;
         };
         OrderCancellationError: {
@@ -1471,8 +1599,7 @@ export interface components {
         /** @description The buy or sell side when quoting an order. */
         OrderQuoteSide: {
             kind: components["schemas"]["OrderQuoteSideKindSell"];
-            /** @description The total amount that is available for the order. From this value, the fee
-             *     is deducted and the buy amount is calculated.
+            /** @description The total amount that is available for the order. From this value, the fee is deducted and the buy amount is calculated.
              *      */
             sellAmountBeforeFee: components["schemas"]["TokenAmount"];
         } | {
@@ -1507,15 +1634,20 @@ export interface components {
              *      */
             receiver?: components["schemas"]["Address"] | null;
             /** @description AppData which will be assigned to the order.
-             *     Expects either a string JSON doc as defined on [AppData](https://github.com/cowprotocol/app-data) or a
-             *     hex encoded string for backwards compatibility.
-             *     When the first format is used, it's possible to provide the derived appDataHash field.
-             *      */
+             *
+             *     Expects either a string JSON doc as defined on
+             *     [AppData](https://github.com/cowprotocol/app-data) or a hex
+             *     encoded string for backwards compatibility.
+             *
+             *     When the first format is used, it's possible to provide the
+             *     derived appDataHash field. */
             appData?: components["schemas"]["AppData"] | components["schemas"]["AppDataHash"];
             /** @description The hash of the stringified JSON appData doc.
-             *     If present, `appData` field must be set with the aforementioned data where this hash is derived from.
-             *     In case they differ, the call will fail.
-             *      */
+             *
+             *     If present, `appData` field must be set with the aforementioned
+             *     data where this hash is derived from.
+             *
+             *     In case they differ, the call will fail. */
             appDataHash?: components["schemas"]["AppDataHash"];
             /** @default erc20 */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
@@ -1527,12 +1659,14 @@ export interface components {
             /** @default eip712 */
             signingScheme: components["schemas"]["SigningScheme"];
             /**
-             * @description Flag to signal whether the order is intended for on-chain order placement. Only valid
-             *     for non ECDSA-signed orders."
+             * @description Flag to signal whether the order is intended for on-chain order placement. Only valid for non ECDSA-signed orders."
              *
              * @default false
              */
             onchainOrder: unknown;
+            /** @description User provided timeout in milliseconds. Can only be used to reduce the response time for quote requests if the default is too slow as values greater than the default will be capped to the default. Note that reducing the timeout can result in worse quotes because the reduced timeout might be too slow for some price estimators.
+             *      */
+            timeout?: number;
         };
         /** @description An order quoted by the backend that can be directly signed and
          *     submitted to the order creation backend.
@@ -1547,8 +1681,7 @@ export interface components {
              * @example 1985-03-10T18:35:18.814523Z
              */
             expiration: string;
-            /** @description Quote ID linked to a quote to enable providing more metadata when analysing
-             *     order slippage.
+            /** @description Quote ID linked to a quote to enable providing more metadata when analysing order slippage.
              *      */
             id?: number;
             /** @description Whether it was possible to verify that the quoted amounts are accurate using a simulation.
@@ -1562,35 +1695,37 @@ export interface components {
         SolverCompetitionResponse: {
             /** @description The ID of the auction the competition info is for. */
             auctionId?: number;
-            /** @description The hash of the transaction that the winning solution of this info was submitted in. */
-            transactionHash?: (string & components["schemas"]["TransactionHash"]) | null;
-            /** @description Gas price used for ranking solutions. */
-            gasPrice?: number;
-            liquidityCollectedBlock?: number;
-            competitionSimulationBlock?: number;
+            /** @description Block that the auction started on. */
+            auctionStartBlock?: number;
+            /** @description The hashes of the transactions for the winning solutions of this competition.
+             *      */
+            transactionHashes?: components["schemas"]["TransactionHash"][];
+            /** @description The reference scores for each winning solver according to [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScores?: {
+                [key: string]: components["schemas"]["BigUint"] | undefined;
+            };
             auction?: components["schemas"]["CompetitionAuction"];
             /** @description Maps from solver name to object describing that solver's settlement. */
             solutions?: components["schemas"]["SolverSettlement"][];
         };
         SolverSettlement: {
-            /** @description Name of the solver. */
-            solver?: string;
+            /** @description Which position the solution achieved in the total ranking of the competition. */
+            ranking?: number;
             /** @description The address used by the solver to execute the settlement on-chain.
-             *     This field is missing for old settlements, the zero address has been used instead.
-             *      */
+             *
+             *     This field is missing for old settlements, the zero address has been
+             *     used instead. */
             solverAddress?: string;
-            objective?: {
-                /** @description The total objective value used for ranking solutions. */
-                total?: number;
-                surplus?: number;
-                fees?: number;
-                cost?: number;
-                gas?: number;
-            };
             /** @description The score of the current auction as defined in [CIP-20](https://snapshot.org/#/cow.eth/proposal/0x2d3f9bd1ea72dca84b03e97dda3efc1f4a42a772c54bd2037e8b62e7d09a491f).
-             *     It is `null` for old auctions.
              *      */
-            score?: components["schemas"]["BigUint"] | null;
+            score?: components["schemas"]["BigUint"];
+            /** @description The reference score as defined in [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScore?: components["schemas"]["BigUint"] | null;
+            /** @description Transaction in which the solution was executed onchain (if available).
+             *      */
+            txHash?: components["schemas"]["TransactionHash"] | null;
             /** @description The prices of tokens for settled user orders as passed to the settlement contract.
              *      */
             clearingPrices?: {
@@ -1599,8 +1734,13 @@ export interface components {
             /** @description Touched orders. */
             orders?: {
                 id?: components["schemas"]["UID"];
-                executedAmount?: components["schemas"]["BigUint"];
+                sellAmount?: components["schemas"]["BigUint"];
+                buyAmount?: components["schemas"]["BigUint"];
             }[];
+            /** @description whether the solution is a winner (received the right to get executed) or not */
+            isWinner?: boolean;
+            /** @description whether the solution was filtered out according to the rules of [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967). */
+            filteredOut?: boolean;
         };
         /** @description The estimated native price for the token
          *      */
@@ -1650,10 +1790,8 @@ export interface components {
         FeePolicy: components["schemas"]["Surplus"] | components["schemas"]["Volume"] | components["schemas"]["PriceImprovement"];
         ExecutedProtocolFee: {
             policy?: components["schemas"]["FeePolicy"];
-            /** @description Fee amount taken */
-            amount?: components["schemas"]["TokenAmount"];
-            /** @description The token in which the fee is taken */
-            token?: components["schemas"]["Address"];
+            amount?: unknown & components["schemas"]["TokenAmount"];
+            token?: unknown & components["schemas"]["Address"];
         };
     };
     responses: never;

@@ -1,10 +1,5 @@
 import { injectable } from 'inversify';
-import {
-  Bps,
-  PairVolatility,
-  SlippageService,
-  VolatilityDetails,
-} from './SlippageService';
+import { Bps, PairVolatility, SlippageService, VolatilityDetails } from './SlippageService';
 
 const DEFAULT_SLIPPAGE_BPS = 50;
 

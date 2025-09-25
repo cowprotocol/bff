@@ -1,40 +1,76 @@
+import { SupportedChainId, lens as lensCoWSdk } from '@cowprotocol/cow-sdk';
+import { AllChainIds, logger } from '@cowprotocol/shared';
+import { Chain, ChainContract, createPublicClient, http, PublicClient, webSocket } from 'viem';
 import {
-  createPublicClient,
-  http,
-  Client,
-  Chain,
-  PublicClient,
-  webSocket,
-} from 'viem';
-import { arbitrum, gnosis, mainnet, sepolia } from 'viem/chains';
-import { AllChainIds, SupportedChainId } from '@cowprotocol/shared';
+  arbitrum,
+  avalanche,
+  base,
+  bsc,
+  gnosis,
+  lens,
+  mainnet,
+  polygon,
+  sepolia,
+} from 'viem/chains';
 
 const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.MAINNET]: mainnet,
   [SupportedChainId.GNOSIS_CHAIN]: gnosis,
   [SupportedChainId.ARBITRUM_ONE]: arbitrum,
+  [SupportedChainId.BASE]: base,
+  [SupportedChainId.POLYGON]: polygon,
+  [SupportedChainId.AVALANCHE]: avalanche,
+  [SupportedChainId.LENS]: {
+    ...lens,
+    contracts: {
+      ...lens.contracts,
+      multicall3: lensCoWSdk.contracts.multicall3 as ChainContract,
+    },
+  },
+  [SupportedChainId.BNB]: bsc,
   [SupportedChainId.SEPOLIA]: sepolia,
 };
 
-export const viemClients = AllChainIds.reduce<
-  Record<SupportedChainId, PublicClient>
->((acc, chainId) => {
-  const chain = NETWORKS[chainId];
-  const rpcEndpoint = process.env[`RPC_URL_${chainId}`];
-  const defaultRpcUrls = getDefaultRpcUrl(chain, rpcEndpoint);
+let viemClients: Record<SupportedChainId, PublicClient> | undefined;
 
-  acc[chainId] = createPublicClient({
-    chain: {
-      ...chain,
-      rpcUrls: {
-        default: defaultRpcUrls,
-      },
+export function getViemClients(): Record<SupportedChainId, PublicClient> {
+  if (viemClients) {
+    return viemClients;
+  }
+
+  viemClients = AllChainIds.reduce<Record<SupportedChainId, PublicClient>>(
+    (acc, chainId) => {
+      const chain = NETWORKS[chainId];
+      const envVarName = `RPC_URL_${chainId}`;
+      const rpcEndpoint = process.env[envVarName];
+      if (!rpcEndpoint) {
+        logger.warn(
+          `RPC_URL_${chainId} is not set. Using default RPC URL for ${chain.name}`
+        );
+      }
+      const defaultRpcUrls = getDefaultRpcUrl(chain, rpcEndpoint);
+
+      acc[chainId] = createPublicClient({
+        chain: {
+          ...chain,
+          rpcUrls: {
+            default: defaultRpcUrls,
+          },
+        },
+        transport: defaultRpcUrls.webSocket ? webSocket(undefined, {
+          retryDelay: 5_000, // 5sec
+          retryCount: 3,
+          reconnect: true,
+        }) : http(),
+      });
+
+      return acc;
     },
-    transport: defaultRpcUrls.webSocket ? webSocket() : http(),
-  });
+    {} as Record<SupportedChainId, PublicClient>
+  );
 
-  return acc;
-}, {} as Record<SupportedChainId, PublicClient>);
+  return viemClients;
+}
 
 function getDefaultRpcUrl(
   chain: Chain,

@@ -1,77 +1,104 @@
-import ms from 'ms';
+import 'reflect-metadata';
 
+import ms from 'ms';
+import { marked } from 'marked';
+import { JSDOM } from 'jsdom';
+import createDOMPurify from 'dompurify';
+
+import { doForever, logger, sleep } from '@cowprotocol/shared';
+import {
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
+  getTelegramBot,
+} from '@cowprotocol/services';
+import { PushNotification } from '@cowprotocol/notifications';
+import TelegramBot from 'node-telegram-bot-api';
 import {
   CmsTelegramSubscription,
-  getAllTelegramSubscriptionsForAccounts,
-} from '@cowprotocol/cms-api';
-import {
-  NOTIFICATIONS_QUEUE,
-  Notification,
-  connectToChannel,
-  parseNotification,
-  sleep,
-} from '@cowprotocol/notifications';
-import { Channel, ConsumeMessage } from 'amqplib';
-import assert from 'assert';
-import TelegramBot from 'node-telegram-bot-api';
+  PushSubscriptionsRepository,
+} from '@cowprotocol/repositories';
 
 const WAIT_TIME = ms(`10s`);
-const SUBSCRIPTION_CACHE_TiME = ms(`5m`);
+const SUBSCRIPTION_CACHE_TIME = ms(`5m`);
 
 const SUBSCRIPTION_CACHE = new Map<string, CmsTelegramSubscription[]>();
 const LAST_SUBSCRIPTION_CHECK = new Map<string, Date>();
 
 let telegramBot: TelegramBot;
 
-// Create telegram bot
-function createTelegramBot() {
-  if (!telegramBot) {
-    const token = process.env.TELEGRAM_SECRET;
-    assert(token, 'TELEGRAM_SECRET is required');
-    telegramBot = new TelegramBot(token, { polling: true });
-  }
+/**
+ * Main loop: Run and re-attempt on error
+ */
+async function mainLoop() {
+  // Create telegram bot
+  telegramBot = getTelegramBot();
 
-  return telegramBot;
+  // Subscribe to notifications
+  logger.info('[telegram] Start telegram consumer');
+  await doForever({
+    name: 'telegram',
+    callback: subscribeToNotifications,
+    waitTimeMilliseconds: WAIT_TIME,
+    logger,
+  });
 }
 
 async function getSubscriptions(
-  account: string
+  account: string,
+  pushSubscriptionsRepository: PushSubscriptionsRepository
 ): Promise<CmsTelegramSubscription[]> {
   // Get the subscriptions for this account
   const lastCheck = LAST_SUBSCRIPTION_CHECK.get(account);
   if (
     !lastCheck ||
-    lastCheck.getTime() + SUBSCRIPTION_CACHE_TiME < Date.now()
+    lastCheck.getTime() + SUBSCRIPTION_CACHE_TIME < Date.now()
   ) {
     // Get the subscriptions for this account (if we haven't checked in a while)
-    const subscriptionForAccount = await getAllTelegramSubscriptionsForAccounts(
-      [account]
-    );
+    const subscriptionForAccount =
+      await pushSubscriptionsRepository.getAllTelegramSubscriptionsForAccounts([
+        account,
+      ]);
     SUBSCRIPTION_CACHE.set(account, subscriptionForAccount);
   }
 
   return SUBSCRIPTION_CACHE.get(account) || [];
 }
 
-async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
-  const notification = parseNotification(msg.content.toString());
-  const { id, message, account, title, url } = notification;
-  console.debug(
-    `[telegram:main] New Notification ${id} for ${account}. ${title}: ${message}. URL=${url}`
+async function sendNotificationToTelegram(
+  notification: PushNotification,
+  pushSubscriptionsRepository: PushSubscriptionsRepository
+): Promise<boolean> {
+  const { id, message, account, title, url, context } = notification;
+  logger.debug(
+    `[telegram] New PushNotification ${id} for ${account}. ${title}: ${message}. URL=${url}. Context=${JSON.stringify(
+      context
+    )}`
   );
 
   // Get the subscriptions for this account
-  const telegramSubscriptions = await getSubscriptions(account);
+  const telegramSubscriptions = await getSubscriptions(
+    account,
+    pushSubscriptionsRepository
+  ).catch((error) => {
+    logger.error(error, `Error getting subscriptions for account ${account}`);
+    return null;
+  });
+
+  if (!telegramSubscriptions) {
+    return false;
+  }
 
   let consumeMessage = false;
   try {
     if (telegramSubscriptions.length > 0) {
       // Send the message to all subscribers
-      for (const { chat_id: chatId } of telegramSubscriptions) {
-        console.debug(
-          `[telegram:main] Sending message ${id} to chatId ${chatId}`
+      for (const { chatId } of telegramSubscriptions) {
+        logger.info(
+          `[telegram] Sending message ${id} to chatId ${chatId}. Title: ${title}. Message: ${message}. URL=${url}`
         );
-        telegramBot.sendMessage(chatId, formatMessage(notification));
+
+        // Send message to Telegram
+        await sendMessageTelegram(chatId, notification);
 
         // Acknowledge the message once its been sent to at least one subscriber for this account
         consumeMessage = true;
@@ -79,60 +106,51 @@ async function onNewMessage(channel: Channel, msg: ConsumeMessage) {
     } else {
       // No telegram subscriptions found for this account
       consumeMessage = true;
-      console.debug(
-        `[telegram:main] No subscriptions found for account ${account}`
-      );
+      logger.debug(`[telegram] No subscriptions found for account ${account}`);
     }
-  } finally {
-    if (consumeMessage) {
-      channel.ack(msg);
-    } else {
-      channel.nack(msg);
-    }
+  } catch (error) {
+    logger.error(error, `Error sending notification`);
   }
-}
 
-async function connect() {
-  const { connection, channel } = await connectToChannel({
-    channel: NOTIFICATIONS_QUEUE,
-  });
-
-  console.info(
-    `[telegram:main] Waiting for messages in "${NOTIFICATIONS_QUEUE}" queue`
-  );
-  await channel.consume(
-    NOTIFICATIONS_QUEUE,
-    async (msg) => {
-      if (msg !== null) {
-        onNewMessage(channel, msg);
-      }
-    },
-    {
-      noAck: false,
-    }
-  );
-
-  return { connection, channel };
+  // We return whether we notified at least one consumer
+  return consumeMessage;
 }
 
 /**
- * Connect to RabbitMQ and listen for messages. It will post them to Telegram when they belong to a subscribed account.
+ * Subscribe to new notifications. It will post them to Telegram when they belong to a subscribed account.
  *
  * This function will not resolved until the connection is closed or an error occurs.
  */
-async function main() {
-  telegramBot = createTelegramBot();
-  const { connection } = await connect();
+async function subscribeToNotifications() {
+  const pushNotificationsRepository = getPushNotificationsRepository();
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository();
+
+  // Connect to push notifications
+  const { connection } = await pushNotificationsRepository.connect();
+
+  // Subscribe to new notifications
+  const { subscriptionId, cancelSubscription } =
+    await pushNotificationsRepository.subscribe(async (notification) => {
+      return sendNotificationToTelegram(
+        notification,
+        pushSubscriptionsRepository
+      );
+    });
+
+  logger.info(
+    `[telegram] Subscribed to notifications with ID ${subscriptionId}`
+  );
 
   // Watch for connection close
   let connectionOpen = true;
   connection.on('close', () => {
-    console.error(
-      `[telegram:main] Queue connection closed! Reconnecting in ${
-        WAIT_TIME / 1000
-      }s`
+    logger.error(
+      `[telegram] Queue connection closed! Reconnecting in ${WAIT_TIME / 1000}s`
     );
     connectionOpen = false;
+
+    // Cancel the subscription
+    cancelSubscription();
   });
 
   // Wait while we have an open connection
@@ -141,37 +159,73 @@ async function main() {
   }
 }
 
-function formatMessage({ title, message, url }: Notification) {
-  return `\
-${title}
+async function sendMessageTelegram(
+  chatId: string,
+  notification: PushNotification
+) {
+  const markdown = formatMessageMarkdown(notification);
+  const html = await markdownToTelegramHTMLSafe(markdown);
+  try {
+    telegramBot.sendMessage(chatId, html, {
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    });
+  } catch (error) {
+    console.error(
+      `Error sending message to telegram.\nMarkdown:\n${markdown}\n\nOffending. HTML:\n${html}\n\n`
+    );
 
-${message}
-
-${
-  url
-    ? `
-
-More info in ${url}`
-    : ''
-}`;
-}
-
-/**
- * Main loop: Run and re-attempt on error
- */
-async function mainLoop() {
-  console.info('[telegram:main] Start telegram consumer');
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    try {
-      await main();
-    } catch (error) {
-      console.error('[telegram:main] Error', error);
-      console.info(`[telegram:main] Reconnecting in ${WAIT_TIME / 1000}s...`);
-    } finally {
-      await sleep(WAIT_TIME);
-    }
+    throw error;
   }
 }
 
-mainLoop();
+function formatMessageMarkdown({ title, message, url }: PushNotification) {
+  const moreInfo = url ? `\n\nMore info in [Explorer](${url})` : '';
+
+  return `\
+**${title}**.
+
+${message}${moreInfo}`;
+}
+
+async function markdownToTelegramHTMLSafe(markdown: string): Promise<string> {
+  const html = await marked(markdown);
+
+  const window = new JSDOM('').window;
+  const DOMPurify = createDOMPurify(window);
+
+  // Replace paragraph tags with double line breaks
+  const withLineBreaks = html
+    .replace(/<\/p>\s*<p>/g, '<br/><br/>') // between paragraphs
+    .replace(/^<p>/, '') // opening <p> at the start
+    .replace(/<\/p>$/, '') // closing </p> at the end
+    .replace(/<\/p>/g, '<br/><br/>') // fallback: closing p
+    .replace(/<p>/g, ''); // fallback: opening p
+
+  // Only allow Telegram-supported tags
+  const cleanHtml = DOMPurify.sanitize(withLineBreaks, {
+    ALLOWED_TAGS: [
+      'b',
+      'strong',
+      'i',
+      'em',
+      'u',
+      'ins',
+      's',
+      'strike',
+      'del',
+      'a',
+      'code',
+      'pre',
+      'br',
+    ],
+    ALLOWED_ATTR: ['href'],
+  });
+
+  // Replace <br/> tags with newlines
+  const finalHtml = cleanHtml.replace(/<br\s*\/?>/g, '\n');
+
+  return finalHtml;
+}
+
+mainLoop().catch((error) => logger.error(error, 'Unhandled error in telegram'));

@@ -1,0 +1,91 @@
+import { JSONSchema } from 'json-schema-to-ts';
+import { AddressSchema, SupportedChainIdSchema } from '../../../schemas';
+import { POOLS_RESULT_LIMIT } from './const';
+
+export const paramsSchema = {
+  type: 'object',
+  required: ['chainId'],
+  additionalProperties: false,
+  properties: {
+    chainId: SupportedChainIdSchema,
+  },
+} as const satisfies JSONSchema;
+
+export const poolsInfoSuccessSchema = {
+  type: 'array',
+  items: {
+    type: 'object',
+    required: [
+      'contract_address',
+      'chain_id',
+      'project',
+      'apr',
+      'fee',
+      'tvl',
+      'volume',
+    ],
+    additionalProperties: false,
+    properties: {
+      contract_address: {
+        title: 'Pool address',
+        type: 'string',
+        pattern: AddressSchema.pattern,
+      },
+      chain_id: SupportedChainIdSchema,
+      project: {
+        title: 'Liquidity provider',
+        type: 'string',
+      },
+      apr: {
+        title: 'APR',
+        description: 'Annual Percentage Rate',
+        type: 'number',
+      },
+      fee: {
+        title: 'Fee tier',
+        description: 'Pool fee percent',
+        type: 'number',
+      },
+      tvl: {
+        title: 'TVL',
+        description: 'Total value locked (in USD)',
+        type: 'number',
+      },
+      volume: {
+        title: 'Volume 24h',
+        description: 'Trading volume in the last 24 hours (in USD)',
+        type: 'number',
+      },
+    },
+  },
+} as const satisfies JSONSchema;
+
+export const poolsInfoBodySchema = {
+  type: 'array',
+  items: {
+    title: 'Pool address',
+    description: 'Blockchain address of the pool',
+    type: 'string',
+    pattern: AddressSchema.pattern,
+  },
+  maxItems: POOLS_RESULT_LIMIT,
+} as const satisfies JSONSchema;
+
+export const poolsAverageAprBodySchema = {
+  type: 'object',
+  title: 'Liquidity provider - apr',
+  additionalProperties: true,
+} as const satisfies JSONSchema;
+
+export const errorSchema = {
+  type: 'object',
+  required: ['message'],
+  additionalProperties: false,
+  properties: {
+    message: {
+      title: 'Message',
+      description: 'Message describing the error.',
+      type: 'string',
+    },
+  },
+} as const satisfies JSONSchema;

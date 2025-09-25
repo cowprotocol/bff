@@ -1,12 +1,5 @@
-import {
-  PricePoint,
-  SupportedChainId,
-  UsdRepository,
-  usdRepositorySymbol,
-} from '@cowprotocol/repositories';
-import { toTokenAddress } from '@cowprotocol/shared';
-import { inject, injectable } from 'inversify';
-import ms from 'ms';
+import { PricePoint, UsdRepository, usdRepositorySymbol } from '@cowprotocol/repositories';
+import { injectable, inject } from 'inversify';
 import {
   Bps,
   GetSlippageBpsParams,
@@ -15,6 +8,9 @@ import {
   SlippageService,
   VolatilityDetails,
 } from './SlippageService';
+import ms from 'ms';
+import { toTokenAddress } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 export const MIN_SLIPPAGE_BPS = 50;
 export const MAX_SLIPPAGE_BPS = 200;
@@ -58,7 +54,7 @@ export class SlippageServiceMain implements SlippageService {
   ): Promise<VolatilityDetails | null> {
     const tokenAddress = toTokenAddress(tokenAddressString, chainId);
     const prices = await this.usdRepository.getUsdPrices(
-      chainId,
+      chainId.toString(),
       tokenAddress,
       '5m'
     );
@@ -69,7 +65,7 @@ export class SlippageServiceMain implements SlippageService {
 
     // Get price of the token
     const usdPrice = await this.usdRepository.getUsdPrice(
-      chainId,
+      chainId.toString(),
       tokenAddress
     );
 
@@ -108,8 +104,8 @@ export class SlippageServiceMain implements SlippageService {
   ): Promise<PairVolatility | null> {
     // Fetch USD prices for both tokens
     const [basePrices, quotePrices] = await Promise.all([
-      this.usdRepository.getUsdPrices(chainId, baseTokenAddress, '5m'),
-      this.usdRepository.getUsdPrices(chainId, quoteTokenAddress, '5m'),
+      this.usdRepository.getUsdPrices(chainId.toString(), baseTokenAddress, '5m'),
+      this.usdRepository.getUsdPrices(chainId.toString(), quoteTokenAddress, '5m'),
     ]);
 
     // Check if either price data is missing

@@ -1,8 +1,10 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
-import { hexZeroPad } from '@ethersproject/bytes';
+import {
+  mapAddressToSupportedNetworks,
+  SupportedChainId,
+} from '@cowprotocol/cow-sdk';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { keccak256 } from '@ethersproject/keccak256';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 
 interface ConditionalOrderParams {
   staticInput: string;
@@ -41,11 +43,8 @@ export const TWAP_ORDER_STRUCT =
   'tuple(address sellToken,address buyToken,address receiver,uint256 partSellAmount,uint256 minPartLimit,uint256 t0,uint256 n,uint256 t,uint256 span,bytes32 appData)';
 
 const twapHandlerAddress = '0x910d00a310f7Dc5B29FE73458F47f519be547D3d';
-export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> = {
-  1: twapHandlerAddress,
-  100: twapHandlerAddress,
-  '11155111': twapHandlerAddress,
-};
+export const TWAP_HANDLER_ADDRESS: Record<SupportedChainId, string> =
+  mapAddressToSupportedNetworks(twapHandlerAddress);
 
 export function twapOrderToStruct(order: TWAPOrder): TWAPOrderStruct {
   return {

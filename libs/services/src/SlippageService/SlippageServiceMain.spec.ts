@@ -1,10 +1,9 @@
 import {
-  PricePoint,
-  SupportedChainId,
-  UsdRepository,
-} from '@cowprotocol/repositories';
+  SlippageServiceMain,
+} from './SlippageServiceMain';
+import { PricePoint, UsdRepository } from '@cowprotocol/repositories';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
-import { SlippageServiceMain } from './SlippageServiceMain';
 
 const FIVE_MIN = ms('5min');
 const FOUR_MIN = ms('4min');

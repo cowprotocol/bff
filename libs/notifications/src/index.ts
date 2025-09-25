@@ -1,36 +1,12 @@
-import amqp, { Channel, Connection } from 'amqplib';
-import assert from 'assert';
+import { Channel, Connection } from 'amqplib';
 
-export const NOTIFICATIONS_QUEUE = 'notifications';
-
-// Connect to RabbitMQ server
-const queueHost = process.env.QUEUE_HOST;
-assert(queueHost, 'QUEUE_HOST is required');
-const queuePort = +(process.env.QUEUE_PORT || '5672');
-const queueUser = process.env.QUEUE_USER;
-assert(queueUser, 'QUEUE_USER is required');
-const queuePassword = process.env.QUEUE_PASSWORD;
-assert(queuePassword, 'QUEUE_PASSWORD is required');
-
-export interface Notification {
+export interface PushNotification {
   id: string;
   account: string;
   title: string;
   message: string;
   url?: string;
-}
-
-export function parseNotification(notificationString: string): Notification {
-  return JSON.parse(notificationString);
-}
-
-export function stringifyNotification(notification: Notification): string {
-  return JSON.stringify(notification);
-}
-
-// TODO: Move to commons lib
-export function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  context?: Record<string, string>;
 }
 
 export interface ConnectToQueueParams {
@@ -42,39 +18,50 @@ export interface ConnectToChannelResponse {
   channel: Channel;
 }
 
-export async function connectToChannel(
-  params: ConnectToQueueParams
-): Promise<ConnectToChannelResponse> {
-  // Connect to RabbitMQ server
-  const { channel: channelName } = params;
-
-  const connection = await amqp.connect({
-    hostname: queueHost,
-    port: queuePort,
-    username: queueUser,
-    password: queuePassword,
-  });
-
-  const channel = await connection.createChannel();
-
-  if (channelName) {
-    // This makes sure the queue is declared
-    channel.assertQueue(channelName, {
-      durable: false,
-    });
-  }
-
-  return { connection, channel };
-}
-
 export interface SendToQueueParams {
   channel: Channel;
   queue: string;
-  notification: Notification;
+  notifications: PushNotification[];
 }
 
-export function sendNotificationToQueue(params: SendToQueueParams) {
-  const { channel, queue, notification } = params;
-  const message = stringifyNotification(notification);
-  channel.sendToQueue(queue, Buffer.from(message));
+export function parseNotifications(
+  notificationsString: string
+): PushNotification[] {
+  const notifications = JSON.parse(notificationsString);
+  if (!isNotificationArray(notifications)) {
+    throw new Error(
+      `The parsed message is not a valid notification array. Message: ${notificationsString}`
+    );
+  }
+
+  return notifications;
+}
+
+export function stringifyNotifications(
+  notifications: PushNotification[]
+): string {
+  return JSON.stringify(notifications);
+}
+
+export function isNotificationArray(
+  notifications: unknown
+): notifications is PushNotification[] {
+  return Array.isArray(notifications) && notifications.every(isNotification);
+}
+
+export function isNotification(
+  notification: unknown
+): notification is PushNotification {
+  if (typeof notification !== 'object' || notification === null) {
+    return false;
+  }
+
+  const record = notification as Record<string, unknown>;
+
+  return (
+    typeof record.id === 'string' &&
+    typeof record.account === 'string' &&
+    typeof record.title === 'string' &&
+    typeof record.message === 'string'
+  );
 }
