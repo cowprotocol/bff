@@ -211,9 +211,6 @@ export class SlippageServiceMain implements SlippageService {
       return null;
     }
 
-    const { prices: _, ...vol } = volatility;
-    console.log(`getRelativeVolatilityOnSettlement`, vol);
-
     return volatility.volatilityInTokens;
   }
 
