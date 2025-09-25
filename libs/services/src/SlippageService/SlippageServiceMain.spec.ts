@@ -1,6 +1,4 @@
-import {
-  SlippageServiceMain,
-} from './SlippageServiceMain';
+import { SlippageServiceMain } from './SlippageServiceMain';
 import { PricePoint, UsdRepository } from '@cowprotocol/repositories';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
@@ -15,7 +13,7 @@ const getUsdPrices = jest.fn();
 const POINTS_VOLATILITY_ZERO = getPoints([1, 1, 1, 1]);
 const POINTS_WITH_HIGH_VOLATILITY = getPoints([100, 110, 120, 130]); // 10% each 5min
 const POINTS_WITH_LOW_VOLATILITY = getPoints([
-  100.0001, 100.0002, 100.0003, 100.0004,
+  100.0001, 100.0002, 100.0003, 100.0004
 ]); // 0.0001% each 5min
 
 /**
@@ -32,7 +30,7 @@ describe('SlippageServiceMain Specification', () => {
   beforeEach(() => {
     usdRepositoryMock = {
       getUsdPrice,
-      getUsdPrices,
+      getUsdPrices
     };
 
     slippageService = new SlippageServiceMain(usdRepositoryMock);
@@ -49,7 +47,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the max slippage
@@ -64,7 +62,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the max slippage
@@ -84,7 +82,7 @@ describe('SlippageServiceMain Specification', () => {
       let result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage
@@ -94,7 +92,7 @@ describe('SlippageServiceMain Specification', () => {
       result = await slippageService.getSlippageBps({
         chainId,
         quoteTokenAddress,
-        baseTokenAddress,
+        baseTokenAddress
       });
 
       // THEN: We get the maximum slippage too
@@ -110,7 +108,7 @@ describe('SlippageServiceMain Specification', () => {
       let result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage
@@ -120,7 +118,7 @@ describe('SlippageServiceMain Specification', () => {
       result = await slippageService.getSlippageBps({
         chainId,
         quoteTokenAddress,
-        baseTokenAddress,
+        baseTokenAddress
       });
 
       // THEN: We get the maximum slippage too
@@ -141,7 +139,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage
@@ -162,7 +160,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the minimum slippage
@@ -183,7 +181,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage
@@ -208,7 +206,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the minimum slippage
@@ -229,7 +227,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the minimum slippage
@@ -256,7 +254,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the the calculated slippage
@@ -290,7 +288,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the the calculated slippage
@@ -322,7 +320,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the the calculated slippage
@@ -356,7 +354,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the calculated slippage
@@ -385,7 +383,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the minimum slippage
@@ -420,7 +418,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get the worst slippage of the two tokens
@@ -443,7 +441,7 @@ describe('SlippageServiceMain Specification', () => {
       const resultTokensInverted = await slippageService.getSlippageBps({
         chainId,
         quoteTokenAddress,
-        baseTokenAddress,
+        baseTokenAddress
       });
 
       // THEN: The result should be the same (worst of the two)
@@ -468,7 +466,7 @@ describe('SlippageServiceMain Specification', () => {
       const result = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: We get 0 slippage
@@ -478,7 +476,7 @@ describe('SlippageServiceMain Specification', () => {
       const resultInverted = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
-        quoteTokenAddress,
+        quoteTokenAddress
       });
 
       // THEN: The result should be the same (worst of the two)
@@ -495,7 +493,7 @@ function getPoints(
   return prices.map((price, i) => ({
     date: new Date(startDate + timeBetweenPoints * i),
     price,
-    volume: 1,
+    volume: 1
   }));
 }
 

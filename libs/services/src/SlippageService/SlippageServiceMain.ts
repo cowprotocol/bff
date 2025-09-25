@@ -12,8 +12,6 @@ import ms from 'ms';
 import { toTokenAddress } from '@cowprotocol/shared';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
-export const MIN_SLIPPAGE_BPS = 50;
-export const MAX_SLIPPAGE_BPS = 200;
 const FAIR_TIME_TO_SETTLEMENT = ms('5min');
 
 @injectable()
@@ -115,8 +113,8 @@ export class SlippageServiceMain implements SlippageService {
 
     // Fetch USD prices for both tokens
     const [baseUsdPrice, quoteUsdPrice] = await Promise.all([
-      this.usdRepository.getUsdPrice(chainId, baseTokenAddress),
-      this.usdRepository.getUsdPrice(chainId, quoteTokenAddress),
+      this.usdRepository.getUsdPrice(chainId.toString(), baseTokenAddress),
+      this.usdRepository.getUsdPrice(chainId.toString(), quoteTokenAddress),
     ]);
 
     // Check if either USD price is missing
