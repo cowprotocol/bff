@@ -21,7 +21,10 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
     reply
       .header('Access-Control-Allow-Origin', origin)
-      .header('Vary', 'Origin')
+      .header(
+        'Vary',
+        'Origin, Access-Control-Request-Method, Access-Control-Request-Headers'
+      )
       .header(
         'Access-Control-Allow-Methods',
         acrm || 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
@@ -37,16 +40,18 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
   fastify.register(httpProxy, {
     upstream,
+    // The route file is mounted under '/proxies/socket', rewrite that prefix to '/'
+    rewritePrefix: '/',
     httpMethods: ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'],
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
-        ...headers,
         'x-api-key': apiKey,
+        origin: 'https://swap.cow.fi',
       }),
     },
     preHandler: async (request) => {
-      fastify.log.debug(
-        { url: request.url, method: request.method },
+      fastify.log.info(
+        { url: request.url, method: request.method, headers: request.headers },
         `Proxying request to socket ${upstream}`
       );
     },
