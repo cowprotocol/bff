@@ -91,12 +91,12 @@ describe('SlippageServiceMain Specification', () => {
       // WHEN: Get slippage (with the tokens inverted)
       result = await slippageService.getSlippageBps({
         chainId,
-        quoteTokenAddress,
-        baseTokenAddress
+        quoteTokenAddress: baseTokenAddress,
+        baseTokenAddress: quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage too
-      expect(result).toBe(87);
+      expect(result).toBe(11181);
     });
 
     it(`one of the tokens has no prices available`, async () => {
@@ -117,8 +117,8 @@ describe('SlippageServiceMain Specification', () => {
       // WHEN: Get slippage (with the tokens inverted)
       result = await slippageService.getSlippageBps({
         chainId,
-        quoteTokenAddress,
-        baseTokenAddress
+        quoteTokenAddress: baseTokenAddress,
+        baseTokenAddress: quoteTokenAddress
       });
 
       // THEN: We get the maximum slippage too
@@ -438,8 +438,8 @@ describe('SlippageServiceMain Specification', () => {
       // WHEN: Get slippage (inverting the tokens)
       const resultTokensInverted = await slippageService.getSlippageBps({
         chainId,
-        quoteTokenAddress,
-        baseTokenAddress
+        quoteTokenAddress: baseTokenAddress,
+        baseTokenAddress: quoteTokenAddress
       });
 
       // THEN: The result should be the same (worst of the two)
@@ -473,8 +473,8 @@ describe('SlippageServiceMain Specification', () => {
       // WHEN: Get slippage (inverting the tokens)
       const resultInverted = await slippageService.getSlippageBps({
         chainId,
-        baseTokenAddress,
-        quoteTokenAddress
+        baseTokenAddress: quoteTokenAddress,
+        quoteTokenAddress: baseTokenAddress
       });
 
       // THEN: The result should be the same (worst of the two)
