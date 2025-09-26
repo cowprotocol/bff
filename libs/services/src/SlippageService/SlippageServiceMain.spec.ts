@@ -358,16 +358,14 @@ describe('SlippageServiceMain Specification', () => {
         quoteTokenAddress
       });
 
-      // THEN: We get the calculated slippage
-      //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
-      //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
-      //    STDDEV = sqrt(0.000125) = 0.01118033989
-      //    Number of points for Fair Settlement = 5min / 6min = 0.8333333333
-      //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(0.8333333333) = 0.01020620726
-      //    Volatility Fair Settlement (Token) = 0.01020620726 / 1 = 0.01020620726
-      //    Slippage BPS = ceil(0.01020620726 * 10000) = 103
-      //    Adjusted Slippage = 103
-      expect(result).toBe(97); // 103 is less than 112 (same prices, but 6min apart instead of 5min)
+      // THEN: We get the calculated slippage for 6min intervals
+      // This test uses pair-wise relative volatility calculation:
+      // Base token: [100, 100.01, 100.02, 100.03] with 6min intervals (volatile)
+      // Quote token: [10, 10, 10, 10] with 6min intervals (stable)
+      // Relative prices: [100/10, 100.01/10, 100.02/10, 100.03/10] = [10, 10.001, 10.002, 10.003]
+      // Time stretch factor: 5min / 6min = 0.833 (less volatility per settlement time)
+      // Expected: Lower volatility than 5min intervals due to time stretching
+      expect(result).toBe(97); // Lower than baseline due to 6min intervals vs 5min
     });
 
     it(`price points closer in time, increase volatility`, async () => {
