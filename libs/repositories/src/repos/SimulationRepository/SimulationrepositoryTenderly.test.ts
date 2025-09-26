@@ -32,7 +32,8 @@ const FAILED_TENDERLY_SIMULATION = {
     '0x23b872dd000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000a',
 };
 
-describe('SimulationRepositoryTenderly', () => {
+// The tests are integration tests and require ENV variables
+describe.skip('SimulationRepositoryTenderly', () => {
   let tenderlyRepository: SimulationRepositoryTenderly;
 
   beforeAll(() => {

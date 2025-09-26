@@ -4,7 +4,8 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { WETH, NULL_ADDRESS } from '../../../test/mock';
 import { ETHPLORER_API_KEY } from '../../datasources/ethplorer';
 
-describe('TokenHolderRepositoryEthplorer', () => {
+// The tests are integration tests and require ENV variables
+describe.skip('TokenHolderRepositoryEthplorer', () => {
   let tokenHolderRepositoryEthplorer: TokenHolderRepositoryEthplorer;
 
   beforeAll(() => {
