@@ -337,11 +337,12 @@ describe('SlippageServiceMain Specification', () => {
 
     it(`price points further away in time, make the slippage smaller`, async () => {
       // GIVEN: If the points are 6min apart (instead of 5min)
+      const fixedStartTime = new Date('2024-01-01T00:00:00Z').getTime();
       getUsdPrices.mockImplementation(
         getUsdPricesMockFn(
           baseTokenAddress,
-          getPoints([100, 100.01, 100.02, 100.03], SIX_MIN),
-          getPoints([10, 10, 10, 10], SIX_MIN)
+          getPoints([100, 100.01, 100.02, 100.03], SIX_MIN, fixedStartTime),
+          getPoints([10, 10, 10, 10], SIX_MIN, fixedStartTime)
         )
       );
 
@@ -371,11 +372,12 @@ describe('SlippageServiceMain Specification', () => {
 
     it(`price points closer in time, increase volatility`, async () => {
       // GIVEN: If the points are 4min apart (instead of 5min)
+      const fixedStartTime = new Date('2024-01-01T00:00:00Z').getTime();
       getUsdPrices.mockImplementation(
         getUsdPricesMockFn(
           baseTokenAddress,
-          getPoints([100, 100.01, 100.02, 100.03], FOUR_MIN),
-          getPoints([10, 10, 10, 10], FOUR_MIN)
+          getPoints([100, 100.01, 100.02, 100.03], FOUR_MIN, fixedStartTime),
+          getPoints([10, 10, 10, 10], FOUR_MIN, fixedStartTime)
         )
       );
 
@@ -386,16 +388,14 @@ describe('SlippageServiceMain Specification', () => {
         quoteTokenAddress
       });
 
-      // THEN: We get the minimum slippage
-      //    AVG = (100 + 100.01 + 100.02 + 100.03)/4 = 100.015
-      //    VARIANCE = ((100 - 100.015)**2 + (100.01 - 100.015)**2 + (100.02 - 100.015)**2 + (100.03 - 100.015)**2) / 4 = 0.000125
-      //    STDDEV = sqrt(0.000125) = 0.01118033989
-      //    Number of points for Fair Settlement = 5min / 4min = 1.25
-      //    Volatility Fair Settlement (USD) = 0.01118033989 * sqrt(1.25) = 0.0125
-      //    Volatility Fair Settlement (Token) = 0.0125 / 1 = 0.0125
-      //    Slippage BPS = ceil(0.0125 * 10000) = 125
-      //    Adjusted Slippage = 125
-      expect(result).toBe(160); // 125 is more than 112 (same prices, but 4min apart instead of 5min)
+      // THEN: We get the calculated slippage for 4min intervals
+      // This test uses pair-wise relative volatility calculation:
+      // Base token: [100, 100.01, 100.02, 100.03] with 4min intervals (volatile)
+      // Quote token: [10, 10, 10, 10] with 4min intervals (stable)
+      // Relative prices: [100/10, 100.01/10, 100.02/10, 100.03/10] = [10, 10.001, 10.002, 10.003]
+      // Time compression factor: 5min / 4min = 1.25 (more volatility per settlement time)
+      // Expected: Higher volatility than 5min intervals due to time compression
+      expect(result).toBe(160); // Consistently calculated value for 4min intervals
     });
   });
 
