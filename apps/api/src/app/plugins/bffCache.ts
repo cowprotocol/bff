@@ -35,7 +35,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
       return;
     }
 
-    let key = getKey(request);
+    const key = getKey(request);
 
     // Remove it so we can cache it properly
     request.headers['accept-encoding'] = undefined;
