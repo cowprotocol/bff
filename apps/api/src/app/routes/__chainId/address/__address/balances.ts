@@ -92,7 +92,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      if (!request.query.ignoreCache) {
+      if (request.query.ignoreCache) {
+        reply.header(CACHE_CONTROL_HEADER, 'no-store, max-age=0');
+      } else {
         reply.header(
           CACHE_CONTROL_HEADER,
           getCacheControlHeaderValue(CACHE_SECONDS)
