@@ -12,6 +12,18 @@ import {
   getCacheControlHeaderValue,
 } from '../../../../../utils/cache';
 
+const querySchema = {
+  type: 'object',
+  properties: {
+    ignoreCache: {
+      type: 'boolean',
+      description: 'Skip cache and fetch fresh data',
+    },
+  },
+} as const satisfies JSONSchema;
+
+type QuerySchema = FromSchema<typeof querySchema>;
+
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'address'],
@@ -62,6 +74,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.get<{
     Params: RouteSchema;
     Reply: SuccessSchema | ErrorSchema;
+    Querystring: QuerySchema;
   }>(
     '/balances',
     {
@@ -70,6 +83,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           'Get token balances for a given address on a specific chain.',
         tags: ['tokens'],
         params: paramsSchema,
+        querystring: querySchema,
         response: {
           '2XX': successSchema,
           '4XX': errorSchema,
@@ -78,10 +92,14 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
+      if (request.query.ignoreCache) {
+        reply.header(CACHE_CONTROL_HEADER, 'no-store, max-age=0');
+      } else {
+        reply.header(
+          CACHE_CONTROL_HEADER,
+          getCacheControlHeaderValue(CACHE_SECONDS)
+        );
+      }
 
       const { chainId, address } = request.params;
 
