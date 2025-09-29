@@ -43,6 +43,7 @@ jobs:
             test-results/
             junit.xml
           retention-days: 30
+          if-no-files-found: ignore
 
   affected-test-and-lint:
     name: Test and Lint Affected Projects
