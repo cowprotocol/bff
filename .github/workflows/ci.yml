@@ -10,6 +10,7 @@ jobs:
   test-and-lint:
     name: Test and Lint
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -43,7 +44,7 @@ jobs:
             junit.xml
           retention-days: 30
 
-  affected:
+  affected-test-and-lint:
     name: Test and Lint Affected Projects
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
