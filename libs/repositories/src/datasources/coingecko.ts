@@ -230,23 +230,26 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
 
 export type CoingeckoProClient = ReturnType<typeof createClient<paths>>;
 
-let coingeckoProClient: CoingeckoProClient | undefined;
+const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> = {}
 
-export function getCoingeckoProClient(): CoingeckoProClient {
-  if (coingeckoProClient) {
-    return coingeckoProClient;
-  }
-
-  if (!process.env.COINGECKO_API_KEY) {
+export function getCoingeckoProClient(apiKey = process.env.COINGECKO_API_KEY): CoingeckoProClient {
+  if (!apiKey) {
     throw new Error('COINGECKO_API_KEY is not set');
   }
 
-  coingeckoProClient = createClient<paths>({
+  const cached = coingeckoProClientCache[apiKey];
+
+  if (cached) return cached
+
+  const coingeckoProClient = createClient<paths>({
     baseUrl: COINGECKO_PRO_BASE_URL + '/api/v3',
     headers: {
-      'x-cg-pro-api-key': process.env.COINGECKO_API_KEY,
+      'x-cg-pro-api-key': apiKey,
     },
   });
+
+  coingeckoProClientCache[apiKey] = coingeckoProClient;
+
   return coingeckoProClient;
 }
 
