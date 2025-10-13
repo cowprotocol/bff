@@ -10,7 +10,8 @@ const ONE_DAY = ms('1d');
 const BUFFER_ERROR_TOLERANCE = 1.5; // 50% error tolerance
 const CHAIN_ID = SupportedChainId.MAINNET.toString();
 
-describe('UsdRepositoryCoingecko', () => {
+// The tests are not mocked and use real HTTP resources
+describe.skip('UsdRepositoryCoingecko', () => {
   let usdRepositoryCoingecko: UsdRepositoryCoingecko;
 
   beforeAll(() => {
