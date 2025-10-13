@@ -11,7 +11,7 @@
         "{workspaceRoot}/coverage/{e2eProjectRoot}"
       ],
       "options": {
-        "jestConfig": "packages/api-e2e/jest.config.ts",
+        "jestConfig": "apps/api-e2e/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -22,7 +22,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "packages/api-e2e/**/*.{js,ts}"
+          "apps/api-e2e/**/*.{js,ts}"
         ]
       }
     }
