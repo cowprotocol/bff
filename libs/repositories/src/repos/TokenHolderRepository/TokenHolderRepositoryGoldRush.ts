@@ -1,14 +1,14 @@
-import { injectable } from 'inversify';
-import {
-  TokenHolderPoint,
-  TokenHolderRepository,
-} from './TokenHolderRepository';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { injectable } from 'inversify';
 import {
   GOLD_RUSH_API_BASE_URL,
   GOLD_RUSH_API_KEY,
   GOLD_RUSH_CLIENT_NETWORK_MAPPING,
 } from '../../datasources/goldRush';
+import {
+  TokenHolderPoint,
+  TokenHolderRepository,
+} from './TokenHolderRepository';
 
 interface GoldRushTokenHolderItem {
   contract_decimals: number;
@@ -47,8 +47,13 @@ export class TokenHolderRepositoryGoldRush implements TokenHolderRepository {
     chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<TokenHolderPoint[] | null> {
+    const network = GOLD_RUSH_CLIENT_NETWORK_MAPPING[chainId];
+    if (!network) {
+      return null;
+    }
+
     const response = (await fetch(
-      `${GOLD_RUSH_API_BASE_URL}/v1/${GOLD_RUSH_CLIENT_NETWORK_MAPPING[chainId]}/tokens/${tokenAddress}/token_holders_v2/`,
+      `${GOLD_RUSH_API_BASE_URL}/v1/${network}/tokens/${tokenAddress}/token_holders_v2/`,
       {
         method: 'GET',
         headers: { Authorization: `Bearer ${GOLD_RUSH_API_KEY}` },
