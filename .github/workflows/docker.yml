@@ -61,6 +61,8 @@ jobs:
           labels: ${{ steps.image_meta.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
           platforms: linux/amd64
+          secret-files: |
+            id=npmrc,src=${{ github.workspace }}/.npmrc
 
       - uses: cowprotocol/autodeploy-action@v2
         if: ${{ github.ref == 'refs/heads/main' }}
