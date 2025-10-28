@@ -21,6 +21,13 @@ RUN chown -R twap:twap .
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc,required=false \
-  sh -eu -c 'ls -l /root/.npmrc || echo "/root/.npmrc not present"; yarn --cwd twap --omit=dev -f install'
+  sh -eu -c '
+    if [ -f /root/.npmrc ]; then
+      echo "Using .npmrc:" && cat /root/.npmrc | sed "s/_authToken=.*/_authToken=***REDACTED***/"
+    else
+      echo ".npmrc not present - building without GitHub Packages auth"
+    fi
+    yarn --cwd twap --omit=dev -f install
+  '
 
 CMD [ "node", "twap" ]
