@@ -43,6 +43,14 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
     address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
     decimals: 18, // YES, it's 18 decimals on BNB
   },
+  [SupportedChainId.LINEA]: {
+    address: '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
+    decimals: 6,
+  },
+  [SupportedChainId.PLASMA]: {
+    address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', // Plasma is the USDT chain, using USDT instead of USDC
+    decimals: 6,
+  },
   [SupportedChainId.SEPOLIA]: {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
     decimals: 18,
