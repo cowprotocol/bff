@@ -22,11 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Setup dependencies
+        uses: ./.github/workflows/actions/setup-dependencies
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn install
+          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt

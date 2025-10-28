@@ -18,14 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js (LTS/Jod)
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - name: Setup dependencies
+        uses: ./.github/workflows/actions/setup-dependencies
         with:
-          node-version: 'lts/jod'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Run ESLint
         run: yarn lint
@@ -56,14 +52,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js (LTS/Jod)
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - name: Setup dependencies
+        uses: ./.github/workflows/actions/setup-dependencies
         with:
-          node-version: 'lts/jod'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Lint affected projects
         run: npx nx affected --target=lint --base=origin/main
