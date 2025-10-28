@@ -32,6 +32,14 @@ jobs:
 
       - run: yarn build
 
+      - name: Check for .npmrc
+        run: |
+          if [ -f .npmrc ]; then
+            echo "HAS_NPMRC=true" >> $GITHUB_ENV
+          else
+            echo "HAS_NPMRC=false" >> $GITHUB_ENV
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -51,7 +59,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
-      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
+      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (with .npmrc)'
+        if: ${{ env.HAS_NPMRC == 'true' }}
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -63,6 +72,18 @@ jobs:
           platforms: linux/amd64
           secret-files: |
             id=npmrc,src=${{ github.workspace }}/.npmrc
+
+      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (no .npmrc)'
+        if: ${{ env.HAS_NPMRC != 'true' }}
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ matrix.package }}/Dockerfile
+          push: true
+          tags: ${{ steps.image_meta.outputs.tags }}
+          labels: ${{ steps.image_meta.outputs.labels }}
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          platforms: linux/amd64
 
       - uses: cowprotocol/autodeploy-action@v2
         if: ${{ github.ref == 'refs/heads/main' }}
