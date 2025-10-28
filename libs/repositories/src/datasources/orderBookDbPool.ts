@@ -1,6 +1,6 @@
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { ensureEnvs } from '@cowprotocol/shared';
 import { Pool } from 'pg';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 const REQUIRED_ENVS = [
   'ORDERBOOK_DATABASE_HOST',
@@ -19,10 +19,15 @@ const chainToDbNameMap: Record<SupportedChainId, string> = {
   [SupportedChainId.BNB]: 'bnb',
   [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-}
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: 'plasma',
+};
 
-function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId): Pool {
-  const ENV_PREFIX = env.toUpperCase()
+function createNewOrderBookDbPool(
+  env: 'prod' | 'barn',
+  chainId: SupportedChainId
+): Pool {
+  const ENV_PREFIX = env.toUpperCase();
 
   ensureEnvs(REQUIRED_ENVS.map((name) => `${ENV_PREFIX}_${name}`));
 
@@ -43,13 +48,16 @@ function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainI
   return pool;
 }
 
-const orderBookDbCache = new Map<string, Pool>()
+const orderBookDbCache = new Map<string, Pool>();
 
-export function getOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId) {
+export function getOrderBookDbPool(
+  env: 'prod' | 'barn',
+  chainId: SupportedChainId
+) {
   const key = `${env}|${chainId}`;
-  const cached = orderBookDbCache.get(key)
+  const cached = orderBookDbCache.get(key);
 
-  if (cached) return cached
+  if (cached) return cached;
 
   const db = createNewOrderBookDbPool(env, chainId);
 
