@@ -38,6 +38,8 @@ export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.AVALANCHE]: 'avax',
   [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.BNB]: 'bnb',
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
 
@@ -51,6 +53,8 @@ export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.BNB]: 'bnb',
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 };
 
