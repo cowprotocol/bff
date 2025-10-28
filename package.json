@@ -30,7 +30,7 @@
   "private": true,
   "dependencies": {
     "@cowprotocol/cms": "^0.3.0-RC.4",
-    "@cowprotocol/cow-sdk": "7.0.3",
+    "@cowprotocol/cow-sdk": "npm:@cowprotocol/cow-sdk@pr-606",
     "@fastify/autoload": "~5.7.1",
     "@fastify/caching": "^8.3.0",
     "@fastify/cors": "^8.2.1",
@@ -68,7 +68,7 @@
     "tslib": "^2.3.0",
     "typeorm": "^0.3.17",
     "typeorm-fastify-plugin": "^1.0.5",
-    "viem": "^2.33.2"
+    "viem": "^2.38.5"
   },
   "devDependencies": {
     "@nx/esbuild": "16.3.2",
