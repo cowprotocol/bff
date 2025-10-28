@@ -36,11 +36,13 @@ jobs:
         run: |
           if [ -f .npmrc ]; then
             echo "HAS_NPMRC=true" >> $GITHUB_ENV
+            echo "Using .npmrc:" && ls -l .npmrc && echo "---" && sed 's/_authToken=.*/_authToken=***REDACTED***/' .npmrc
           else
             echo "HAS_NPMRC=false" >> $GITHUB_ENV
           fi
 
       - name: Set up Docker Buildx
+        id: setup-buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
