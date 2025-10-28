@@ -20,6 +20,8 @@ export const SUPPORTED_COINGECKO_PLATFORMS: Record<
   [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.BNB]: 'binance-smart-chain',
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: 'plasma',
 };
 
 /**
@@ -177,7 +179,6 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [57]: 'syscoin',
   [570]: 'rollux',
   [57073]: 'ink',
-  [59144]: 'linea',
   [592]: 'astar',
   [6001]: 'bouncebit',
   [61]: 'ethereum-classic',
@@ -230,16 +231,19 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
 
 export type CoingeckoProClient = ReturnType<typeof createClient<paths>>;
 
-const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> = {}
+const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> =
+  {};
 
-export function getCoingeckoProClient(apiKey = process.env.COINGECKO_API_KEY): CoingeckoProClient {
+export function getCoingeckoProClient(
+  apiKey = process.env.COINGECKO_API_KEY
+): CoingeckoProClient {
   if (!apiKey) {
     throw new Error('COINGECKO_API_KEY is not set');
   }
 
   const cached = coingeckoProClientCache[apiKey];
 
-  if (cached) return cached
+  if (cached) return cached;
 
   const coingeckoProClient = createClient<paths>({
     baseUrl: COINGECKO_PRO_BASE_URL + '/api/v3',
