@@ -81,7 +81,7 @@ jobs:
           cache-from: type=gha  
           cache-to: type=gha,mode=max  
           secret-files: |
-            id=npmrc,src=.npmrc
+            id=npmrc,src=${{ github.workspace }}/.npmrc
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (no .npmrc)'
         if: ${{ env.HAS_NPMRC != 'true' }}
