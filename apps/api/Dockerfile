@@ -22,13 +22,6 @@ RUN chown -R api:api .
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc,required=false \
-  sh -eu -c '
-    if [ -f /root/.npmrc ]; then
-      echo "Using .npmrc:" && cat /root/.npmrc | sed "s/_authToken=.*/_authToken=***REDACTED***/"
-    else
-      echo ".npmrc not present - building without GitHub Packages auth"
-    fi
-    yarn --cwd api --omit=dev -f install
-  '
+  yarn --cwd api --omit=dev -f install
 
 CMD [ "node", "api" ]
