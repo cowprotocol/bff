@@ -20,7 +20,10 @@ RUN chown -R notification-producer:notification-producer .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN --mount=type=secret,id=npmrc,target=/root/.npmrc,required=false \
-  yarn --cwd notification-producer --omit=dev -f install
+RUN --mount=type=secret,id=npmrc,required=false \
+  sh -euxc '\
+    if [ -f /run/secrets/npmrc ]; then cp /run/secrets/npmrc /root/.npmrc && chmod 600 /root/.npmrc; fi && \
+    export NPM_CONFIG_USERCONFIG=/root/.npmrc && yarn --cwd notification-producer --omit=dev -f install && \
+    rm -f /root/.npmrc'
 
 CMD [ "node", "notification-producer" ]
