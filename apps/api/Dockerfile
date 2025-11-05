@@ -21,6 +21,6 @@ RUN chown -R api:api .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN yarn --cwd api --omit=dev -f install
+RUN yarn --cwd api install --production -f
 
 CMD [ "node", "api" ]

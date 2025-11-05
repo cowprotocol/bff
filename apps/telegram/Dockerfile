@@ -20,6 +20,6 @@ RUN chown -R telegram:telegram .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN yarn --cwd telegram --omit=dev -f install
+RUN yarn --cwd telegram install --production -f
 
 CMD [ "node", "telegram" ]

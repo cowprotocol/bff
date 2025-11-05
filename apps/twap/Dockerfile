@@ -20,6 +20,6 @@ RUN chown -R twap:twap .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-RUN yarn --cwd twap --omit=dev -f install
+RUN yarn --cwd twap install --production -f
 
 CMD [ "node", "twap" ]
