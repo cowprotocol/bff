@@ -56,7 +56,6 @@ jobs:
           images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
-        if: ${{ env.HAS_NPMRC == 'true' }}
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
