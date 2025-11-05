@@ -80,7 +80,8 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha  
           cache-to: type=gha,mode=max  
-          secret-files: |
+          # Provide both possible input names to be robust across action versions
+          secrets: |
             id=npmrc,src=${{ github.workspace }}/.npmrc
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (no .npmrc)'
