@@ -21,9 +21,15 @@ RUN chown -R telegram:telegram .
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
 RUN --mount=type=secret,id=npmrc,required=false \
-  sh -euxc '\
-    if [ -f /run/secrets/npmrc ]; then cp /run/secrets/npmrc /root/.npmrc && chmod 600 /root/.npmrc; fi && \
-    export NPM_CONFIG_USERCONFIG=/root/.npmrc && yarn --cwd telegram --omit=dev -f install && \
+  sh -euxc ' \
+    if [ -f /run/secrets/npmrc ]; then \
+      cp /run/secrets/npmrc /root/.npmrc && chmod 600 /root/.npmrc; \
+      # ensure always-auth is set so tarball downloads include Authorization header
+      grep -q "^always-auth=" /root/.npmrc || echo "always-auth=true" >> /root/.npmrc; \
+    fi; \
+    export NPM_CONFIG_USERCONFIG=/root/.npmrc; \
+    # run yarn and remove the .npmrc afterwards
+    yarn --cwd notification-producer --omit=dev -f install; \
     rm -f /root/.npmrc'
-    
+        
 CMD [ "node", "telegram" ]
