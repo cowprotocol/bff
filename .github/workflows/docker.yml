@@ -52,22 +52,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
-      - name: Check for .npmrc
-        run: |
-          pwd
-          echo "---"
-          ls -la | grep -E "^\\.|npmrc" || echo "No .npmrc found"
-          echo "---"
-          pwd_val=$PWD
-          if [ -f .npmrc ]; then
-            echo "HAS_NPMRC=true" >> $GITHUB_ENV
-            echo "Full path: ${pwd_val}/.npmrc"
-            echo "Using .npmrc:" && ls -l .npmrc && echo "---" && sed 's/_authToken=.*/_authToken=***REDACTED***/' .npmrc
-          else
-            echo "HAS_NPMRC=false" >> $GITHUB_ENV
-          fi
-
-      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (with .npmrc)'
+      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
         if: ${{ env.HAS_NPMRC == 'true' }}
         uses: docker/build-push-action@v6
         with:
@@ -80,21 +65,9 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha  
           cache-to: type=gha,mode=max  
-          # Provide both possible input names to be robust across action versions
-          secrets: |
-            id=npmrc,src=${{ github.workspace }}/.npmrc
-
-      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (no .npmrc)'
-        if: ${{ env.HAS_NPMRC != 'true' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.package }}/Dockerfile
-          push: true
-          tags: ${{ steps.image_meta.outputs.tags }}
-          labels: ${{ steps.image_meta.outputs.labels }}
-          builder: ${{ steps.setup-buildx.outputs.name }}
-          platforms: linux/amd64
+          # TODO: Disabled as I couldn't get it to work with GH pkgs
+          # secrets: |
+          #   id=npmrc,src=${{ github.workspace }}/.npmrc
 
       - uses: cowprotocol/autodeploy-action@v2
         if: ${{ github.ref == 'refs/heads/main' }}

@@ -20,30 +20,6 @@ RUN chown -R twap:twap .
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.
-# ensure buildkit secret is used and npm/yarn will actually authenticate on tarball downloads
-RUN --mount=type=secret,id=npmrc,required=false \
-  sh -euxc '\
-    # If buildkit mounted a secret, copy it to root and make sure it contains always-auth
-    if [ -f /run/secrets/npmrc ]; then \
-      cp /run/secrets/npmrc /root/.npmrc && chmod 600 /root/.npmrc; \
-      # ensure always-auth exists (append only if missing) \
-      if ! grep -q "^always-auth=" /root/.npmrc 2>/dev/null; then \
-        echo "always-auth=true" >> /root/.npmrc; \
-      fi; \
-      # Extract token without printing it and set it into npm config (userconfig=/root/.npmrc) \
-      TOKEN=$(sed -n \"s@.*_authToken=\\(.*\\)@\\1@p\" /root/.npmrc || true); \
-      if [ -n \"$TOKEN\" ]; then \
-        npm config set //npm.pkg.github.com/:_authToken \"$TOKEN\" --userconfig=/root/.npmrc >/dev/null 2>&1 || true; \
-        npm config set always-auth true --userconfig=/root/.npmrc >/dev/null 2>&1 || true; \
-      fi; \
-      # Copy into project dir so yarn will definitely read it for tarball downloads \
-      cp /root/.npmrc twap/.npmrc || true; \
-    fi; \
-    # Ensure yarn/npm use this config at runtime \
-    export NPM_CONFIG_USERCONFIG=/root/.npmrc; \
-    export NPM_CONFIG_ALWAYS_AUTH=true; \
-    # Run install and remove credentials immediately after use \
-    yarn --cwd twap --omit=dev -f install; \
-    rm -f /root/.npmrc twap/.npmrc || true'
+RUN yarn --cwd twap --omit=dev -f install
 
 CMD [ "node", "twap" ]
