@@ -36,6 +36,9 @@ registry=https://registry.npmjs.org/
 # Install @cowprotocol/* from npm.pkg.github.com
 @cowprotocol:registry=https://npm.pkg.github.com
 
+# Force authentication for GitHub Packages
+always-auth=true
+
 # Authentication for GitHub Packages
 //npm.pkg.github.com/:_authToken=${PACKAGE_READ_AUTH_TOKEN}
 `
