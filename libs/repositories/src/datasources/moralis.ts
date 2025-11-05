@@ -18,5 +18,7 @@ export const MORALIS_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.LENS]: null,
-  [SupportedChainId.BNB]: 'bsc', // TODO: confirm
+  [SupportedChainId.BNB]: 'bsc',
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: null,
 };

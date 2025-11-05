@@ -1,6 +1,13 @@
-import { SupportedChainId, lens as lensCoWSdk } from '@cowprotocol/cow-sdk';
+import { lens as lensCoWSdk, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { AllChainIds, logger } from '@cowprotocol/shared';
-import { Chain, ChainContract, createPublicClient, http, PublicClient, webSocket } from 'viem';
+import {
+  Chain,
+  ChainContract,
+  createPublicClient,
+  http,
+  PublicClient,
+  webSocket,
+} from 'viem';
 import {
   arbitrum,
   avalanche,
@@ -8,7 +15,9 @@ import {
   bsc,
   gnosis,
   lens,
+  linea,
   mainnet,
+  plasma,
   polygon,
   sepolia,
 } from 'viem/chains';
@@ -29,6 +38,8 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   },
   [SupportedChainId.BNB]: bsc,
   [SupportedChainId.SEPOLIA]: sepolia,
+  [SupportedChainId.LINEA]: linea,
+  [SupportedChainId.PLASMA]: plasma,
 };
 
 let viemClients: Record<SupportedChainId, PublicClient> | undefined;
@@ -57,11 +68,13 @@ export function getViemClients(): Record<SupportedChainId, PublicClient> {
             default: defaultRpcUrls,
           },
         },
-        transport: defaultRpcUrls.webSocket ? webSocket(undefined, {
-          retryDelay: 5_000, // 5sec
-          retryCount: 3,
-          reconnect: true,
-        }) : http(),
+        transport: defaultRpcUrls.webSocket
+          ? webSocket(undefined, {
+              retryDelay: 5_000, // 5sec
+              retryCount: 3,
+              reconnect: true,
+            })
+          : http(),
       });
 
       return acc;
