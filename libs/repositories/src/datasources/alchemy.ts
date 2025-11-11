@@ -20,7 +20,7 @@ export const ALCHEMY_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.LENS]: 'lens-mainnet',
   [SupportedChainId.BNB]: 'bnb-mainnet',
   [SupportedChainId.LINEA]: 'linea-mainnet',
-  [SupportedChainId.PLASMA]: null,
+  [SupportedChainId.PLASMA]: null, // todo add when alchemy supports plasma
 };
 
 export function getAlchemyApiUrl(network: string, apiKey: string): string {

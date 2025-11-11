@@ -1,6 +1,14 @@
 import { injectable } from 'inversify';
-import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } from './TokenBalancesRepository';
-import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
+import {
+  TokenBalanceParams,
+  TokenBalancesRepository,
+  TokenBalancesResponse,
+} from './TokenBalancesRepository';
+import {
+  ALCHEMY_API_KEY,
+  ALCHEMY_CLIENT_NETWORK_MAPPING,
+  getAlchemyApiUrl,
+} from '../../datasources/alchemy';
 
 const JSON_RPC_VERSION = '2.0';
 const JSON_RPC_REQUEST_ID = 1;
@@ -9,7 +17,7 @@ const TOKEN_SPEC_ERC20 = 'erc20';
 
 type AlchemyTokenBalance = {
   contractAddress: string;
-  tokenBalance: string; // hex string
+  tokenBalance: string;
   error?: string;
 };
 
@@ -86,8 +94,8 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
           const balanceBigInt = BigInt(balanceHex);
           acc[contractAddress] = balanceBigInt.toString();
         } catch (error) {
-          // If conversion fails, skip this token
           // todo add logging here
+          // If conversion fails, skip this token
           return acc;
         }
       } else {
