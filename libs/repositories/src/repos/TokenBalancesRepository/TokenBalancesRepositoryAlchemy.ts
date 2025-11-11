@@ -2,6 +2,11 @@ import { injectable } from 'inversify';
 import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } from './TokenBalancesRepository';
 import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
 
+const JSON_RPC_VERSION = '2.0';
+const JSON_RPC_REQUEST_ID = 1;
+const REQUEST_TIMEOUT_MS = 10_000;
+const TOKEN_SPEC_ERC20 = 'erc20';
+
 type AlchemyTokenBalance = {
   contractAddress: string;
   tokenBalance: string; // hex string
@@ -28,7 +33,7 @@ function isAlchemyGetTokenBalancesResponse(
   const response = data as AlchemyGetTokenBalancesResponse;
 
   if (
-    response.jsonrpc !== '2.0' ||
+    response.jsonrpc !== JSON_RPC_VERSION ||
     typeof response.id !== 'number' ||
     !response.result ||
     typeof response.result !== 'object'
@@ -102,15 +107,15 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     const apiUrl = getAlchemyApiUrl(network, ALCHEMY_API_KEY);
 
     const requestBody = {
-      jsonrpc: '2.0',
+      jsonrpc: JSON_RPC_VERSION,
       method: 'alchemy_getTokenBalances',
-      params: [address, 'erc20'],
-      id: 1,
+      params: [address, TOKEN_SPEC_ERC20],
+      id: JSON_RPC_REQUEST_ID,
     };
 
     try {
