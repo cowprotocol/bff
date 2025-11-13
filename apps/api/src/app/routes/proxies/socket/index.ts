@@ -1,6 +1,9 @@
 import httpProxy from '@fastify/http-proxy';
 import { FastifyPluginAsync } from 'fastify';
 
+const bungeeAffiliateCode =
+  '609913096e1a3d62cecd0ffff47aa3e459eaedceb5fef75aad43e6cbff367039708902197e0b2b78b1d76cb0837ad0b318baedceb5fef75aad43e6cb'
+
 const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange';
 
 const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
@@ -47,6 +50,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       rewriteRequestHeaders: (request, headers) => ({
         'x-api-key': apiKey,
         origin: 'https://swap.cow.fi',
+        Affiliate: bungeeAffiliateCode,
       }),
     },
     preHandler: async (request) => {
