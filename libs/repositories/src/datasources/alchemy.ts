@@ -11,7 +11,7 @@ export const ALCHEMY_CLIENT_NETWORK_MAPPING: Record<
   string | null
 > = {
   [SupportedChainId.MAINNET]: 'eth-mainnet',
-  [SupportedChainId.SEPOLIA]: 'eth-sepolia',
+  [SupportedChainId.SEPOLIA]: null, // it's actually supported, but we don't use it for bff 
   [SupportedChainId.GNOSIS_CHAIN]: 'gnosis-mainnet',
   [SupportedChainId.ARBITRUM_ONE]: 'arb-mainnet',
   [SupportedChainId.POLYGON]: 'polygon-mainnet',

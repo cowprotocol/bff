@@ -954,6 +954,15 @@ export interface components {
             /** @description Whether it was possible to verify that the quoted amounts are accurate using a simulation.
              *      */
             verified: boolean;
+            /**
+             * @description Protocol fee in basis points (e.g., "2" for 0.02%). This represents the volume-based fee policy. Only present when configured.
+             *
+             * @example 2
+             */
+            protocolFeeBps?: string;
+            /** @description Protocol fee amount in sell token. For SELL orders, this amount is already included in the returned sellAmount. For BUY orders, this amount is applied before network fees are added to sellAmount. Only present when a volume fee is configured.
+             *      */
+            protocolFeeSellAmount?: components["schemas"]["TokenAmount"];
         };
         /** @description The settlements submitted by every solver for a specific auction.
          *     The `auctionId` corresponds to the id external solvers are provided

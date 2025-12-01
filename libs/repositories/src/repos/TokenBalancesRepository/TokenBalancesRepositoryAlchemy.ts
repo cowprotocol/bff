@@ -1,22 +1,17 @@
 import { injectable } from 'inversify';
-import {
-  TokenBalanceParams,
-  TokenBalancesRepository,
-  TokenBalancesResponse,
-} from './TokenBalancesRepository';
-import {
-  ALCHEMY_API_KEY,
-  ALCHEMY_CLIENT_NETWORK_MAPPING,
-  getAlchemyApiUrl,
-} from '../../datasources/alchemy';
+import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } from './TokenBalancesRepository';
+import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
+import { NATIVE_CURRENCY_ADDRESS, ZERO_ADDRESS } from '@cowprotocol/cow-sdk';
 
+const ZERO_ALCHEMY_BALANCE =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 const JSON_RPC_VERSION = '2.0';
 const JSON_RPC_REQUEST_ID = 1;
 const REQUEST_TIMEOUT_MS = 10_000;
-const TOKEN_SPEC_ERC20 = 'erc20';
+const TOKEN_SPEC = ['erc20', 'NATIVE_TOKEN'] as const;
 
 type AlchemyTokenBalance = {
-  contractAddress: string;
+  contractAddress: string | null;
   tokenBalance: string;
   error?: string;
 };
@@ -85,11 +80,28 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
         return acc;
       }
 
-      const contractAddress = tokenBalance.contractAddress.toLowerCase();
+      // Handle native token (contractAddress is null or zero address)
+      if (!tokenBalance.contractAddress) {
+        console.log('Native token balance: ', tokenBalance.tokenBalance, '');
+      }
+      const contractAddress =
+        // alchemy return null for native token
+        tokenBalance.contractAddress === 'null' ||
+        tokenBalance.contractAddress === null ||
+        tokenBalance.contractAddress === ZERO_ADDRESS
+          ? NATIVE_CURRENCY_ADDRESS.toLowerCase()
+          : tokenBalance.contractAddress.toLowerCase();
+
       // Convert hex balance to decimal string
       // Alchemy returns hex string
       const balanceHex = tokenBalance.tokenBalance;
-      if (balanceHex && balanceHex !== '0x' && balanceHex !== '0x0') {
+      if (
+        balanceHex &&
+        balanceHex !== '0x' &&
+        balanceHex !== '0x0' &&
+        // it's always return ZERO_ALCHEMY_BALANCE for native token
+        balanceHex !== ZERO_ALCHEMY_BALANCE
+      ) {
         try {
           const balanceBigInt = BigInt(balanceHex);
           acc[contractAddress] = balanceBigInt.toString();
@@ -98,8 +110,6 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
           // If conversion fails, skip this token
           return acc;
         }
-      } else {
-        acc[contractAddress] = '0';
       }
 
       return acc;
@@ -122,7 +132,7 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
     const requestBody = {
       jsonrpc: JSON_RPC_VERSION,
       method: 'alchemy_getTokenBalances',
-      params: [address, TOKEN_SPEC_ERC20],
+      params: [address, TOKEN_SPEC],
       id: JSON_RPC_REQUEST_ID,
     };
 
