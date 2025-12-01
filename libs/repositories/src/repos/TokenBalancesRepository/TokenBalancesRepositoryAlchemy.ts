@@ -3,8 +3,6 @@ import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } fr
 import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
 import { NATIVE_CURRENCY_ADDRESS, ZERO_ADDRESS } from '@cowprotocol/cow-sdk';
 
-const ZERO_ALCHEMY_BALANCE =
-  '0x0000000000000000000000000000000000000000000000000000000000000000';
 const JSON_RPC_VERSION = '2.0';
 const JSON_RPC_REQUEST_ID = 1;
 const REQUEST_TIMEOUT_MS = 10_000;
