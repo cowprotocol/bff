@@ -91,16 +91,12 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
       // Convert hex balance to decimal string
       // Alchemy returns hex string
       const balanceHex = tokenBalance.tokenBalance;
-      if (
-        balanceHex &&
-        balanceHex !== '0x' &&
-        balanceHex !== '0x0' &&
-        // it's always return ZERO_ALCHEMY_BALANCE for native token
-        balanceHex !== ZERO_ALCHEMY_BALANCE
-      ) {
+      if (balanceHex && balanceHex !== '0x') {
         try {
           const balanceBigInt = BigInt(balanceHex);
-          acc[contractAddress] = balanceBigInt.toString();
+          if (balanceBigInt !== 0n) {
+            acc[contractAddress] = balanceBigInt.toString();
+          }
         } catch (error) {
           // todo add logging here
           // If conversion fails, skip this token
