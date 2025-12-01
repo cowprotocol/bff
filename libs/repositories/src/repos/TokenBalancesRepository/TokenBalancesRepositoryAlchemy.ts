@@ -44,11 +44,7 @@ function isAlchemyGetTokenBalancesResponse(
     return false;
   }
 
-  if (!Array.isArray(response.result.tokenBalances)) {
-    return false;
-  }
-
-  return true;
+  return Array.isArray(response.result.tokenBalances);
 }
 
 @injectable()
