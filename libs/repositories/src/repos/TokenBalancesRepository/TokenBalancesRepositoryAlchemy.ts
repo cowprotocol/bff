@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } from './TokenBalancesRepository';
 import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
 import { NATIVE_CURRENCY_ADDRESS, ZERO_ADDRESS } from '@cowprotocol/cow-sdk';
+import { logger } from '@cowprotocol/shared';
 
 const JSON_RPC_VERSION = '2.0';
 const JSON_RPC_REQUEST_ID = 1;
@@ -74,10 +75,6 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
         return acc;
       }
 
-      // Handle native token (contractAddress is null or zero address)
-      if (!tokenBalance.contractAddress) {
-        console.log('Native token balance: ', tokenBalance.tokenBalance, '');
-      }
       const contractAddress =
         // alchemy return null for native token
         tokenBalance.contractAddress === 'null' ||
@@ -96,8 +93,10 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
             acc[contractAddress] = balanceBigInt.toString();
           }
         } catch (error) {
-          // todo add logging here
-          // If conversion fails, skip this token
+          logger.error(
+            error,
+            `[TokenBalancesRepository] Error processing balance for token ${contractAddress} on chain ${chainId}. Value is ${balanceHex}.`
+          );
           return acc;
         }
       }
