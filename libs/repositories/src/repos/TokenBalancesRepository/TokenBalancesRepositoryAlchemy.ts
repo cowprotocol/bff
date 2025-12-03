@@ -126,7 +126,7 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
     };
 
     try {
-      return fetch(apiUrl, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,6 +134,8 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
         body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
+
+      return response;
     } finally {
       clearTimeout(timeoutId);
     }
