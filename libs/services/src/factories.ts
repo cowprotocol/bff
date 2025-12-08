@@ -30,7 +30,7 @@ import {
   SimulationRepositoryTenderly,
   TelegramBot,
   TokenBalancesRepository,
-  TokenBalancesRepositoryMoralis,
+  TokenBalancesRepositoryAlchemy,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -110,7 +110,7 @@ export function getUsdRepository(
 ): UsdRepository {
   return new UsdRepositoryFallback([
     getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository)
+    getUsdRepositoryCow(cacheRepository, erc20Repository),
   ]);
 }
 
@@ -143,12 +143,12 @@ export function getTokenHolderRepository(
 ): TokenHolderRepository {
   return new TokenHolderRepositoryFallback([
     getTokenHolderRepositoryMoralis(cacheRepository),
-    getTokenHolderRepositoryEthplorer(cacheRepository)
+    getTokenHolderRepositoryEthplorer(cacheRepository),
   ]);
 }
 
 export function getTokenBalancesRepository(): TokenBalancesRepository {
-  return new TokenBalancesRepositoryMoralis();
+  return new TokenBalancesRepositoryAlchemy();
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {
