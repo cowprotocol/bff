@@ -30,7 +30,7 @@ import {
   SimulationRepositoryTenderly,
   TelegramBot,
   TokenBalancesRepository,
-  TokenBalancesRepositoryAlchemy,
+  TokenBalancesRepositoryAnkr,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
@@ -148,7 +148,7 @@ export function getTokenHolderRepository(
 }
 
 export function getTokenBalancesRepository(): TokenBalancesRepository {
-  return new TokenBalancesRepositoryAlchemy();
+  return new TokenBalancesRepositoryAnkr();
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {
