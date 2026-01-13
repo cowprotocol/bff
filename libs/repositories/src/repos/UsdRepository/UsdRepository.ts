@@ -20,6 +20,8 @@ export interface PricePoint {
 }
 
 export interface UsdRepository {
+  name: string;
+
   getUsdPrice(
     chainIdOrSlug: string,
     tokenAddress?: string | undefined
@@ -33,6 +35,8 @@ export interface UsdRepository {
 }
 
 export class UsdRepositoryNoop implements UsdRepository {
+  name = 'Noop';
+
   async getUsdPrice(
     chainIdOrSlug: string,
     tokenAddress?: string | undefined
