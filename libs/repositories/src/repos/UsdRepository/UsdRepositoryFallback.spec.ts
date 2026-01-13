@@ -1,9 +1,11 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { logger } from '@cowprotocol/shared';
+import { WETH } from '../../../test/mock';
 import { PricePoint, UsdRepository } from './UsdRepository';
 import { UsdRepositoryFallback } from './UsdRepositoryFallback';
-import { WETH } from '../../../test/mock';
 const mockDate = new Date('2024-01-01T00:00:00Z');
 class UsdRepositoryMock_1_1 implements UsdRepository {
+  name = 'Mock_1_1';
   async getUsdPrice() {
     return 1;
   }
@@ -14,6 +16,7 @@ class UsdRepositoryMock_1_1 implements UsdRepository {
 }
 
 class UsdRepositoryMock_2_2 implements UsdRepository {
+  name = 'Mock_2_2';
   async getUsdPrice(): Promise<number | null> {
     return 2;
   }
@@ -24,6 +27,7 @@ class UsdRepositoryMock_2_2 implements UsdRepository {
 }
 
 class UsdRepositoryMock_null_3 implements UsdRepository {
+  name = 'Mock_null_3';
   async getUsdPrice() {
     return null;
   }
@@ -34,6 +38,7 @@ class UsdRepositoryMock_null_3 implements UsdRepository {
 }
 
 class UsdRepositoryMock_3_null implements UsdRepository {
+  name = 'Mock_3_null';
   async getUsdPrice() {
     return 3;
   }
@@ -44,6 +49,7 @@ class UsdRepositoryMock_3_null implements UsdRepository {
 }
 
 class UsdRepositoryMock_null_null implements UsdRepository {
+  name = 'Mock_null_null';
   async getUsdPrice() {
     return null;
   }
@@ -94,7 +100,8 @@ describe('UsdRepositoryCoingecko', () => {
       expect(price).toEqual(1);
     });
 
-    it('Returns second repo price when null', async () => {
+    it('Returns second repo price when null, and logs the name', async () => {
+      const loggerSpy = jest.spyOn(logger, 'info');
       const usdRepositoryFallback = new UsdRepositoryFallback([
         usdRepositoryMock_null_3,
         usdRepositoryMock_1_1,
@@ -102,6 +109,9 @@ describe('UsdRepositoryCoingecko', () => {
 
       const price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE);
       expect(price).toEqual(1);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `UsdRepositoryFallback: ${usdRepositoryMock_null_3.name} returned null, falling back to ${usdRepositoryMock_1_1.name}`
+      );
     });
 
     it('Returns null when configured with no repositories', async () => {

@@ -1,20 +1,22 @@
-import { injectable } from 'inversify';
 import { logger } from '@cowprotocol/shared';
+import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
+  name = 'Fallback';
+
   constructor(private usdRepositories: UsdRepository[]) {}
 
   async getUsdPrice(
     chainIdOrSlug: string,
-    tokenAddress: string,
+    tokenAddress: string
   ): Promise<number | null> {
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i];
       const price = await usdRepository.getUsdPrice(
         chainIdOrSlug,
-        tokenAddress,
+        tokenAddress
       );
       if (price !== null) {
         return price;
@@ -23,7 +25,7 @@ export class UsdRepositoryFallback implements UsdRepository {
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
-          `UsdRepositoryFallback: ${usdRepository.constructor.name} returned null, falling back to ${nextRepository.constructor.name}`,
+          `UsdRepositoryFallback: ${usdRepository.name} returned null, falling back to ${nextRepository.name}`
         );
       }
     }
@@ -33,14 +35,14 @@ export class UsdRepositoryFallback implements UsdRepository {
   async getUsdPrices(
     chainIdOrSlug: string,
     tokenAddress: string,
-    priceStrategy: PriceStrategy,
+    priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i];
       const prices = await usdRepository.getUsdPrices(
         chainIdOrSlug,
         tokenAddress,
-        priceStrategy,
+        priceStrategy
       );
       if (prices !== null) {
         return prices;
@@ -49,7 +51,7 @@ export class UsdRepositoryFallback implements UsdRepository {
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
-          `UsdRepositoryFallback: ${usdRepository.constructor.name} returned null, falling back to ${nextRepository.constructor.name}`,
+          `UsdRepositoryFallback: ${usdRepository.name} returned null, falling back to ${nextRepository.name}`
         );
       }
     }
