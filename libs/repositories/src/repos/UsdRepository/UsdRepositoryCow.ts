@@ -13,6 +13,8 @@ import { getSupportedCoingeckoChainId } from '../../utils/coingeckoUtils';
 
 @injectable()
 export class UsdRepositoryCow extends UsdRepositoryNoop {
+  override name = 'Cow';
+
   constructor(
     private cowApiClients: Record<SupportedChainId, CowApiClient>,
     private erc20Repository: Erc20Repository
