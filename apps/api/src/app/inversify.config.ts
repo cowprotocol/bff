@@ -2,6 +2,7 @@ import {
   getCacheRepository,
   getDuneRepository,
   getErc20Repository,
+  getAffiliatesRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
   getSimulationRepository,
@@ -15,6 +16,8 @@ import {
 } from '@cowprotocol/services';
 
 import {
+  AffiliatesRepository,
+  affiliatesRepositorySymbol,
   CacheRepository,
   cacheRepositorySymbol,
   DuneRepository,
@@ -80,6 +83,7 @@ function getApiContainer(): Container {
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
+  const affiliatesRepository = getAffiliatesRepository();
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -104,6 +108,10 @@ function getApiContainer(): Container {
   apiContainer
     .bind<PushSubscriptionsRepository>(pushSubscriptionsRepositorySymbol)
     .toConstantValue(pushSubscriptionsRepository);
+
+  apiContainer
+    .bind<AffiliatesRepository>(affiliatesRepositorySymbol)
+    .toConstantValue(affiliatesRepository);
 
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
