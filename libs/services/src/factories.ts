@@ -12,6 +12,8 @@ import {
   Erc20RepositoryFallback,
   Erc20RepositoryNative,
   Erc20RepositoryViem,
+  AffiliatesRepository,
+  AffiliatesRepositoryCms,
   ExpiredOrdersRepository,
   ExpiredOrdersRepositoryPostgres,
   getViemClients,
@@ -171,6 +173,10 @@ export function getPushNotificationsRepository(): PushNotificationsRepository {
 
 export function getPushSubscriptionsRepository(): PushSubscriptionsRepository {
   return new PushSubscriptionsRepositoryCms();
+}
+
+export function getAffiliatesRepository(): AffiliatesRepository {
+  return new AffiliatesRepositoryCms();
 }
 
 function getPostgresPool(): Pool {

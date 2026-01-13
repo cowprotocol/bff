@@ -79,3 +79,7 @@ export * from './repos/OrdersAppDataRepository/OrdersAppDataRepositoryPostgres';
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
+
+// Affiliates repositories
+export * from './repos/AffiliatesRepository/AffiliatesRepository';
+export * from './repos/AffiliatesRepository/AffiliatesRepositoryCms';
