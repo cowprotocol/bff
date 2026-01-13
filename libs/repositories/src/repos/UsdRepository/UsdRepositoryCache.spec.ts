@@ -1,10 +1,10 @@
-import { UsdRepositoryCache } from './UsdRepositoryCache';
-import IORedis from 'ioredis';
-import { UsdRepository } from './UsdRepository';
-import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import IORedis from 'ioredis';
 import { WETH } from '../../../test/mock';
+import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis';
 import type { PricePoint } from './UsdRepository';
+import { UsdRepository } from './UsdRepository';
+import { UsdRepositoryCache } from './UsdRepositoryCache';
 
 const CACHE_VALUE_SECONDS = 10;
 const CACHE_NULL_SECONDS = 20;
@@ -27,6 +27,7 @@ describe('UsdRepositoryCache', () => {
   beforeEach(() => {
     redisMock = new IORedis() as jest.Mocked<IORedis>;
     proxyMock = {
+      name: 'ProxyMock',
       getUsdPrice: jest.fn(),
       getUsdPrices: jest.fn(),
     };
@@ -38,6 +39,12 @@ describe('UsdRepositoryCache', () => {
       CACHE_VALUE_SECONDS,
       CACHE_NULL_SECONDS
     );
+  });
+
+  describe('name', () => {
+    it('should delegate name to proxy', () => {
+      expect(usdRepositoryCache.name).toEqual('ProxyMock');
+    });
   });
 
   describe('getUsdPrice', () => {
