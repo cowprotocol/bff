@@ -20,7 +20,6 @@ export class UsdRepositoryFallback implements UsdRepository {
         return price;
       }
 
-      // Log fallback if there's a next repository to fall back to
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
@@ -47,7 +46,6 @@ export class UsdRepositoryFallback implements UsdRepository {
         return prices;
       }
 
-      // Log fallback if there's a next repository to fall back to
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
