@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+import { logger } from '@cowprotocol/shared';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 @injectable()
@@ -7,15 +8,24 @@ export class UsdRepositoryFallback implements UsdRepository {
 
   async getUsdPrice(
     chainIdOrSlug: string,
-    tokenAddress: string
+    tokenAddress: string,
   ): Promise<number | null> {
-    for (const usdRepository of this.usdRepositories) {
+    for (let i = 0; i < this.usdRepositories.length; i++) {
+      const usdRepository = this.usdRepositories[i];
       const price = await usdRepository.getUsdPrice(
         chainIdOrSlug,
-        tokenAddress
+        tokenAddress,
       );
       if (price !== null) {
         return price;
+      }
+
+      // Log fallback if there's a next repository to fall back to
+      if (i < this.usdRepositories.length - 1) {
+        const nextRepository = this.usdRepositories[i + 1];
+        logger.info(
+          `UsdRepositoryFallback: ${usdRepository.constructor.name} returned null, falling back to ${nextRepository.constructor.name}`,
+        );
       }
     }
     return null;
@@ -24,16 +34,25 @@ export class UsdRepositoryFallback implements UsdRepository {
   async getUsdPrices(
     chainIdOrSlug: string,
     tokenAddress: string,
-    priceStrategy: PriceStrategy
+    priceStrategy: PriceStrategy,
   ): Promise<PricePoint[] | null> {
-    for (const usdRepository of this.usdRepositories) {
+    for (let i = 0; i < this.usdRepositories.length; i++) {
+      const usdRepository = this.usdRepositories[i];
       const prices = await usdRepository.getUsdPrices(
         chainIdOrSlug,
         tokenAddress,
-        priceStrategy
+        priceStrategy,
       );
       if (prices !== null) {
         return prices;
+      }
+
+      // Log fallback if there's a next repository to fall back to
+      if (i < this.usdRepositories.length - 1) {
+        const nextRepository = this.usdRepositories[i + 1];
+        logger.info(
+          `UsdRepositoryFallback: ${usdRepository.constructor.name} returned null, falling back to ${nextRepository.constructor.name}`,
+        );
       }
     }
     return null;
