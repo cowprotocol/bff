@@ -25,7 +25,7 @@ export class UsdRepositoryFallback implements UsdRepository {
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null, falling back to ${nextRepository.name}`
+          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
         );
       }
     }
@@ -51,7 +51,7 @@ export class UsdRepositoryFallback implements UsdRepository {
       if (i < this.usdRepositories.length - 1) {
         const nextRepository = this.usdRepositories[i + 1];
         logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null, falling back to ${nextRepository.name}`
+          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
         );
       }
     }
