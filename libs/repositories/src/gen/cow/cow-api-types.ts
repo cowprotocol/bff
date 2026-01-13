@@ -97,11 +97,45 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get existing trades.
-         * @description Exactly one of `owner` or `orderUid` must be set.
+         * Get existing trades (unpaginated).
+         * @deprecated
+         * @description **Deprecated:** This endpoint is deprecated and will be removed in the future. Please use `/api/v2/trades` instead, which provides pagination support.
+         *
+         *     Exactly one of `owner` or `orderUid` must be set.
+         *
+         *     Results are sorted by block number and log index descending (newest trades first).
+         *
+         *     **Note:** This endpoint returns all matching trades without pagination. For paginated results, use `/api/v2/trades`.
          *
          */
         get: operations["getTrades"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/trades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get existing trades (paginated).
+         * @description Exactly one of `owner` or `orderUid` must be set.
+         *
+         *     Results are paginated and sorted by block number and log index descending (newest trades first).
+         *
+         *     To enumerate all trades start with `offset` 0 and keep increasing the
+         *     `offset` by the total number of returned results. When a response
+         *     contains less than `limit` the last page has been reached.
+         *
+         */
+        get: operations["getTradesV2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -973,6 +1007,8 @@ export interface components {
             auctionId?: number;
             /** @description Block that the auction started on. */
             auctionStartBlock?: number;
+            /** @description Block deadline by which the auction must be settled. */
+            auctionDeadlineBlock?: number;
             /** @description The hashes of the transactions for the winning solutions of this competition.
              *      */
             transactionHashes?: components["schemas"]["TransactionHash"][];
@@ -1312,6 +1348,43 @@ export interface operations {
             query?: {
                 owner?: components["schemas"]["Address"];
                 orderUid?: components["schemas"]["UID"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ### If `owner` is specified:
+             *
+             *     Return all trades related to that `owner`.
+             *
+             *     ### If `orderUid` is specified:
+             *
+             *     Return all trades related to that `orderUid`. Given that an order
+             *     may be partially fillable, it is possible that an individual order
+             *     may have *multiple* trades. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trade"][];
+                };
+            };
+        };
+    };
+    getTradesV2: {
+        parameters: {
+            query?: {
+                owner?: components["schemas"]["Address"];
+                orderUid?: components["schemas"]["UID"];
+                /** @description The pagination offset. Defaults to 0.
+                 *      */
+                offset?: number;
+                /** @description The maximum number of trades to return. Defaults to 10. Must be between 1 and 1000.
+                 *      */
+                limit?: number;
             };
             header?: never;
             path?: never;
