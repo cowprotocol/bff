@@ -369,12 +369,14 @@
         function log(message) {
             const logDiv = document.getElementById('log');
             const timestamp = new Date().toLocaleTimeString();
-            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            const line = document.createElement('div');
+            line.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(line);
             logDiv.scrollTop = logDiv.scrollHeight;
         }
 
         function clearLog() {
-            document.getElementById('log').innerHTML = '';
+            document.getElementById('log').textContent = '';
         }
 
         function clearSavedSettings() {
@@ -396,35 +398,67 @@
 
         function updateBalanceDisplay() {
             const balancesDiv = document.getElementById('balances');
-            balancesDiv.innerHTML = '';
+            balancesDiv.textContent = '';
             
             if (Object.keys(balances).length === 0) {
-                balancesDiv.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">No balances loaded yet. Connect to start tracking.</p>';
+                const emptyMessage = document.createElement('p');
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.color = '#6b7280';
+                emptyMessage.style.fontStyle = 'italic';
+                emptyMessage.textContent = 'No balances loaded yet. Connect to start tracking.';
+                balancesDiv.appendChild(emptyMessage);
                 return;
             }
             
             Object.values(balances).forEach(balance => {
-                const div = document.createElement('div');
-                div.className = 'balance-item';
-                div.innerHTML = `
-                    <div class="balance-symbol">${balance.symbol || 'Unknown Token'}</div>
-                    <div class="balance-address">${balance.tokenAddress}</div>
-                    <div class="balance-details">
-                        <div class="balance-detail">
-                            <span class="balance-detail-label">Balance:</span>
-                            <span class="balance-detail-value">${balance.balance}</span>
-                        </div>
-                        <div class="balance-detail">
-                            <span class="balance-detail-label">Allowance:</span>
-                            <span class="balance-detail-value">${balance.allowance || '0'}</span>
-                        </div>
-                        <div class="balance-detail">
-                            <span class="balance-detail-label">Decimals:</span>
-                            <span class="balance-detail-value">${balance.decimals}</span>
-                        </div>
-                    </div>
-                `;
-                balancesDiv.appendChild(div);
+                const container = document.createElement('div');
+                container.className = 'balance-item';
+                container.dataset.tokenAddress = balance.tokenAddress;
+
+                const symbol = document.createElement('div');
+                symbol.className = 'balance-symbol';
+                symbol.textContent = balance.symbol || 'Unknown Token';
+
+                const address = document.createElement('div');
+                address.className = 'balance-address';
+                address.textContent = balance.tokenAddress;
+
+                const details = document.createElement('div');
+                details.className = 'balance-details';
+
+                const balanceDetail = document.createElement('div');
+                balanceDetail.className = 'balance-detail';
+                const balanceLabel = document.createElement('span');
+                balanceLabel.className = 'balance-detail-label';
+                balanceLabel.textContent = 'Balance:';
+                const balanceValue = document.createElement('span');
+                balanceValue.className = 'balance-detail-value';
+                balanceValue.textContent = balance.balance;
+                balanceDetail.append(balanceLabel, balanceValue);
+
+                const allowanceDetail = document.createElement('div');
+                allowanceDetail.className = 'balance-detail';
+                const allowanceLabel = document.createElement('span');
+                allowanceLabel.className = 'balance-detail-label';
+                allowanceLabel.textContent = 'Allowance:';
+                const allowanceValue = document.createElement('span');
+                allowanceValue.className = 'balance-detail-value';
+                allowanceValue.textContent = balance.allowance || '0';
+                allowanceDetail.append(allowanceLabel, allowanceValue);
+
+                const decimalsDetail = document.createElement('div');
+                decimalsDetail.className = 'balance-detail';
+                const decimalsLabel = document.createElement('span');
+                decimalsLabel.className = 'balance-detail-label';
+                decimalsLabel.textContent = 'Decimals:';
+                const decimalsValue = document.createElement('span');
+                decimalsValue.className = 'balance-detail-value';
+                decimalsValue.textContent = String(balance.decimals);
+                decimalsDetail.append(decimalsLabel, decimalsValue);
+
+                details.append(balanceDetail, allowanceDetail, decimalsDetail);
+                container.append(symbol, address, details);
+                balancesDiv.appendChild(container);
             });
         }
 
@@ -514,13 +548,13 @@
                     }
                     
                     // Highlight the updated item
-                    const balanceItems = document.querySelectorAll('.balance-item');
-                    balanceItems.forEach(item => {
-                        if (item.innerHTML.includes(data.tokenAddress)) {
-                            item.classList.add('updated');
-                            setTimeout(() => item.classList.remove('updated'), 2000);
-                        }
-                    });
+                    const updatedItem = document.querySelector(
+                        `.balance-item[data-token-address="${data.tokenAddress}"]`
+                    );
+                    if (updatedItem) {
+                        updatedItem.classList.add('updated');
+                        setTimeout(() => updatedItem.classList.remove('updated'), 2000);
+                    }
                 }
                 
                 updateBalanceDisplay();
