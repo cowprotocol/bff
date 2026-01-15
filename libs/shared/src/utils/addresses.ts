@@ -1,23 +1,17 @@
 import { Address, getAddress, isAddress } from 'viem';
 
-export function parseEthereumAddressList(value: string[]): Address[] {
-  const items = value;
-  const unique = new Map<string, Address>();
+export function parseEthereumAddressList(values: string[]): Address[] {
+  const unique = new Set<Address>();
 
-  for (const item of items) {
+  for (const item of values) {
     if (!item.trim()) {
       continue;
     }
 
-    const checksummed = parseEthereumAddress(item);
-
-    const key = checksummed.toLowerCase();
-    if (!unique.has(key)) {
-      unique.set(key, checksummed);
-    }
+    unique.add(parseEthereumAddress(item));
   }
 
-  return Array.from(unique.values());
+  return Array.from(unique);
 }
 
 export function parseEthereumAddress(value: string): Address {
