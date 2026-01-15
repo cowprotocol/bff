@@ -14,6 +14,7 @@ import {
   balanceTrackingServiceSymbol,
   SSEClient,
 } from '@cowprotocol/services';
+import { parseEthereumAddressList } from '@cowprotocol/shared';
 
 const paramsSchema = {
   type: 'object',
@@ -94,6 +95,15 @@ const userBalanceRepository: UserBalanceRepository = apiContainer.get(
   userBalanceRepositorySymbol
 );
 
+function parseTokenAddresses(tokens: string): string[] {
+  const tokenAddresses = parseEthereumAddressList(tokens.split(','));
+  if (tokenAddresses.length === 0) {
+    throw new Error('At least one token address is required');
+  }
+
+  return tokenAddresses;
+}
+
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // REST endpoint for fetching user token balances
   // Example: GET /1/accounts/0x123.../balances?tokens=0xabc...,0xdef...&spender=0x456...
@@ -119,17 +129,17 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const { chainId, userAddress } = request.params;
       const { tokens } = request.query;
 
+      let tokenAddresses: string[];
       try {
-        // Parse token addresses
-        const tokenAddresses = tokens.split(',').map((addr) => addr.trim());
+        tokenAddresses = parseTokenAddresses(tokens);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Invalid token addresses';
+        reply.code(400).send({ message });
+        return;
+      }
 
-        if (tokenAddresses.length === 0) {
-          reply
-            .code(400)
-            .send({ message: 'At least one token address is required' });
-          return;
-        }
-
+      try {
         // Fetch balances (includes allowances for Cow Protocol vault relayer)
         const balances = await userBalanceRepository.getUserTokenBalances(
           chainId,
@@ -178,15 +188,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         balanceTrackingServiceSymbol
       );
 
-      // Parse token addresses
-      const tokenAddresses = tokens
-        .split(',')
-        .map((addr: string) => addr.trim());
-
-      if (tokenAddresses.length === 0) {
-        reply
-          .code(400)
-          .send({ error: 'At least one token address is required' });
+      let tokenAddresses: string[];
+      try {
+        tokenAddresses = parseTokenAddresses(tokens);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Invalid token addresses';
+        reply.code(400).send({ message });
         return;
       }
 
