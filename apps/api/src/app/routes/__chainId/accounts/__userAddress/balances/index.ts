@@ -14,6 +14,7 @@ import {
   balanceTrackingServiceSymbol,
   SSEClient,
 } from '@cowprotocol/services';
+import { parseEthereumAddressList } from '@cowprotocol/shared';
 
 const paramsSchema = {
   type: 'object',
@@ -119,17 +120,26 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const { chainId, userAddress } = request.params;
       const { tokens } = request.query;
 
+      let tokenAddresses: string[];
       try {
-        // Parse token addresses
-        const tokenAddresses = tokens.split(',').map((addr) => addr.trim());
+        tokenAddresses = parseEthereumAddressList(tokens.split(','));
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Invalid token addresses';
+        reply.code(400).send({ message });
+        return;
+      }
 
-        if (tokenAddresses.length === 0) {
-          reply
-            .code(400)
-            .send({ message: 'At least one token address is required' });
-          return;
-        }
+      if (tokenAddresses.length === 0) {
+        reply
+          .code(400)
+          .send({ message: 'At least one token address is required' });
+        return;
+      }
 
+      try {
         // Fetch balances (includes allowances for Cow Protocol vault relayer)
         const balances = await userBalanceRepository.getUserTokenBalances(
           chainId,
@@ -178,10 +188,17 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         balanceTrackingServiceSymbol
       );
 
-      // Parse token addresses
-      const tokenAddresses = tokens
-        .split(',')
-        .map((addr: string) => addr.trim());
+      let tokenAddresses: string[];
+      try {
+        tokenAddresses = parseEthereumAddressList(tokens.split(','));
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Invalid token addresses';
+        reply.code(400).send({ error: message });
+        return;
+      }
 
       if (tokenAddresses.length === 0) {
         reply
