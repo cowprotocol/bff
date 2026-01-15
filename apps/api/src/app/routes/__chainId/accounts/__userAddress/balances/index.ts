@@ -95,6 +95,15 @@ const userBalanceRepository: UserBalanceRepository = apiContainer.get(
   userBalanceRepositorySymbol
 );
 
+function parseTokenAddresses(tokens: string): string[] {
+  const tokenAddresses = parseEthereumAddressList(tokens.split(','));
+  if (tokenAddresses.length === 0) {
+    throw new Error('At least one token address is required');
+  }
+
+  return tokenAddresses;
+}
+
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // REST endpoint for fetching user token balances
   // Example: GET /1/accounts/0x123.../balances?tokens=0xabc...,0xdef...&spender=0x456...
@@ -122,20 +131,11 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       let tokenAddresses: string[];
       try {
-        tokenAddresses = parseEthereumAddressList(tokens.split(','));
+        tokenAddresses = parseTokenAddresses(tokens);
       } catch (error) {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Invalid token addresses';
+          error instanceof Error ? error.message : 'Invalid token addresses';
         reply.code(400).send({ message });
-        return;
-      }
-
-      if (tokenAddresses.length === 0) {
-        reply
-          .code(400)
-          .send({ message: 'At least one token address is required' });
         return;
       }
 
@@ -190,20 +190,11 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       let tokenAddresses: string[];
       try {
-        tokenAddresses = parseEthereumAddressList(tokens.split(','));
+        tokenAddresses = parseTokenAddresses(tokens);
       } catch (error) {
         const message =
-          error instanceof Error
-            ? error.message
-            : 'Invalid token addresses';
-        reply.code(400).send({ error: message });
-        return;
-      }
-
-      if (tokenAddresses.length === 0) {
-        reply
-          .code(400)
-          .send({ error: 'At least one token address is required' });
+          error instanceof Error ? error.message : 'Invalid token addresses';
+        reply.code(400).send({ message });
         return;
       }
 
