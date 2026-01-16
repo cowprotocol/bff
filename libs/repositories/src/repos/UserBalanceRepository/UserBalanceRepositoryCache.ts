@@ -70,7 +70,7 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
     const t0 = Date.now();
     logger.info(
       { chainId, userAddress, tokenAddresses },
-      'getUserTokenBalances: start'
+      '[UserBalanceRepositoryCache:getUserTokenBalances:debug99] start'
     );
     const cachedBalances = await this.getCachedBalances(
       chainId,
@@ -79,7 +79,7 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
     );
     logger.info(
       { ms: Date.now() - t0, n: cachedBalances.length },
-      'getUserTokenBalances: cachedBalances: done'
+      '[UserBalanceRepositoryCache:getUserTokenBalances:debug99] cachedBalances: done'
     );
     // Group the cached balances by token address
     const cachedByToken = new Map(
@@ -109,7 +109,7 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
       );
     logger.info(
       { ms: Date.now() - t1, n: fetchedBalances.length },
-      'getUserTokenBalances: fetchedBalances: done'
+      '[UserBalanceRepositoryCache:getUserTokenBalances:debug99] fetchedBalances: done'
     );
 
     for (const balance of fetchedBalances) {

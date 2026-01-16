@@ -105,12 +105,16 @@ export class TokenBalancesServiceMain implements TokenBalancesService {
     const balancesPromise = this.userBalanceRepository
       .getUserTokenBalances(chainId, userAddress, tokenAddresses)
       .then((balances) => {
-        logger.info('balances: done');
+        logger.info(
+          '[TokenBalancesService:getUserTokenBalances:debug99] balances: done'
+        );
         return balances;
       });
     const tokensPromise = this.getTokenInfos(chainId, tokenAddresses).then(
       (tokens) => {
-        logger.info('tokens: done');
+        logger.info(
+          '[TokenBalancesService:getUserTokenBalances:debug99] tokens: done'
+        );
         return tokens;
       }
     );
@@ -121,7 +125,7 @@ export class TokenBalancesServiceMain implements TokenBalancesService {
     ]);
     logger.info(
       { ms: Date.now() - t0, n: balances.length },
-      'balances and tokens: done'
+      '[TokenBalancesService:getUserTokenBalances:debug99] balances and tokens: done'
     );
 
     const tokensByAddress = new Map(
