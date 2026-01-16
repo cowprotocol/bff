@@ -61,6 +61,18 @@ export interface BalanceTrackingService {
   ): Promise<void>;
 
   /**
+   * Updates the list of tracked tokens for a user.
+   * @param chainId
+   * @param userAddress
+   * @param tokenAddresses List of tokens to monitor
+   */
+  updateTrackedTokens(
+    chainId: SupportedChainId,
+    userAddress: string,
+    tokenAddresses: string[]
+  ): Promise<void>;
+
+  /**
    * Get all users being tracked
    */
   getTrackedUsers(): Promise<Array<BalanceTrackingRequest>>;

@@ -105,7 +105,7 @@ export const bffCache: FastifyPluginCallback<BffCacheOptions> = (
         return content;
       }
     } catch (error) {
-      console.error('[bffCache] Error handling the cache', error);
+      fastify.log.error(error, '[bffCache] Error handling the cache');
     }
   });
 

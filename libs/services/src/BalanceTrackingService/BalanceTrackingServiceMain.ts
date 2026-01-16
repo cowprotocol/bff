@@ -206,6 +206,63 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     }
   }
 
+  /**
+   * Updates the list of tracked tokens for a user
+   */
+  async updateTrackedTokens(
+    chainId: SupportedChainId,
+    userAddress: string,
+    tokenAddresses: string[]
+  ): Promise<void> {
+    const key = this.getUserKey(chainId, userAddress);
+    const trackedUser = this.trackedUsers.get(key);
+    if (!trackedUser) {
+      return;
+    }
+
+    const normalizedTokenAddresses =
+      this.normalizeTokenAddresses(tokenAddresses);
+
+    const currentTokens = new Set(
+      trackedUser.tokenAddresses.map((tokenAddress) =>
+        tokenAddress.toLowerCase()
+      )
+    );
+    const desiredTokens = new Set(normalizedTokenAddresses);
+    const tokensToAdd = normalizedTokenAddresses.filter(
+      (tokenAddress) => !currentTokens.has(tokenAddress)
+    );
+    logger.info(`New tracked token: ${tokensToAdd.join(',')}`);
+
+    // Set the new list of tracked tokens
+    trackedUser.tokenAddresses = normalizedTokenAddresses;
+
+    // Delete balances for untracked tokens
+    for (const tokenAddress of trackedUser.lastBalances.keys()) {
+      if (!desiredTokens.has(tokenAddress)) {
+        logger.info(`Stopping balance tracking for token: ${tokenAddress}`);
+        trackedUser.lastBalances.delete(tokenAddress);
+      }
+    }
+
+    // Update balances for new tokens
+    if (tokensToAdd.length > 0) {
+      const balancesForTokens =
+        await this.tokenBalancesService.getUserTokenBalances({
+          chainId,
+          userAddress,
+          tokenAddresses: tokensToAdd,
+        });
+
+      balancesForTokens.forEach((balance) => {
+        trackedUser.lastBalances.set(
+          balance.token.address.toLowerCase(),
+          balance
+        );
+      });
+    }
+  }
+
   async getTrackedUsers(): Promise<Array<BalanceTrackingRequest>> {
     return Array.from(this.trackedUsers.values()).map(
       ({ clientId, chainId, userAddress, tokenAddresses }) => ({

@@ -96,9 +96,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
 
+      const queryString = JSON.stringify(request.query);
       fastify.log.info(
-        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: %s'`,
-        JSON.stringify(request.query)
+        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`
       );
       const slippageBps = await slippageService.getSlippageBps({
         chainId,
@@ -131,8 +131,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
 
+      const queryString = JSON.stringify(request.query);
       fastify.log.info(
-        `Get volatility details for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: %s'`,
+        `Get volatility details for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`,
         JSON.stringify(request.query)
       );
       const volatilityDetailsBase = await slippageService.getVolatilityDetails(

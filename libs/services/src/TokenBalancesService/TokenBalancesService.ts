@@ -10,6 +10,7 @@ import {
 } from '@cowprotocol/repositories';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { inject, injectable } from 'inversify';
+import { logger } from '@cowprotocol/shared';
 
 export interface UserTokenBalanceWithToken {
   balance: string;
@@ -73,7 +74,7 @@ export class TokenBalancesServiceMain implements TokenBalancesService {
       // TODO: Potentially consider adding a getAll method in the repository
       const token = await this.erc20Repository.get(chainId, tokenAddress);
       if (!token) {
-        console.warn(
+        logger.warn(
           `Token ${tokenAddress} not found for chain ${chainId}. Skipping.`
         );
         continue;

@@ -5,6 +5,7 @@ import {
   UserBalanceRepository,
   UserTokenBalance,
 } from './UserBalanceRepository';
+import { logger } from '@cowprotocol/shared';
 
 @injectable()
 export class UserBalanceRepositoryCache implements UserBalanceRepository {
@@ -53,7 +54,7 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
         });
       });
     } catch (error) {
-      console.warn(
+      logger.warn(
         'Error parsing cached balances. Proceeding to fetch fresh data.',
         error
       );
