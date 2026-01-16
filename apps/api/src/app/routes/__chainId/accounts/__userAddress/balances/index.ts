@@ -219,14 +219,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         userAddress,
         tokenAddresses,
         send: (data: string) => {
-          try {
-            reply.raw.write(data);
-          } catch (error) {
-            fastify.log.error(
-              `Error sending SSE data to client ${clientId}:`,
-              error
-            );
-          }
+          reply.raw.write(data);
         },
         close: () => {
           try {
@@ -259,9 +252,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         );
       }
 
-      // Handle client disconnect
-      request.raw.on('close', async () => {
-        fastify.log.info(`Client ${clientId} closed connection`);
+      let isDisconnecting = false;
+      const handleDisconnect = async (reason: string) => {
+        if (isDisconnecting) {
+          return;
+        }
+        isDisconnecting = true;
+        fastify.log.info(`Client ${clientId} disconnected (${reason})`);
         sseService.removeClient(clientId);
 
         // Stop tracking if no other clients are connected for this user
@@ -296,20 +293,24 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
             fastify.log.error(error, 'Error updating tracked tokens');
           }
         }
-      });
+      };
 
       // Send keep-alive messages every 30 seconds
       const keepAliveInterval = setInterval(() => {
-        try {
-          sseClient.send('event: ping\ndata: {}\n\n');
-        } catch (error) {
+        const didSend = sseService.sendToClient(
+          clientId,
+          'event: ping\ndata: {}\n\n'
+        );
+        if (!didSend) {
           clearInterval(keepAliveInterval);
+          void handleDisconnect('ping failed');
         }
       }, 30000);
 
-      // Clean up interval when connection closes
+      // Handle client disconnect
       request.raw.on('close', () => {
         clearInterval(keepAliveInterval);
+        void handleDisconnect('close');
       });
 
       // Don't end the response - keep it open for SSE

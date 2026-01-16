@@ -30,7 +30,7 @@ export interface SSEService {
    * @param clientId
    * @param data
    */
-  sendToClient(clientId: string, data: string): void;
+  sendToClient(clientId: string, data: string): boolean;
 
   /**
    * Return the SSE client subscriptions for a given user account and chain

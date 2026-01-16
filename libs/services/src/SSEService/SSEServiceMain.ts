@@ -37,19 +37,22 @@ export class SSEServiceMain implements SSEService {
     );
   }
 
-  sendToClient(clientId: string, data: string): void {
+  sendToClient(clientId: string, data: string): boolean {
     const client = this.clients.get(clientId);
     if (client) {
       try {
         client.send(data);
+        return true;
       } catch (error) {
         logger.error(
           `Error sending data to SSE client ${client.clientId}:`,
           error
         );
         this.removeClient(client.clientId);
+        return false;
       }
     }
+    return false;
   }
 
   broadcastToUser(
