@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { logger } from '@cowprotocol/shared';
-import { UserTokenBalance } from '@cowprotocol/repositories';
+import { UserTokenBalanceWithToken } from '../TokenBalancesService/TokenBalancesService';
 import { BalanceAllowanceChangeEvent } from '../BalanceTrackingService/BalanceTrackingService';
 import { SSEService, SSEClient } from './SSEService';
 
@@ -71,7 +71,7 @@ export class SSEServiceMain implements SSEService {
 
   broadcastInitialBalances(
     clientId: string,
-    balances: UserTokenBalance[]
+    balances: UserTokenBalanceWithToken[]
   ): void {
     const data = this.formatSSEData('initial_balances', { balances });
     this.sendToClient(clientId, data);

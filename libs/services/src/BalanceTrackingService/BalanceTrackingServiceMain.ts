@@ -1,23 +1,23 @@
 import { injectable, inject } from 'inversify';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { logger } from '@cowprotocol/shared';
-import {
-  UserBalanceRepository,
-  UserTokenBalance,
-  userBalanceRepositorySymbol,
-} from '@cowprotocol/repositories';
+import { UserTokenBalanceWithToken } from '../TokenBalancesService/TokenBalancesService';
 import {
   BalanceTrackingService,
   BalanceAllowanceChangeEvent,
   BalanceChangeCallback,
   BalanceTrackingRequest,
 } from './BalanceTrackingService';
+import {
+  TokenBalancesService,
+  tokenBalancesServiceSymbol,
+} from '../TokenBalancesService/TokenBalancesService';
 import { SSEService, sseServiceSymbol } from '../SSEService/SSEService';
 
 const POLLING_INTERVAL_MS = 5000; // 5 seconds // TODO: We should do this service more sophisticated. When a client subscribes, we poll more often, but because we want to use this is notifications, we might want to have other lower prio checking logics
 
 export interface TrackedUser extends BalanceTrackingRequest {
-  lastBalances: Map<string, UserTokenBalance>;
+  lastBalances: Map<string, UserTokenBalanceWithToken>;
   intervalId: NodeJS.Timeout;
 }
 
@@ -27,8 +27,8 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
   private balanceChangeCallbacks: Array<BalanceChangeCallback> = [];
 
   constructor(
-    @inject(userBalanceRepositorySymbol)
-    private userBalanceRepository: UserBalanceRepository,
+    @inject(tokenBalancesServiceSymbol)
+    private tokenBalancesService: TokenBalancesService,
     @inject(sseServiceSymbol) private sseService?: SSEService
   ) {
     // Auto-connect to SSE service if available
@@ -50,15 +50,15 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     // Get initial balances
     // TODO: Maybe is not great that if this fails, the subscription is not done. This should be refined (hackathon mode)
     const initialBalances =
-      await this.userBalanceRepository.getUserTokenBalances(
+      await this.tokenBalancesService.getUserTokenBalances({
         chainId,
         userAddress,
-        tokenAddresses
-      );
+        tokenAddresses,
+      });
 
-    const lastBalances = new Map<string, UserTokenBalance>();
+    const lastBalances = new Map<string, UserTokenBalanceWithToken>();
     initialBalances.forEach((balance) => {
-      lastBalances.set(balance.tokenAddress.toLowerCase(), balance);
+      lastBalances.set(balance.token.address.toLowerCase(), balance);
     });
 
     if (this.sseService) {
@@ -130,17 +130,22 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     chainId: SupportedChainId,
     userAddress: string,
     tokenAddresses: string[],
-    lastBalances: Map<string, UserTokenBalance>
+    lastBalances: Map<string, UserTokenBalanceWithToken>
   ): Promise<void> {
+    if (tokenAddresses.length === 0) {
+      return;
+    }
+
     const currentBalances =
-      await this.userBalanceRepository.getUserTokenBalances(
+      await this.tokenBalancesService.getUserTokenBalances({
         chainId,
         userAddress,
-        tokenAddresses
-      );
+        tokenAddresses,
+      });
 
     for (const currentBalance of currentBalances) {
-      const tokenKey = currentBalance.tokenAddress.toLowerCase();
+      const tokenAddress = currentBalance.token.address;
+      const tokenKey = tokenAddress.toLowerCase();
       const lastBalance = lastBalances.get(tokenKey);
 
       if (!lastBalance) {
@@ -155,7 +160,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
           type: 'balance_change',
           chainId,
           userAddress,
-          tokenAddress: currentBalance.tokenAddress,
+          tokenAddress: tokenAddress,
           oldBalance: lastBalance.balance,
           newBalance: currentBalance.balance,
           timestamp: Date.now(),
@@ -174,7 +179,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
           type: 'allowance_change',
           chainId,
           userAddress,
-          tokenAddress: currentBalance.tokenAddress,
+          tokenAddress: tokenAddress,
           oldAllowance: lastBalance.allowance,
           newAllowance: currentBalance.allowance,
           timestamp: Date.now(),

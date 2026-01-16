@@ -413,15 +413,15 @@
             Object.values(balances).forEach(balance => {
                 const container = document.createElement('div');
                 container.className = 'balance-item';
-                container.dataset.tokenAddress = balance.tokenAddress;
+                container.dataset.tokenAddress = balance.token.address;
 
                 const symbol = document.createElement('div');
                 symbol.className = 'balance-symbol';
-                symbol.textContent = balance.symbol || 'Unknown Token';
+                symbol.textContent = balance.token.symbol || 'Unknown Token';
 
                 const address = document.createElement('div');
                 address.className = 'balance-address';
-                address.textContent = balance.tokenAddress;
+                address.textContent = balance.token.address;
 
                 const details = document.createElement('div');
                 details.className = 'balance-details';
@@ -453,7 +453,9 @@
                 decimalsLabel.textContent = 'Decimals:';
                 const decimalsValue = document.createElement('span');
                 decimalsValue.className = 'balance-detail-value';
-                decimalsValue.textContent = String(balance.decimals);
+                decimalsValue.textContent = String(
+                    balance.token.decimals ?? 'N/A'
+                );
                 decimalsDetail.append(decimalsLabel, decimalsValue);
 
                 details.append(balanceDetail, allowanceDetail, decimalsDetail);
@@ -522,7 +524,7 @@
                 log('📊 Received initial balances');
                 const data = JSON.parse(event.data);
                 data.balances.forEach(balance => {
-                    balances[balance.tokenAddress] = balance;
+                    balances[balance.token.address] = balance;
                 });
                 updateBalanceDisplay();
             });
