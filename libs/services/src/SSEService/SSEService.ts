@@ -65,7 +65,7 @@ export interface SSEService {
   ): void;
 
   /**
-   * Push some update in the balance ch
+   * Push a balance update event to the clients
    * @param event
    */
   broadcastBalanceUpdate(event: BalanceAllowanceChangeEvent): void;

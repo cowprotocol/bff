@@ -327,11 +327,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
       }
 
       // Check for allowance changes (if both have allowance data)
-      if (
-        lastBalance.allowance &&
-        currentBalance.allowance &&
-        lastBalance.allowance !== currentBalance.allowance
-      ) {
+      if (lastBalance.allowance !== currentBalance.allowance) {
         const event: BalanceAllowanceChangeEvent = {
           type: 'allowance_change',
           chainId,

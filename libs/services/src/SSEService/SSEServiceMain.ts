@@ -108,7 +108,8 @@ export class SSEServiceMain implements SSEService {
 
   // Cleanup method to remove all clients (useful for graceful shutdown)
   cleanup(): void {
-    this.clients.forEach((client, id) => {
+    const clientIds = Array.from(this.clients.keys());
+    clientIds.forEach((id) => {
       this.removeClient(id);
     });
   }
