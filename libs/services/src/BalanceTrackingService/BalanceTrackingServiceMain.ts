@@ -215,7 +215,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     tokenAddresses: string[]
   ): Promise<void> {
     if (tokenAddresses.length === 0) {
-      this.stopTrackingUser(chainId, userAddress);
+      await this.stopTrackingUser(chainId, userAddress);
       return;
     }
 
