@@ -67,15 +67,20 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
     userAddress: string,
     tokenAddresses: string[]
   ): Promise<UserTokenBalance[]> {
-    // const cacheKey = this.getCacheKey(chainId, userAddress);
-
-    // const cached = await this.cacheRepository.get(cacheKey);
+    const t0 = Date.now();
+    logger.info(
+      { chainId, userAddress, tokenAddresses },
+      'getUserTokenBalances: start'
+    );
     const cachedBalances = await this.getCachedBalances(
       chainId,
       userAddress,
       tokenAddresses
     );
-
+    logger.info(
+      { ms: Date.now() - t0, n: cachedBalances.length },
+      'getUserTokenBalances: cachedBalances: done'
+    );
     // Group the cached balances by token address
     const cachedByToken = new Map(
       cachedBalances.map((balance) => [
@@ -95,12 +100,17 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
     }
 
     // Fetch the missing balances
+    const t1 = Date.now();
     const fetchedBalances =
       await this.userBalanceRepository.getUserTokenBalances(
         chainId,
         userAddress,
         missingTokenAddresses
       );
+    logger.info(
+      { ms: Date.now() - t1, n: fetchedBalances.length },
+      'getUserTokenBalances: fetchedBalances: done'
+    );
 
     for (const balance of fetchedBalances) {
       cachedByToken.set(balance.tokenAddress.toLowerCase(), balance);

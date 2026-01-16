@@ -9,6 +9,7 @@ import {
   UserBalanceRepository,
   UserTokenBalance,
 } from './UserBalanceRepository';
+import { logger } from '@cowprotocol/shared';
 
 @injectable()
 export class UserBalanceRepositoryViem implements UserBalanceRepository {
@@ -44,9 +45,15 @@ export class UserBalanceRepositoryViem implements UserBalanceRepository {
     });
 
     // TODO: We need to batch the calls (it might be a loooong list of tokens)
+    const t0 = Date.now();
+    logger.info({ contracts }, 'getUserTokenBalances: multicall: start');
     const results = await viemClient.multicall({
       contracts,
     });
+    logger.info(
+      { ms: Date.now() - t0, n: results.length },
+      'getUserTokenBalances: multicall: done'
+    );
 
     const balances: UserTokenBalance[] = [];
 

@@ -204,11 +204,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       }
 
       // Set SSE headers
-      reply.raw.setHeader('Content-Type', 'text/event-stream');
+      reply.hijack();
+      reply.raw.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
       reply.raw.setHeader('Cache-Control', 'no-cache');
       reply.raw.setHeader('Connection', 'keep-alive');
       reply.raw.setHeader('Access-Control-Allow-Origin', '*');
       reply.raw.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
+      reply.raw.setHeader('X-Accel-Buffering', 'no');
 
       // Create SSE client
       const clientId = uuidv4();
