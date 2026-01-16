@@ -116,16 +116,21 @@ export class TokenBalancesServiceMain implements TokenBalancesService {
       tokens.map((token) => [token.address.toLowerCase(), token])
     );
 
-    return balances.map((balance) => {
-      const token = tokensByAddress.get(balance.tokenAddress.toLowerCase()) ?? {
-        address: balance.tokenAddress,
-      };
+    return balances
+      .map((balance) => {
+        const token = tokensByAddress.get(balance.tokenAddress.toLowerCase());
+        if (!token) {
+          return null;
+        }
 
-      return {
-        balance: balance.balance,
-        allowance: balance.allowance,
-        token,
-      };
-    });
+        return {
+          balance: balance.balance,
+          allowance: balance.allowance,
+          token,
+        };
+      })
+      .filter(
+        (balance): balance is UserTokenBalanceWithToken => balance !== null
+      );
   }
 }
