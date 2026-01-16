@@ -30,7 +30,7 @@ export interface SSEService {
    * @param clientId
    * @param data
    */
-  sendToClient(clientId: string, data: string): void;
+  sendToClient(clientId: string, data: string): boolean;
 
   /**
    * Return the SSE client subscriptions for a given user account and chain
@@ -65,7 +65,7 @@ export interface SSEService {
   ): void;
 
   /**
-   * Push some update in the balance ch
+   * Push a balance update event to the clients
    * @param event
    */
   broadcastBalanceUpdate(event: BalanceAllowanceChangeEvent): void;
