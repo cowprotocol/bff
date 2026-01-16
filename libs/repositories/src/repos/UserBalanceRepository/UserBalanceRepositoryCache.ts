@@ -42,12 +42,18 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
         const cachedBalances: UserTokenBalance[] = JSON.parse(cached);
         // Filter cached results to only include requested tokens
         return cachedBalances.filter((balance) =>
-          tokenAddresses.some(
-            (addr) => addr.toLowerCase() === balance.tokenAddress.toLowerCase()
-          )
+          tokenAddresses.some((tokenAddress) => {
+            return (
+              tokenAddress.toLowerCase() === balance.tokenAddress.toLowerCase()
+            );
+          })
         );
       } catch (error) {
         // If parsing fails, continue to fetch fresh data
+        console.warn(
+          'Error parsing cached balances. Proceeding to fetch fresh data.',
+          error
+        );
       }
     }
 

@@ -4,15 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { apiContainer } from '../../../../../inversify.config';
 import { AddressSchema, SupportedChainIdSchema } from '../../../../../schemas';
 import {
-  UserBalanceRepository,
-  userBalanceRepositorySymbol,
-} from '@cowprotocol/repositories';
-import {
   SSEService,
   sseServiceSymbol,
   BalanceTrackingService,
   balanceTrackingServiceSymbol,
   SSEClient,
+  TokenBalancesService,
+  tokenBalancesServiceSymbol,
 } from '@cowprotocol/services';
 import { parseEthereumAddressList } from '@cowprotocol/shared';
 
@@ -42,13 +40,9 @@ const successSchema = {
   type: 'array',
   items: {
     type: 'object',
-    required: ['tokenAddress', 'balance', 'decimals'],
+    required: ['token', 'balance', 'allowance'],
     additionalProperties: false,
     properties: {
-      tokenAddress: {
-        type: 'string',
-        description: 'Token contract address',
-      },
       balance: {
         type: 'string',
         description: 'User balance in token units',
@@ -57,17 +51,28 @@ const successSchema = {
         type: 'string',
         description: 'Allowance for Cow Protocol vault relayer',
       },
-      decimals: {
-        type: 'number',
-        description: 'Token decimals',
-      },
-      symbol: {
-        type: 'string',
-        description: 'Token symbol',
-      },
-      name: {
-        type: 'string',
-        description: 'Token name',
+      token: {
+        type: 'object',
+        required: ['address'],
+        additionalProperties: false,
+        properties: {
+          address: {
+            type: 'string',
+            description: 'Token contract address',
+          },
+          decimals: {
+            type: 'number',
+            description: 'Token decimals',
+          },
+          symbol: {
+            type: 'string',
+            description: 'Token symbol',
+          },
+          name: {
+            type: 'string',
+            description: 'Token name',
+          },
+        },
       },
     },
   },
@@ -91,8 +96,8 @@ type SuccessSchema = FromSchema<typeof successSchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
 // TODO: In principle is not nice I use a repository in the API. We should make a service. Here I'm being lazy. Lets fix clean it up later! (hacking mode). Also this service will use 2 repos: ERC20Repo + balanceRepo
-const userBalanceRepository: UserBalanceRepository = apiContainer.get(
-  userBalanceRepositorySymbol
+const tokenBalancesService: TokenBalancesService = apiContainer.get(
+  tokenBalancesServiceSymbol
 );
 
 function parseTokenAddresses(tokens: string): string[] {
@@ -141,11 +146,11 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       try {
         // Fetch balances (includes allowances for Cow Protocol vault relayer)
-        const balances = await userBalanceRepository.getUserTokenBalances(
+        const balances = await tokenBalancesService.getUserTokenBalances({
           chainId,
           userAddress,
-          tokenAddresses
-        );
+          tokenAddresses,
+        });
 
         reply.send(balances);
 

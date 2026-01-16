@@ -1,5 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { UserTokenBalance } from '@cowprotocol/repositories';
+import { UserTokenBalanceWithToken } from '../TokenBalancesService/TokenBalancesService';
 import { BalanceAllowanceChangeEvent } from '../BalanceTrackingService/BalanceTrackingService';
 
 export const sseServiceSymbol = Symbol.for('SSEService');
@@ -61,7 +61,7 @@ export interface SSEService {
    */
   broadcastInitialBalances(
     clientId: string,
-    balances: UserTokenBalance[]
+    balances: UserTokenBalanceWithToken[]
   ): void;
 
   /**

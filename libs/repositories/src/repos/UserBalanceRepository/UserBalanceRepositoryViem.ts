@@ -40,25 +40,9 @@ export class UserBalanceRepositoryViem implements UserBalanceRepository {
           functionName: 'allowance',
           args: [userAddressHex, vaultRelayerAddress],
         },
-        {
-          address: tokenAddressHex,
-          abi: erc20Abi,
-          functionName: 'decimals', // TODO: Will remove and use ERC20Repository
-        },
-        {
-          address: tokenAddressHex,
-          abi: erc20Abi,
-          functionName: 'symbol', // TODO: Will remove and use ERC20Repository
-        },
-        {
-          address: tokenAddressHex,
-          abi: erc20Abi,
-          functionName: 'name', // TODO: Will remove and use ERC20Repository
-        },
       ];
     });
 
-    // TODO: We should probably have an alternative implementations using services that gets this information already for us like Moralis
     // TODO: We need to batch the calls (it might be a loooong list of tokens)
     const results = await viemClient.multicall({
       contracts,
@@ -67,28 +51,20 @@ export class UserBalanceRepositoryViem implements UserBalanceRepository {
     const balances: UserTokenBalance[] = [];
 
     for (let i = 0; i < tokenAddresses.length; i++) {
-      const baseIndex = i * 5;
+      const baseIndex = i * 2;
       const balanceResult = results[baseIndex];
       const allowanceResult = results[baseIndex + 1];
-      const decimalsResult = results[baseIndex + 2];
-      const symbolResult = results[baseIndex + 3];
-      const nameResult = results[baseIndex + 4];
+      const tokenAddress = getAddress(tokenAddresses[i]);
 
       // TODO: Improve the error handling. This implementation drops from the result tokens where the RPC fails, which can happen. It should re-attempt or/and return the errors
       if (
         balanceResult.status === 'success' &&
-        decimalsResult.status === 'success' &&
-        allowanceResult.status === 'success' &&
-        symbolResult.status === 'success' &&
-        nameResult.status === 'success'
+        allowanceResult.status === 'success'
       ) {
         balances.push({
-          tokenAddress: tokenAddresses[i],
+          tokenAddress,
           balance: balanceResult.result.toString(),
           allowance: allowanceResult.result.toString(),
-          decimals: Number(decimalsResult.result),
-          symbol: String(symbolResult.result),
-          name: String(nameResult.result),
         });
       }
     }
