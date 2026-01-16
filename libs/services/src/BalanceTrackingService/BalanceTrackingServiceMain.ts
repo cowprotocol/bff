@@ -214,6 +214,11 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     userAddress: string,
     tokenAddresses: string[]
   ): Promise<void> {
+    if (tokenAddresses.length === 0) {
+      this.stopTrackingUser(chainId, userAddress);
+      return;
+    }
+
     const key = this.getUserKey(chainId, userAddress);
     const trackedUser = this.trackedUsers.get(key);
     if (!trackedUser) {
@@ -232,7 +237,6 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
     const tokensToAdd = normalizedTokenAddresses.filter(
       (tokenAddress) => !currentTokens.has(tokenAddress)
     );
-    logger.info(`New tracked token: ${tokensToAdd.join(',')}`);
 
     // Set the new list of tracked tokens
     trackedUser.tokenAddresses = normalizedTokenAddresses;
@@ -247,6 +251,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
 
     // Update balances for new tokens
     if (tokensToAdd.length > 0) {
+      logger.info(`New tracked token: ${tokensToAdd.join(',')}`);
       const balancesForTokens =
         await this.tokenBalancesService.getUserTokenBalances({
           chainId,
