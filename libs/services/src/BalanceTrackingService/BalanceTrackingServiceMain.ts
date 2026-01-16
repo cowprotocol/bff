@@ -73,19 +73,16 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
       );
 
       // Update the last known balances
-      const updatedLastBalances = new Map<string, UserTokenBalanceWithToken>(
-        existingTrackedUser.lastBalances
-      );
       balancesForTokens.forEach((balance) => {
-        updatedLastBalances.set(balance.token.address.toLowerCase(), balance);
+        existingTrackedUser.lastBalances.set(
+          balance.token.address.toLowerCase(),
+          balance
+        );
       });
+      existingTrackedUser.tokenAddresses = mergedTokensToTrack;
 
       return {
-        trackedUser: {
-          ...existingTrackedUser,
-          lastBalances: updatedLastBalances,
-          tokenAddresses: mergedTokensToTrack,
-        },
+        trackedUser: existingTrackedUser,
         isNewTracking: false,
       };
     } else {
@@ -132,6 +129,11 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
       balancesForTokens
     );
 
+    // Broadcast the initial balances to the client
+    if (this.sseService) {
+      this.sseService.broadcastInitialBalances(clientId, balancesForTokens);
+    }
+
     const key = this.getUserKey(chainId, userAddress);
     this.trackedUsers.set(key, trackedUser);
 
@@ -139,18 +141,7 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
       logger.info(
         `Created new tracking for user ${userAddress} on chain ${chainId}. Tracking ${normalizedTokenAddresses.length} tokens`
       );
-    } else {
-      logger.info(
-        `Updated tracking user ${userAddress} on chain ${chainId}. Tracking ${normalizedTokenAddresses.length} new tokens. Total tokens: ${trackedUser.tokenAddresses.length}`
-      );
-    }
 
-    // Broadcast the initial balances to the client
-    if (this.sseService) {
-      this.sseService.broadcastInitialBalances(clientId, balancesForTokens);
-    }
-
-    if (isNewTracking) {
       // Start polling for changes
       const intervalId = this.startPollingForChanges(
         chainId,
@@ -158,6 +149,10 @@ export class BalanceTrackingServiceMain implements BalanceTrackingService {
         trackedUser
       );
       trackedUser.intervalId = intervalId;
+    } else {
+      logger.info(
+        `Updated tracking user ${userAddress} on chain ${chainId}. Tracking ${normalizedTokenAddresses.length} new tokens. Total tokens: ${trackedUser.tokenAddresses.length}`
+      );
     }
   }
 
