@@ -38,6 +38,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           '2XX': poolsInfoSuccessSchema,
           '400': errorSchema,
         },
+        tags: ['yield'],
         body: poolsInfoBodySchema,
       },
     },

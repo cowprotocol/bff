@@ -97,11 +97,45 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get existing trades.
-         * @description Exactly one of `owner` or `orderUid` must be set.
+         * Get existing trades (unpaginated).
+         * @deprecated
+         * @description **Deprecated:** This endpoint is deprecated and will be removed in the future. Please use `/api/v2/trades` instead, which provides pagination support.
+         *
+         *     Exactly one of `owner` or `orderUid` must be set.
+         *
+         *     Results are sorted by block number and log index descending (newest trades first).
+         *
+         *     **Note:** This endpoint returns all matching trades without pagination. For paginated results, use `/api/v2/trades`.
          *
          */
         get: operations["getTrades"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/trades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get existing trades (paginated).
+         * @description Exactly one of `owner` or `orderUid` must be set.
+         *
+         *     Results are paginated and sorted by block number and log index descending (newest trades first).
+         *
+         *     To enumerate all trades start with `offset` 0 and keep increasing the
+         *     `offset` by the total number of returned results. When a response
+         *     contains less than `limit` the last page has been reached.
+         *
+         */
+        get: operations["getTradesV2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -549,18 +583,36 @@ export interface components {
             buyAmount: components["schemas"]["TokenAmount"];
             /** @description Unix timestamp (`uint32`) until which the order is valid. */
             validTo: number;
-            appData: components["schemas"]["AppDataHash"];
-            /** @description sellAmount in atoms to cover network fees. Needs to be zero (and incorporated into the limit price) when placing the order */
+            /** @description The app data associated with the order. In quote responses, this can be either the full app data JSON string or the app data hash, depending on what was provided in the quote request.
+             *      */
+            appData: components["schemas"]["AppData"] | components["schemas"]["AppDataHash"];
+            /** @description The hash of the app data. Only present when the full app data is also provided in the `appData` field.
+             *      */
+            appDataHash?: components["schemas"]["AppDataHash"];
+            /** @description The fee amount in sell token atoms. For quote responses, this represents the estimated network fee. When creating an order, this should be set to zero as fees are now computed dynamically by solvers.
+             *      */
             feeAmount: components["schemas"]["TokenAmount"];
             /** @description The kind is either a buy or sell order. */
             kind: components["schemas"]["OrderKind"];
             /** @description Is the order fill-or-kill or partially fillable? */
             partiallyFillable: boolean;
-            /** @default erc20 */
+            /**
+             * @description Where the sell token should be drawn from. Defaults to `erc20` for standard ERC-20 token transfers.
+             *
+             * @default erc20
+             */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
-            /** @default erc20 */
+            /**
+             * @description Where the buy token should be transferred to. Defaults to `erc20` for standard ERC-20 token transfers.
+             *
+             * @default erc20
+             */
             buyTokenBalance: components["schemas"]["BuyTokenDestination"];
-            /** @default eip712 */
+            /**
+             * @description The signing scheme to use for the order. Defaults to `eip712` for standard typed data signing.
+             *
+             * @default eip712
+             */
             signingScheme: components["schemas"]["SigningScheme"];
         };
         /** @description Data a user provides when creating a new order. */
@@ -616,8 +668,14 @@ export interface components {
              * @example 2020-12-03T18:35:18.814523Z
              */
             creationDate: string;
+            /** @description The class of the order (market, limit, or liquidity). Determines how fees are handled.
+             *      */
             class: components["schemas"]["OrderClass"];
+            /** @description The address that signed the order and owns it. For regular orders, this is the trader. For EIP 1271 orders, it's the respective contract (see `onchainUser` for the actual trader).
+             *      */
             owner: components["schemas"]["Address"];
+            /** @description Unique identifier of the order. Computed as the EIP-712 hash of the order data combined with the owner address and valid_to timestamp.
+             *      */
             uid: components["schemas"]["UID"];
             /**
              * @deprecated
@@ -651,6 +709,8 @@ export interface components {
              *     settlement of normal orders. They should not be expected to be
              *     traded otherwise and should not expect to get surplus. */
             isLiquidityOrder?: boolean;
+            /** @description Additional data specific to ethflow orders. Only present for orders placed through the EthFlow contract, which allows trading native ETH directly without wrapping to WETH first.
+             *      */
             ethflowData?: components["schemas"]["EthflowData"];
             /** @description This represents the actual trader of an on-chain order.
              *     ### ethflow orders
@@ -668,8 +728,27 @@ export interface components {
             /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
+            /** @description The address of the CoW Protocol settlement contract that this order is valid for. Orders are only valid on the settlement contract they were signed for.
+             *      */
+            settlementContract: components["schemas"]["Address"];
+            /** @description If the order was created with a quote, this field contains the original quote data for reference. Includes gas estimation and pricing information captured at the time of quoting, which can be used to analyze order execution and calculate fees.
+             *      */
+            quote?: components["schemas"]["StoredOrderQuote"] | null;
         };
-        Order: components["schemas"]["OrderCreation"] & components["schemas"]["OrderMetaData"];
+        /** @description An order as returned by the API. Combines the order creation data, order metadata, and any associated interactions.
+         *      */
+        Order: components["schemas"]["OrderCreation"] & components["schemas"]["OrderMetaData"] & {
+            /** @description Optional pre and post interactions associated with the order. Pre-interactions are executed before the order's trade, and post-interactions are executed after.
+             *      */
+            interactions?: {
+                /** @description Interactions to be executed before the order's trade. These can be used for setup operations like token approvals.
+                 *      */
+                pre?: components["schemas"]["InteractionData"][];
+                /** @description Interactions to be executed after the order's trade. These can be used for cleanup or follow-up operations.
+                 *      */
+                post?: components["schemas"]["InteractionData"][];
+            };
+        };
         /** @description A solvable order included in the current batch auction. Contains the data forwarded to solvers for solving.
          *      */
         AuctionOrder: {
@@ -939,7 +1018,11 @@ export interface components {
          *     submitted to the order creation backend.
          *      */
         OrderQuoteResponse: {
+            /** @description The quoted order parameters. These values can be used directly to create and sign an order.
+             *      */
             quote: components["schemas"]["OrderParameters"];
+            /** @description The address of the trader for whom the quote was requested.
+             *      */
             from?: components["schemas"]["Address"];
             /**
              * @description Expiration date of the offered fee. Order service might not accept
@@ -955,14 +1038,11 @@ export interface components {
              *      */
             verified: boolean;
             /**
-             * @description Protocol fee in basis points (e.g., "2" for 0.02%). This represents the volume-based fee policy. Only present when configured.
+             * @description Protocol fee in basis points (e.g., "2" for 0.02%). This represents the volume-based fee policy. Only present when a volume fee is configured.
              *
              * @example 2
              */
             protocolFeeBps?: string;
-            /** @description Protocol fee amount in sell token. For SELL orders, this amount is already included in the returned sellAmount. For BUY orders, this amount is applied before network fees are added to sellAmount. Only present when a volume fee is configured.
-             *      */
-            protocolFeeSellAmount?: components["schemas"]["TokenAmount"];
         };
         /** @description The settlements submitted by every solver for a specific auction.
          *     The `auctionId` corresponds to the id external solvers are provided
@@ -973,6 +1053,8 @@ export interface components {
             auctionId?: number;
             /** @description Block that the auction started on. */
             auctionStartBlock?: number;
+            /** @description Block deadline by which the auction must be settled. */
+            auctionDeadlineBlock?: number;
             /** @description The hashes of the transactions for the winning solutions of this competition.
              *      */
             transactionHashes?: components["schemas"]["TransactionHash"][];
@@ -1030,13 +1112,74 @@ export interface components {
             /** @description The total surplus. */
             totalSurplus?: string;
         };
+        /** @description Represents a smart contract interaction that can be executed as part of an order's pre or post hooks.
+         *      */
         InteractionData: {
-            target?: components["schemas"]["Address"];
-            value?: components["schemas"]["TokenAmount"];
-            /** @description The call data to be used for the interaction. */
-            call_data?: components["schemas"]["CallData"][];
+            /** @description The address of the contract to call. */
+            target: components["schemas"]["Address"];
+            /** @description The amount of native token (ETH, xDAI, etc.) in Wei to send with the interaction call.
+             *      */
+            value: components["schemas"]["TokenAmount"];
+            /** @description The calldata to be sent to the target contract. Encoded as a hex string with `0x` prefix.
+             *      */
+            callData: components["schemas"]["CallData"];
         };
-        /** @description A calculated order quote.
+        /** @description Quote data stored with an order. This represents the original quote used to
+         *     create the order, containing gas estimation and pricing information captured
+         *     at the time of quoting.
+         *
+         *     Note: This is different from `OrderQuoteResponse` which is returned by the
+         *     `POST /api/v1/quote` endpoint and contains order parameters to sign.
+         *      */
+        StoredOrderQuote: {
+            /**
+             * @description The estimated gas units required to execute the quoted trade.
+             *     Measured in gas units (not Wei). Used together with `gasPrice` and
+             *     `sellTokenPrice` to calculate the network fee in sell token atoms.
+             *
+             * @example 150000
+             */
+            gasAmount: string;
+            /**
+             * @description The estimated gas price at the time of quoting, measured in Wei per gas unit.
+             *     The network fee in Wei can be calculated as: `feeInWei = gasAmount * gasPrice`.
+             *
+             * @example 15000000000
+             */
+            gasPrice: string;
+            /**
+             * @description The price of the sell token in terms of the native token (ETH, xDAI, etc.)
+             *     at the time of quoting. Represents how much native token (in Wei) one atomic
+             *     unit of the sell token is worth.
+             *
+             *     The network fee in sell token atoms can be calculated as:
+             *     `feeInSellToken = (gasAmount * gasPrice) / sellTokenPrice`.
+             *
+             *     This is useful for UIs that need to calculate gas costs in the sell token,
+             *     especially when the exact fee amount isn't known upfront (e.g., when
+             *     additional hook gas costs need to be factored in after quoting).
+             *
+             * @example 0.0004
+             */
+            sellTokenPrice: string;
+            /** @description The quoted sell amount in atoms of the sell token. */
+            sellAmount: components["schemas"]["TokenAmount"];
+            /** @description The quoted buy amount in atoms of the buy token. */
+            buyAmount: components["schemas"]["TokenAmount"];
+            /** @description The address of the solver that provided this quote. */
+            solver: components["schemas"]["Address"];
+            /** @description Whether the quote was verified through simulation. A verified quote
+             *     provides higher confidence that the trade will execute successfully.
+             *      */
+            verified: boolean;
+            /** @description Additional metadata about the quote execution plan (e.g., the route taken).
+             *     This field is only populated for orders that are no longer fillable
+             *     (filled, cancelled, or expired) to prevent solvers from copying
+             *     execution strategies for active orders.
+             *      */
+            metadata?: Record<string, never>;
+        };
+        /** @description A calculated order quote used in solver auctions.
          *      */
         Quote: {
             /** @description The amount of the sell token. */
@@ -1312,6 +1455,43 @@ export interface operations {
             query?: {
                 owner?: components["schemas"]["Address"];
                 orderUid?: components["schemas"]["UID"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ### If `owner` is specified:
+             *
+             *     Return all trades related to that `owner`.
+             *
+             *     ### If `orderUid` is specified:
+             *
+             *     Return all trades related to that `orderUid`. Given that an order
+             *     may be partially fillable, it is possible that an individual order
+             *     may have *multiple* trades. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trade"][];
+                };
+            };
+        };
+    };
+    getTradesV2: {
+        parameters: {
+            query?: {
+                owner?: components["schemas"]["Address"];
+                orderUid?: components["schemas"]["UID"];
+                /** @description The pagination offset. Defaults to 0.
+                 *      */
+                offset?: number;
+                /** @description The maximum number of trades to return. Defaults to 10. Must be between 1 and 1000.
+                 *      */
+                limit?: number;
             };
             header?: never;
             path?: never;

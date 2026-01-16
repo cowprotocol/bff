@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERC20 Balance Tracking with SSE</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .container {
+            padding: 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .container:last-child {
+            border-bottom: none;
+        }
+        
+        .container h3 {
+            margin: 0 0 20px 0;
+            color: #374151;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        .log {
+            background: #1f2937;
+            color: #f9fafb;
+            border: none;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .balance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .balance-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        .balance-item.updated {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #f59e0b;
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+        }
+        
+        .balance-item.updated::before {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .balance-symbol {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .balance-address {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-family: monospace;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+        
+        .balance-details {
+            display: grid;
+            gap: 8px;
+        }
+        
+        .balance-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            gap: 8px;
+        }
+        
+        .balance-detail-label {
+            font-weight: 600;
+            color: #374151;
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+        
+        .balance-detail-value {
+            font-family: monospace;
+            color: #1f2937;
+            font-weight: 500;
+            word-break: break-all;
+            text-align: right;
+            flex: 1;
+            overflow-wrap: break-word;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected {
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-disconnected {
+            background: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .balance-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🔗 ERC20 Balance Tracker</h1>
+            <p>Real-time balance and allowance monitoring with Server-Sent Events</p>
+        </div>
+        
+        <div class="container">
+            <h3>
+                <span class="status-indicator status-disconnected" id="connectionStatus"></span>
+                Connection Settings
+            </h3>
+            
+            <div class="form-group">
+                <label>Chain ID:</label>
+                <select id="chainId">
+                    <option value="1">Ethereum Mainnet</option>
+                    <option value="100">Gnosis Chain</option>
+                    <option value="42161">Arbitrum One</option>
+                    <option value="8453">Base</option>
+                    <option value="137">Polygon</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>User Address:</label>
+                <input type="text" id="userAddress" placeholder="0x...">
+            </div>
+            
+            <div class="form-group">
+                <label>Token Addresses (comma-separated):</label>
+                <input type="text" id="tokenAddresses" placeholder="0x...,0x...">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="connect()">
+                    <span>🔌</span> Connect
+                </button>
+                <button class="btn-secondary" onclick="disconnect()">
+                    <span>🔌</span> Disconnect
+                </button>
+                <button class="btn-danger" onclick="clearSavedSettings()">
+                    <span>🗑️</span> Clear Settings
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <h3>
+                <span>💰</span> Current Balances
+            </h3>
+            <div id="balances" class="balance-grid"></div>
+        </div>
+
+        <div class="container">
+            <h3>
+                <span>📋</span> Event Log
+            </h3>
+            <div id="log" class="log"></div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="clearLog()">
+                    <span>🧹</span> Clear Log
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        const balances = {};
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(line);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        function clearSavedSettings() {
+            localStorage.removeItem('sse-balance-settings');
+            document.getElementById('chainId').value = '1';
+            document.getElementById('userAddress').value = '';
+            document.getElementById('tokenAddresses').value = '';
+            log('🗑️ Cleared saved settings');
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusIndicator = document.getElementById('connectionStatus');
+            if (connected) {
+                statusIndicator.className = 'status-indicator status-connected';
+            } else {
+                statusIndicator.className = 'status-indicator status-disconnected';
+            }
+        }
+
+        function updateBalanceDisplay() {
+            const balancesDiv = document.getElementById('balances');
+            balancesDiv.textContent = '';
+            
+            if (Object.keys(balances).length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.color = '#6b7280';
+                emptyMessage.style.fontStyle = 'italic';
+                emptyMessage.textContent = 'No balances loaded yet. Connect to start tracking.';
+                balancesDiv.appendChild(emptyMessage);
+                return;
+            }
+            
+            Object.values(balances).forEach(balance => {
+                const container = document.createElement('div');
+                container.className = 'balance-item';
+                container.dataset.tokenAddress = balance.token.address;
+
+                const symbol = document.createElement('div');
+                symbol.className = 'balance-symbol';
+                symbol.textContent = balance.token.symbol || 'Unknown Token';
+
+                const address = document.createElement('div');
+                address.className = 'balance-address';
+                address.textContent = balance.token.address;
+
+                const details = document.createElement('div');
+                details.className = 'balance-details';
+
+                const balanceDetail = document.createElement('div');
+                balanceDetail.className = 'balance-detail';
+                const balanceLabel = document.createElement('span');
+                balanceLabel.className = 'balance-detail-label';
+                balanceLabel.textContent = 'Balance:';
+                const balanceValue = document.createElement('span');
+                balanceValue.className = 'balance-detail-value';
+                balanceValue.textContent = balance.balance;
+                balanceDetail.append(balanceLabel, balanceValue);
+
+                const allowanceDetail = document.createElement('div');
+                allowanceDetail.className = 'balance-detail';
+                const allowanceLabel = document.createElement('span');
+                allowanceLabel.className = 'balance-detail-label';
+                allowanceLabel.textContent = 'Allowance:';
+                const allowanceValue = document.createElement('span');
+                allowanceValue.className = 'balance-detail-value';
+                allowanceValue.textContent = balance.allowance || '0';
+                allowanceDetail.append(allowanceLabel, allowanceValue);
+
+                const decimalsDetail = document.createElement('div');
+                decimalsDetail.className = 'balance-detail';
+                const decimalsLabel = document.createElement('span');
+                decimalsLabel.className = 'balance-detail-label';
+                decimalsLabel.textContent = 'Decimals:';
+                const decimalsValue = document.createElement('span');
+                decimalsValue.className = 'balance-detail-value';
+                decimalsValue.textContent = String(
+                    balance.token.decimals ?? 'N/A'
+                );
+                decimalsDetail.append(decimalsLabel, decimalsValue);
+
+                details.append(balanceDetail, allowanceDetail, decimalsDetail);
+                container.append(symbol, address, details);
+                balancesDiv.appendChild(container);
+            });
+        }
+
+        function saveConnectionSettings() {
+            const settings = {
+                chainId: document.getElementById('chainId').value,
+                userAddress: document.getElementById('userAddress').value,
+                tokenAddresses: document.getElementById('tokenAddresses').value
+            };
+            localStorage.setItem('sse-balance-settings', JSON.stringify(settings));
+        }
+
+        function loadConnectionSettings() {
+            const saved = localStorage.getItem('sse-balance-settings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    document.getElementById('chainId').value = settings.chainId || '1';
+                    document.getElementById('userAddress').value = settings.userAddress || '';
+                    document.getElementById('tokenAddresses').value = settings.tokenAddresses || '';
+                } catch (e) {
+                    console.warn('Failed to load saved settings:', e);
+                }
+            }
+        }
+
+        function connect() {
+            const chainId = document.getElementById('chainId').value;
+            const userAddress = document.getElementById('userAddress').value;
+            const tokenAddresses = document.getElementById('tokenAddresses').value;
+
+            if (!userAddress || !tokenAddresses) {
+                alert('Please provide user address and token addresses');
+                return;
+            }
+
+            // Save current settings
+            saveConnectionSettings();
+
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            const url = `/${chainId}/accounts/${userAddress}/balances/sse?tokens=${encodeURIComponent(tokenAddresses)}`;
+            log(`Connecting to: ${url}`);
+            
+            eventSource = new EventSource(url);
+
+            eventSource.onopen = function(event) {
+                log('✅ Connected to SSE stream');
+                updateConnectionStatus(true);
+            };
+
+            eventSource.onmessage = function(event) {
+              console.log(`📨 Message:`, event.data);
+                log(`📨 Message: ${event.data}`);
+            };
+
+            eventSource.addEventListener('initial_balances', function(event) {
+                console.log(`📨 Initial balances:`, event.data);
+                log('📊 Received initial balances');
+                const data = JSON.parse(event.data);
+                data.balances.forEach(balance => {
+                    balances[balance.token.address] = balance;
+                });
+                updateBalanceDisplay();
+            });
+
+            eventSource.addEventListener('balance_update', function(event) {
+                console.log(`📨 Balance update:`, event.data);
+                log('🔄 Balance update received');
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'balance_change') {
+                    log(`💰 Balance changed for ${data.tokenAddress}: ${data.oldBalance} → ${data.newBalance}`);
+                } else if (data.type === 'allowance_change') {
+                    log(`🔓 Allowance changed for ${data.tokenAddress}: ${data.oldAllowance} → ${data.newAllowance}`);
+                }
+                
+                // Update the balance in our display
+                if (balances[data.tokenAddress]) {
+                    if (data.newBalance !== undefined) {
+                        balances[data.tokenAddress].balance = data.newBalance;
+                    }
+                    if (data.newAllowance !== undefined) {
+                        balances[data.tokenAddress].allowance = data.newAllowance;
+                    }
+                    
+                    // Highlight the updated item
+                    const updatedItem = document.querySelector(
+                        `.balance-item[data-token-address="${data.tokenAddress}"]`
+                    );
+                    if (updatedItem) {
+                        updatedItem.classList.add('updated');
+                        setTimeout(() => updatedItem.classList.remove('updated'), 2000);
+                    }
+                }
+                
+                updateBalanceDisplay();
+            });
+
+            eventSource.addEventListener('error', function(event) {
+                log('❌ SSE Error: ' + JSON.stringify(event));
+                updateConnectionStatus(false);
+            });
+
+            eventSource.addEventListener('ping', function(event) {
+                log('🏓 Ping received');
+            });
+        }
+
+        function disconnect() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                log('🔌 Disconnected from SSE stream');
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Load saved settings or use example values
+        loadConnectionSettings();
+        
+        // If no saved settings, use example values
+        if (!localStorage.getItem('sse-balance-settings')) {
+            document.getElementById('userAddress').value = '0xd380bdee4e254bf85cc993f3bdb670cabcd10b85';
+            document.getElementById('tokenAddresses').value = '0xd380bdee4e254bf85cc993f3bdb670cabcd10b85,0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c,0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8,0xdac17f958d2ee523a2206206994597c13d831ec7,0xd3E8695d2Bef061EAb38B5EF526c0f714108119C,0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8,0x6b175474e89094c44da98b954eedeac495271d0f,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+        }
+    </script>
+</body>
+</html>

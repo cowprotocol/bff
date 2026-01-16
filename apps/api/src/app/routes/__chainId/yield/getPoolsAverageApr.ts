@@ -36,6 +36,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           '2XX': poolsAverageAprBodySchema,
           '400': errorSchema,
         },
+        tags: ['yield'],
       },
     },
     async function (request, reply) {
