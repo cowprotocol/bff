@@ -100,17 +100,33 @@ export class TokenBalancesServiceMain implements TokenBalancesService {
     userAddress: string;
     tokenAddresses: string[];
   }): Promise<UserTokenBalanceWithToken[]> {
-    const balancesPromise = this.userBalanceRepository.getUserTokenBalances(
-      chainId,
-      userAddress,
-      tokenAddresses
+    logger.info({ chainId, userAddress, tokenAddresses }, 'balances: start');
+    const t0 = Date.now();
+    const balancesPromise = this.userBalanceRepository
+      .getUserTokenBalances(chainId, userAddress, tokenAddresses)
+      .then((balances) => {
+        logger.info(
+          '[TokenBalancesService:getUserTokenBalances:debug99] balances: done'
+        );
+        return balances;
+      });
+    const tokensPromise = this.getTokenInfos(chainId, tokenAddresses).then(
+      (tokens) => {
+        logger.info(
+          '[TokenBalancesService:getUserTokenBalances:debug99] tokens: done'
+        );
+        return tokens;
+      }
     );
-    const tokensPromise = this.getTokenInfos(chainId, tokenAddresses);
 
     const [balances, tokens] = await Promise.all([
       balancesPromise,
       tokensPromise,
     ]);
+    logger.info(
+      { ms: Date.now() - t0, n: balances.length },
+      '[TokenBalancesService:getUserTokenBalances:debug99] balances and tokens: done'
+    );
 
     const tokensByAddress = new Map(
       tokens.map((token) => [token.address.toLowerCase(), token])
