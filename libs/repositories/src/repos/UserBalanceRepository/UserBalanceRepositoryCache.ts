@@ -29,63 +29,92 @@ export class UserBalanceRepositoryCache implements UserBalanceRepository {
     return baseKey;
   }
 
-  async getUserTokenBalances(
+  private async getCachedBalances(
     chainId: SupportedChainId,
     userAddress: string,
     tokenAddresses: string[]
   ): Promise<UserTokenBalance[]> {
     const cacheKey = this.getCacheKey(chainId, userAddress);
     const cached = await this.cacheRepository.get(cacheKey);
-
-    if (cached) {
-      try {
-        const cachedBalances: UserTokenBalance[] = JSON.parse(cached);
-        // Filter cached results to only include requested tokens
-        return cachedBalances.filter((balance) =>
-          tokenAddresses.some((tokenAddress) => {
-            return (
-              tokenAddress.toLowerCase() === balance.tokenAddress.toLowerCase()
-            );
-          })
-        );
-      } catch (error) {
-        // If parsing fails, continue to fetch fresh data
-        console.warn(
-          'Error parsing cached balances. Proceeding to fetch fresh data.',
-          error
-        );
-      }
+    if (!cached) {
+      return [];
     }
 
-    const balances = await this.userBalanceRepository.getUserTokenBalances(
+    // Get the cached balances
+    try {
+      const cachedBalances: UserTokenBalance[] = JSON.parse(cached);
+
+      // Return only the relevant tokens
+      return cachedBalances.filter((balance) => {
+        return tokenAddresses.some((tokenAddress) => {
+          return (
+            tokenAddress.toLowerCase() === balance.tokenAddress.toLowerCase()
+          );
+        });
+      });
+    } catch (error) {
+      console.warn(
+        'Error parsing cached balances. Proceeding to fetch fresh data.',
+        error
+      );
+      return [];
+    }
+  }
+
+  async getUserTokenBalances(
+    chainId: SupportedChainId,
+    userAddress: string,
+    tokenAddresses: string[]
+  ): Promise<UserTokenBalance[]> {
+    // const cacheKey = this.getCacheKey(chainId, userAddress);
+
+    // const cached = await this.cacheRepository.get(cacheKey);
+    const cachedBalances = await this.getCachedBalances(
       chainId,
       userAddress,
       tokenAddresses
     );
 
+    // Group the cached balances by token address
+    const cachedByToken = new Map(
+      cachedBalances.map((balance) => [
+        balance.tokenAddress.toLowerCase(),
+        balance,
+      ])
+    );
+
+    // Get the tokens that we don't have cached
+    const missingTokenAddresses = tokenAddresses.filter((tokenAddress) => {
+      return !cachedByToken.has(tokenAddress.toLowerCase());
+    });
+
+    // Return early if we have all the balances cached
+    if (missingTokenAddresses.length == 0) {
+      return cachedBalances;
+    }
+
+    // Fetch the missing balances
+    const fetchedBalances =
+      await this.userBalanceRepository.getUserTokenBalances(
+        chainId,
+        userAddress,
+        missingTokenAddresses
+      );
+
+    for (const balance of fetchedBalances) {
+      cachedByToken.set(balance.tokenAddress.toLowerCase(), balance);
+    }
+
+    // Combine cached balances and fetched balances
+    const mergedBalances = Array.from(cachedByToken.values());
+
     // Cache the results
     await this.cacheRepository.set(
-      cacheKey,
-      JSON.stringify(balances),
+      this.getCacheKey(chainId, userAddress),
+      JSON.stringify(mergedBalances),
       this.cacheTimeSeconds
     );
 
-    return balances;
-  }
-
-  /**
-   * Invalidate a cache for a token
-   * @param chainId
-   * @param userAddress
-   * @param tokenAddress
-   */
-  async invalidateUserBalances(
-    chainId: SupportedChainId,
-    userAddress: string,
-    tokenAddress?: string
-  ): Promise<void> {
-    const cacheKey = this.getCacheKey(chainId, userAddress, tokenAddress);
-    // Invalidate using the TTL to zero
-    await this.cacheRepository.set(cacheKey, '', 0);
+    return mergedBalances;
   }
 }
