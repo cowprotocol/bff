@@ -161,7 +161,7 @@ export function getUserBalanceRepository(
     new UserBalanceRepositoryViem(getViemClients()),
     cacheRepository,
     'user_balance',
-    DEFAULT_CACHE_VALUE_SECONDS
+    1 // Cache balances for 1 second
   );
 }
 

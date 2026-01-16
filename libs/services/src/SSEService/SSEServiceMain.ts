@@ -65,8 +65,17 @@ export class SSEServiceMain implements SSEService {
   }
 
   broadcastBalanceUpdate(event: BalanceAllowanceChangeEvent): void {
+    const clients = this.getClientsForUser(event.chainId, event.userAddress);
+    const tokenAddress = event.tokenAddress.toLowerCase();
+
+    // Send the data to the clients
     const data = this.formatSSEData('balance_update', event);
-    this.broadcastToUser(event.chainId, event.userAddress, data);
+    clients.forEach((client) => {
+      // Make sure the client is interested in this specific token
+      if (this.clientTracksToken(client, tokenAddress)) {
+        this.sendToClient(client.clientId, data);
+      }
+    });
   }
 
   broadcastInitialBalances(
@@ -79,6 +88,22 @@ export class SSEServiceMain implements SSEService {
 
   private formatSSEData(eventType: string, data: unknown): string {
     return `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
+  }
+
+  /**
+   * Check if the client is interested in the given token
+   *
+   * @param client the client to check
+   * @param tokenAddressLowerCase expected to be in lowercase
+   * @returns true if the client is interested in the given token, false otherwise
+   */
+  private clientTracksToken(
+    client: SSEClient,
+    tokenAddressLowerCase: string
+  ): boolean {
+    return client.tokenAddresses.some(
+      (address) => address.toLowerCase() === tokenAddressLowerCase
+    );
   }
 
   // Cleanup method to remove all clients (useful for graceful shutdown)

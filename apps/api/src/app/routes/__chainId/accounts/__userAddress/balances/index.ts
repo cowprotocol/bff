@@ -241,6 +241,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       };
 
       // Add client to SSE service
+      fastify.log.info(`New client ${clientId} connected to SSE service`);
       sseService.addClient(sseClient);
 
       // Start tracking user balances
@@ -260,6 +261,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       // Handle client disconnect
       request.raw.on('close', async () => {
+        fastify.log.info(`Client ${clientId} closed connection`);
         sseService.removeClient(clientId);
 
         // Stop tracking if no other clients are connected for this user
@@ -267,11 +269,31 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           chainId,
           userAddress
         );
+
         if (remainingClients.length === 0) {
+          // No more clients. Don't track this user anymore
           try {
             await balanceTrackingService.stopTrackingUser(chainId, userAddress);
           } catch (error) {
             fastify.log.error('Error stopping balance tracking:', error);
+          }
+        } else {
+          // There's more clients for this user. Update the tracked tokens
+          const remainingTokens = new Set<string>();
+          remainingClients.forEach((client) => {
+            client.tokenAddresses.forEach((tokenAddress) => {
+              remainingTokens.add(tokenAddress.toLowerCase());
+            });
+          });
+
+          try {
+            await balanceTrackingService.updateTrackedTokens(
+              chainId,
+              userAddress,
+              Array.from(remainingTokens)
+            );
+          } catch (error) {
+            fastify.log.error(error, 'Error updating tracked tokens');
           }
         }
       });
