@@ -118,8 +118,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     Reply: SuccessSchema | ErrorSchema;
   }>(
     '/',
-    {
+    {      
       schema: {
+        description: 'Fetches Token balance and allowance for a given user address and token addresses',
         params: paramsSchema,
         querystring: querySchema,
         tags: ['accounts'],
@@ -172,6 +173,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     '/sse',
     {
       schema: {
+        description: `Fetches the real-time token balance and allowance for a given user address and token addresses. It sends an initial message with the balances of the requested tokens, and then sends updates when the balances change. You can test this endpoint using the [demo page](/tests/balances).`,
         params: paramsSchema,
         querystring: querySchema,
         tags: ['accounts'],
