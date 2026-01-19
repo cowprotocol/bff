@@ -47,6 +47,7 @@ export * from './repos/TokenHolderRepository/TokenHolderRepositoryMoralis';
 export * from './repos/TokenBalancesRepository/TokenBalancesRepository';
 export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryMoralis';
 export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryAlchemy';
+export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryAnkr';
 
 // User balance repositories
 export * from './repos/UserBalanceRepository/UserBalanceRepository';
