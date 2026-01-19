@@ -5,10 +5,10 @@ import { join } from 'path';
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // Serve the SSE test HTML page
   fastify.get('/', { schema: { tags: ['tests'] } }, async (request, reply) => {
-    // Use process.cwd() to get the project root, then navigate to the source file
+    // Resolve from the copied assets folder (shared build rule).
     const htmlPath = join(
       process.cwd(),
-      'apps/api/src/app/routes/tests/balances/sse-test.html'
+      'apps/api/src/assets/tests/balances/sse-test.html'
     );
     const htmlContent = readFileSync(htmlPath, 'utf8');
 
