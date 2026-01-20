@@ -12,6 +12,13 @@ type AffiliateAttributes = {
   walletAddress: string;
   signedMessage?: string | null;
   enabled: boolean;
+  rewardAmount: number;
+  triggerVolume: number;
+  timeCapDays: number;
+  volumeCap: number;
+  revenueSplitAffiliatePct: number;
+  revenueSplitTraderPct: number;
+  revenueSplitDaoPct: number;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
@@ -103,6 +110,13 @@ function mapAffiliate(data: StrapiData<AffiliateAttributes>): AffiliateRecord {
     walletAddress: data.attributes.walletAddress,
     signedMessage: data.attributes.signedMessage ?? null,
     enabled: data.attributes.enabled,
+    rewardAmount: data.attributes.rewardAmount,
+    triggerVolume: data.attributes.triggerVolume,
+    timeCapDays: data.attributes.timeCapDays,
+    volumeCap: data.attributes.volumeCap,
+    revenueSplitAffiliatePct: data.attributes.revenueSplitAffiliatePct,
+    revenueSplitTraderPct: data.attributes.revenueSplitTraderPct,
+    revenueSplitDaoPct: data.attributes.revenueSplitDaoPct,
     createdAt: data.attributes.createdAt,
     updatedAt: data.attributes.updatedAt,
     publishedAt: data.attributes.publishedAt ?? null,

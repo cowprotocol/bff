@@ -6,6 +6,13 @@ export type AffiliateRecord = {
   walletAddress: string;
   signedMessage: string | null;
   enabled: boolean;
+  rewardAmount: number;
+  triggerVolume: number;
+  timeCapDays: number;
+  volumeCap: number;
+  revenueSplitAffiliatePct: number;
+  revenueSplitTraderPct: number;
+  revenueSplitDaoPct: number;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
