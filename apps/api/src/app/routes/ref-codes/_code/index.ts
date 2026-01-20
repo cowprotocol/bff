@@ -26,12 +26,22 @@ const paramsSchema = {
 
 const responseSchema = {
   type: 'object',
-  required: ['code'],
+  required: [
+    'code',
+    'traderRewardAmount',
+    'triggerVolume',
+    'timeCapDays',
+    'volumeCap',
+  ],
   additionalProperties: false,
   properties: {
     code: {
       type: 'string',
     },
+    traderRewardAmount: { type: 'number' },
+    triggerVolume: { type: 'number' },
+    timeCapDays: { type: 'number' },
+    volumeCap: { type: 'number' },
   },
 } as const satisfies JSONSchema;
 
@@ -80,6 +90,8 @@ const refCodes: FastifyPluginAsync = async (fastify): Promise<void> => {
           '400': errorSchema,
           '404': errorSchema,
           '403': errorSchema,
+          '500': errorSchema,
+          '502': errorSchema,
         },
       },
     },
@@ -111,7 +123,16 @@ const refCodes: FastifyPluginAsync = async (fastify): Promise<void> => {
           return;
         }
 
-        reply.send({ code: affiliateEntry.code });
+        reply.send({
+          code: affiliateEntry.code,
+          traderRewardAmount:
+            (affiliateEntry.rewardAmount *
+              affiliateEntry.revenueSplitTraderPct) /
+            100,
+          triggerVolume: affiliateEntry.triggerVolume,
+          timeCapDays: affiliateEntry.timeCapDays,
+          volumeCap: affiliateEntry.volumeCap,
+        });
       } catch (error) {
         handleCmsError(error, reply);
       }
