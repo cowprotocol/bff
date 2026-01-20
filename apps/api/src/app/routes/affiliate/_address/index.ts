@@ -47,7 +47,34 @@ const bodySchema = {
   },
 } as const satisfies JSONSchema;
 
-const affiliateResponseSchema = {
+const affiliateGetResponseSchema = {
+  type: 'object',
+  required: [
+    'code',
+    'rewardAmount',
+    'triggerVolume',
+    'timeCapDays',
+    'volumeCap',
+    'revenueSplitAffiliatePct',
+    'revenueSplitTraderPct',
+    'revenueSplitDaoPct',
+  ],
+  additionalProperties: false,
+  properties: {
+    code: {
+      type: 'string',
+    },
+    rewardAmount: { type: 'number' },
+    triggerVolume: { type: 'number' },
+    timeCapDays: { type: 'number' },
+    volumeCap: { type: 'number' },
+    revenueSplitAffiliatePct: { type: 'number' },
+    revenueSplitTraderPct: { type: 'number' },
+    revenueSplitDaoPct: { type: 'number' },
+  },
+} as const satisfies JSONSchema;
+
+const affiliateCreateResponseSchema = {
   type: 'object',
   required: ['code'],
   additionalProperties: false,
@@ -71,7 +98,8 @@ const errorSchema = {
 
 type ParamsSchema = FromSchema<typeof paramsSchema>;
 type BodySchema = FromSchema<typeof bodySchema>;
-type SuccessSchema = FromSchema<typeof affiliateResponseSchema>;
+type GetSuccessSchema = FromSchema<typeof affiliateGetResponseSchema>;
+type CreateSuccessSchema = FromSchema<typeof affiliateCreateResponseSchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
 const affiliatesRepository: AffiliatesRepository = apiContainer.get(
@@ -105,7 +133,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
   // GET /affiliate/:address
   fastify.get<{
     Params: ParamsSchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Reply: GetSuccessSchema | ErrorSchema;
   }>(
     '/',
     {
@@ -114,8 +142,10 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
         tags: ['affiliate'],
         params: paramsSchema,
         response: {
-          '2XX': affiliateResponseSchema,
+          '2XX': affiliateGetResponseSchema,
           '404': errorSchema,
+          '500': errorSchema,
+          '502': errorSchema,
         },
       },
     },
@@ -133,7 +163,16 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
           return;
         }
 
-        reply.send({ code: affiliateEntry.code });
+        reply.send({
+          code: affiliateEntry.code,
+          rewardAmount: affiliateEntry.rewardAmount,
+          triggerVolume: affiliateEntry.triggerVolume,
+          timeCapDays: affiliateEntry.timeCapDays,
+          volumeCap: affiliateEntry.volumeCap,
+          revenueSplitAffiliatePct: affiliateEntry.revenueSplitAffiliatePct,
+          revenueSplitTraderPct: affiliateEntry.revenueSplitTraderPct,
+          revenueSplitDaoPct: affiliateEntry.revenueSplitDaoPct,
+        });
       } catch (error) {
         handleCmsError(error, reply);
       }
@@ -144,7 +183,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.post<{
     Params: ParamsSchema;
     Body: BodySchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Reply: CreateSuccessSchema | ErrorSchema;
   }>(
     '/',
     {
@@ -154,7 +193,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
         params: paramsSchema,
         body: bodySchema,
         response: {
-          '2XX': affiliateResponseSchema,
+          '2XX': affiliateCreateResponseSchema,
           '4XX': errorSchema,
           '5XX': errorSchema,
         },
@@ -195,7 +234,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
         );
 
         if (normalizeAddress(recoveredAddress) !== walletAddress) {
-          reply.code(401).send({ message: 'Invalid signature' });
+          reply.code(401).send({ message: 'Invalid signature address' });
           return;
         }
       } catch (error) {
