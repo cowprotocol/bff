@@ -4,7 +4,8 @@ import { NULL_ADDRESS, WETH } from '../../../test/mock';
 import { MORALIS_API_KEY } from '../../datasources/moralis';
 import { TokenHolderRepositoryMoralis } from './TokenHolderRepositoryMoralis';
 
-describe('TokenHolderRepositoryMoralis', () => {
+// The tests are integration tests and require ENV variables
+describe.skip('TokenHolderRepositoryMoralis', () => {
   let tokenHolderRepositoryMoralis: TokenHolderRepositoryMoralis;
 
   beforeAll(() => {

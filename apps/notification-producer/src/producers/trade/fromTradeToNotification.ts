@@ -1,18 +1,13 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { PushNotification } from '@cowprotocol/notifications';
 import { Erc20Repository } from '@cowprotocol/repositories';
-import { getAddress } from 'viem';
-import {
-  ChainNames,
-  formatAmount,
-  formatTokenName,
-  getExplorerUrl,
-  logger,
-} from '@cowprotocol/shared';
+import { getExplorerUrl, logger } from '@cowprotocol/shared';
+import { getNotificationSummary } from '../../utils/getNotificationSummary';
 
 export async function fromTradeToNotification(props: {
   prefix: string;
   id: string;
+  isEthFlowOrder: boolean;
   chainId: SupportedChainId;
   orderUid: string;
   owner: string;
@@ -29,6 +24,7 @@ export async function fromTradeToNotification(props: {
     id,
     chainId,
     owner,
+    isEthFlowOrder,
     sellTokenAddress,
     buyTokenAddress,
     sellAmount,
@@ -37,26 +33,20 @@ export async function fromTradeToNotification(props: {
     prefix,
     orderUid,
     transactionHash,
-    logIndex,
+    logIndex
   } = props;
 
-  const sellToken = await erc20Repository.get(
+  const summary = await getNotificationSummary({
     chainId,
-    getAddress(sellTokenAddress)
-  );
+    isEthFlowOrder,
+    erc20Repository,
+    sellTokenAddress,
+    buyTokenAddress,
+    sellAmount,
+    buyAmount
+  });
 
-  const buyToken = await erc20Repository.get(
-    chainId,
-    getAddress(buyTokenAddress)
-  );
-
-  const sellAmountFormatted = formatAmount(sellAmount, sellToken?.decimals);
-  const buyAmountFormatted = formatAmount(buyAmount, buyToken?.decimals);
-
-  const sellTokenName = formatTokenName(sellToken);
-  const buyTokenName = formatTokenName(buyToken);
-
-  const title = `Trade ${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName} in ${ChainNames[chainId]}`;
+  const title = `Trade ${summary}`;
   const message = `Account: ${owner}`;
 
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
@@ -71,7 +61,7 @@ export async function fromTradeToNotification(props: {
     url,
     context: {
       transactionHash,
-      logIndex: logIndex.toString(),
-    },
+      logIndex: logIndex.toString()
+    }
   };
 }

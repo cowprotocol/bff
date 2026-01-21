@@ -18,6 +18,10 @@ export const SUPPORTED_COINGECKO_PLATFORMS: Record<
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.POLYGON]: 'polygon-pos',
   [SupportedChainId.AVALANCHE]: 'avalanche',
+  [SupportedChainId.LENS]: 'lens',
+  [SupportedChainId.BNB]: 'binance-smart-chain',
+  [SupportedChainId.LINEA]: 'linea',
+  [SupportedChainId.PLASMA]: 'plasma',
 };
 
 /**
@@ -171,12 +175,10 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [53935]: 'defi-kingdoms-blockchain',
   [5464]: 'saga',
   [5545]: 'duckchain',
-  [56]: 'binance-smart-chain',
   [56288]: 'boba-bnb',
   [57]: 'syscoin',
   [570]: 'rollux',
   [57073]: 'ink',
-  [59144]: 'linea',
   [592]: 'astar',
   [6001]: 'bouncebit',
   [61]: 'ethereum-classic',
@@ -229,23 +231,29 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
 
 export type CoingeckoProClient = ReturnType<typeof createClient<paths>>;
 
-let coingeckoProClient: CoingeckoProClient | undefined;
+const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> =
+  {};
 
-export function getCoingeckoProClient(): CoingeckoProClient {
-  if (coingeckoProClient) {
-    return coingeckoProClient;
-  }
-
-  if (!process.env.COINGECKO_API_KEY) {
+export function getCoingeckoProClient(
+  apiKey = process.env.COINGECKO_API_KEY
+): CoingeckoProClient {
+  if (!apiKey) {
     throw new Error('COINGECKO_API_KEY is not set');
   }
 
-  coingeckoProClient = createClient<paths>({
+  const cached = coingeckoProClientCache[apiKey];
+
+  if (cached) return cached;
+
+  const coingeckoProClient = createClient<paths>({
     baseUrl: COINGECKO_PRO_BASE_URL + '/api/v3',
     headers: {
-      'x-cg-pro-api-key': process.env.COINGECKO_API_KEY,
+      'x-cg-pro-api-key': apiKey,
     },
   });
+
+  coingeckoProClientCache[apiKey] = coingeckoProClient;
+
   return coingeckoProClient;
 }
 

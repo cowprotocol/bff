@@ -1,21 +1,32 @@
+import { logger } from '@cowprotocol/shared';
 import { injectable } from 'inversify';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
+  name = 'Fallback';
+
   constructor(private usdRepositories: UsdRepository[]) {}
 
   async getUsdPrice(
     chainIdOrSlug: string,
     tokenAddress: string
   ): Promise<number | null> {
-    for (const usdRepository of this.usdRepositories) {
+    for (let i = 0; i < this.usdRepositories.length; i++) {
+      const usdRepository = this.usdRepositories[i];
       const price = await usdRepository.getUsdPrice(
         chainIdOrSlug,
         tokenAddress
       );
       if (price !== null) {
         return price;
+      }
+
+      if (i < this.usdRepositories.length - 1) {
+        const nextRepository = this.usdRepositories[i + 1];
+        logger.info(
+          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
+        );
       }
     }
     return null;
@@ -26,7 +37,8 @@ export class UsdRepositoryFallback implements UsdRepository {
     tokenAddress: string,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    for (const usdRepository of this.usdRepositories) {
+    for (let i = 0; i < this.usdRepositories.length; i++) {
+      const usdRepository = this.usdRepositories[i];
       const prices = await usdRepository.getUsdPrices(
         chainIdOrSlug,
         tokenAddress,
@@ -34,6 +46,13 @@ export class UsdRepositoryFallback implements UsdRepository {
       );
       if (prices !== null) {
         return prices;
+      }
+
+      if (i < this.usdRepositories.length - 1) {
+        const nextRepository = this.usdRepositories[i + 1];
+        logger.info(
+          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
+        );
       }
     }
     return null;

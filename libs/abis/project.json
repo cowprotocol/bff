@@ -32,7 +32,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "src/libs/abis/**/*.ts"
+          "libs/abis/**/*.ts"
         ]
       }
     }

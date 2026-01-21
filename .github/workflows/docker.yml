@@ -20,13 +20,15 @@ jobs:
           - apps/telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn install
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup dependencies
+        uses: ./.github/workflows/actions/setup-dependencies
+        with:
+          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
@@ -34,10 +36,11 @@ jobs:
       - run: yarn build
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        id: setup-buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -48,12 +51,12 @@ jobs:
 
       - name: 'Image metadata for ${{ env.PACKAGE_NAME }}'
         id: image_meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v5.9.0
         with:
           images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
 
       - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           file: ${{ matrix.package }}/Dockerfile
@@ -62,6 +65,11 @@ jobs:
           labels: ${{ steps.image_meta.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
           platforms: linux/amd64
+          cache-from: type=gha  
+          cache-to: type=gha,mode=max  
+          # TODO: Disabled as I couldn't get it to work with GH pkgs
+          # secrets: |
+          #   id=npmrc,src=${{ github.workspace }}/.npmrc
 
       - uses: cowprotocol/autodeploy-action@v2
         if: ${{ github.ref == 'refs/heads/main' }}

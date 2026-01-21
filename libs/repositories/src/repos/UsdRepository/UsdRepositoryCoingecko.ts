@@ -3,12 +3,12 @@ import {
   getCoingeckoProClient,
   SimplePriceResponse,
 } from '../../datasources/coingecko';
-import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
-import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 import {
   getAddressOrPlatform,
   getCoingeckoPlatform,
 } from '../../utils/coingeckoUtils';
+import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
+import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
 /**
  * Number of days of data to fetch for each price strategy
@@ -27,6 +27,8 @@ const DAYS_PER_PRICE_STRATEGY: Record<PriceStrategy, number> = {
 
 @injectable()
 export class UsdRepositoryCoingecko implements UsdRepository {
+  name = 'Coingecko';
+
   async getUsdPrice(
     chainIdOrSlug: string,
     tokenAddress?: string | undefined

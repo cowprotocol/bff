@@ -4,6 +4,8 @@ import {
   getViemClients,
   IndexerStateValue,
   PushNotificationsRepository,
+  OnChainPlacedOrdersRepository,
+  OrdersAppDataRepository
 } from '@cowprotocol/repositories';
 
 import { Runnable } from '../../../types';
@@ -25,6 +27,8 @@ export type TradeNotificationProducerProps = {
   pushSubscriptionsRepository: PushSubscriptionsRepository;
   indexerStateRepository: IndexerStateRepository;
   erc20Repository: Erc20Repository;
+  onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository;
+  ordersAppDataRepository: OrdersAppDataRepository;
 };
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
@@ -42,7 +46,7 @@ export class TradeNotificationProducer implements Runnable {
   }
 
   /**
-   * Main loop: Run the CMS notification producer. This method runs indefinitely,
+   * Main loop: Run the Trade notification producer. This method runs indefinitely,
    * fetching notifications and sending them to the queue.
    *
    * The method should not throw or finish.
@@ -172,6 +176,8 @@ export class TradeNotificationProducer implements Runnable {
       pushSubscriptionsRepository,
       indexerStateRepository,
       erc20Repository,
+      onChainPlacedOrdersRepository,
+      ordersAppDataRepository
     } = this.props;
 
     // Get all accounts subscribed to PUSH notifications
@@ -185,6 +191,8 @@ export class TradeNotificationProducer implements Runnable {
       toBlock,
       chainId,
       erc20Repository,
+      onChainPlacedOrdersRepository,
+      ordersAppDataRepository,
       prefix: this.prefix,
     });
 
@@ -200,10 +208,10 @@ export class TradeNotificationProducer implements Runnable {
         `${this.prefix} Sending ${notifications.length} notifications`,
         JSON.stringify(notifications, null, 2)
       );
-    }
 
-    // Post notifications to queue
-    this.props.pushNotificationsRepository.send(notifications);
+      // Post notifications to queue
+      this.props.pushNotificationsRepository.send(notifications);
+    }
 
     // Update state
     await indexerStateRepository.upsert<TradeNotificationProducerState>(

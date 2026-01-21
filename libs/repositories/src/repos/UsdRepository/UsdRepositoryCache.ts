@@ -1,13 +1,13 @@
 import { injectable } from 'inversify';
+import { getCacheKey, PartialCacheKey } from '../../utils/cache';
+import { CacheRepository } from '../CacheRepository/CacheRepository';
 import {
+  deserializePricePoints,
   PricePoint,
   PriceStrategy,
-  UsdRepository,
-  deserializePricePoints,
   serializePricePoints,
+  UsdRepository,
 } from './UsdRepository';
-import { CacheRepository } from '../CacheRepository/CacheRepository';
-import { getCacheKey, PartialCacheKey } from '../../utils/cache';
 
 const NULL_VALUE = 'null';
 
@@ -23,6 +23,10 @@ export class UsdRepositoryCache implements UsdRepository {
     private cacheTimeNullSeconds: number
   ) {
     this.baseCacheKey = ['repos', this.cacheName];
+  }
+
+  get name(): string {
+    return this.proxy.name;
   }
 
   async getUsdPrice(

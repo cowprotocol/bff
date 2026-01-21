@@ -2,14 +2,20 @@ import 'reflect-metadata';
 
 import {
   getCacheRepository,
+  getOnChainPlacedOrdersRepository,
   getErc20Repository,
   getIndexerStateRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
+  getExpiredOrdersRepository,
+  getOrdersAppDataRepository
 } from '@cowprotocol/services';
 
 import { Runnable } from '../types';
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer';
+import {
+  ExpiredOrdersNotificationProducer
+} from './producers/expired-orders/ExpiredOrdersNotificationProducer';
 import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk';
 import ms from 'ms';
 import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer';
@@ -34,12 +40,16 @@ async function mainLoop() {
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
   const indexerStateRepository = getIndexerStateRepository();
+  const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository();
+  const expiredOrdersRepository = getExpiredOrdersRepository();
+  const ordersAppDataRepository = getOrdersAppDataRepository();
 
   const repositories = {
     pushNotificationsRepository,
     pushSubscriptionsRepository,
     indexerStateRepository,
     erc20Repository,
+    onChainPlacedOrdersRepository,
   };
 
   // Create all producers
@@ -51,7 +61,17 @@ async function mainLoop() {
     ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
+        ordersAppDataRepository,
         chainId,
+      });
+    }),
+
+    // Expired order producer
+    ...chainIds.map((chainId) => {
+      return new ExpiredOrdersNotificationProducer({
+        chainId,
+        ...repositories,
+        expiredOrdersRepository
       });
     }),
   ];

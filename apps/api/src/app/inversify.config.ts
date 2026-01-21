@@ -5,33 +5,40 @@ import {
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
   getSimulationRepository,
+  getTokenBalancesRepository,
   getTokenHolderRepository,
   getUsdRepository,
+  TokenBalancesService,
+  TokenBalancesServiceMain,
+  tokenBalancesServiceSymbol,
 } from '@cowprotocol/services';
 
 import {
   CacheRepository,
-  DuneRepository,
-  Erc20Repository,
-  PushNotificationsRepository,
-  PushSubscriptionsRepository,
-  SimulationRepository,
-  TokenHolderRepository,
-  UsdRepository,
   cacheRepositorySymbol,
+  DuneRepository,
   duneRepositorySymbol,
+  Erc20Repository,
   erc20RepositorySymbol,
   isDuneEnabled,
+  PushNotificationsRepository,
   pushNotificationsRepositorySymbol,
+  PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
+  SimulationRepository,
   tenderlyRepositorySymbol,
+  TokenBalancesRepository,
+  tokenBalancesRepositorySymbol,
+  TokenHolderRepository,
   tokenHolderRepositorySymbol,
+  UsdRepository,
   usdRepositorySymbol,
 } from '@cowprotocol/repositories';
 
 import {
   HooksService,
   HooksServiceImpl,
+  hooksServiceSymbol,
   SimulationService,
   SlippageService,
   SlippageServiceMain,
@@ -39,7 +46,6 @@ import {
   TokenHolderServiceMain,
   UsdService,
   UsdServiceMain,
-  hooksServiceSymbol,
   simulationServiceSymbol,
   slippageServiceSymbol,
   tokenHolderServiceSymbol,
@@ -60,6 +66,7 @@ function getApiContainer(): Container {
   const erc20Repository = getErc20Repository(cacheRepository);
   const simulationRepository = getSimulationRepository();
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
+  const tokenBalancesRepository = getTokenBalancesRepository();
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
@@ -104,6 +111,10 @@ function getApiContainer(): Container {
       .toDynamicValue(() => new HooksServiceImpl(duneRepository));
   }
 
+  apiContainer
+    .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
+    .toConstantValue(tokenBalancesRepository);
+
   // Services
   apiContainer
     .bind<SlippageService>(slippageServiceSymbol)
@@ -112,6 +123,10 @@ function getApiContainer(): Container {
   apiContainer
     .bind<TokenHolderService>(tokenHolderServiceSymbol)
     .to(TokenHolderServiceMain);
+
+  apiContainer
+    .bind<TokenBalancesService>(tokenBalancesServiceSymbol)
+    .to(TokenBalancesServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
 

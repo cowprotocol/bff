@@ -16,119 +16,13 @@ export interface paths {
         /** Create a new order. In order to replace an existing order with a new one, the appData must contain a [valid replacement order UID](https://github.com/cowprotocol/app-data/blob/main/src/schemas/v1.1.0.json#L62), then the indicated order is cancelled, and a new one placed.
          *     This allows an old order to be cancelled AND a new order to be created in an atomic operation with a single signature.
          *     This may be useful for replacing orders when on-chain prices move outside of the original order's limit price. */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description The order to create. */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["OrderCreation"];
-                };
-            };
-            responses: {
-                /** @description Order has been accepted. */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UID"];
-                    };
-                };
-                /** @description Error during order validation. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderPostError"];
-                    };
-                };
-                /** @description Forbidden, your account is deny-listed. */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description No route was found quoting the order. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Too many order placements. */
-                429: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Error adding an order. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        post: operations["createOrder"];
         /**
          * Cancel multiple orders by marking them invalid with a timestamp.
          * @description This is a *best effort* cancellation, and might not prevent solvers from settling the orders (if the order is part of an in-flight settlement transaction for example). Authentication must be provided by an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an `OrderCancellations(bytes[] orderUids)` message.
          *
          */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Signed `OrderCancellations`. */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["OrderCancellations"];
-                };
-            };
-            responses: {
-                /** @description Order(s) are cancelled. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Malformed signature. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderCancellationError"];
-                    };
-                };
-                /** @description Invalid signature. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description One or more orders were not found and no orders were cancelled. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        delete: operations["cancelOrders"];
         options?: never;
         head?: never;
         patch?: never;
@@ -142,35 +36,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get existing order from UID. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    UID: components["schemas"]["UID"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Order */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Order"];
-                    };
-                };
-                /** @description Order was not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getOrder"];
         put?: never;
         post?: never;
         /**
@@ -183,54 +49,7 @@ export interface paths {
          *     [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signature of an
          *     `OrderCancellation(bytes orderUid)` message.
          */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    UID: components["schemas"]["UID"];
-                };
-                cookie?: never;
-            };
-            /** @description Signed `OrderCancellation` */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["OrderCancellation"];
-                };
-            };
-            responses: {
-                /** @description Order cancelled. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Malformed signature. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderCancellationError"];
-                    };
-                };
-                /** @description Invalid signature. */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Order was not found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        delete: operations["cancelOrder"];
         options?: never;
         head?: never;
         patch?: never;
@@ -244,28 +63,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the status of an order. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    UID: components["schemas"]["UID"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The order status with a list of solvers that proposed solutions (if applicable). */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["CompetitionOrderStatus"];
-                    };
-                };
-            };
-        };
+        get: operations["getOrderStatus"];
         put?: never;
         post?: never;
         delete?: never;
@@ -282,28 +80,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get orders by settlement transaction hash. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    txHash: components["schemas"]["TransactionHash"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Order(s). */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Order"][];
-                    };
-                };
-            };
-        };
+        get: operations["getOrdersByTxHash"];
         put?: never;
         post?: never;
         delete?: never;
@@ -324,37 +101,7 @@ export interface paths {
          * @description Exactly one of `owner` or `orderUid` must be set.
          *
          */
-        get: {
-            parameters: {
-                query?: {
-                    owner?: components["schemas"]["Address"];
-                    orderUid?: components["schemas"]["UID"];
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description ### If `owner` is specified:
-                 *
-                 *     Return all trades related to that `owner`.
-                 *
-                 *     ### If `orderUid` is specified:
-                 *
-                 *     Return all trades related to that `orderUid`. Given that an order
-                 *     may be partially fillable, it is possible that an individual order
-                 *     may have *multiple* trades. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Trade"][];
-                    };
-                };
-            };
-        };
+        get: operations["getTrades"];
         put?: never;
         post?: never;
         delete?: never;
@@ -382,26 +129,7 @@ export interface paths {
          *     **Note: This endpoint is currently permissioned. Reach out in discord if
          *     you need access.**
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Batch auction. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Auction"];
-                    };
-                };
-            };
-        };
+        get: operations["getCurrentBatchAuction"];
         put?: never;
         post?: never;
         delete?: never;
@@ -426,42 +154,7 @@ export interface paths {
          *     `offset` by the total number of returned results. When a response
          *     contains less than `limit` the last page has been reached.
          */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description The pagination offset. Defaults to 0.
-                     *      */
-                    offset?: number;
-                    /** @description The pagination limit. Defaults to 10. Maximum 1000. Minimum 1.
-                     *      */
-                    limit?: number;
-                };
-                header?: never;
-                path: {
-                    owner: components["schemas"]["Address"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The orders. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Order"][];
-                    };
-                };
-                /** @description Problem with parameters like limit being too large. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getUserOrdersPaginated"];
         put?: never;
         post?: never;
         delete?: never;
@@ -485,49 +178,7 @@ export interface paths {
          *     It represents the amount of native token atoms needed to buy 1 atom of
          *     the specified token.
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    token: components["schemas"]["Address"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The estimated native price. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NativePriceResponse"];
-                    };
-                };
-                /** @description Error finding the price. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description No liquidity was found. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unexpected error. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getTokenNativePrice"];
         put?: never;
         post?: never;
         delete?: never;
@@ -550,61 +201,7 @@ export interface paths {
          * @description Given a partial order compute the minimum fee and a price estimate for the order. Return a full order that can be used directly for signing, and with an included signature, passed directly to the order creation endpoint.
          *
          */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description The order parameters to compute a quote for. */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["OrderQuoteRequest"];
-                };
-            };
-            responses: {
-                /** @description Quoted order. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderQuoteResponse"];
-                    };
-                };
-                /** @description Error quoting order. */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PriceEstimationError"];
-                    };
-                };
-                /** @description No route was found for the specified order. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Too many order quotes. */
-                429: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unexpected error quoting an order. */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        post: operations["quote"];
         delete?: never;
         options?: never;
         head?: never;
@@ -620,38 +217,11 @@ export interface paths {
         };
         /**
          * Get information about a solver competition.
+         * @deprecated
          * @description Returns the competition information by `auction_id`.
          *
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    auction_id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Competition */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SolverCompetitionResponse"];
-                    };
-                };
-                /** @description No competition information available for this auction id. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getSolverCompetitionByAuctionId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -669,39 +239,11 @@ export interface paths {
         };
         /**
          * Get information about solver competition.
+         * @deprecated
          * @description Returns the competition information by `tx_hash`.
          *
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Transaction hash in which the competition was settled. */
-                    tx_hash: components["schemas"]["TransactionHash"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Competition */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SolverCompetitionResponse"];
-                    };
-                };
-                /** @description No competition information available for this `tx_hash`. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getSolverCompetitionByTxHash"];
         put?: never;
         post?: never;
         delete?: never;
@@ -719,36 +261,74 @@ export interface paths {
         };
         /**
          * Get information about the most recent solver competition.
+         * @deprecated
          * @description Returns the competition information for the last seen auction_id.
          *
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Competition */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SolverCompetitionResponse"];
-                    };
-                };
-                /** @description No competition information available. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        get: operations["getSolverCompetitionLatest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/{auction_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
+        /**
+         * Get information about a solver competition.
+         * @description Returns the competition information by `auction_id`.
+         *
+         */
+        get: operations["getSolverCompetitionByAuctionIdV2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/by_tx_hash/{tx_hash}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about solver competition.
+         * @description Returns the competition information by `tx_hash`.
+         *
+         */
+        get: operations["getSolverCompetitionByTxHashV2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/solver_competition/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about the most recent solver competition.
+         * @description Returns the competition information for the last seen auction_id.
+         *
+         */
+        get: operations["getSolverCompetitionLatestV2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -769,26 +349,7 @@ export interface paths {
          * @description Returns the git commit hash, branch name and release tag (code: https://github.com/cowprotocol/services).
          *
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Version */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": unknown;
-                    };
-                };
-            };
-        };
+        get: operations["getApiVersion"];
         put?: never;
         post?: never;
         delete?: never;
@@ -805,90 +366,13 @@ export interface paths {
             cookie?: never;
         };
         /** Get the full `appData` from contract `appDataHash`. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    app_data_hash: components["schemas"]["AppDataHash"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Full `appData`. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AppDataObject"];
-                    };
-                };
-                /** @description No full `appData` stored for this hash. */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["getAppDataByHash"];
         /**
          * Registers a full `appData` so it can be referenced by `appDataHash`.
          * @description Uploads a full `appData` to orderbook so that orders created with the corresponding `appDataHash` can be linked to the original full `appData`.
          *
          */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    app_data_hash: components["schemas"]["AppDataHash"];
-                };
-                cookie?: never;
-            };
-            /** @description The `appData` document to upload. */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["AppDataObject"];
-                };
-            };
-            responses: {
-                /** @description The full `appData` already exists. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AppDataHash"];
-                    };
-                };
-                /** @description The full `appData` was successfully registered. */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AppDataHash"];
-                    };
-                };
-                /** @description Error validating full `appData` */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Error storing the full `appData` */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        put: operations["registerAppDataByHash"];
         post?: never;
         delete?: never;
         options?: never;
@@ -909,54 +393,7 @@ export interface paths {
          * @description Uploads a full `appData` to orderbook and returns the corresponding `appDataHash`.
          *
          */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description The `appData` document to upload. */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["AppDataObject"];
-                };
-            };
-            responses: {
-                /** @description The full `appData` already exists. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AppDataHash"];
-                    };
-                };
-                /** @description The full `appData` was successfully registered. */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AppDataHash"];
-                    };
-                };
-                /** @description Error validating full `appData` */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Error storing the full `appData` */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        put: operations["registerAppData"];
         post?: never;
         delete?: never;
         options?: never;
@@ -978,28 +415,7 @@ export interface paths {
          *     This endpoint is under active development and should NOT be considered
          *     stable.
          */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    address: components["schemas"]["Address"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The total surplus. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TotalSurplus"];
-                    };
-                };
-            };
-        };
+        get: operations["getAddressTotalSurplus"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1538,6 +954,15 @@ export interface components {
             /** @description Whether it was possible to verify that the quoted amounts are accurate using a simulation.
              *      */
             verified: boolean;
+            /**
+             * @description Protocol fee in basis points (e.g., "2" for 0.02%). This represents the volume-based fee policy. Only present when configured.
+             *
+             * @example 2
+             */
+            protocolFeeBps?: string;
+            /** @description Protocol fee amount in sell token. For SELL orders, this amount is already included in the returned sellAmount. For BUY orders, this amount is applied before network fees are added to sellAmount. Only present when a volume fee is configured.
+             *      */
+            protocolFeeSellAmount?: components["schemas"]["TokenAmount"];
         };
         /** @description The settlements submitted by every solver for a specific auction.
          *     The `auctionId` corresponds to the id external solvers are provided
@@ -1546,36 +971,37 @@ export interface components {
         SolverCompetitionResponse: {
             /** @description The ID of the auction the competition info is for. */
             auctionId?: number;
-            /** @description The hash of the transaction that the winning solution of this info was submitted in. */
-            transactionHash?: (string & components["schemas"]["TransactionHash"]) | null;
-            /** @description Gas price used for ranking solutions. */
-            gasPrice?: number;
-            liquidityCollectedBlock?: number;
-            competitionSimulationBlock?: number;
+            /** @description Block that the auction started on. */
+            auctionStartBlock?: number;
+            /** @description The hashes of the transactions for the winning solutions of this competition.
+             *      */
+            transactionHashes?: components["schemas"]["TransactionHash"][];
+            /** @description The reference scores for each winning solver according to [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScores?: {
+                [key: string]: components["schemas"]["BigUint"] | undefined;
+            };
             auction?: components["schemas"]["CompetitionAuction"];
             /** @description Maps from solver name to object describing that solver's settlement. */
             solutions?: components["schemas"]["SolverSettlement"][];
         };
         SolverSettlement: {
-            /** @description Name of the solver. */
-            solver?: string;
+            /** @description Which position the solution achieved in the total ranking of the competition. */
+            ranking?: number;
             /** @description The address used by the solver to execute the settlement on-chain.
              *
              *     This field is missing for old settlements, the zero address has been
              *     used instead. */
             solverAddress?: string;
-            objective?: {
-                /** @description The total objective value used for ranking solutions. */
-                total?: number;
-                surplus?: number;
-                fees?: number;
-                cost?: number;
-                gas?: number;
-            };
             /** @description The score of the current auction as defined in [CIP-20](https://snapshot.org/#/cow.eth/proposal/0x2d3f9bd1ea72dca84b03e97dda3efc1f4a42a772c54bd2037e8b62e7d09a491f).
-             *     It is `null` for old auctions.
              *      */
-            score?: components["schemas"]["BigUint"] | null;
+            score?: components["schemas"]["BigUint"];
+            /** @description The reference score as defined in [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967) (if available).
+             *      */
+            referenceScore?: components["schemas"]["BigUint"] | null;
+            /** @description Transaction in which the solution was executed onchain (if available).
+             *      */
+            txHash?: components["schemas"]["TransactionHash"] | null;
             /** @description The prices of tokens for settled user orders as passed to the settlement contract.
              *      */
             clearingPrices?: {
@@ -1584,10 +1010,13 @@ export interface components {
             /** @description Touched orders. */
             orders?: {
                 id?: components["schemas"]["UID"];
-                executedAmount?: components["schemas"]["BigUint"];
+                sellAmount?: components["schemas"]["BigUint"];
+                buyAmount?: components["schemas"]["BigUint"];
             }[];
             /** @description whether the solution is a winner (received the right to get executed) or not */
             isWinner?: boolean;
+            /** @description whether the solution was filtered out according to the rules of [CIP-67](https://forum.cow.fi/t/cip-67-moving-from-batch-auction-to-the-fair-combinatorial-auction/2967). */
+            filteredOut?: boolean;
         };
         /** @description The estimated native price for the token
          *      */
@@ -1648,4 +1077,760 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The order to create. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderCreation"];
+            };
+        };
+        responses: {
+            /** @description Order has been accepted. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UID"];
+                };
+            };
+            /** @description Error during order validation. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderPostError"];
+                };
+            };
+            /** @description Forbidden, your account is deny-listed. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No route was found quoting the order. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many order placements. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error adding an order. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancelOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Signed `OrderCancellations`. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderCancellations"];
+            };
+        };
+        responses: {
+            /** @description Order(s) are cancelled. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Malformed signature. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderCancellationError"];
+                };
+            };
+            /** @description Invalid signature. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description One or more orders were not found and no orders were cancelled. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                UID: components["schemas"]["UID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /** @description Order was not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancelOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                UID: components["schemas"]["UID"];
+            };
+            cookie?: never;
+        };
+        /** @description Signed `OrderCancellation` */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderCancellation"];
+            };
+        };
+        responses: {
+            /** @description Order cancelled. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Malformed signature. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderCancellationError"];
+                };
+            };
+            /** @description Invalid signature. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order was not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getOrderStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                UID: components["schemas"]["UID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The order status with a list of solvers that proposed solutions (if applicable). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompetitionOrderStatus"];
+                };
+            };
+        };
+    };
+    getOrdersByTxHash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                txHash: components["schemas"]["TransactionHash"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order(s). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    getTrades: {
+        parameters: {
+            query?: {
+                owner?: components["schemas"]["Address"];
+                orderUid?: components["schemas"]["UID"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ### If `owner` is specified:
+             *
+             *     Return all trades related to that `owner`.
+             *
+             *     ### If `orderUid` is specified:
+             *
+             *     Return all trades related to that `orderUid`. Given that an order
+             *     may be partially fillable, it is possible that an individual order
+             *     may have *multiple* trades. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trade"][];
+                };
+            };
+        };
+    };
+    getCurrentBatchAuction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batch auction. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Auction"];
+                };
+            };
+        };
+    };
+    getUserOrdersPaginated: {
+        parameters: {
+            query?: {
+                /** @description The pagination offset. Defaults to 0.
+                 *      */
+                offset?: number;
+                /** @description The pagination limit. Defaults to 10. Maximum 1000. Minimum 1.
+                 *      */
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                owner: components["schemas"]["Address"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The orders. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+            /** @description Problem with parameters like limit being too large. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getTokenNativePrice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["schemas"]["Address"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The estimated native price. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NativePriceResponse"];
+                };
+            };
+            /** @description Error finding the price. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No liquidity was found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    quote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The order parameters to compute a quote for. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Quoted order. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderQuoteResponse"];
+                };
+            };
+            /** @description Error quoting order. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceEstimationError"];
+                };
+            };
+            /** @description No route was found for the specified order. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many order quotes. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected error quoting an order. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionByAuctionId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                auction_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available for this auction id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionByTxHash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Transaction hash in which the competition was settled. */
+                tx_hash: components["schemas"]["TransactionHash"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available for this `tx_hash`. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionLatest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionByAuctionIdV2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                auction_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available for this auction id. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionByTxHashV2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Transaction hash in which the competition was settled. */
+                tx_hash: components["schemas"]["TransactionHash"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available for this `tx_hash`. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getSolverCompetitionLatestV2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Competition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SolverCompetitionResponse"];
+                };
+            };
+            /** @description No competition information available. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getApiVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": unknown;
+                };
+            };
+        };
+    };
+    getAppDataByHash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                app_data_hash: components["schemas"]["AppDataHash"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Full `appData`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppDataObject"];
+                };
+            };
+            /** @description No full `appData` stored for this hash. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    registerAppDataByHash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                app_data_hash: components["schemas"]["AppDataHash"];
+            };
+            cookie?: never;
+        };
+        /** @description The `appData` document to upload. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppDataObject"];
+            };
+        };
+        responses: {
+            /** @description The full `appData` already exists. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppDataHash"];
+                };
+            };
+            /** @description The full `appData` was successfully registered. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppDataHash"];
+                };
+            };
+            /** @description Error validating full `appData` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error storing the full `appData` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    registerAppData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The `appData` document to upload. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppDataObject"];
+            };
+        };
+        responses: {
+            /** @description The full `appData` already exists. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppDataHash"];
+                };
+            };
+            /** @description The full `appData` was successfully registered. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppDataHash"];
+                };
+            };
+            /** @description Error validating full `appData` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error storing the full `appData` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAddressTotalSurplus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                address: components["schemas"]["Address"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The total surplus. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TotalSurplus"];
+                };
+            };
+        };
+    };
+}
