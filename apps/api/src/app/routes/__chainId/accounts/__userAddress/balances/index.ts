@@ -14,6 +14,8 @@ import {
 } from '@cowprotocol/services';
 import { parseEthereumAddressList } from '@cowprotocol/shared';
 
+const KEEP_ALIVE_INTERVAL_MS = 20_000; // 20 seconds
+
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'userAddress'],
@@ -308,7 +310,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           clearInterval(keepAliveInterval);
           void handleDisconnect('ping failed');
         }
-      }, 30000);
+      }, KEEP_ALIVE_INTERVAL_MS);
 
       // Handle client disconnect
       request.raw.on('close', () => {
