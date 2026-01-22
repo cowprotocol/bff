@@ -14,7 +14,9 @@ import {
 } from '@cowprotocol/services';
 import { parseEthereumAddressList } from '@cowprotocol/shared';
 
-const KEEP_ALIVE_INTERVAL_MS = 20_000; // 20 seconds
+const KEEP_ALIVE_INTERVAL_MS = parseInt(
+  process.env.KEEP_ALIVE_INTERVAL_MS || '20000' // 20 seconds
+);
 
 const paramsSchema = {
   type: 'object',
