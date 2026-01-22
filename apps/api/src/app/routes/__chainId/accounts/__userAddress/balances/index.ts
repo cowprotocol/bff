@@ -211,6 +211,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       reply.raw.setHeader('Connection', 'keep-alive');
       reply.raw.setHeader('Access-Control-Allow-Origin', '*');
       reply.raw.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
+      reply.raw.setHeader('X-Accel-Buffering', 'no');
 
       // Create SSE client
       const clientId = uuidv4();
