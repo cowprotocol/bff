@@ -89,11 +89,17 @@ export class AffiliateProgramExportServiceImpl
 
   private async upload(rows: AffiliateProgramRow[]): Promise<void> {
     const csv = buildCsv(rows);
-    await this.duneRepository.uploadCsv({
+    const response = await this.duneRepository.uploadCsv({
       tableName: AFFILIATE_PROGRAM_TABLE_NAME,
       data: csv,
       isPrivate: true,
     });
+    if (!response.success) {
+      const message = response.message ? `: ${response.message}` : '';
+      throw new Error(
+        `Dune CSV upload failed for ${AFFILIATE_PROGRAM_TABLE_NAME}${message}`
+      );
+    }
   }
 }
 

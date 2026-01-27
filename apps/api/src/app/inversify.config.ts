@@ -83,7 +83,7 @@ function getAffiliateStatsCacheTtlMs(): number {
   }
 
   const parsed = Number(rawValue);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     logger.warn(
       `Invalid DUNE_AFFILIATE_STATS_CACHE_TTL_MS value: ${rawValue}. Using default ${DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS}ms.`
     );
