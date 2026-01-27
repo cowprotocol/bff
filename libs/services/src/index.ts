@@ -16,4 +16,8 @@ export * from './SSEService/SSEServiceMain';
 export * from './BalanceTrackingService/BalanceTrackingService';
 export * from './BalanceTrackingService/BalanceTrackingServiceMain';
 
+export * from './AffiliateStatsService/AffiliateStatsService';
+export * from './AffiliateStatsService/AffiliateStatsServiceImpl';
+export * from './AffiliateProgramExportService/AffiliateProgramExportService';
+export * from './AffiliateProgramExportService/AffiliateProgramExportServiceImpl';
 export * from './factories';

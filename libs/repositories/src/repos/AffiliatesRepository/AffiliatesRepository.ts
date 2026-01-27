@@ -36,4 +36,6 @@ export interface AffiliatesRepository {
   getAffiliateByCode(params: { code: string }): Promise<AffiliateRecord | null>;
 
   createAffiliate(params: CreateAffiliateInput): Promise<AffiliateRecord>;
+
+  listAffiliates(): Promise<AffiliateRecord[]>;
 }
