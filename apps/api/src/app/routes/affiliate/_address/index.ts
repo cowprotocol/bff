@@ -6,10 +6,15 @@ import {
   affiliatesRepositorySymbol,
   isCmsEnabled,
   isCmsRequestError,
+  isDuneEnabled,
 } from '@cowprotocol/repositories';
 import { apiContainer } from '../../../inversify.config';
 import { logger } from '@cowprotocol/shared';
 import { ethers, type TypedDataField } from 'ethers';
+import {
+  AffiliateProgramExportService,
+  affiliateProgramExportServiceSymbol,
+} from '@cowprotocol/services';
 
 const paramsSchema = {
   type: 'object',
@@ -274,6 +279,30 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
           { walletAddress, code: affiliateEntry.code },
           'Affiliate code created'
         );
+
+        if (isDuneEnabled) {
+          const exportService = apiContainer.get<AffiliateProgramExportService>(
+            affiliateProgramExportServiceSymbol
+          );
+          void exportService
+            .exportAffiliateProgramData()
+            .then((result) => {
+              fastify.log.info(
+                {
+                  rows: result.rows,
+                  maxUpdatedAt: result.signature.maxUpdatedAt,
+                },
+                'Affiliate program export after create'
+              );
+            })
+            .catch((error) => {
+              fastify.log.error(
+                { error },
+                'Affiliate program export after create failed'
+              );
+            });
+        }
+
         reply.code(201).send({ code: affiliateEntry.code });
       } catch (error) {
         handleCmsError(error, reply);

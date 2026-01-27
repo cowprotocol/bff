@@ -6,6 +6,7 @@ import {
 } from './AffiliatesRepository';
 
 const AFFILIATE_COLLECTION_PATH = '/affiliates';
+const PAGE_SIZE = 100;
 
 type AffiliateAttributes = {
   code: string;
@@ -29,9 +30,18 @@ type StrapiData<T> = {
   attributes: T;
 };
 
+type StrapiPagination = {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+};
+
 type StrapiListResponse<T> = {
   data: Array<StrapiData<T>>;
-  meta?: unknown;
+  meta?: {
+    pagination?: StrapiPagination;
+  };
 };
 
 type StrapiSingleResponse<T> = {
@@ -101,6 +111,15 @@ export class AffiliatesRepositoryCms implements AffiliatesRepository {
 
     return mapAffiliate(response.data);
   }
+
+  async listAffiliates(): Promise<AffiliateRecord[]> {
+    const entries = await getAllPages<AffiliateAttributes>({
+      pageSize: PAGE_SIZE,
+      getPage: (params) => getAffiliatePage(params),
+    });
+
+    return entries.map(mapAffiliate);
+  }
 }
 
 function mapAffiliate(data: StrapiData<AffiliateAttributes>): AffiliateRecord {
@@ -160,4 +179,73 @@ async function cmsPost<T>(path: string, body: unknown): Promise<T> {
 
 export function isCmsRequestError(error: unknown): error is CmsRequestError {
   return error instanceof CmsRequestError;
+}
+
+/**
+ * Strapi REST pagination docs: https://docs.strapi.io/cms/api/rest/sort-pagination
+ */
+async function getAffiliatePage({
+  page = 1,
+  pageSize = PAGE_SIZE,
+}: PaginationParam = {}): Promise<StrapiListResponse<AffiliateAttributes>> {
+  return cmsGet<StrapiListResponse<AffiliateAttributes>>(
+    AFFILIATE_COLLECTION_PATH,
+    {
+      'pagination[withCount]': true,
+      'pagination[page]': page,
+      'pagination[pageSize]': pageSize,
+    }
+  );
+}
+
+type PaginationParam = {
+  page?: number;
+  pageSize?: number;
+};
+
+async function getAllPages<T>({
+  pageSize = PAGE_SIZE,
+  getPage,
+}: PaginationParam & {
+  getPage: (params: PaginationParam) => Promise<StrapiListResponse<T>>;
+}): Promise<Array<StrapiData<T>>> {
+  const allEntries: Array<StrapiData<T>> = [];
+  let page = 1;
+  let total: number | null = null;
+  let fetched = 0;
+
+  let hasMore = true;
+  while (hasMore) {
+    const response = await getPage({ page, pageSize });
+    const entries = response.data;
+
+    if (total === null) {
+      const metaTotal = response.meta?.pagination?.total;
+      if (typeof metaTotal === 'number') {
+        total = metaTotal;
+      }
+    }
+
+    if (entries.length === 0) {
+      hasMore = false;
+      continue;
+    }
+
+    allEntries.push(...entries);
+    fetched += entries.length;
+
+    if (total !== null && fetched >= total) {
+      hasMore = false;
+      continue;
+    }
+
+    if (entries.length < pageSize) {
+      hasMore = false;
+      continue;
+    }
+
+    page++;
+  }
+
+  return allEntries;
 }
