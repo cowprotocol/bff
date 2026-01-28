@@ -36,11 +36,11 @@ const bodySchema = {
     code: {
       title: 'Affiliate code',
       description:
-        'Affiliate code to bind to the wallet. Format: 6-12 uppercase chars (A-Z, 0-9, -, _).',
+        'Affiliate code to bind to the wallet. Format: 5-20 uppercase chars (A-Z, 0-9, -, _).',
       type: 'string',
-      minLength: 6,
-      maxLength: 12,
-      pattern: '^[A-Z0-9_-]{6,12}$',
+      minLength: 5,
+      maxLength: 20,
+      pattern: '^[A-Z0-9_-]{5,20}$',
     },
     walletAddress: AddressSchema,
     signedMessage: {
@@ -125,7 +125,7 @@ const AFFILIATE_TYPED_DATA_TYPES: Record<string, TypedDataField[]> = {
 };
 
 const PAYOUTS_CHAIN_ID = 1;
-const CODE_REGEX = /^[A-Z0-9_-]{6,12}$/;
+const CODE_REGEX = /^[A-Z0-9_-]{5,20}$/;
 
 const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
   if (!isCmsEnabled) {
