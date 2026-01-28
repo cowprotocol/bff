@@ -7,6 +7,8 @@ export * from './TokenHolderService/TokenHolderService';
 export * from './TokenBalancesService/TokenBalancesService';
 
 export * from './SimulationService/SimulationService';
+export * from './HooksService/HooksService';
+export * from './HooksService/HooksServiceImpl';
 
 export * from './SSEService/SSEService';
 export * from './SSEService/SSEServiceMain';
