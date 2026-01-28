@@ -1,14 +1,8 @@
 import { DuneRepository } from '@cowprotocol/repositories';
-import {
-  GetHooksParams,
-  GetLatestHooksParams,
-  HookData,
-  HooksService,
-} from './HooksService';
+import { GetHooksParams, HookData, HooksService } from './HooksService';
 import { isHookData } from './utils/isHookData';
 
 const DEFAULT_QUERY_ID = 5302473; // Example on executing a query
-const DEFAULT_QUERY_LATESTS = 5527161; // Example on getting of a query
 
 export class HooksServiceImpl implements HooksService {
   private readonly duneRepository: DuneRepository;
@@ -18,8 +12,7 @@ export class HooksServiceImpl implements HooksService {
   }
 
   async getHooks(params: GetHooksParams): Promise<HookData[]> {
-    const { blockchain, period, maxWaitTimeMs } = params;
-    console.log("📜 LOG > getHooks > blockchain:", blockchain);
+    const { blockchain, period, maxWaitTimeMs, limit, offset } = params;
 
     // Execute the query with parameters
     const execution = await this.duneRepository.executeQuery({
@@ -31,21 +24,14 @@ export class HooksServiceImpl implements HooksService {
     });
 
     // Wait for execution to complete with type assertion
-    const result = await this.duneRepository.waitForExecution<HookData>({
+    await this.duneRepository.waitForExecution<HookData>({
       executionId: execution.execution_id,
       typeAssertion: isHookData,
       maxWaitTimeMs,
     });
 
-    // The data is already typed as HookData from the generic repository
-    return result.result.rows;
-  }
-
-  async getLatestHooks(params: GetLatestHooksParams): Promise<HookData[]> {
-    const { limit, offset } = params;
-
-    const result = await this.duneRepository.getQueryResults({
-      queryId: DEFAULT_QUERY_LATESTS,
+    const result = await this.duneRepository.getQueryResults<HookData>({
+      queryId: DEFAULT_QUERY_ID,
       limit,
       offset,
       typeAssertion: isHookData,

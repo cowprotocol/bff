@@ -26,6 +26,10 @@ class MockDuneRepository implements DuneRepository {
     return this.mockResult as DuneResultResponse<T>;
   }
 
+  async getQueryResults<T>(): Promise<DuneResultResponse<T>> {
+    return this.mockResult as DuneResultResponse<T>;
+  }
+
   async waitForExecution<T>(params: {
     executionId: string;
     maxWaitTimeMs?: number;

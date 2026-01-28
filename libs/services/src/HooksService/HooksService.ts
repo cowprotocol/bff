@@ -48,16 +48,10 @@ export interface GetHooksParams {
   blockchain: Blockchain;
   period: Period;
   maxWaitTimeMs?: number;
-}
-
-export interface GetLatestHooksParams {
   limit?: number;
   offset?: number;
 }
 
 export interface HooksService {
   getHooks(params: GetHooksParams): Promise<HookData[]>;
-
-  // TODO: PoC: Since the getHooks params are currently not working. Delete this method after PoC.
-  getLatestHooks(params: GetLatestHooksParams): Promise<HookData[]>;
 }

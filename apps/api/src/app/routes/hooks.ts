@@ -21,9 +21,6 @@ interface HooksQuery {
   blockchain: Blockchain;
   period: Period;
   maxWaitTimeMs?: number;
-}
-
-interface LatestHooksQuery {
   limit?: number;
   offset?: number;
 }
@@ -78,83 +75,6 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
               description:
                 'Maximum time to wait for query execution in milliseconds',
             },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              hooks: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    environment: { type: 'string' },
-                    block_time: { type: 'string' },
-                    is_bridging: { type: 'boolean' },
-                    success: { type: 'boolean' },
-                    app_code: { type: 'string' },
-                    destination_chain_id: {
-                      type: ['number', 'null'],
-                    },
-                    destination_token_address: {
-                      type: ['string', 'null'],
-                    },
-                    hook_type: { type: 'string' },
-                    app_id: {
-                      type: ['string', 'null'],
-                    },
-                    target: { type: 'string' },
-                    gas_limit: { type: 'number' },
-                    app_hash: { type: 'string' },
-                    tx_hash: { type: 'string' },
-                  },
-                },
-              },
-              count: { type: 'number' },
-            },
-          },
-        },
-      },
-    },
-    async function (request, reply) {
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
-
-      try {
-        const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
-        const hooks = await hooksService.getHooks({
-          blockchain: request.query.blockchain,
-          period: request.query.period,
-          maxWaitTimeMs: request.query.maxWaitTimeMs,
-        });
-
-        return reply.send({
-          hooks,
-          count: hooks.length,
-        });
-      } catch (error) {
-        fastify.log.error('Error fetching hooks:', error);
-        return reply.status(500).send({
-          hooks: [],
-          count: 0,
-        });
-      }
-    }
-  );
-
-  // Latest hooks endpoint
-  fastify.get<{ Querystring: LatestHooksQuery; Reply: HooksResponse }>(
-    '/hooks/latest',
-    {
-      schema: {
-        description: 'Get latest hooks data from Dune Analytics',
-        tags: ['hooks'],
-        querystring: {
-          type: 'object',
-          properties: {
             limit: {
               type: 'number',
               default: 1000,
@@ -212,7 +132,10 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
 
       try {
         const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
-        const hooks = await hooksService.getLatestHooks({
+        const hooks = await hooksService.getHooks({
+          blockchain: request.query.blockchain,
+          period: request.query.period,
+          maxWaitTimeMs: request.query.maxWaitTimeMs,
           limit: request.query.limit,
           offset: request.query.offset,
         });
@@ -222,7 +145,7 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
           count: hooks.length,
         });
       } catch (error) {
-        fastify.log.error('Error fetching latest hooks:', error);
+        fastify.log.error('Error fetching hooks:', error);
         return reply.status(500).send({
           hooks: [],
           count: 0,
@@ -230,6 +153,7 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
       }
     }
   );
+
 };
 
 export default hooks;
