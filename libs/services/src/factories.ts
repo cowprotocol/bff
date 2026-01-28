@@ -38,11 +38,14 @@ import {
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
   TokenHolderRepositoryMoralis,
+  UserBalanceRepository,
+  UserBalanceRepositoryCache,
+  UserBalanceRepositoryViem,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
   UsdRepositoryCow,
-  UsdRepositoryFallback
+  UsdRepositoryFallback,
 } from '@cowprotocol/repositories';
 
 import ms from 'ms';
@@ -151,6 +154,17 @@ export function getTokenHolderRepository(
 
 export function getTokenBalancesRepository(): TokenBalancesRepository {
   return new TokenBalancesRepositoryAlchemy();
+}
+
+export function getUserBalanceRepository(
+  cacheRepository: CacheRepository
+): UserBalanceRepository {
+  return new UserBalanceRepositoryCache(
+    new UserBalanceRepositoryViem(getViemClients()),
+    cacheRepository,
+    'user_balance',
+    1 // Cache balances for 1 second
+  );
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {

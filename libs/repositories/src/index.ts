@@ -43,9 +43,15 @@ export * from './repos/TokenHolderRepository/TokenHolderRepositoryFallback';
 export * from './repos/TokenHolderRepository/TokenHolderRepositoryGoldRush';
 export * from './repos/TokenHolderRepository/TokenHolderRepositoryMoralis';
 
+// Token balances repositories
 export * from './repos/TokenBalancesRepository/TokenBalancesRepository';
 export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryMoralis';
 export * from './repos/TokenBalancesRepository/TokenBalancesRepositoryAlchemy';
+
+// User balance repositories
+export * from './repos/UserBalanceRepository/UserBalanceRepository';
+export * from './repos/UserBalanceRepository/UserBalanceRepositoryCache';
+export * from './repos/UserBalanceRepository/UserBalanceRepositoryViem';
 
 // Simulation repositories
 export * from './repos/SimulationRepository/SimulationRepository';

@@ -73,6 +73,7 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
           '2XX': successSchema,
           '404': errorSchema,
         },
+        tags: ['tokens'],
       },
     },
     async function (request, reply) {
