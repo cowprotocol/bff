@@ -29,21 +29,11 @@ export class DuneRepositoryImpl implements DuneRepository {
   ): Promise<DuneExecutionResponse> {
     const { queryId, parameters, performance } = params;
 
-    // Build URL with query parameters
-    let url = `/query/${queryId}/execute`;
-    const queryParams = new URLSearchParams();
-
-    if (parameters) {
-      queryParams.append('query_parameters', JSON.stringify(parameters));
-    }
-
-    if (performance) {
-      queryParams.append('performance', performance);
-    }
-
-    if (queryParams.size > 0) {
-      url += `?${queryParams.toString()}`;
-    }
+    const url = `/query/${queryId}/execute`;
+    const body = {
+      ...(parameters ? { query_parameters: parameters } : {}),
+      ...(performance ? { performance } : {}),
+    };
 
     logger.info(
       `Executing Dune query ${queryId} with parameters: ${JSON.stringify(
@@ -51,9 +41,7 @@ export class DuneRepositoryImpl implements DuneRepository {
       )} and performance: ${performance || 'medium'}`
     );
 
-    return this.makeRequest<DuneExecutionResponse>(url, {
-      method: 'POST',
-    });
+    return this.makeRequest<DuneExecutionResponse>(url, {}, body);
   }
 
   async getExecutionResults<T>(
@@ -138,12 +126,12 @@ export class DuneRepositoryImpl implements DuneRepository {
 
   private async makeRequest<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    body?: Record<string, unknown>
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const defaultHeaders = {
       'X-DUNE-API-KEY': this.apiKey,
-      'Content-Type': 'application/json',
     };
 
     const requestOptions: RequestInit = {
@@ -154,9 +142,20 @@ export class DuneRepositoryImpl implements DuneRepository {
       },
     };
 
+    if (body) {
+      requestOptions.method = 'POST';
+      requestOptions.body = JSON.stringify(body);
+      requestOptions.headers = {
+        ...requestOptions.headers,
+        'Content-Type': 'application/json',
+      };
+    }
+
     logger.info(
-      `Making Dune API request: ${options.method || 'GET'} ${url}${
-        options.body ? ` with body: ${options.body}` : ''
+      `Making Dune API request: ${
+        requestOptions.method || 'GET'
+      } ${url}${
+        requestOptions.body ? ` with body: ${requestOptions.body}` : ''
       }`
     );
 

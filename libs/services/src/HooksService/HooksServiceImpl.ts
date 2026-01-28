@@ -19,6 +19,7 @@ export class HooksServiceImpl implements HooksService {
 
   async getHooks(params: GetHooksParams): Promise<HookData[]> {
     const { blockchain, period, maxWaitTimeMs } = params;
+    console.log("📜 LOG > getHooks > blockchain:", blockchain);
 
     // Execute the query with parameters
     const execution = await this.duneRepository.executeQuery({
