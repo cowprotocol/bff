@@ -261,7 +261,7 @@ describe('HooksService', () => {
           blockchain: 'mainnet',
           period: 'last 7d',
         })
-      ).rejects.toThrow('Failed to fetch hooks data: Dune API error');
+      ).rejects.toThrow('Dune API error');
     });
 
     it('should throw error when data validation fails', async () => {

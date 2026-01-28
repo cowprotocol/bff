@@ -1,8 +1,5 @@
-import {
-  DuneRepositoryImpl,
-  DuneExecutionResponse,
-  DuneResultResponse,
-} from './DuneRepository';
+import { DuneExecutionResponse, DuneResultResponse } from './DuneRepository';
+import { DuneRepositoryImpl } from './DuneRepositoryImpl';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -36,13 +33,16 @@ describe('DuneRepositoryImpl', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.dune.com/api/v1/query/12345/execute?query_parameters=%7B%22param1%22%3A%22value1%22%2C%22param2%22%3A42%7D',
+        'https://api.dune.com/api/v1/query/12345/execute',
         {
           method: 'POST',
           headers: {
             'X-DUNE-API-KEY': mockApiKey,
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            query_parameters: { param1: 'value1', param2: 42 },
+          }),
         }
       );
 
@@ -68,13 +68,14 @@ describe('DuneRepositoryImpl', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.dune.com/api/v1/query/12345/execute?performance=large',
+        'https://api.dune.com/api/v1/query/12345/execute',
         {
           method: 'POST',
           headers: {
             'X-DUNE-API-KEY': mockApiKey,
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ performance: 'large' }),
         }
       );
 
@@ -101,13 +102,17 @@ describe('DuneRepositoryImpl', () => {
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.dune.com/api/v1/query/12345/execute?query_parameters=%7B%22param1%22%3A%22value1%22%7D&performance=large',
+        'https://api.dune.com/api/v1/query/12345/execute',
         {
           method: 'POST',
           headers: {
             'X-DUNE-API-KEY': mockApiKey,
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            query_parameters: { param1: 'value1' },
+            performance: 'large',
+          }),
         }
       );
 
@@ -139,6 +144,7 @@ describe('DuneRepositoryImpl', () => {
             'X-DUNE-API-KEY': mockApiKey,
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({}),
         }
       );
 
@@ -201,10 +207,8 @@ describe('DuneRepositoryImpl', () => {
       expect(fetch).toHaveBeenCalledWith(
         'https://api.dune.com/api/v1/execution/test-execution-123/results',
         {
-          method: 'GET',
           headers: {
             'X-DUNE-API-KEY': mockApiKey,
-            'Content-Type': 'application/json',
           },
         }
       );
