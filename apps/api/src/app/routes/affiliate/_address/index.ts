@@ -210,7 +210,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
       const code = normalizeCode(request.body.code);
 
       if (address !== walletAddress) {
-        reply.code(400).send({ message: 'Wallet address mismatch' });
+        reply.code(400).send({ message: 'Affiliate wallet address mismatch' });
         return;
       }
 
@@ -239,12 +239,12 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
         );
 
         if (normalizeAddress(recoveredAddress) !== walletAddress) {
-          reply.code(401).send({ message: 'Invalid signature address' });
+          reply.code(401).send({ message: 'Affiliate signature has invalid address' });
           return;
         }
       } catch (error) {
         fastify.log.warn({ error }, 'Affiliate signature verification failed');
-        reply.code(401).send({ message: 'Invalid signature' });
+        reply.code(401).send({ message: 'Affiliate has invalid signature' });
         return;
       }
 
@@ -255,7 +255,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
           });
 
         if (existingByWallet) {
-          reply.code(409).send({ message: 'Wallet already bound to a code' });
+          reply.code(409).send({ message: 'Affiliate wallet address already bound to a code' });
           return;
         }
 
