@@ -56,6 +56,7 @@ const affiliateGetResponseSchema = {
   type: 'object',
   required: [
     'code',
+    'createdAt',
     'rewardAmount',
     'triggerVolume',
     'timeCapDays',
@@ -67,6 +68,9 @@ const affiliateGetResponseSchema = {
   additionalProperties: false,
   properties: {
     code: {
+      type: 'string',
+    },
+    createdAt: {
       type: 'string',
     },
     rewardAmount: { type: 'number' },
@@ -81,10 +85,13 @@ const affiliateGetResponseSchema = {
 
 const affiliateCreateResponseSchema = {
   type: 'object',
-  required: ['code'],
+  required: ['code', 'createdAt'],
   additionalProperties: false,
   properties: {
     code: {
+      type: 'string',
+    },
+    createdAt: {
       type: 'string',
     },
   },
@@ -170,6 +177,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
 
         reply.send({
           code: affiliateEntry.code,
+          createdAt: affiliateEntry.createdAt,
           rewardAmount: affiliateEntry.rewardAmount,
           triggerVolume: affiliateEntry.triggerVolume,
           timeCapDays: affiliateEntry.timeCapDays,
@@ -303,7 +311,10 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
             });
         }
 
-        reply.code(201).send({ code: affiliateEntry.code });
+        reply.code(201).send({
+          code: affiliateEntry.code,
+          createdAt: affiliateEntry.createdAt,
+        });
       } catch (error) {
         handleCmsError(error, reply);
       }
