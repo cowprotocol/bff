@@ -1,8 +1,10 @@
 import { logger } from '@cowprotocol/shared';
 import { DuneRepository } from '@cowprotocol/repositories';
 import {
+  AffiliateStatsResult,
   AffiliateStatsRow,
   AffiliateStatsService,
+  TraderStatsResult,
   TraderStatsRow,
 } from './AffiliateStatsService';
 
@@ -12,6 +14,7 @@ const AFFILIATE_STATS_QUERY_ID = 6560325;
 type CacheEntry<T> = {
   expiresAt: number;
   rows: T[];
+  lastUpdatedAt: string;
 };
 
 type NumericValue = number | string;
@@ -64,34 +67,42 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     this.cacheTtlMs = cacheTtlMs;
   }
 
-  async getTraderStats(address: string): Promise<TraderStatsRow[]> {
+  async getTraderStats(address: string): Promise<TraderStatsResult> {
     const normalizedAddress = address.toLowerCase();
-    const rows = await this.getCachedQuery<TraderStatsRowRaw, TraderStatsRow>({
+    const { rows, lastUpdatedAt } = await this.getCachedQuery<
+      TraderStatsRowRaw,
+      TraderStatsRow
+    >({
       cacheKey: 'affiliate-trader-stats',
       queryId: TRADER_STATS_QUERY_ID,
       typeAssertion: isTraderStatsRowRaw,
       mapRow: normalizeTraderStatsRow,
     });
 
-    return rows.filter(
+    const filtered = rows.filter(
       (row) => row.trader_address.toLowerCase() === normalizedAddress
     );
+
+    return { rows: filtered, lastUpdatedAt };
   }
 
-  async getAffiliateStats(address: string): Promise<AffiliateStatsRow[]> {
+  async getAffiliateStats(address: string): Promise<AffiliateStatsResult> {
     const normalizedAddress = address.toLowerCase();
-    const rows = await this.getCachedQuery<AffiliateStatsRowRaw, AffiliateStatsRow>(
-      {
+    const { rows, lastUpdatedAt } = await this.getCachedQuery<
+      AffiliateStatsRowRaw,
+      AffiliateStatsRow
+    >({
       cacheKey: 'affiliate-stats',
       queryId: AFFILIATE_STATS_QUERY_ID,
       typeAssertion: isAffiliateStatsRowRaw,
       mapRow: normalizeAffiliateStatsRow,
-    }
-    );
+    });
 
-    return rows.filter(
+    const filtered = rows.filter(
       (row) => row.affiliate_address.toLowerCase() === normalizedAddress
     );
+
+    return { rows: filtered, lastUpdatedAt };
   }
 
   private async getCachedQuery<T, U>(params: {
@@ -99,10 +110,10 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     queryId: number;
     typeAssertion: (data: unknown) => data is T;
     mapRow: (row: T) => U;
-  }): Promise<U[]> {
+  }): Promise<{ rows: U[]; lastUpdatedAt: string }> {
     const cached = this.getCache<U>(params.cacheKey);
     if (cached) {
-      return cached;
+      return { rows: cached.rows as U[], lastUpdatedAt: cached.lastUpdatedAt };
     }
 
     logger.debug(`Affiliate stats cache miss for ${params.cacheKey}.`);
@@ -112,6 +123,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       let offset = 0;
       let total: number | null = null;
       const rows: U[] = [];
+      let lastUpdatedAt: string | undefined = undefined;
 
       let hasMore = true;
       while (hasMore) {
@@ -121,6 +133,13 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
           limit,
           offset,
         });
+
+        if (!lastUpdatedAt) {
+          lastUpdatedAt =
+            result.execution_started_at ||
+            result.execution_ended_at ||
+            result.submitted_at;
+        }
 
         const pageRows = result.result.rows.map(params.mapRow);
         rows.push(...pageRows);
@@ -150,15 +169,16 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
         }
       }
 
-      this.setCache(params.cacheKey, rows);
-      return rows;
+      const resolvedLastUpdatedAt = lastUpdatedAt ?? new Date().toISOString();
+      this.setCache(params.cacheKey, rows, resolvedLastUpdatedAt);
+      return { rows, lastUpdatedAt: resolvedLastUpdatedAt };
     } catch (error) {
       logger.error({ error }, `Affiliate stats Dune query failed (${params.cacheKey}).`);
       throw error;
     }
   }
 
-  private getCache<T>(key: string): T[] | null {
+  private getCache<T>(key: string): CacheEntry<T> | null {
     const cached = this.cache.get(key);
     if (!cached) {
       return null;
@@ -169,11 +189,16 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       return null;
     }
 
+    if (!cached.lastUpdatedAt) {
+      this.cache.delete(key);
+      return null;
+    }
+
     logger.debug(`Affiliate stats cache hit for ${key}.`);
-    return cached.rows as T[];
+    return cached as CacheEntry<T>;
   }
 
-  private setCache<T>(key: string, rows: T[]): void {
+  private setCache<T>(key: string, rows: T[], lastUpdatedAt: string): void {
     if (this.cacheTtlMs <= 0) {
       return;
     }
@@ -182,6 +207,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     this.cache.set(key, {
       expiresAt: Date.now() + this.cacheTtlMs,
       rows,
+      lastUpdatedAt,
     });
   }
 }

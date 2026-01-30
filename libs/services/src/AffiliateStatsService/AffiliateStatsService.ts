@@ -26,7 +26,17 @@ export interface AffiliateStatsRow {
   total_traders: number;
 }
 
+export interface AffiliateStatsResult {
+  rows: AffiliateStatsRow[];
+  lastUpdatedAt: string;
+}
+
+export interface TraderStatsResult {
+  rows: TraderStatsRow[];
+  lastUpdatedAt: string;
+}
+
 export interface AffiliateStatsService {
-  getTraderStats(address: string): Promise<TraderStatsRow[]>;
-  getAffiliateStats(address: string): Promise<AffiliateStatsRow[]>;
+  getTraderStats(address: string): Promise<TraderStatsResult>;
+  getAffiliateStats(address: string): Promise<AffiliateStatsResult>;
 }

@@ -30,6 +30,7 @@ const traderStatsSchema = {
     'total_earned',
     'paid_out',
     'next_payout',
+    'lastUpdatedAt',
   ],
   additionalProperties: false,
   properties: {
@@ -43,6 +44,7 @@ const traderStatsSchema = {
     total_earned: { type: 'number' },
     paid_out: { type: 'number' },
     next_payout: { type: 'number' },
+    lastUpdatedAt: { type: 'string' },
   },
 } as const satisfies JSONSchema;
 
@@ -86,15 +88,18 @@ const traderStats: FastifyPluginAsync = async (fastify): Promise<void> => {
         const affiliateStatsService = apiContainer.get<AffiliateStatsService>(
           affiliateStatsServiceSymbol
         );
-        const stats = await affiliateStatsService.getTraderStats(
+        const result = await affiliateStatsService.getTraderStats(
           request.params.address
         );
 
-        if (stats.length === 0) {
+        if (result.rows.length === 0) {
           return reply.status(404).send({ message: 'Trader stats not found' });
         }
 
-        return reply.send(stats[0]);
+        return reply.send({
+          ...result.rows[0],
+          lastUpdatedAt: result.lastUpdatedAt,
+        });
       } catch (error) {
         fastify.log.error('Error fetching affiliate trader stats:', error);
         return reply.status(500).send({ message: 'Unexpected error' });
