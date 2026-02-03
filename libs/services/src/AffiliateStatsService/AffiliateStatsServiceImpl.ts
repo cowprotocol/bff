@@ -7,14 +7,14 @@ import {
   TraderStatsResult,
   TraderStatsRow,
 } from './AffiliateStatsService';
-import { DUNE_MAX_ROWS, DUNE_PAGE_SIZE, DUNE_QUERY_IDS } from './constants';
-import type { AffiliateStatsRowRaw, CacheEntry, TraderStatsRowRaw } from './types';
+import { DUNE_MAX_ROWS, DUNE_PAGE_SIZE, DUNE_QUERY_IDS } from './AffiliateStatsService.constants';
+import type { AffiliateStatsRowRaw, CacheEntry, TraderStatsRowRaw } from './AffiliateStatsService.types';
 import {
   isAffiliateStatsRowRaw,
   isTraderStatsRowRaw,
   normalizeAffiliateStatsRow,
   normalizeTraderStatsRow,
-} from './utils';
+} from './AffiliateStatsService.utils';
 
 export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   private readonly duneRepository: DuneRepository;

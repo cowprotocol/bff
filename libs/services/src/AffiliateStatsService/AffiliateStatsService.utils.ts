@@ -5,7 +5,7 @@ import type {
 import type {
   AffiliateStatsRowRaw,
   TraderStatsRowRaw,
-} from './types';
+} from './AffiliateStatsService.types';
 import { isNumeric, isRecord, isString, toNumber } from '../utils/type-checking-utils';
 
 export function isTraderStatsRowRaw(
