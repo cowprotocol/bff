@@ -15,7 +15,9 @@ const POLL_INTERVAL_MS = 5 * 60 * 1000;
 let lastSignature: AffiliateProgramSignature | null = null;
 let inFlight = false;
 
-export function startAffiliateProgramExportPoller(): void {
+export function startAffiliateProgramExportPoller():
+  | (() => void)
+  | undefined {
   if (!isCmsEnabled || !isDuneEnabled) {
     logger.warn(
       'Affiliate export poller disabled (CMS or Dune not enabled).'
@@ -63,5 +65,6 @@ export function startAffiliateProgramExportPoller(): void {
   };
 
   void run();
-  setInterval(run, POLL_INTERVAL_MS);
+  const intervalId = setInterval(run, POLL_INTERVAL_MS);
+  return () => clearInterval(intervalId);
 }

@@ -2,6 +2,7 @@ import {
   DuneRepository,
   DuneExecutionResponse,
   DuneResultResponse,
+  UploadCsvResponse,
 } from '@cowprotocol/repositories';
 import { HookData, Blockchain, Period } from './HooksService';
 import { HooksServiceImpl } from './HooksServiceImpl';
@@ -58,7 +59,7 @@ class MockDuneRepository implements DuneRepository {
     return this.mockResult as DuneResultResponse<T>;
   }
 
-  async uploadCsv(): Promise<{ success: boolean; message?: string }> {
+  async uploadCsv(): Promise<UploadCsvResponse> {
     return { success: true };
   }
 

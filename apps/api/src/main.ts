@@ -14,7 +14,10 @@ export const server = Fastify({
 // Register your application as a normal plugin.
 server.register(app);
 
-startAffiliateProgramExportPoller();
+const stopAffiliateProgramExportPoller = startAffiliateProgramExportPoller();
+server.addHook('onClose', async () => {
+  await stopAffiliateProgramExportPoller?.();
+});
 
 // Start listening.
 server.listen({ port, host }, (err) => {

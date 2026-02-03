@@ -141,10 +141,7 @@ export class DuneRepositoryImpl implements DuneRepository {
       payload.is_private = isPrivate;
     }
 
-    return this.makeRequest<UploadCsvResponse>('/uploads/csv', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+    return this.makeRequest<UploadCsvResponse>('/uploads/csv', {}, payload);
   }
 
   private async makeRequest<T>(

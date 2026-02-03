@@ -15,10 +15,6 @@ type ParamsSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof responseSchema>;
 type ErrorSchema = FromSchema<typeof errorSchema>;
 
-const affiliatesRepository: AffiliatesRepository = apiContainer.get(
-  affiliatesRepositorySymbol
-);
-
 const refCodes: FastifyPluginAsync = async (fastify): Promise<void> => {
   if (!isCmsEnabled) {
     logger.warn(
@@ -26,6 +22,10 @@ const refCodes: FastifyPluginAsync = async (fastify): Promise<void> => {
     );
     return;
   }
+
+  const affiliatesRepository: AffiliatesRepository = apiContainer.get(
+    affiliatesRepositorySymbol
+  );
 
   // GET /ref-codes/:code
   fastify.get<{
