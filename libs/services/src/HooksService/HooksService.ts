@@ -1,5 +1,3 @@
-import { PerformanceTier } from '@cowprotocol/repositories';
-
 export const hooksServiceSymbol = Symbol.for('HooksService');
 
 // Single source of truth - define the values once

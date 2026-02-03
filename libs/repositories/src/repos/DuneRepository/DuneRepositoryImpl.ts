@@ -151,7 +151,7 @@ export class DuneRepositoryImpl implements DuneRepository {
       };
     }
 
-    logger.info(
+    logger.debug(
       `Making Dune API request: ${
         requestOptions.method || 'GET'
       } ${url}${
@@ -164,8 +164,17 @@ export class DuneRepositoryImpl implements DuneRepository {
     logger.info(`Dune API response: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
+      let errorBody = 'Unable to read error body';
+      const responseText = (response as Partial<Response>).text;
+      if (typeof responseText === 'function') {
+        try {
+          errorBody = await responseText.call(response);
+        } catch {
+          // keep default
+        }
+      }
       throw new Error(
-        `Dune API request failed: ${response.status} ${response.statusText}`
+        `Dune API request failed: ${response.status} ${response.statusText}. Body: ${errorBody}`
       );
     }
 

@@ -1,21 +1,22 @@
 import { HookData } from '../HooksService';
 
+// Check required string fields
+const requiredStringFields = [
+  'environment',
+  'block_time',
+  'app_code',
+  'hook_type',
+  'target',
+  'app_hash',
+  'tx_hash',
+];
+
 export function isHookData(data: unknown): data is HookData {
   // Check if data is an object
   if (typeof data !== 'object' || data === null) {
     return false;
   }
 
-  // Check required string fields
-  const requiredStringFields = [
-    'environment',
-    'block_time',
-    'app_code',
-    'hook_type',
-    'target',
-    'app_hash',
-    'tx_hash',
-  ];
   for (const field of requiredStringFields) {
     if (typeof (data as Record<string, unknown>)[field] !== 'string') {
       return false;
