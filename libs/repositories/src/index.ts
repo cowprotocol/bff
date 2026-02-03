@@ -79,3 +79,7 @@ export * from './repos/OrdersAppDataRepository/OrdersAppDataRepositoryPostgres';
 export * from './repos/PushNotificationsRepository/PushNotificationsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepository';
 export * from './repos/PushSubscriptionsRepository/PushSubscriptionsRepositoryCms';
+
+// Dune repositories
+export * from './repos/DuneRepository/DuneRepository';
+export * from './repos/DuneRepository/DuneRepositoryImpl';

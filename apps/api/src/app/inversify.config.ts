@@ -1,5 +1,6 @@
 import {
   getCacheRepository,
+  getDuneRepository,
   getErc20Repository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
@@ -8,27 +9,19 @@ import {
   getTokenHolderRepository,
   getUserBalanceRepository,
   getUsdRepository,
-  SimulationService,
-  simulationServiceSymbol,
-  SlippageService,
-  SlippageServiceMain,
-  slippageServiceSymbol,
   TokenBalancesService,
   TokenBalancesServiceMain,
   tokenBalancesServiceSymbol,
-  TokenHolderService,
-  TokenHolderServiceMain,
-  tokenHolderServiceSymbol,
-  UsdService,
-  UsdServiceMain,
-  usdServiceSymbol,
 } from '@cowprotocol/services';
 
 import {
   CacheRepository,
   cacheRepositorySymbol,
+  DuneRepository,
+  duneRepositorySymbol,
   Erc20Repository,
   erc20RepositorySymbol,
+  isDuneEnabled,
   PushNotificationsRepository,
   pushNotificationsRepositorySymbol,
   PushSubscriptionsRepository,
@@ -46,6 +39,20 @@ import {
 } from '@cowprotocol/repositories';
 
 import {
+  HooksService,
+  HooksServiceImpl,
+  hooksServiceSymbol,
+  SimulationService,
+  SlippageService,
+  SlippageServiceMain,
+  TokenHolderService,
+  TokenHolderServiceMain,
+  UsdService,
+  UsdServiceMain,
+  simulationServiceSymbol,
+  slippageServiceSymbol,
+  tokenHolderServiceSymbol,
+  usdServiceSymbol,
   BalanceTrackingService,
   BalanceTrackingServiceMain,
   SSEService,
@@ -101,6 +108,18 @@ function getApiContainer(): Container {
   apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
     .toConstantValue(tokenHolderRepository);
+
+  if (isDuneEnabled) {
+    const duneRepository = getDuneRepository();
+
+    apiContainer
+      .bind<DuneRepository>(duneRepositorySymbol)
+      .toConstantValue(duneRepository);
+
+    apiContainer
+      .bind<HooksService>(hooksServiceSymbol)
+      .toDynamicValue(() => new HooksServiceImpl(duneRepository));
+  }
 
   apiContainer
     .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
