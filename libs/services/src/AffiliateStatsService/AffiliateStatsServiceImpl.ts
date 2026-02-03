@@ -7,23 +7,14 @@ import {
   TraderStatsResult,
   TraderStatsRow,
 } from './AffiliateStatsService';
-
-const TRADER_STATS_QUERY_ID = 6560853;
-const AFFILIATE_STATS_QUERY_ID = 6560325;
-const DUNE_PAGE_SIZE = 1000;
-const DUNE_MAX_ROWS = 1_000_000;
-
-type CacheEntry<T> = {
-  expiresAt: number;
-  rows: T[];
-  lastUpdatedAt: string;
-};
-
-type NumericValue = number | string;
-
-type TraderStatsRowRaw = TraderStatsRow<NumericValue>;
-
-type AffiliateStatsRowRaw = AffiliateStatsRow<NumericValue>;
+import { DUNE_MAX_ROWS, DUNE_PAGE_SIZE, DUNE_QUERY_IDS } from './constants';
+import type { AffiliateStatsRowRaw, CacheEntry, TraderStatsRowRaw } from './types';
+import {
+  isAffiliateStatsRowRaw,
+  isTraderStatsRowRaw,
+  normalizeAffiliateStatsRow,
+  normalizeTraderStatsRow,
+} from './utils';
 
 export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   private readonly duneRepository: DuneRepository;
@@ -42,7 +33,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       TraderStatsRow
     >({
       cacheKey: 'affiliate-trader-stats',
-      queryId: TRADER_STATS_QUERY_ID,
+      queryId: DUNE_QUERY_IDS.traderStats,
       typeAssertion: isTraderStatsRowRaw,
       mapRow: normalizeTraderStatsRow,
     });
@@ -61,7 +52,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       AffiliateStatsRow
     >({
       cacheKey: 'affiliate-stats',
-      queryId: AFFILIATE_STATS_QUERY_ID,
+      queryId: DUNE_QUERY_IDS.affiliateStats,
       typeAssertion: isAffiliateStatsRowRaw,
       mapRow: normalizeAffiliateStatsRow,
     });
@@ -187,109 +178,4 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       lastUpdatedAt,
     });
   }
-}
-
-function isTraderStatsRowRaw(data: unknown): data is TraderStatsRowRaw {
-  if (!isRecord(data)) {
-    return false;
-  }
-
-  return (
-    isString(data.trader_address) &&
-    isString(data.bound_referrer_code) &&
-    isString(data.linked_since) &&
-    isString(data.rewards_end) &&
-    isNumeric(data.eligible_volume) &&
-    isNumeric(data.left_to_next_rewards) &&
-    isNumeric(data.trigger_volume) &&
-    isNumeric(data.total_earned) &&
-    isNumeric(data.paid_out) &&
-    isNumeric(data.next_payout)
-  );
-}
-
-function isAffiliateStatsRowRaw(data: unknown): data is AffiliateStatsRowRaw {
-  if (!isRecord(data)) {
-    return false;
-  }
-
-  return (
-    isString(data.affiliate_address) &&
-    isString(data.referrer_code) &&
-    isNumeric(data.total_volume) &&
-    isNumeric(data.trigger_volume) &&
-    isNumeric(data.total_earned) &&
-    isNumeric(data.paid_out) &&
-    isNumeric(data.next_payout) &&
-    isNumeric(data.left_to_next_reward) &&
-    isNumeric(data.active_traders) &&
-    isNumeric(data.total_traders)
-  );
-}
-
-function normalizeTraderStatsRow(row: TraderStatsRowRaw): TraderStatsRow {
-  return {
-    trader_address: row.trader_address,
-    bound_referrer_code: row.bound_referrer_code,
-    linked_since: row.linked_since,
-    rewards_end: row.rewards_end,
-    eligible_volume: toNumber(row.eligible_volume, 'eligible_volume'),
-    left_to_next_rewards: toNumber(
-      row.left_to_next_rewards,
-      'left_to_next_rewards'
-    ),
-    trigger_volume: toNumber(row.trigger_volume, 'trigger_volume'),
-    total_earned: toNumber(row.total_earned, 'total_earned'),
-    paid_out: toNumber(row.paid_out, 'paid_out'),
-    next_payout: toNumber(row.next_payout, 'next_payout'),
-  };
-}
-
-function normalizeAffiliateStatsRow(
-  row: AffiliateStatsRowRaw
-): AffiliateStatsRow {
-  return {
-    affiliate_address: row.affiliate_address,
-    referrer_code: row.referrer_code,
-    total_volume: toNumber(row.total_volume, 'total_volume'),
-    trigger_volume: toNumber(row.trigger_volume, 'trigger_volume'),
-    total_earned: toNumber(row.total_earned, 'total_earned'),
-    paid_out: toNumber(row.paid_out, 'paid_out'),
-    next_payout: toNumber(row.next_payout, 'next_payout'),
-    left_to_next_reward: toNumber(
-      row.left_to_next_reward,
-      'left_to_next_reward'
-    ),
-    active_traders: toNumber(row.active_traders, 'active_traders'),
-    total_traders: toNumber(row.total_traders, 'total_traders'),
-  };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function isString(value: unknown): value is string {
-  return typeof value === 'string';
-}
-
-function isNumeric(value: unknown): value is NumericValue {
-  if (typeof value === 'number') {
-    return !Number.isNaN(value);
-  }
-
-  if (typeof value === 'string') {
-    return value.trim().length > 0 && !Number.isNaN(Number(value));
-  }
-
-  return false;
-}
-
-function toNumber(value: NumericValue, field: string): number {
-  const parsed = Number(value);
-  if (Number.isNaN(parsed)) {
-    throw new Error(`Invalid numeric value for ${field}: ${value}`);
-  }
-
-  return parsed;
 }
