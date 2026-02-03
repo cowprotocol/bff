@@ -55,11 +55,6 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
-
       try {
         const hooksService = apiContainer.get<HooksService>(hooksServiceSymbol);
         const hooks = await hooksService.getHooks({
@@ -70,12 +65,18 @@ const hooks: FastifyPluginAsync = async (fastify): Promise<void> => {
           offset: request.query.offset,
         });
 
+        reply.header(
+          CACHE_CONTROL_HEADER,
+          getCacheControlHeaderValue(CACHE_SECONDS)
+        );
+
         return reply.send({
           hooks,
           count: hooks.length,
         });
       } catch (error) {
         fastify.log.error('Error fetching hooks:', error);
+        reply.header(CACHE_CONTROL_HEADER, 'no-store');
         return reply.status(500).send({
           hooks: [],
           count: 0,
