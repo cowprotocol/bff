@@ -58,6 +58,10 @@ class MockDuneRepository implements DuneRepository {
     return this.mockResult as DuneResultResponse<T>;
   }
 
+  async uploadCsv(): Promise<{ success: boolean; message?: string }> {
+    return { success: true };
+  }
+
   private getDefaultMockResult(): DuneResultResponse<HookData> {
     return {
       execution_id: this.mockExecutionId,

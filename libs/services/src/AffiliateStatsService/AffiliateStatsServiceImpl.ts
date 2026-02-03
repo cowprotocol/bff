@@ -10,6 +10,8 @@ import {
 
 const TRADER_STATS_QUERY_ID = 6560853;
 const AFFILIATE_STATS_QUERY_ID = 6560325;
+const DUNE_PAGE_SIZE = 1000;
+const DUNE_MAX_ROWS = 1_000_000;
 
 type CacheEntry<T> = {
   expiresAt: number;
@@ -19,43 +21,9 @@ type CacheEntry<T> = {
 
 type NumericValue = number | string;
 
-type TraderStatsRowRaw = Omit<
-  TraderStatsRow,
-  | 'eligible_volume'
-  | 'left_to_next_rewards'
-  | 'trigger_volume'
-  | 'total_earned'
-  | 'paid_out'
-  | 'next_payout'
-> & {
-  eligible_volume: NumericValue;
-  left_to_next_rewards: NumericValue;
-  trigger_volume: NumericValue;
-  total_earned: NumericValue;
-  paid_out: NumericValue;
-  next_payout: NumericValue;
-};
+type TraderStatsRowRaw = TraderStatsRow<NumericValue>;
 
-type AffiliateStatsRowRaw = Omit<
-  AffiliateStatsRow,
-  | 'total_volume'
-  | 'trigger_volume'
-  | 'total_earned'
-  | 'paid_out'
-  | 'next_payout'
-  | 'left_to_next_reward'
-  | 'active_traders'
-  | 'total_traders'
-> & {
-  total_volume: NumericValue;
-  trigger_volume: NumericValue;
-  total_earned: NumericValue;
-  paid_out: NumericValue;
-  next_payout: NumericValue;
-  left_to_next_reward: NumericValue;
-  active_traders: NumericValue;
-  total_traders: NumericValue;
-};
+type AffiliateStatsRowRaw = AffiliateStatsRow<NumericValue>;
 
 export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   private readonly duneRepository: DuneRepository;
@@ -119,7 +87,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     logger.debug(`Affiliate stats cache miss for ${params.cacheKey}.`);
 
     try {
-      const limit = 1000;
+      const limit = DUNE_PAGE_SIZE;
       let offset = 0;
       let total: number | null = null;
       const rows: U[] = [];
@@ -164,6 +132,15 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
         }
 
         if (result.result.rows.length < limit) {
+          hasMore = false;
+          continue;
+        }
+
+        if (offset >= DUNE_MAX_ROWS) {
+          logger.warn(
+            { cacheKey: params.cacheKey, maxRows: DUNE_MAX_ROWS },
+            'Affiliate stats row limit reached. Stopping pagination.'
+          );
           hasMore = false;
           continue;
         }

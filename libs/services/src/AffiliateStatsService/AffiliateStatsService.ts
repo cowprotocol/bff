@@ -1,29 +1,29 @@
 export const affiliateStatsServiceSymbol = Symbol.for('AffiliateStatsService');
 
-export interface TraderStatsRow {
+export interface TraderStatsRow<T = number> {
   trader_address: string;
   bound_referrer_code: string;
   linked_since: string;
   rewards_end: string;
-  eligible_volume: number;
-  left_to_next_rewards: number;
-  trigger_volume: number;
-  total_earned: number;
-  paid_out: number;
-  next_payout: number;
+  eligible_volume: T;
+  left_to_next_rewards: T;
+  trigger_volume: T;
+  total_earned: T;
+  paid_out: T;
+  next_payout: T;
 }
 
-export interface AffiliateStatsRow {
+export interface AffiliateStatsRow<T = number> {
   affiliate_address: string;
   referrer_code: string;
-  total_volume: number;
-  trigger_volume: number;
-  total_earned: number;
-  paid_out: number;
-  next_payout: number;
-  left_to_next_reward: number;
-  active_traders: number;
-  total_traders: number;
+  total_volume: T;
+  trigger_volume: T;
+  total_earned: T;
+  paid_out: T;
+  next_payout: T;
+  left_to_next_reward: T;
+  active_traders: T;
+  total_traders: T;
 }
 
 export interface AffiliateStatsResult {

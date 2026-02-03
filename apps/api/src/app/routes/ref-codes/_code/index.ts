@@ -1,5 +1,5 @@
 import { FastifyPluginAsync, FastifyReply } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
+import { FromSchema } from 'json-schema-to-ts';
 import {
   AffiliatesRepository,
   affiliatesRepositorySymbol,
@@ -8,53 +8,8 @@ import {
 } from '@cowprotocol/repositories';
 import { apiContainer } from '../../../inversify.config';
 import { logger } from '@cowprotocol/shared';
-
-const paramsSchema = {
-  type: 'object',
-  required: ['code'],
-  properties: {
-    code: {
-      title: 'Affiliate code',
-      description: 'Affiliate code to validate. Format: 5-20 uppercase chars (A-Z, 0-9, -, _).',
-      type: 'string',
-      minLength: 5,
-      maxLength: 20,
-      pattern: '^[A-Z0-9_-]{5,20}$',
-    },
-  },
-} as const satisfies JSONSchema;
-
-const responseSchema = {
-  type: 'object',
-  required: [
-    'code',
-    'traderRewardAmount',
-    'triggerVolume',
-    'timeCapDays',
-    'volumeCap',
-  ],
-  additionalProperties: false,
-  properties: {
-    code: {
-      type: 'string',
-    },
-    traderRewardAmount: { type: 'number' },
-    triggerVolume: { type: 'number' },
-    timeCapDays: { type: 'number' },
-    volumeCap: { type: 'number' },
-  },
-} as const satisfies JSONSchema;
-
-const errorSchema = {
-  type: 'object',
-  required: ['message'],
-  additionalProperties: false,
-  properties: {
-    message: {
-      type: 'string',
-    },
-  },
-} as const satisfies JSONSchema;
+import { errorSchema, paramsSchema, responseSchema } from './refCodes.schemas';
+import { AFFILIATE_CODE_REGEX } from '../../../config/affiliate';
 
 type ParamsSchema = FromSchema<typeof paramsSchema>;
 type SuccessSchema = FromSchema<typeof responseSchema>;
@@ -63,8 +18,6 @@ type ErrorSchema = FromSchema<typeof errorSchema>;
 const affiliatesRepository: AffiliatesRepository = apiContainer.get(
   affiliatesRepositorySymbol
 );
-
-const CODE_REGEX = /^[A-Z0-9_-]{5,20}$/;
 
 const refCodes: FastifyPluginAsync = async (fastify): Promise<void> => {
   if (!isCmsEnabled) {
@@ -145,7 +98,7 @@ function normalizeCode(value: string): string {
 }
 
 function isValidCode(value: string): boolean {
-  return CODE_REGEX.test(value);
+  return AFFILIATE_CODE_REGEX.test(value);
 }
 
 function handleCmsError(error: unknown, reply: FastifyReply) {
