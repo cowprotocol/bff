@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
 import { logger } from '@cowprotocol/shared';
+import { startAffiliateProgramExportPoller } from './app/affiliateProgramExportPoller';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -12,6 +13,11 @@ export const server = Fastify({
 
 // Register your application as a normal plugin.
 server.register(app);
+
+const stopAffiliateProgramExportPoller = startAffiliateProgramExportPoller();
+server.addHook('onClose', async () => {
+  await stopAffiliateProgramExportPoller?.();
+});
 
 // Start listening.
 server.listen({ port, host }, (err) => {

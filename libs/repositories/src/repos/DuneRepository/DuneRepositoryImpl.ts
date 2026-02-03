@@ -6,6 +6,8 @@ import {
   ExecuteQueryParams,
   GetExecutionResultsParams,
   GetQueryResultsParams,
+  UploadCsvParams,
+  UploadCsvResponse,
   WaitForExecutionParams,
 } from './DuneRepository';
 
@@ -122,6 +124,24 @@ export class DuneRepositoryImpl implements DuneRepository {
     return this.makeRequest<DuneResultResponse<T>>(url, {
       method: 'GET',
     });
+  }
+
+  async uploadCsv(params: UploadCsvParams): Promise<UploadCsvResponse> {
+    const { tableName, data, description, isPrivate } = params;
+    const payload: Record<string, unknown> = {
+      table_name: tableName,
+      data,
+    };
+
+    if (description) {
+      payload.description = description;
+    }
+
+    if (typeof isPrivate === 'boolean') {
+      payload.is_private = isPrivate;
+    }
+
+    return this.makeRequest<UploadCsvResponse>('/uploads/csv', {}, payload);
   }
 
   private async makeRequest<T>(

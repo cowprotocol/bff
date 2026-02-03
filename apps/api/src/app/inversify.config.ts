@@ -2,6 +2,7 @@ import {
   getCacheRepository,
   getDuneRepository,
   getErc20Repository,
+  getAffiliatesRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
   getSimulationRepository,
@@ -12,15 +13,21 @@ import {
   TokenBalancesService,
   TokenBalancesServiceMain,
   tokenBalancesServiceSymbol,
+  AffiliateProgramExportService,
+  AffiliateProgramExportServiceImpl,
+  affiliateProgramExportServiceSymbol,
 } from '@cowprotocol/services';
 
 import {
+  AffiliatesRepository,
+  affiliatesRepositorySymbol,
   CacheRepository,
   cacheRepositorySymbol,
   DuneRepository,
   duneRepositorySymbol,
   Erc20Repository,
   erc20RepositorySymbol,
+  isCmsEnabled,
   isDuneEnabled,
   PushNotificationsRepository,
   pushNotificationsRepositorySymbol,
@@ -41,6 +48,9 @@ import {
 import {
   HooksService,
   HooksServiceImpl,
+  AffiliateStatsService,
+  AffiliateStatsServiceImpl,
+  affiliateStatsServiceSymbol,
   hooksServiceSymbol,
   SimulationService,
   SlippageService,
@@ -64,6 +74,25 @@ import {
 import { Container } from 'inversify';
 import { Logger, logger } from '@cowprotocol/shared';
 
+const DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS = 3600000;
+
+function getAffiliateStatsCacheTtlMs(): number {
+  const rawValue = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS;
+  if (!rawValue) {
+    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS;
+  }
+
+  const parsed = Number(rawValue);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    logger.warn(
+      `Invalid DUNE_AFFILIATE_STATS_CACHE_TTL_MS value: ${rawValue}. Using default ${DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS}ms.`
+    );
+    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS;
+  }
+
+  return parsed;
+}
+
 function getApiContainer(): Container {
   const apiContainer = new Container();
 
@@ -80,6 +109,7 @@ function getApiContainer(): Container {
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
   const pushNotificationsRepository = getPushNotificationsRepository();
   const pushSubscriptionsRepository = getPushSubscriptionsRepository();
+  const affiliatesRepository = getAffiliatesRepository();
 
   apiContainer
     .bind<Erc20Repository>(erc20RepositorySymbol)
@@ -106,11 +136,16 @@ function getApiContainer(): Container {
     .toConstantValue(pushSubscriptionsRepository);
 
   apiContainer
+    .bind<AffiliatesRepository>(affiliatesRepositorySymbol)
+    .toConstantValue(affiliatesRepository);
+
+  apiContainer
     .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
     .toConstantValue(tokenHolderRepository);
 
   if (isDuneEnabled) {
     const duneRepository = getDuneRepository();
+    const affiliateStatsCacheTtlMs = getAffiliateStatsCacheTtlMs();
 
     apiContainer
       .bind<DuneRepository>(duneRepositorySymbol)
@@ -119,6 +154,21 @@ function getApiContainer(): Container {
     apiContainer
       .bind<HooksService>(hooksServiceSymbol)
       .toDynamicValue(() => new HooksServiceImpl(duneRepository));
+
+    apiContainer
+      .bind<AffiliateStatsService>(affiliateStatsServiceSymbol)
+      .toDynamicValue(
+        () => new AffiliateStatsServiceImpl(duneRepository, affiliateStatsCacheTtlMs)
+      );
+  }
+
+  if (isDuneEnabled && isCmsEnabled) {
+    const duneRepository = apiContainer.get<DuneRepository>(duneRepositorySymbol);
+    apiContainer
+      .bind<AffiliateProgramExportService>(affiliateProgramExportServiceSymbol)
+      .toDynamicValue(
+        () => new AffiliateProgramExportServiceImpl(affiliatesRepository, duneRepository)
+      );
   }
 
   apiContainer

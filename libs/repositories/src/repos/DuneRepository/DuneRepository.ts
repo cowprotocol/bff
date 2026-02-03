@@ -32,6 +32,18 @@ export interface DuneResultResponse<T> {
 
 export type PerformanceTier = 'medium' | 'large';
 
+export interface UploadCsvParams {
+  tableName: string;
+  data: string;
+  description?: string;
+  isPrivate?: boolean;
+}
+
+export interface UploadCsvResponse {
+  success: boolean;
+  message?: string;
+}
+
 export interface ExecuteQueryParams {
   queryId: number;
   parameters?: Record<string, unknown>;
@@ -71,4 +83,6 @@ export interface DuneRepository {
   waitForExecution<T>(
     params: WaitForExecutionParams<T>
   ): Promise<DuneResultResponse<T>>;
+
+  uploadCsv(params: UploadCsvParams): Promise<UploadCsvResponse>;
 }
