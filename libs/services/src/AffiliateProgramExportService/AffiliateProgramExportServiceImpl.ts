@@ -4,8 +4,7 @@ import {
   AffiliateProgramExportService,
   AffiliateProgramSignature,
 } from './AffiliateProgramExportService';
-
-const AFFILIATE_PROGRAM_TABLE_NAME = 'affiliate_program_data';
+import { getAffiliateProgramTableName } from './AffiliateProgramExportService.config';
 
 type AffiliateProgramRow = {
   code: string;
@@ -89,16 +88,15 @@ export class AffiliateProgramExportServiceImpl
 
   private async upload(rows: AffiliateProgramRow[]): Promise<void> {
     const csv = buildCsv(rows);
+    const tableName = getAffiliateProgramTableName();
     const response = await this.duneRepository.uploadCsv({
-      tableName: AFFILIATE_PROGRAM_TABLE_NAME,
+      tableName,
       data: csv,
       isPrivate: true,
     });
     if (!response.success) {
       const message = response.message ? `: ${response.message}` : '';
-      throw new Error(
-        `Dune CSV upload failed for ${AFFILIATE_PROGRAM_TABLE_NAME}${message}`
-      );
+      throw new Error(`Dune CSV upload failed for ${tableName}${message}`);
     }
   }
 }

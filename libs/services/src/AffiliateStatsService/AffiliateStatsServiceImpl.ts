@@ -7,7 +7,11 @@ import {
   TraderStatsResult,
   TraderStatsRow,
 } from './AffiliateStatsService';
-import { DUNE_MAX_ROWS, DUNE_PAGE_SIZE, DUNE_QUERY_IDS } from './AffiliateStatsService.constants';
+import {
+  DUNE_MAX_ROWS,
+  DUNE_PAGE_SIZE,
+  getDuneQueryIds,
+} from './AffiliateStatsService.config';
 import type { AffiliateStatsRowRaw, CacheEntry, TraderStatsRowRaw } from './AffiliateStatsService.types';
 import {
   isAffiliateStatsRowRaw,
@@ -33,7 +37,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       TraderStatsRow
     >({
       cacheKey: 'affiliate-trader-stats',
-      queryId: DUNE_QUERY_IDS.traderStats,
+      queryId: getDuneQueryIds().traderStats,
       typeAssertion: isTraderStatsRowRaw,
       mapRow: normalizeTraderStatsRow,
     });
@@ -52,7 +56,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       AffiliateStatsRow
     >({
       cacheKey: 'affiliate-stats',
-      queryId: DUNE_QUERY_IDS.affiliateStats,
+      queryId: getDuneQueryIds().affiliateStats,
       typeAssertion: isAffiliateStatsRowRaw,
       mapRow: normalizeAffiliateStatsRow,
     });
