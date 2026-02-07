@@ -6,10 +6,7 @@ export const GOLD_RUSH_API_BASE_URL = 'https://api.covalenthq.com';
 /**
  * From https://goldrush.dev/docs/chains/overview
  */
-export const GOLD_RUSH_CLIENT_NETWORK_MAPPING: Record<
-  SupportedChainId,
-  string | null
-> = {
+export const GOLD_RUSH_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.MAINNET]: 'eth-mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'gnosis-mainnet',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-mainnet',
@@ -20,5 +17,6 @@ export const GOLD_RUSH_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.LENS]: 'lens-mainnet',
   [SupportedChainId.BNB]: 'bsc-mainnet',
   [SupportedChainId.LINEA]: 'linea-mainnet',
-  [SupportedChainId.PLASMA]: null,
-};
+  [SupportedChainId.PLASMA]: 'plasma-mainnet',
+  [SupportedChainId.INK]: 'ink-mainnet',
+} as const satisfies Record<SupportedChainId, string>;

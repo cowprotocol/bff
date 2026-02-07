@@ -9,7 +9,7 @@ const REQUIRED_ENVS = [
   'ORDERBOOK_DATABASE_PASSWORD',
 ];
 
-const chainToDbNameMap: Record<SupportedChainId, string> = {
+const chainToDbNameMap = {
   [SupportedChainId.MAINNET]: 'mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
   [SupportedChainId.BASE]: 'base',
@@ -21,7 +21,8 @@ const chainToDbNameMap: Record<SupportedChainId, string> = {
   [SupportedChainId.SEPOLIA]: 'sepolia',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
-};
+  [SupportedChainId.INK]: 'ink',
+} as const satisfies Record<SupportedChainId, string>;
 
 function createNewOrderBookDbPool(
   env: 'prod' | 'barn',

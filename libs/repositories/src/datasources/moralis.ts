@@ -6,10 +6,7 @@ export const MORALIS_API_BASE_URL = 'https://deep-index.moralis.io/api';
 /**
  * From https://docs.moralis.com/supported-web3data-apis
  */
-export const MORALIS_CLIENT_NETWORK_MAPPING: Record<
-  SupportedChainId,
-  string | null
-> = {
+export const MORALIS_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.MAINNET]: 'eth',
   [SupportedChainId.SEPOLIA]: 'sepolia',
   [SupportedChainId.GNOSIS_CHAIN]: 'gnosis',
@@ -21,4 +18,5 @@ export const MORALIS_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.BNB]: 'bsc',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: null,
-};
+  [SupportedChainId.INK]: null,
+} as const satisfies Record<SupportedChainId, string | null>;
