@@ -53,7 +53,7 @@ export const USDC = {
   },
   [SupportedChainId.INK]: {
     address: '0x2D270e6886d130D724215A266106e6832161EAEd',
-    decimals: 18,
+    decimals: 6,
   },
   [SupportedChainId.SEPOLIA]: {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
