@@ -7,10 +7,7 @@ import type { components } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
-export const SUPPORTED_COINGECKO_PLATFORMS: Record<
-  SupportedChainId,
-  string | undefined
-> = {
+export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.SEPOLIA]: undefined,
   [SupportedChainId.MAINNET]: 'ethereum',
   [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
@@ -22,7 +19,8 @@ export const SUPPORTED_COINGECKO_PLATFORMS: Record<
   [SupportedChainId.BNB]: 'binance-smart-chain',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
-};
+  [SupportedChainId.INK]: 'ink',
+} as const satisfies Record<SupportedChainId, string | undefined>;
 
 /**
  * Map of chain IDs to Coingecko platform IDs, for every platform that has a network id.

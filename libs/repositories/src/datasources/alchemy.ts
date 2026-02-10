@@ -20,6 +20,7 @@ export const ALCHEMY_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.LENS]: 'lens-mainnet',
   [SupportedChainId.BNB]: 'bnb-mainnet',
   [SupportedChainId.LINEA]: 'linea-mainnet',
+  [SupportedChainId.INK]: 'ink-mainnet',
   [SupportedChainId.PLASMA]: null, // todo add when alchemy supports plasma
 };
 

@@ -6,7 +6,7 @@ interface TokenAddressAndDecimals {
   decimals: number;
 }
 
-export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
+export const USDC = {
   [SupportedChainId.MAINNET]: {
     address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     decimals: 6,
@@ -51,11 +51,15 @@ export const USDC: Record<SupportedChainId, TokenAddressAndDecimals> = {
     address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', // Plasma is the USDT chain, using USDT instead of USDC
     decimals: 6,
   },
+  [SupportedChainId.INK]: {
+    address: '0x2D270e6886d130D724215A266106e6832161EAEd',
+    decimals: 6,
+  },
   [SupportedChainId.SEPOLIA]: {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
     decimals: 18,
   },
-};
+} as const satisfies Record<SupportedChainId, TokenAddressAndDecimals>;
 
 export const ZeroBigNumber = new BigNumber(0);
 export const OneBigNumber = new BigNumber(1);

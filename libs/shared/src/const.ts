@@ -29,7 +29,7 @@ export const ChainNames: Record<SupportedChainId, string> = Object.values(
 }, {} as Record<SupportedChainId, string>);
 
 // TODO: Get from SDK
-export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
+export const EXPLORER_NETWORK_NAMES = {
   [SupportedChainId.MAINNET]: 'mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'gc',
   [SupportedChainId.ARBITRUM_ONE]: 'arb1',
@@ -40,11 +40,12 @@ export const EXPLORER_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.BNB]: 'bnb',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
+  [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-};
+} as const satisfies Record<SupportedChainId, string>;
 
 // TODO: Get from SDK
-export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
+export const COW_API_NETWORK_NAMES = {
   [SupportedChainId.MAINNET]: 'mainnet',
   [SupportedChainId.GNOSIS_CHAIN]: 'xdai',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum_one',
@@ -55,7 +56,8 @@ export const COW_API_NETWORK_NAMES: Record<SupportedChainId, string> = {
   [SupportedChainId.BNB]: 'bnb',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
+  [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-};
+} as const satisfies Record<SupportedChainId, string>;
 
 export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS;

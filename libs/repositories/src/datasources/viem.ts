@@ -20,9 +20,10 @@ import {
   plasma,
   polygon,
   sepolia,
+  ink,
 } from 'viem/chains';
 
-const NETWORKS: Record<SupportedChainId, Chain> = {
+const NETWORKS = {
   [SupportedChainId.MAINNET]: mainnet,
   [SupportedChainId.GNOSIS_CHAIN]: gnosis,
   [SupportedChainId.ARBITRUM_ONE]: arbitrum,
@@ -40,7 +41,8 @@ const NETWORKS: Record<SupportedChainId, Chain> = {
   [SupportedChainId.SEPOLIA]: sepolia,
   [SupportedChainId.LINEA]: linea,
   [SupportedChainId.PLASMA]: plasma,
-};
+  [SupportedChainId.INK]: ink,
+} as const satisfies Record<SupportedChainId, Chain>;
 
 let viemClients: Record<SupportedChainId, PublicClient> | undefined;
 
@@ -70,12 +72,12 @@ export function getViemClients(): Record<SupportedChainId, PublicClient> {
         },
         transport: defaultRpcUrls.webSocket
           ? webSocket(undefined, {
-              retryDelay: 5_000, // 5sec
-              retryCount: 3,
-              reconnect: true,
-            })
+            retryDelay: 5_000, // 5sec
+            retryCount: 3,
+            reconnect: true,
+          })
           : http(),
-      });
+      }) as PublicClient;
 
       return acc;
     },

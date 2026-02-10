@@ -589,9 +589,33 @@ export interface components {
             /** @description The hash of the app data. Only present when the full app data is also provided in the `appData` field.
              *      */
             appDataHash?: components["schemas"]["AppDataHash"];
-            /** @description The fee amount in sell token atoms. For quote responses, this represents the estimated network fee. When creating an order, this should be set to zero as fees are now computed dynamically by solvers.
+            /** @description The fee amount in sell token atoms. For quote responses, this represents
+             *     the estimated network fee, calculated as:
+             *     `feeAmount = ceil((gasAmount * gasPrice) / sellTokenPrice)`.
+             *
+             *     When creating an order, this should be set to zero as fees are now
+             *     computed dynamically by solvers.
              *      */
             feeAmount: components["schemas"]["TokenAmount"];
+            /**
+             * @description The estimated gas units required to execute the quoted trade.
+             *
+             * @example 150000
+             */
+            gasAmount: string;
+            /**
+             * @description The estimated gas price at the time of quoting, measured in Wei per gas unit.
+             *
+             * @example 15000000000
+             */
+            gasPrice: string;
+            /**
+             * @description Represents how much one atomic unit of the sell token is worth
+             *     in the network's native token (in Wei or the equivalent atom).
+             *
+             * @example 0.0004
+             */
+            sellTokenPrice: string;
             /** @description The kind is either a buy or sell order. */
             kind: components["schemas"]["OrderKind"];
             /** @description Is the order fill-or-kill or partially fillable? */
@@ -1148,24 +1172,34 @@ export interface components {
              */
             gasPrice: string;
             /**
-             * @description The price of the sell token in terms of the native token (ETH, xDAI, etc.)
-             *     at the time of quoting. Represents how much native token (in Wei) one atomic
-             *     unit of the sell token is worth.
+             * @description The price of the sell token expressed in native token atoms per sell token atom.
              *
-             *     The network fee in sell token atoms can be calculated as:
-             *     `feeInSellToken = (gasAmount * gasPrice) / sellTokenPrice`.
+             *     Units: `native token atoms / sell token atoms`
              *
-             *     This is useful for UIs that need to calculate gas costs in the sell token,
-             *     especially when the exact fee amount isn't known upfront (e.g., when
-             *     additional hook gas costs need to be factored in after quoting).
+             *     **Example calculation (Mainnet, selling USDC):**
+             *     - Sell token: USDC (6 decimals)
+             *     - Native token: ETH (18 decimals)
+             *     - Market price: 1 ETH = 1000 USDC
              *
-             * @example 0.0004
+             *     `sellTokenPrice = 1 × 10^18 wei / (1000 × 10^6 USDC atoms) = 10^9`
+             *
+             *     This value is used to convert network fees (in native token) to sell token amounts.
+             *
+             * @example 1000000000
              */
             sellTokenPrice: string;
             /** @description The quoted sell amount in atoms of the sell token. */
             sellAmount: components["schemas"]["TokenAmount"];
             /** @description The quoted buy amount in atoms of the buy token. */
             buyAmount: components["schemas"]["TokenAmount"];
+            /** @description The fee amount in atoms of the sell token, calculated from the gas parameters
+             *     at the time of quoting.
+             *
+             *     Computed as: `ceil((gasAmount * gasPrice) / sellTokenPrice)`.
+             *
+             *     This represents the network fee that was estimated when the quote was created.
+             *      */
+            feeAmount: components["schemas"]["TokenAmount"];
             /** @description The address of the solver that provided this quote. */
             solver: components["schemas"]["Address"];
             /** @description Whether the quote was verified through simulation. A verified quote
