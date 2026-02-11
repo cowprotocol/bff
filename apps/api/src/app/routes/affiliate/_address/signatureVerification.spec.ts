@@ -1,7 +1,7 @@
 import { Wallet } from 'ethers';
 
 import {
-  AffiliateSignatureVerificationResult,
+  SignatureCheckResult,
   AffiliateTypedData,
   verifyAffiliateSignature,
 } from './signatureVerification';
@@ -48,7 +48,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.valid);
+    expect(result).toBe(SignatureCheckResult.valid);
     expect(client.getBytecode).not.toHaveBeenCalled();
   });
 
@@ -73,7 +73,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.invalidAddress);
+    expect(result).toBe(SignatureCheckResult.invalidAddress);
     expect(client.readContract).not.toHaveBeenCalled();
   });
 
@@ -98,7 +98,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.valid);
+    expect(result).toBe(SignatureCheckResult.valid);
     expect(client.readContract).toHaveBeenCalledTimes(1);
   });
 
@@ -123,7 +123,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.invalidAddress);
+    expect(result).toBe(SignatureCheckResult.invalidAddress);
   });
 
   it('returns invalidSignature for malformed signatures', async () => {
@@ -141,7 +141,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.invalidSignature);
+    expect(result).toBe(SignatureCheckResult.invalidSignature);
     expect(client.getBytecode).not.toHaveBeenCalled();
   });
 
@@ -166,7 +166,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe(AffiliateSignatureVerificationResult.invalidSignature);
+    expect(result).toBe(SignatureCheckResult.invalidSignature);
   });
 
   it('returns addressIsNotSmartContract when recovery fails for an EOA address', async () => {
@@ -186,7 +186,7 @@ describe('verifyAffiliateSignature', () => {
     });
 
     expect(result).toBe(
-      AffiliateSignatureVerificationResult.addressIsNotSmartContract
+      SignatureCheckResult.addressIsNotSmartContract
     );
     expect(client.readContract).not.toHaveBeenCalled();
   });
