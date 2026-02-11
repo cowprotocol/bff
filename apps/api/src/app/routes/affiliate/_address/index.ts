@@ -3,13 +3,15 @@ import { FromSchema } from 'json-schema-to-ts';
 import {
   AffiliatesRepository,
   affiliatesRepositorySymbol,
+  getViemClients,
   isCmsEnabled,
   isCmsRequestError,
   isDuneEnabled,
 } from '@cowprotocol/repositories';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { apiContainer } from '../../../inversify.config';
 import { logger } from '@cowprotocol/shared';
-import { ethers, type TypedDataField } from 'ethers';
+import { type TypedDataField } from 'ethers';
 import {
   AffiliateProgramExportService,
   affiliateProgramExportServiceSymbol,
@@ -22,6 +24,10 @@ import {
   errorSchema,
   paramsSchema,
 } from './affiliate.schemas';
+import {
+  verifyAffiliateSignature,
+  type AffiliateTypedData,
+} from './signatureVerification';
 
 type ParamsSchema = FromSchema<typeof paramsSchema>;
 type BodySchema = FromSchema<typeof bodySchema>;
@@ -129,6 +135,7 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
       const address = normalizeAddress(request.params.address);
       const walletAddress = normalizeAddress(request.body.walletAddress);
       const code = normalizeCode(request.body.code);
+      const signedMessage = request.body.signedMessage;
 
       if (address !== walletAddress) {
         reply.code(400).send({ message: 'Affiliate wallet address mismatch' });
@@ -152,15 +159,20 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
       });
 
       try {
-        const recoveredAddress = ethers.utils.verifyTypedData(
-          typedData.domain,
-          typedData.types,
-          typedData.message,
-          request.body.signedMessage
-        );
+        const signatureVerificationResult = await verifyAffiliateSignature({
+          walletAddress,
+          signedMessage,
+          typedData,
+          client: getViemClients()[SupportedChainId.MAINNET],
+        });
 
-        if (normalizeAddress(recoveredAddress) !== walletAddress) {
+        if (signatureVerificationResult === 'invalidAddress') {
           reply.code(401).send({ message: 'Affiliate signature has invalid address' });
+          return;
+        }
+
+        if (signatureVerificationResult === 'invalidSignature') {
+          reply.code(401).send({ message: 'Affiliate has invalid signature' });
           return;
         }
       } catch (error) {
@@ -239,7 +251,7 @@ function buildAffiliateTypedData(params: {
   walletAddress: string;
   code: string;
   chainId: number;
-}) {
+}): AffiliateTypedData {
   return {
     domain: {
       ...AFFILIATE_TYPED_DATA_DOMAIN,
