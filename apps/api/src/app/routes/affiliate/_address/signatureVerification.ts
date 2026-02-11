@@ -1,5 +1,11 @@
-import { ethers, type TypedDataField } from 'ethers';
-import { Address, PublicClient } from 'viem';
+import { logger } from '@cowprotocol/shared';
+import {
+  Address,
+  hashTypedData,
+  isHex,
+  PublicClient,
+  verifyTypedData,
+} from 'viem';
 
 const EIP1271_MAGIC_VALUE = '0x1626ba7e';
 
@@ -21,7 +27,7 @@ export type AffiliateTypedData = {
     name: string;
     version: string;
   };
-  types: Record<string, TypedDataField[]>;
+  types: Record<string, AffiliateTypedDataField[]>;
   message: {
     walletAddress: string;
     code: string;
@@ -29,10 +35,17 @@ export type AffiliateTypedData = {
   };
 };
 
-export type AffiliateSignatureVerificationResult =
-  | 'valid'
-  | 'invalidAddress'
-  | 'invalidSignature';
+export type AffiliateTypedDataField = {
+  name: string;
+  type: string;
+};
+
+export enum SignatureCheckResult {
+  valid = 'valid',
+  invalidAddress = 'invalidAddress',
+  invalidSignature = 'invalidSignature',
+  addressIsNotSmartContract = 'addressIsNotSmartContract',
+}
 
 type Eip1271Client = Pick<PublicClient, 'getBytecode' | 'readContract'>;
 
@@ -50,35 +63,43 @@ type Eip1271Client = Pick<PublicClient, 'getBytecode' | 'readContract'>;
  * - `valid`: ownership proof succeeded (EOA or EIP-1271 contract wallet).
  * - `invalidAddress`: signature is valid syntactically but not for `walletAddress`.
  * - `invalidSignature`: malformed signature or verification infrastructure failure.
+ * - `addressIsNotSmartContract`: recovery failed and the address has no bytecode.
  */
 export async function verifyAffiliateSignature(params: {
   walletAddress: string;
   signedMessage: string;
   typedData: AffiliateTypedData;
   client: Eip1271Client;
-}): Promise<AffiliateSignatureVerificationResult> {
+}): Promise<SignatureCheckResult> {
   const { walletAddress, signedMessage, typedData } = params;
   const normalizedWalletAddress = walletAddress.toLowerCase();
+  const primaryType = 'AffiliateCode';
 
   let hasRecoverError = false;
 
   try {
-    const recoveredAddress = ethers.utils.verifyTypedData(
-      typedData.domain,
-      typedData.types,
-      typedData.message,
-      signedMessage
-    );
+    const isValidEoaSignature = await verifyTypedData({
+      address: walletAddress as Address,
+      domain: typedData.domain,
+      types: typedData.types,
+      primaryType,
+      message: typedData.message,
+      signature: signedMessage as `0x${string}`,
+    });
 
-    if (recoveredAddress.toLowerCase() === normalizedWalletAddress) {
-      return 'valid';
+    if (isValidEoaSignature) {
+      return SignatureCheckResult.valid;
     }
-  } catch {
+  } catch (error) {
     hasRecoverError = true;
+    logger.warn(
+      { error, walletAddress: normalizedWalletAddress },
+      'Affiliate typed data recovery failed'
+    );
   }
 
-  if (!ethers.utils.isHexString(signedMessage)) {
-    return 'invalidSignature';
+  if (!isHex(signedMessage)) {
+    return SignatureCheckResult.invalidSignature;
   }
 
   try {
@@ -87,14 +108,17 @@ export async function verifyAffiliateSignature(params: {
     });
 
     if (!bytecode || bytecode === '0x') {
-      return hasRecoverError ? 'invalidSignature' : 'invalidAddress';
+      return hasRecoverError
+        ? SignatureCheckResult.addressIsNotSmartContract
+        : SignatureCheckResult.invalidAddress;
     }
 
-    const digest = ethers.utils._TypedDataEncoder.hash(
-      typedData.domain,
-      typedData.types,
-      typedData.message
-    );
+    const digest = hashTypedData({
+      domain: typedData.domain,
+      types: typedData.types,
+      primaryType,
+      message: typedData.message,
+    });
 
     const isValidSignatureResult = await params.client.readContract({
       address: walletAddress as Address,
@@ -107,11 +131,15 @@ export async function verifyAffiliateSignature(params: {
       typeof isValidSignatureResult === 'string' &&
       isValidSignatureResult.slice(0, 10).toLowerCase() === EIP1271_MAGIC_VALUE
     ) {
-      return 'valid';
+      return SignatureCheckResult.valid;
     }
 
-    return 'invalidAddress';
-  } catch {
-    return 'invalidSignature';
+    return SignatureCheckResult.invalidAddress;
+  } catch (error) {
+    logger.warn(
+      { error, walletAddress: normalizedWalletAddress },
+      'Affiliate EIP-1271 verification failed'
+    );
+    return SignatureCheckResult.invalidSignature;
   }
 }

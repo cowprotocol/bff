@@ -11,7 +11,6 @@ import {
 import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { apiContainer } from '../../../inversify.config';
 import { logger } from '@cowprotocol/shared';
-import { type TypedDataField } from 'ethers';
 import {
   AffiliateProgramExportService,
   affiliateProgramExportServiceSymbol,
@@ -25,6 +24,7 @@ import {
   paramsSchema,
 } from './affiliate.schemas';
 import {
+  SignatureCheckResult,
   verifyAffiliateSignature,
   type AffiliateTypedData,
 } from './signatureVerification';
@@ -44,7 +44,7 @@ const AFFILIATE_TYPED_DATA_DOMAIN = {
   version: '1',
 };
 
-const AFFILIATE_TYPED_DATA_TYPES: Record<string, TypedDataField[]> = {
+const AFFILIATE_TYPED_DATA_TYPES: AffiliateTypedData['types'] = {
   AffiliateCode: [
     { name: 'walletAddress', type: 'address' },
     { name: 'code', type: 'string' },
@@ -159,19 +159,24 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
       });
 
       try {
-        const signatureVerificationResult = await verifyAffiliateSignature({
+        const res = await verifyAffiliateSignature({
           walletAddress,
           signedMessage,
           typedData,
           client: getViemClients()[SupportedChainId.MAINNET],
         });
 
-        if (signatureVerificationResult === 'invalidAddress') {
-          reply.code(401).send({ message: 'Affiliate signature has invalid address' });
+        if (
+          res === SignatureCheckResult.invalidAddress ||
+          res === SignatureCheckResult.addressIsNotSmartContract
+        ) {
+          reply
+            .code(401)
+            .send({ message: 'Affiliate signature has invalid address' });
           return;
         }
 
-        if (signatureVerificationResult === 'invalidSignature') {
+        if (res === SignatureCheckResult.invalidSignature) {
           reply.code(401).send({ message: 'Affiliate has invalid signature' });
           return;
         }
@@ -188,7 +193,11 @@ const affiliate: FastifyPluginAsync = async (fastify): Promise<void> => {
           });
 
         if (existingByWallet) {
-          reply.code(409).send({ message: 'Affiliate wallet address already bound to a code' });
+          reply
+            .code(409)
+            .send({
+              message: 'Affiliate wallet address already bound to a code',
+            });
           return;
         }
 

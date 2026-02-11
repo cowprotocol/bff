@@ -1,6 +1,7 @@
 import { Wallet } from 'ethers';
 
 import {
+  AffiliateSignatureVerificationResult,
   AffiliateTypedData,
   verifyAffiliateSignature,
 } from './signatureVerification';
@@ -47,7 +48,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('valid');
+    expect(result).toBe(AffiliateSignatureVerificationResult.valid);
     expect(client.getBytecode).not.toHaveBeenCalled();
   });
 
@@ -72,7 +73,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('invalidAddress');
+    expect(result).toBe(AffiliateSignatureVerificationResult.invalidAddress);
     expect(client.readContract).not.toHaveBeenCalled();
   });
 
@@ -97,7 +98,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('valid');
+    expect(result).toBe(AffiliateSignatureVerificationResult.valid);
     expect(client.readContract).toHaveBeenCalledTimes(1);
   });
 
@@ -122,7 +123,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('invalidAddress');
+    expect(result).toBe(AffiliateSignatureVerificationResult.invalidAddress);
   });
 
   it('returns invalidSignature for malformed signatures', async () => {
@@ -140,7 +141,7 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('invalidSignature');
+    expect(result).toBe(AffiliateSignatureVerificationResult.invalidSignature);
     expect(client.getBytecode).not.toHaveBeenCalled();
   });
 
@@ -165,6 +166,28 @@ describe('verifyAffiliateSignature', () => {
       client,
     });
 
-    expect(result).toBe('invalidSignature');
+    expect(result).toBe(AffiliateSignatureVerificationResult.invalidSignature);
+  });
+
+  it('returns addressIsNotSmartContract when recovery fails for an EOA address', async () => {
+    const walletAddress = Wallet.createRandom().address;
+    const typedData = buildTypedData(walletAddress);
+    const client = {
+      getBytecode: jest.fn().mockResolvedValue('0x'),
+      readContract: jest.fn(),
+    };
+
+    const result = await verifyAffiliateSignature({
+      walletAddress,
+      signedMessage:
+        '0x11111111111111111111111111111111111111111111111111111111111111111b',
+      typedData,
+      client,
+    });
+
+    expect(result).toBe(
+      AffiliateSignatureVerificationResult.addressIsNotSmartContract
+    );
+    expect(client.readContract).not.toHaveBeenCalled();
   });
 });
