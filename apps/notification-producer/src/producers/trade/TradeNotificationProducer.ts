@@ -7,6 +7,7 @@ import {
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository
 } from '@cowprotocol/repositories';
+import { BlockNotFoundError } from 'viem';
 
 import { Runnable } from '../../../types';
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories';
@@ -137,7 +138,18 @@ export class TradeNotificationProducer implements Runnable {
         );
       }
 
-      const toBlockInfo = await client.getBlock({ blockNumber: toBlock });
+      let toBlockInfo;
+      try {
+        toBlockInfo = await client.getBlock({ blockNumber: toBlock });
+      } catch (e) {
+        if (e instanceof BlockNotFoundError) {
+          logger.warn(
+            `${this.prefix} Block ${toBlock} not found on RPC node (chainId: ${chainId}) (possible load balancer lag). Stopping batch processing.`
+          );
+          break;
+        }
+        throw e;
+      }
       const producerState: TradeNotificationProducerState = {
         lastBlock: toBlock.toString(),
         lastBlockTimestamp: toBlockInfo.timestamp.toString(),

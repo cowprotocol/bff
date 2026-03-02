@@ -953,7 +953,7 @@ export interface components {
         PreSignature: string;
         OrderPostError: {
             /** @enum {string} */
-            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppdataFromMismatch" | "OldOrderActivelyBidOn";
+            errorType: "DuplicatedOrder" | "QuoteNotFound" | "QuoteNotVerified" | "InvalidQuote" | "MissingFrom" | "WrongOwner" | "InvalidEip1271Signature" | "InsufficientBalance" | "InsufficientAllowance" | "InvalidSignature" | "SellAmountOverflow" | "TransferSimulationFailed" | "ZeroAmount" | "IncompatibleSigningScheme" | "TooManyLimitOrders" | "TooMuchGas" | "UnsupportedBuyTokenDestination" | "UnsupportedSellTokenSource" | "UnsupportedOrderType" | "InsufficientValidTo" | "ExcessiveValidTo" | "InvalidNativeSellToken" | "SameBuyAndSellToken" | "UnsupportedToken" | "InvalidAppData" | "AppDataHashMismatch" | "AppDataMismatch" | "AppdataFromMismatch" | "MetadataSerializationFailed" | "OldOrderActivelyBidOn";
             description: string;
         };
         OrderCancellationError: {
@@ -963,7 +963,7 @@ export interface components {
         };
         PriceEstimationError: {
             /** @enum {string} */
-            errorType: "QuoteNotVerified" | "UnsupportedToken" | "ZeroAmount" | "UnsupportedOrderType";
+            errorType: "QuoteNotVerified" | "UnsupportedToken" | "NoLiquidity" | "UnsupportedOrderType";
             description: string;
         };
         /** @description The buy or sell side when quoting an order. */
@@ -1301,6 +1301,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Too many order placements. */
             429: {
                 headers: {
@@ -1361,6 +1368,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getOrder: {
@@ -1382,6 +1396,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Order"];
                 };
+            };
+            /** @description Invalid order UID. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Order was not found. */
             404: {
@@ -1438,6 +1459,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getOrderStatus: {
@@ -1460,6 +1488,13 @@ export interface operations {
                     "application/json": components["schemas"]["CompetitionOrderStatus"];
                 };
             };
+            /** @description Invalid order UID. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getOrdersByTxHash: {
@@ -1481,6 +1516,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Order"][];
                 };
+            };
+            /** @description Invalid transaction hash. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1690,6 +1732,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Too many order quotes. */
             429: {
                 headers: {
@@ -1726,6 +1775,13 @@ export interface operations {
                     "application/json": components["schemas"]["SolverCompetitionResponse"];
                 };
             };
+            /** @description Invalid auction ID. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description No competition information available for this auction id. */
             404: {
                 headers: {
@@ -1755,6 +1811,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SolverCompetitionResponse"];
                 };
+            };
+            /** @description Invalid transaction hash. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description No competition information available for this `tx_hash`. */
             404: {
@@ -1812,6 +1875,13 @@ export interface operations {
                     "application/json": components["schemas"]["SolverCompetitionResponse"];
                 };
             };
+            /** @description Invalid auction ID. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description No competition information available for this auction id. */
             404: {
                 headers: {
@@ -1841,6 +1911,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SolverCompetitionResponse"];
                 };
+            };
+            /** @description Invalid transaction hash. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description No competition information available for this `tx_hash`. */
             404: {
@@ -1918,6 +1995,13 @@ export interface operations {
                     "application/json": components["schemas"]["AppDataObject"];
                 };
             };
+            /** @description Invalid app data hash. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description No full `appData` stored for this hash. */
             404: {
                 headers: {
@@ -1963,6 +2047,13 @@ export interface operations {
             };
             /** @description Error validating full `appData` */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2016,6 +2107,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Error storing the full `appData` */
             500: {
                 headers: {
@@ -2044,6 +2142,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TotalSurplus"];
                 };
+            };
+            /** @description Invalid address. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
