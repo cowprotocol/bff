@@ -15,6 +15,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         return {
           ...headers,
           Origin: fastify.config.PROXY_ORIGIN,
+          Host: fastify.config.PROXY_HOST,
         };
       },
     },

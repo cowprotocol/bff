@@ -14,6 +14,9 @@ const schema = {
     PROXY_ORIGIN: {
       type: 'string',
     },
+    PROXY_HOST: {
+      type: 'string',
+    },
     PROXY_UPSTREAM: {
       type: 'string',
     },
