@@ -5,14 +5,14 @@ import {
 import { FastifyPluginAsync } from 'fastify';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { apiContainer } from '../../../../inversify.config';
-import { AddressSchema, ChainIdOrSlugSchema } from '../../../../schemas';
+import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
 
 const paramsSchema = {
   type: 'object',
   required: ['chainId', 'tokenAddress'],
   additionalProperties: false,
   properties: {
-    chainId: ChainIdOrSlugSchema,
+    chainId: SupportedChainIdSchema,
     tokenAddress: AddressSchema,
   },
 } as const satisfies JSONSchema;

@@ -3,17 +3,17 @@ import {
   Erc20Repository,
   erc20RepositorySymbol,
 } from '@cowprotocol/repositories';
-import { toSupportedChainId } from '@cowprotocol/shared';
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 import { inject, injectable } from 'inversify';
 
 export interface TokenDetailService {
   getTokenDetails(
-    chainId: string,
+    chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<Erc20 | null>;
 
   getTokensDetails(
-    chainId: string,
+    chainId: SupportedChainId,
     tokenAddresses: string[]
   ): Promise<(Erc20 | null)[]>;
 }
@@ -28,21 +28,19 @@ export class TokenDetailServiceMain implements TokenDetailService {
   ) {}
 
   async getTokenDetails(
-    chainId: string,
+    chainId: SupportedChainId,
     tokenAddress: string
   ): Promise<Erc20 | null> {
-    const supportedChainId = toSupportedChainId(chainId);
-    return this.erc20Repository.get(supportedChainId, tokenAddress);
+    return this.erc20Repository.get(chainId, tokenAddress);
   }
 
   async getTokensDetails(
-    chainId: string,
+    chainId: SupportedChainId,
     tokenAddresses: string[]
   ): Promise<(Erc20 | null)[]> {
-    const supportedChainId = toSupportedChainId(chainId);
     return Promise.all(
       tokenAddresses.map((address) =>
-        this.erc20Repository.get(supportedChainId, address)
+        this.erc20Repository.get(chainId, address)
       )
     );
   }
