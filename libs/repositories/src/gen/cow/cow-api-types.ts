@@ -28,6 +28,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orders/by_uids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get existing orders from the list of UIDs.
+         * @description Returns an array where each element is an object with either
+         *     an "order" key containing the full order, or an "error" key
+         *     containing the UID and a description of what went wrong.
+         *
+         */
+        post: operations["getOrders"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders/{UID}": {
         parameters: {
             query?: never;
@@ -879,7 +902,7 @@ export interface components {
         /** @description EIP-712 signature of struct OrderCancellations { orderUid: bytes[] } from the order's owner.
          *      */
         OrderCancellations: {
-            /** @description UIDs of orders to cancel. */
+            /** @description Up to 128 UIDs of orders to cancel. */
             orderUids?: components["schemas"]["UID"][];
             /** @description `OrderCancellation` signed by the owner. */
             signature: components["schemas"]["EcdsaSignature"];
@@ -1369,6 +1392,58 @@ export interface operations {
                 content?: never;
             };
             /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The list of up to 128 order uids to fetch */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UID"][];
+            };
+        };
+        responses: {
+            /** @description The resulting full order data based on the request. Each element of the array is
+             *     an object of the following format:
+             *     - `{"order": <Order>}` for successfully fetched orders
+             *     - `{"error": {"uid": "<UID>", "description": "<message>"}}` for orders that failed conversion
+             *     The result ordering is not guaranteed and might differ from the order of requested UIDs.
+             *     Orders that do not exist in the database will be missing from the response.
+             *      */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        order: components["schemas"]["Order"];
+                    } | {
+                        error: {
+                            uid: components["schemas"]["UID"];
+                            description: string;
+                        };
+                    };
+                };
+            };
+            /** @description Request array size larger than 128 or unable to parse request body as valid JSON. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Could not decode array values as order UID. */
             422: {
                 headers: {
                     [name: string]: unknown;

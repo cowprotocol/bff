@@ -20,4 +20,6 @@ export * from './AffiliateStatsService/AffiliateStatsService';
 export * from './AffiliateStatsService/AffiliateStatsServiceImpl';
 export * from './AffiliateProgramExportService/AffiliateProgramExportService';
 export * from './AffiliateProgramExportService/AffiliateProgramExportServiceImpl';
+export * from './TokenDetailService/TokenDetailService';
+
 export * from './factories';
