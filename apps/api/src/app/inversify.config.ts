@@ -1,24 +1,4 @@
 import {
-  getCacheRepository,
-  getDuneRepository,
-  getErc20Repository,
-  getAffiliatesRepository,
-  getPushNotificationsRepository,
-  getPushSubscriptionsRepository,
-  getSimulationRepository,
-  getTokenBalancesRepository,
-  getTokenHolderRepository,
-  getUserBalanceRepository,
-  getUsdRepository,
-  TokenBalancesService,
-  TokenBalancesServiceMain,
-  tokenBalancesServiceSymbol,
-  AffiliateProgramExportService,
-  AffiliateProgramExportServiceImpl,
-  affiliateProgramExportServiceSymbol,
-} from '@cowprotocol/services';
-
-import {
   AffiliatesRepository,
   affiliatesRepositorySymbol,
   CacheRepository,
@@ -46,6 +26,26 @@ import {
 } from '@cowprotocol/repositories';
 
 import {
+  getCacheRepository,
+  getDuneRepository,
+  getErc20Repository,
+  getAffiliatesRepository,
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
+  getSimulationRepository,
+  getTokenBalancesRepository,
+  getTokenHolderRepository,
+  getUserBalanceRepository,
+  getUsdRepository,
+  TokenBalancesService,
+  TokenBalancesServiceMain,
+  tokenBalancesServiceSymbol,
+  AffiliateProgramExportService,
+  AffiliateProgramExportServiceImpl,
+  affiliateProgramExportServiceSymbol,
+  TokenDetailService,
+  TokenDetailServiceMain,
+  tokenDetailServiceSymbol,
   HooksService,
   HooksServiceImpl,
   AffiliateStatsService,
@@ -158,16 +158,25 @@ function getApiContainer(): Container {
     apiContainer
       .bind<AffiliateStatsService>(affiliateStatsServiceSymbol)
       .toDynamicValue(
-        () => new AffiliateStatsServiceImpl(duneRepository, affiliateStatsCacheTtlMs)
+        () =>
+          new AffiliateStatsServiceImpl(
+            duneRepository,
+            affiliateStatsCacheTtlMs
+          )
       );
   }
 
   if (isDuneEnabled && isCmsEnabled) {
-    const duneRepository = apiContainer.get<DuneRepository>(duneRepositorySymbol);
+    const duneRepository =
+      apiContainer.get<DuneRepository>(duneRepositorySymbol);
     apiContainer
       .bind<AffiliateProgramExportService>(affiliateProgramExportServiceSymbol)
       .toDynamicValue(
-        () => new AffiliateProgramExportServiceImpl(affiliatesRepository, duneRepository)
+        () =>
+          new AffiliateProgramExportServiceImpl(
+            affiliatesRepository,
+            duneRepository
+          )
       );
   }
 
@@ -193,6 +202,10 @@ function getApiContainer(): Container {
     .to(TokenBalancesServiceMain);
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+
+  apiContainer
+    .bind<TokenDetailService>(tokenDetailServiceSymbol)
+    .to(TokenDetailServiceMain);
 
   apiContainer
     .bind<SimulationService>(simulationServiceSymbol)
