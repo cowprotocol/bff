@@ -13,7 +13,6 @@ export const ETHPLORER_BASE_URL = {
   [SupportedChainId.BASE]: null,
   [SupportedChainId.POLYGON]: null,
   [SupportedChainId.AVALANCHE]: null,
-  [SupportedChainId.LENS]: null,
   [SupportedChainId.BNB]: 'https://api.binplorer.com',
   [SupportedChainId.LINEA]: 'https://api.lineaplorer.build',
   [SupportedChainId.PLASMA]: null,
