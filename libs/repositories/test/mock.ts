@@ -2,6 +2,7 @@ export const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const MOCK_RESPONSE: Response = {
+  bytes: () => Promise.resolve(new Uint8Array(new ArrayBuffer(0))),
   status: 200,
   statusText: 'OK',
   ok: true,

@@ -1,5 +1,5 @@
 import {
-  NATIVE_CURRENCY_ADDRESS,
+  EVM_NATIVE_CURRENCY_ADDRESS,
   SupportedChainId,
   WRAPPED_NATIVE_CURRENCIES,
 } from '@cowprotocol/cow-sdk';
@@ -10,10 +10,10 @@ describe('Erc20RepositoryNative', () => {
 
   it('returns wrapped native token info when given native sentinel address', async () => {
     const chainId = SupportedChainId.MAINNET;
-    const result = await repo.get(chainId, NATIVE_CURRENCY_ADDRESS);
+    const result = await repo.get(chainId, EVM_NATIVE_CURRENCY_ADDRESS);
 
     expect(result).not.toBeNull();
-    expect(result?.address).toEqual(NATIVE_CURRENCY_ADDRESS);
+    expect(result?.address).toEqual(EVM_NATIVE_CURRENCY_ADDRESS);
     expect(result?.symbol).toEqual('ETH');
     expect(result?.decimals).toEqual(18);
   });

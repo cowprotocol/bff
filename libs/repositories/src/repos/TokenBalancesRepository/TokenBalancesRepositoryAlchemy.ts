@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { TokenBalanceParams, TokenBalancesRepository, TokenBalancesResponse } from './TokenBalancesRepository';
 import { ALCHEMY_API_KEY, ALCHEMY_CLIENT_NETWORK_MAPPING, getAlchemyApiUrl } from '../../datasources/alchemy';
-import { NATIVE_CURRENCY_ADDRESS, ZERO_ADDRESS } from '@cowprotocol/cow-sdk';
+import { EVM_NATIVE_CURRENCY_ADDRESS, ZERO_ADDRESS } from '@cowprotocol/cow-sdk';
 import { logger } from '@cowprotocol/shared';
 
 const JSON_RPC_VERSION = '2.0';
@@ -78,9 +78,9 @@ export class TokenBalancesRepositoryAlchemy implements TokenBalancesRepository {
       const contractAddress =
         // alchemy return null for native token
         tokenBalance.contractAddress === 'null' ||
-        tokenBalance.contractAddress === null ||
-        tokenBalance.contractAddress === ZERO_ADDRESS
-          ? NATIVE_CURRENCY_ADDRESS.toLowerCase()
+          tokenBalance.contractAddress === null ||
+          tokenBalance.contractAddress === ZERO_ADDRESS
+          ? EVM_NATIVE_CURRENCY_ADDRESS.toLowerCase()
           : tokenBalance.contractAddress.toLowerCase();
 
       // Convert hex balance to decimal string
