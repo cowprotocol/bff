@@ -1,4 +1,4 @@
-import { Headers, Response } from 'node-fetch';
+import type { Headers, Response } from 'node-fetch';
 
 export const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -7,7 +7,7 @@ const MOCK_RESPONSE: Response = {
   status: 200,
   statusText: 'OK',
   ok: true,
-  headers: new Headers(),
+  headers: new globalThis.Headers() as unknown as Headers,
   redirected: false,
   type: 'basic',
   url: 'http://mocked-url.mock',
