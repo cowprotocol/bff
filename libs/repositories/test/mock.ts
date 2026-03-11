@@ -7,9 +7,6 @@ const MOCK_RESPONSE: Response = {
   statusText: 'OK',
   ok: true,
   headers: {
-    entries: function (): IterableIterator<[string, string]> {
-      throw new Error('Function not implemented.');
-    },
     keys: function (): IterableIterator<string> {
       throw new Error('Function not implemented.');
     },
