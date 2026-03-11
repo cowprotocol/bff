@@ -7,6 +7,18 @@ const MOCK_RESPONSE: Response = {
   statusText: 'OK',
   ok: true,
   headers: {
+    entries: function (): IterableIterator<[string, string]> {
+      throw new Error('Function not implemented.');
+    },
+    keys: function (): IterableIterator<string> {
+      throw new Error('Function not implemented.');
+    },
+    values: function (): IterableIterator<string> {
+      throw new Error('Function not implemented.');
+    },
+    [Symbol.iterator]: function (): IterableIterator<[string, string]> {
+      throw new Error('Function not implemented.');
+    },
     append: function (name: string, value: string): void {
       throw new Error('Function not implemented.');
     },
