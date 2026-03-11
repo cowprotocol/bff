@@ -1,4 +1,4 @@
-import { Channel, ChannelModel } from 'amqplib';
+import { Channel, Connection } from 'amqplib';
 
 export interface PushNotification {
   id: string;
@@ -14,7 +14,7 @@ export interface ConnectToQueueParams {
 }
 
 export interface ConnectToChannelResponse {
-  connection: ChannelModel;
+  connection: Connection;
   channel: Channel;
 }
 
