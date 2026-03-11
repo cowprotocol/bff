@@ -33,11 +33,6 @@ export const USDC = {
     address: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
     decimals: 6,
   },
-  // https://explorer.lens.xyz/address/0x88f08e304ec4f90d644cec3fb69b8ad414acf884
-  [SupportedChainId.LENS]: {
-    address: '0x88f08e304ec4f90d644cec3fb69b8ad414acf884',
-    decimals: 6,
-  },
   // https://bscscan.com/token/0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d
   [SupportedChainId.BNB]: {
     address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',

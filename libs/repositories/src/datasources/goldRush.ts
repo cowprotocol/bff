@@ -14,7 +14,6 @@ export const GOLD_RUSH_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.POLYGON]: 'polygon-mainnet',
   [SupportedChainId.AVALANCHE]: 'avalanche-mainnet',
   [SupportedChainId.SEPOLIA]: 'eth-sepolia',
-  [SupportedChainId.LENS]: 'lens-mainnet',
   [SupportedChainId.BNB]: 'bsc-mainnet',
   [SupportedChainId.LINEA]: 'linea-mainnet',
   [SupportedChainId.PLASMA]: 'plasma-mainnet',

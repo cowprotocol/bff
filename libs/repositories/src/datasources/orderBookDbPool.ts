@@ -17,7 +17,6 @@ const chainToDbNameMap = {
   [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum-one',
   [SupportedChainId.BNB]: 'bnb',
-  [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.SEPOLIA]: 'sepolia',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',

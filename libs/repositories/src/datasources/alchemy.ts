@@ -17,7 +17,6 @@ export const ALCHEMY_CLIENT_NETWORK_MAPPING: Record<
   [SupportedChainId.POLYGON]: 'polygon-mainnet',
   [SupportedChainId.AVALANCHE]: 'avax-mainnet',
   [SupportedChainId.BASE]: 'base-mainnet',
-  [SupportedChainId.LENS]: 'lens-mainnet',
   [SupportedChainId.BNB]: 'bnb-mainnet',
   [SupportedChainId.LINEA]: 'linea-mainnet',
   [SupportedChainId.INK]: 'ink-mainnet',
