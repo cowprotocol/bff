@@ -481,6 +481,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/debug/order/{uid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Debug an order's lifecycle.
+         * @description Returns a comprehensive debug report for the given order, including order details, lifecycle events, auction participation, proposed solutions, executions, trades, and settlement attempts.
+         *
+         */
+        get: operations["debugOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1268,6 +1289,92 @@ export interface components {
             policy?: components["schemas"]["FeePolicy"];
             amount?: unknown & components["schemas"]["TokenAmount"];
             token?: unknown & components["schemas"]["Address"];
+        };
+        DebugOrderResponse: {
+            /** @description The UID of the order being debugged. */
+            orderUid: components["schemas"]["UID"];
+            order: components["schemas"]["Order"];
+            events: components["schemas"]["DebugEvent"][];
+            /** @description Auctions this order participated in, sorted by ID. Each auction groups all related data: native prices, proposed solutions, executions, settlement attempts, and fee policies.
+             *      */
+            auctions: components["schemas"]["DebugAuction"][];
+            trades: components["schemas"]["DebugTrade"][];
+        };
+        DebugEvent: {
+            /** @description Event type (e.g. created, ready, filtered, traded). */
+            label: string;
+            /** Format: date-time */
+            timestamp: string;
+        };
+        DebugAuction: {
+            /** @description Auction ID. */
+            id: number;
+            /** @description Block number of the auction. */
+            block: number;
+            /** @description Deadline block for the auction. */
+            deadline: number;
+            /** @description Native prices for the order's sell and buy tokens in this auction. Keys are hex-encoded token addresses, values are decimal price strings.
+             *      */
+            nativePrices: {
+                [key: string]: string | undefined;
+            };
+            proposedSolutions: components["schemas"]["DebugProposedSolution"][];
+            executions: components["schemas"]["DebugExecution"][];
+            settlementAttempts: components["schemas"]["DebugSettlementAttempt"][];
+            feePolicies: components["schemas"]["DebugFeePolicy"][];
+        };
+        DebugProposedSolution: {
+            solutionUid: number;
+            ranking: number;
+            solver: components["schemas"]["Address"];
+            isWinner: boolean;
+            filteredOut: boolean;
+            /** @description Decimal-encoded score. */
+            score: string;
+            executedSell: components["schemas"]["TokenAmount"];
+            executedBuy: components["schemas"]["TokenAmount"];
+        };
+        DebugExecution: {
+            executedFee: components["schemas"]["TokenAmount"];
+            executedFeeToken: components["schemas"]["Address"];
+            blockNumber: number;
+            protocolFees: components["schemas"]["DebugProtocolFee"][];
+        };
+        DebugProtocolFee: {
+            token: components["schemas"]["Address"];
+            amount: components["schemas"]["TokenAmount"];
+        };
+        DebugTrade: {
+            blockNumber: number;
+            logIndex: number;
+            buyAmount: components["schemas"]["TokenAmount"];
+            sellAmount: components["schemas"]["TokenAmount"];
+            sellAmountBeforeFees: components["schemas"]["TokenAmount"];
+            txHash?: components["schemas"]["TransactionHash"];
+            auctionId?: number;
+        };
+        DebugSettlementAttempt: {
+            solver: components["schemas"]["Address"];
+            solutionUid: number;
+            /** Format: date-time */
+            startTimestamp: string;
+            /** Format: date-time */
+            endTimestamp?: string;
+            startBlock: number;
+            endBlock?: number;
+            deadlineBlock: number;
+            /** @description Settlement outcome (e.g. "success", "revert"). */
+            outcome?: string;
+        };
+        /** @description Fee policy applied to this order in this auction. */
+        DebugFeePolicy: {
+            /** @enum {string} */
+            kind: "surplus" | "volume" | "priceImprovement";
+            surplusFactor?: number;
+            surplusMaxVolumeFactor?: number;
+            volumeFactor?: number;
+            priceImprovementFactor?: number;
+            priceImprovementMaxVolumeFactor?: number;
         };
     };
     responses: never;
@@ -2220,6 +2327,49 @@ export interface operations {
             };
             /** @description Invalid address. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    debugOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                uid: components["schemas"]["UID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Debug report returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebugOrderResponse"];
+                };
+            };
+            /** @description Invalid order UID (malformed hex or wrong length). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal error. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };

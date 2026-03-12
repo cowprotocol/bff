@@ -15,7 +15,6 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.BASE]: 'base',
   [SupportedChainId.POLYGON]: 'polygon-pos',
   [SupportedChainId.AVALANCHE]: 'avalanche',
-  [SupportedChainId.LENS]: 'lens',
   [SupportedChainId.BNB]: 'binance-smart-chain',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',

@@ -14,7 +14,6 @@ export const MORALIS_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.POLYGON]: 'polygon',
   [SupportedChainId.AVALANCHE]: 'avalanche',
   [SupportedChainId.BASE]: 'base',
-  [SupportedChainId.LENS]: null,
   [SupportedChainId.BNB]: 'bsc',
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: null,

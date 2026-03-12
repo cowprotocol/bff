@@ -1,3 +1,5 @@
+import type { Headers, Response } from 'node-fetch';
+
 export const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -5,37 +7,16 @@ const MOCK_RESPONSE: Response = {
   status: 200,
   statusText: 'OK',
   ok: true,
-  headers: {
-    append: function (name: string, value: string): void {
-      throw new Error('Function not implemented.');
-    },
-    delete: function (name: string): void {
-      throw new Error('Function not implemented.');
-    },
-    get: function (name: string): string | null {
-      throw new Error('Function not implemented.');
-    },
-    getSetCookie: function (): string[] {
-      throw new Error('Function not implemented.');
-    },
-    has: function (name: string): boolean {
-      throw new Error('Function not implemented.');
-    },
-    set: function (name: string, value: string): void {
-      throw new Error('Function not implemented.');
-    },
-    forEach: function (
-      _callbackfn: (value: string, key: string, parent: Headers) => void,
-      _thisArg?: any
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-  },
+  headers: new globalThis.Headers() as unknown as Headers,
   redirected: false,
   type: 'basic',
   url: 'http://mocked-url.mock',
   body: null,
   bodyUsed: false,
+  size: 0,
+  buffer(): Promise<Buffer> {
+    throw new Error('Function not implemented.');
+  },
   async text() {
     return 'Mock response text';
   },
@@ -51,7 +32,7 @@ const MOCK_RESPONSE: Response = {
   formData(): Promise<FormData> {
     throw new Error('Function not implemented.');
   },
-  json(): Promise<any> {
+  json(): Promise<unknown> {
     throw new Error('Function not implemented.');
   },
 };
@@ -71,7 +52,7 @@ export function okResponse(params: OkResponseParams): {
       ...overrides,
       status: 200,
       ok: true,
-    },
+    } as Response,
     data,
   };
 }
@@ -92,7 +73,7 @@ export function errorResponse(params: ErrorResponseParams): {
       ...overrides,
       status,
       ok: false,
-    },
+    } as Response,
     error,
   };
 }

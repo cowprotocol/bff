@@ -40,8 +40,7 @@ export interface PushNotificationsRepository {
 }
 
 export class PushNotificationsRepositoryRabbit
-  implements PushNotificationsRepository
-{
+  implements PushNotificationsRepository {
   connection: ConnectToChannelResponse | null = null;
 
   messageRetries = new Map<string, number>(); // Track message retries by message ID
@@ -49,7 +48,7 @@ export class PushNotificationsRepositoryRabbit
   constructor(
     private readonly queueName = NOTIFICATIONS_QUEUE,
     private readonly maxRetries = MAX_RETRIES
-  ) {}
+  ) { }
 
   async connect(): Promise<ConnectToChannelResponse> {
     if (!this.connection || !(await this.ping())) {
