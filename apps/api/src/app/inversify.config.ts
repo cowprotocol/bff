@@ -74,7 +74,7 @@ import {
 import { Container } from 'inversify';
 import { Logger, logger } from '@cowprotocol/shared';
 
-const DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS = 3600000;
+const DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function getAffiliateStatsCacheTtlMs(): number {
   const rawValue = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS;
@@ -93,7 +93,7 @@ function getAffiliateStatsCacheTtlMs(): number {
   return parsed;
 }
 
-function getApiContainer(): Container {
+export function getApiContainer(): Container {
   const apiContainer = new Container();
 
   // Bind logger
@@ -163,7 +163,8 @@ function getApiContainer(): Container {
             duneRepository,
             affiliateStatsCacheTtlMs
           )
-      );
+      )
+      .inSingletonScope();
   }
 
   if (isDuneEnabled && isCmsEnabled) {
