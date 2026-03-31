@@ -28,6 +28,8 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
  */
 export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   ...SUPPORTED_COINGECKO_PLATFORMS,
+  [1000000000]: 'bitcoin',
+  [1000000001]: 'solana',
   [10]: 'optimistic-ethereum',
   [10000]: 'smartbch',
   [100009]: 'vechain',

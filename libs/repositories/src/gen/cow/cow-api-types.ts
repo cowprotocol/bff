@@ -727,6 +727,12 @@ export interface components {
             /** @description May be set for debugging purposes. If set, this field is compared to what the backend internally calculates as the app data hash based on the contents of `appData`. If the hash does not match, an error is returned. If this field is set, then `appData` **MUST** be a string encoding of a JSON object.
              *      */
             appDataHash?: components["schemas"]["AppDataHash"] | null;
+            /**
+             * @description If set to true, full sell amount will be checked during allowance and balance checking. This will ensure the account has correct allowance and available balance for the order to be created.
+             *
+             * @default false
+             */
+            fullBalanceCheck: boolean;
         };
         /** @description Extra order data that is returned to users when querying orders but not provided by users when creating orders.
          *      */
@@ -1305,6 +1311,9 @@ export interface components {
             label: string;
             /** Format: date-time */
             timestamp: string;
+            /** @description Why the order was filtered or marked invalid. Only present for "filtered" and "invalid" events.
+             *      */
+            reason?: string | null;
         };
         DebugAuction: {
             /** @description Auction ID. */

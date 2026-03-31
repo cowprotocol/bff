@@ -1,9 +1,20 @@
-import { isAddress } from 'viem';
 import {
   COINGECKO_PLATFORMS,
   SUPPORTED_COINGECKO_PLATFORMS,
 } from '../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import {
+  SupportedChainId,
+  EVM_NATIVE_CURRENCY_ADDRESS,
+  SOL_NATIVE_CURRENCY_ADDRESS,
+  BTC_CURRENCY_ADDRESS,
+  getAddressKey,
+} from '@cowprotocol/cow-sdk';
+
+const NATIVE_CURRENCY_ADDRESSES = new Set([
+  getAddressKey(EVM_NATIVE_CURRENCY_ADDRESS),
+  getAddressKey(SOL_NATIVE_CURRENCY_ADDRESS),
+  getAddressKey(BTC_CURRENCY_ADDRESS),
+]);
 
 // Invert number→slug map to slug→SupportedChainId
 const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
@@ -22,13 +33,17 @@ export function getAddressOrPlatform(
     return platform;
   }
 
-  if (isAddress(tokenAddress)) {
-    // EVM like address, Coingecko expects it lowercased
-    return tokenAddress.toLowerCase();
+  // Native currency addresses are conventions, not real contracts.
+  // CoinGecko expects platform-level lookup for native tokens.
+  const addressKey = getAddressKey(tokenAddress);
+
+  if (NATIVE_CURRENCY_ADDRESSES.has(addressKey)) {
+    return platform;
   }
 
-  // Non-EVM address, Coingecko expects it as is
-  return tokenAddress;
+  // getAddressKey lowercases EVM addresses (as CoinGecko expects)
+  // and preserves case for non-EVM addresses
+  return addressKey;
 }
 
 export function getCoingeckoPlatform(
