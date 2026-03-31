@@ -3,11 +3,13 @@ import {
   SUPPORTED_COINGECKO_PLATFORMS,
 } from '../datasources/coingecko';
 import {
-  SupportedChainId,
-  EVM_NATIVE_CURRENCY_ADDRESS,
-  SOL_NATIVE_CURRENCY_ADDRESS,
+  AdditionalTargetChainId,
   BTC_CURRENCY_ADDRESS,
+  EVM_NATIVE_CURRENCY_ADDRESS,
   getAddressKey,
+  SOL_NATIVE_CURRENCY_ADDRESS,
+  SupportedChainId,
+  TargetChainId,
 } from '@cowprotocol/cow-sdk';
 
 const NATIVE_CURRENCY_ADDRESSES = new Set([
@@ -17,13 +19,13 @@ const NATIVE_CURRENCY_ADDRESSES = new Set([
 ]);
 
 // Invert number→slug map to slug→SupportedChainId
-const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
+const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, TargetChainId> =
   Object.entries(SUPPORTED_COINGECKO_PLATFORMS).reduce((map, [id, slug]) => {
     if (slug) {
-      map[slug as string] = +id as SupportedChainId;
+      map[slug as string] = +id as TargetChainId;
     }
     return map;
-  }, {} as Record<string, SupportedChainId>);
+  }, {} as Record<string, TargetChainId>);
 
 export function getAddressOrPlatform(
   tokenAddress: string | undefined,
@@ -55,12 +57,14 @@ export function getCoingeckoPlatform(
 
 export function getSupportedCoingeckoChainId(
   chainIdOrSlug: string
-): SupportedChainId | null {
+): TargetChainId | null {
   const chainIdAsNumber = +chainIdOrSlug;
   // Only SupportedChainIds are supported
   const numericId = isNaN(chainIdAsNumber)
     ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]
-    : (chainIdAsNumber as SupportedChainId);
+    : (chainIdAsNumber as TargetChainId);
 
-  return SupportedChainId[numericId] ? numericId : null;
+  return SupportedChainId[numericId] || AdditionalTargetChainId[numericId]
+    ? numericId
+    : null;
 }

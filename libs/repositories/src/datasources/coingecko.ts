@@ -1,9 +1,7 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AdditionalTargetChainId, SupportedChainId, TargetChainId } from '@cowprotocol/cow-sdk';
 
 import createClient from 'openapi-fetch';
-import type { paths } from '../gen/coingecko/coingecko-pro-types';
-
-import type { components } from '../gen/coingecko/coingecko-pro-types';
+import type { components, paths } from '../gen/coingecko/coingecko-pro-types';
 
 export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
 
@@ -19,7 +17,10 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
-} as const satisfies Record<SupportedChainId, string | undefined>;
+  [AdditionalTargetChainId.OPTIMISM]: 'optimistic-ethereum',
+  [AdditionalTargetChainId.BITCOIN]: 'bitcoin',
+  [AdditionalTargetChainId.SOLANA]: 'solana',
+} as const satisfies Record<TargetChainId, string | undefined>;
 
 /**
  * Map of chain IDs to Coingecko platform IDs, for every platform that has a network id.
@@ -28,9 +29,6 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
  */
 export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   ...SUPPORTED_COINGECKO_PLATFORMS,
-  [1000000000]: 'bitcoin',
-  [1000000001]: 'solana',
-  [10]: 'optimistic-ethereum',
   [10000]: 'smartbch',
   [100009]: 'vechain',
   [10201]: 'maxxchain',

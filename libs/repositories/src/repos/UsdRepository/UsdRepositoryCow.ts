@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { isSupportedChain, SupportedChainId } from '@cowprotocol/cow-sdk';
 import { logger } from '@cowprotocol/shared';
 import { BigNumber } from 'bignumber.js';
 import { injectable } from 'inversify';
@@ -27,7 +27,7 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
     tokenAddress?: string | undefined
   ): Promise<number | null> {
     const chainId = getSupportedCoingeckoChainId(chainIdOrSlug);
-    if (!chainId) {
+    if (!chainId || !isSupportedChain(chainId)) {
       return null;
     }
 
