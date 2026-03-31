@@ -5,15 +5,15 @@ import {
 import {
   AdditionalTargetChainId,
   BTC_CURRENCY_ADDRESS,
-  EVM_NATIVE_CURRENCY_ADDRESS,
   getAddressKey,
   SOL_NATIVE_CURRENCY_ADDRESS,
   SupportedChainId,
   TargetChainId,
 } from '@cowprotocol/cow-sdk';
 
-const NATIVE_CURRENCY_ADDRESSES = new Set([
-  getAddressKey(EVM_NATIVE_CURRENCY_ADDRESS),
+// for sol/btc we use our internal convention of the native address
+// for coingecko we should just replace the address by platform
+const NON_EVM_NATIVE_TOKENS = new Set([
   getAddressKey(SOL_NATIVE_CURRENCY_ADDRESS),
   getAddressKey(BTC_CURRENCY_ADDRESS),
 ]);
@@ -39,7 +39,7 @@ export function getAddressOrPlatform(
   // CoinGecko expects platform-level lookup for native tokens.
   const addressKey = getAddressKey(tokenAddress);
 
-  if (NATIVE_CURRENCY_ADDRESSES.has(addressKey)) {
+  if (NON_EVM_NATIVE_TOKENS.has(addressKey)) {
     return platform;
   }
 
