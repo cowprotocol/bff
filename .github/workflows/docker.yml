@@ -27,8 +27,6 @@ jobs:
 
       - name: Setup dependencies
         uses: ./.github/workflows/actions/setup-dependencies
-        with:
-          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
