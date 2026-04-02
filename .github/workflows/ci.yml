@@ -20,8 +20,6 @@ jobs:
 
       - name: Setup dependencies
         uses: ./.github/workflows/actions/setup-dependencies
-        with:
-          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Run ESLint
         run: yarn lint
@@ -54,8 +52,6 @@ jobs:
 
       - name: Setup dependencies
         uses: ./.github/workflows/actions/setup-dependencies
-        with:
-          authToken: ${{ secrets.PACKAGE_READ_AUTH_TOKEN }}
 
       - name: Lint affected projects
         run: npx nx affected --target=lint --base=origin/main
