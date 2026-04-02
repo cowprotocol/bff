@@ -481,6 +481,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/debug/simulation/{uid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Tenderly simulation request for an order.
+         * @description Returns the Tenderly simulation request that would be used to simulate the given order, along with any simulation error if applicable.
+         *
+         */
+        get: operations["debugSimulation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/debug/order/{uid}": {
         parameters: {
             query?: never;
@@ -727,6 +748,12 @@ export interface components {
             /** @description May be set for debugging purposes. If set, this field is compared to what the backend internally calculates as the app data hash based on the contents of `appData`. If the hash does not match, an error is returned. If this field is set, then `appData` **MUST** be a string encoding of a JSON object.
              *      */
             appDataHash?: components["schemas"]["AppDataHash"] | null;
+            /**
+             * @description If set to true, full sell amount will be checked during allowance and balance checking. This will ensure the account has correct allowance and available balance for the order to be created.
+             *
+             * @default false
+             */
+            fullBalanceCheck: boolean;
         };
         /** @description Extra order data that is returned to users when querying orders but not provided by users when creating orders.
          *      */
@@ -1305,6 +1332,9 @@ export interface components {
             label: string;
             /** Format: date-time */
             timestamp: string;
+            /** @description Why the order was filtered or marked invalid. Only present for "filtered" and "invalid" events.
+             *      */
+            reason?: string | null;
         };
         DebugAuction: {
             /** @description Auction ID. */
@@ -1375,6 +1405,79 @@ export interface components {
             volumeFactor?: number;
             priceImprovementFactor?: number;
             priceImprovementMaxVolumeFactor?: number;
+        };
+        /**
+         * @description The kind of Tenderly simulation to run.
+         * @enum {string}
+         */
+        SimulationType: "full" | "quick";
+        AccessListItem: {
+            address: components["schemas"]["Address"];
+            storage_keys: string[];
+        };
+        /** @description State overrides for a given account before simulation. */
+        StateObject: {
+            /**
+             * @description Fake balance to set for the account (decimal-encoded uint256).
+             * @example 1000000000000000000
+             */
+            balance?: string;
+            /**
+             * @description Fake EVM bytecode to inject into the account (hex with `0x` prefix).
+             * @example 0x6080604052
+             */
+            code?: string;
+            /** @description Fake key-value mapping to override individual storage slots. Keys and values are 32-byte hex strings with `0x` prefix.
+             *      */
+            storage?: {
+                [key: string]: string | undefined;
+            };
+        };
+        /** @description A Tenderly transaction simulation request. */
+        TenderlyRequest: {
+            /**
+             * @description The network identifier (e.g. "1" for mainnet).
+             * @example 1
+             */
+            network_id: string;
+            /** @description Block number to simulate the transaction at. */
+            block_number?: number;
+            /** @description Transaction index within the block. */
+            transaction_index?: number;
+            from: components["schemas"]["Address"];
+            to: components["schemas"]["Address"];
+            /** @description Transaction calldata encoded as hex with `0x` prefix. */
+            input: components["schemas"]["CallData"];
+            /** @description Gas limit for the transaction. */
+            gas?: number;
+            /** @description Gas price in Wei. */
+            gas_price?: number;
+            /**
+             * @description ETH value to send with the transaction (decimal-encoded uint256).
+             * @example 0
+             */
+            value?: string;
+            simulation_type?: components["schemas"]["SimulationType"];
+            /** @description Whether to save the simulation on Tenderly. */
+            save?: boolean;
+            /** @description Whether to save the simulation only if it fails. */
+            save_if_fails?: boolean;
+            /** @description Whether to generate an access list for the transaction. */
+            generate_access_list?: boolean;
+            /** @description State overrides applied before simulation. Keys are account addresses (hex with `0x` prefix).
+             *      */
+            state_objects?: {
+                [key: string]: components["schemas"]["StateObject"] | undefined;
+            };
+            /** @description EIP-2930 access list for the transaction. */
+            access_list?: components["schemas"]["AccessListItem"][];
+        };
+        /** @description The Tenderly simulation request for an order, along with any simulation error.
+         *      */
+        OrderSimulation: {
+            tenderly_request: components["schemas"]["TenderlyRequest"];
+            /** @description Simulation error message, if the simulation failed. */
+            error?: string | null;
         };
     };
     responses: never;
@@ -2327,6 +2430,56 @@ export interface operations {
             };
             /** @description Invalid address. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    debugSimulation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                uid: components["schemas"]["UID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Simulation request returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderSimulation"];
+                };
+            };
+            /** @description Invalid order UID. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order simulation endpoint is not enabled. */
+            405: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal error. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
