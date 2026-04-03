@@ -1,16 +1,18 @@
 import httpProxy from '@fastify/http-proxy';
 import { FastifyPluginAsync } from 'fastify';
 
-const bungeeAffiliateCode =
-  '609913096e1a3d62cecd0ffff47aa3e459eaedceb5fef75aad43e6cbff367039708902197e0b2b78b1d76cb0837ad0b318baedceb5fef75aad43e6cb'
-
 const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange';
 
 const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const upstream = fastify.config.SOCKET_BASE_URL || DEFAULT_SOCKET_BASE_URL;
   const apiKey = fastify.config.SOCKET_API_KEY;
+  const affiliateCode = fastify.config.SOCKET_AFFILIATE_CODE;
   if (!apiKey) {
     fastify.log.warn('SOCKET_API_KEY is not set. Skipping proxy.');
+    return;
+  }
+  if (!affiliateCode) {
+    fastify.log.warn('SOCKET_AFFILIATE_CODE is not set. Skipping proxy.');
     return;
   }
 
@@ -50,7 +52,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       rewriteRequestHeaders: (request, headers) => ({
         'x-api-key': apiKey,
         origin: 'https://swap.cow.fi',
-        Affiliate: bungeeAffiliateCode,
+        Affiliate: affiliateCode,
       }),
     },
     preHandler: async (request) => {

@@ -23,6 +23,9 @@ const schema = {
     SOCKET_API_KEY: {
       type: 'string',
     },
+    SOCKET_AFFILIATE_CODE: {
+      type: 'string',
+    },
     SOCKET_BASE_URL: {
       type: 'string',
     },
