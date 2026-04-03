@@ -1,12 +1,7 @@
 import { injectable } from 'inversify';
-import {
-  getCoingeckoProClient,
-  SimplePriceResponse,
-} from '../../datasources/coingecko';
-import {
-  getAddressOrPlatform,
-  getCoingeckoPlatform,
-} from '../../utils/coingeckoUtils';
+import { getAddressKey } from '@cowprotocol/cow-sdk';
+import { getCoingeckoProClient, SimplePriceResponse } from '../../datasources/coingecko';
+import { getAddressOrPlatform, getCoingeckoPlatform } from '../../utils/coingeckoUtils';
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful';
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
 
@@ -40,9 +35,10 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform);
 
-    const fetchPromise = tokenAddress
-      ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
-      : this.getSinglePriceByPlatformId(platform);
+    const fetchPromise =
+      tokenAddress && addressOrPlatform !== platform
+        ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
+        : this.getSinglePriceByPlatformId(platform);
 
     return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform);
   }
@@ -60,14 +56,17 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     const days = DAYS_PER_PRICE_STRATEGY[priceStrategy].toString();
     const interval = priceStrategy === 'daily' ? 'daily' : undefined;
 
-    const { data, response } = tokenAddress
-      ? await this.getMarketDataByTokenAddress(
-          platform,
-          days,
-          interval,
-          tokenAddress
-        )
-      : await this.getMarketDataByPlatformId(platform, days, interval);
+    const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform);
+
+    const { data, response } =
+      tokenAddress && addressOrPlatform !== platform
+        ? await this.getMarketDataByTokenAddress(
+            platform,
+            days,
+            interval,
+            addressOrPlatform
+          )
+        : await this.getMarketDataByPlatformId(platform, days, interval);
 
     if (response.status === 404 || !data) {
       return null;
@@ -154,7 +153,6 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     interval: 'daily' | undefined,
     tokenAddress: string
   ) {
-    const address = tokenAddress.toLowerCase();
     // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
     return getCoingeckoProClient().GET(
       `/coins/{id}/contract/{contract_address}/market_chart`,
@@ -162,7 +160,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
         params: {
           path: {
             id: platform,
-            contract_address: address,
+            contract_address: getAddressKey(tokenAddress),
           },
           query: {
             vs_currency: 'usd',
