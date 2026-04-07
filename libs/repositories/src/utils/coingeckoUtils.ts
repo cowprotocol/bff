@@ -1,18 +1,31 @@
-import { isAddress } from 'viem';
 import {
   COINGECKO_PLATFORMS,
   SUPPORTED_COINGECKO_PLATFORMS,
 } from '../datasources/coingecko';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import {
+  AdditionalTargetChainId,
+  BTC_CURRENCY_ADDRESS,
+  getAddressKey,
+  SOL_NATIVE_CURRENCY_ADDRESS,
+  SupportedChainId,
+  TargetChainId,
+} from '@cowprotocol/cow-sdk';
+
+// for sol/btc we use our internal convention of the native address
+// for coingecko we should just replace the address by platform
+const NON_EVM_NATIVE_TOKENS = new Set([
+  getAddressKey(SOL_NATIVE_CURRENCY_ADDRESS),
+  getAddressKey(BTC_CURRENCY_ADDRESS),
+]);
 
 // Invert number→slug map to slug→SupportedChainId
-const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, SupportedChainId> =
+const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, TargetChainId> =
   Object.entries(SUPPORTED_COINGECKO_PLATFORMS).reduce((map, [id, slug]) => {
     if (slug) {
-      map[slug as string] = +id as SupportedChainId;
+      map[slug as string] = +id as TargetChainId;
     }
     return map;
-  }, {} as Record<string, SupportedChainId>);
+  }, {} as Record<string, TargetChainId>);
 
 export function getAddressOrPlatform(
   tokenAddress: string | undefined,
@@ -22,13 +35,17 @@ export function getAddressOrPlatform(
     return platform;
   }
 
-  if (isAddress(tokenAddress)) {
-    // EVM like address, Coingecko expects it lowercased
-    return tokenAddress.toLowerCase();
+  // Native currency addresses are conventions, not real contracts.
+  // CoinGecko expects platform-level lookup for native tokens.
+  const addressKey = getAddressKey(tokenAddress);
+
+  if (NON_EVM_NATIVE_TOKENS.has(addressKey)) {
+    return platform;
   }
 
-  // Non-EVM address, Coingecko expects it as is
-  return tokenAddress;
+  // getAddressKey lowercases EVM addresses (as CoinGecko expects)
+  // and preserves case for non-EVM addresses
+  return addressKey;
 }
 
 export function getCoingeckoPlatform(
@@ -40,12 +57,14 @@ export function getCoingeckoPlatform(
 
 export function getSupportedCoingeckoChainId(
   chainIdOrSlug: string
-): SupportedChainId | null {
+): TargetChainId | null {
   const chainIdAsNumber = +chainIdOrSlug;
   // Only SupportedChainIds are supported
   const numericId = isNaN(chainIdAsNumber)
     ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]
-    : (chainIdAsNumber as SupportedChainId);
+    : (chainIdAsNumber as TargetChainId);
 
-  return SupportedChainId[numericId] ? numericId : null;
+  return SupportedChainId[numericId] || AdditionalTargetChainId[numericId]
+    ? numericId
+    : null;
 }
