@@ -578,8 +578,8 @@ interface LogRaw {
 export interface StateDiff {
   address: string;
   soltype: SoltypeElement | null;
-  original: string | Record<string, any> | null;
-  dirty: string | Record<string, any> | null;
+  original: string | number | boolean | Record<string, any> | unknown[] | null;
+  dirty: string | number | boolean | Record<string, any> | unknown[] | null;
   raw?: RawElement[];
 }
 
