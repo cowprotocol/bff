@@ -105,12 +105,12 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
       },
     });
 
-    // If tokens is not found, return null. See See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
+    // If tokens is not found, return null. See See https://api.cow.finance/mainnet/api/v1/token/this-is-not-a-token/native_price
     if (response.status === 404) {
       return null;
     }
 
-    // Unsupported tokens return undefined. See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
+    // Unsupported tokens return undefined. See https://api.cow.finance/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
     if (response.status === 400) {
       const errorType = (error as any)?.errorType;
       const description = (error as any)?.description;

@@ -13,7 +13,7 @@ export function getExplorerBaseUrl(chainId: SupportedChainId) {
     chainId === SupportedChainId.MAINNET
       ? ''
       : `/${EXPLORER_NETWORK_NAMES[chainId]}`;
-  return `https://explorer.cow.fi${suffix}`;
+  return `https://explorer.cow.finance${suffix}`;
 }
 
 export function formatAmount(amount: bigint, decimals: number | undefined) {

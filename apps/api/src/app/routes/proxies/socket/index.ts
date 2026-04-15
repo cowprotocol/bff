@@ -51,7 +51,7 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     replyOptions: {
       rewriteRequestHeaders: (request, headers) => ({
         'x-api-key': apiKey,
-        origin: 'https://swap.cow.fi',
+        origin: 'https://swap.cow.finance',
         Affiliate: affiliateCode,
       }),
     },

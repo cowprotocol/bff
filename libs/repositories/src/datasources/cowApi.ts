@@ -1,6 +1,7 @@
 import createClient from 'openapi-fetch';
 
-const COW_API_BASE_URL = process.env.COW_API_BASE_URL || 'https://api.cow.fi';
+const COW_API_BASE_URL =
+  process.env.COW_API_BASE_URL || 'https://api.cow.finance';
 
 import { AllChainIds, COW_API_NETWORK_NAMES } from '@cowprotocol/shared';
 import { SupportedChainId } from '@cowprotocol/cow-sdk';

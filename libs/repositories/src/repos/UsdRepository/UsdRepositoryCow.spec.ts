@@ -20,8 +20,8 @@ const mockApi: CowApiClient = {
 } as unknown as jest.Mocked<CowApiClient>;
 
 const NATIVE_PRICE_ENDPOINT = '/api/v1/token/{token}/native_price';
-const WETH_NATIVE_PRICE = 1; // See https://api.cow.fi/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
-const USDC_PRICE = 288778763.042292; // USD price: 3,462.8585200136 (calculated 1e12 / 288778763.042292). See https://api.cow.fi/mainnet/api/v1/token/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/native_price
+const WETH_NATIVE_PRICE = 1; // See https://api.cow.finance/mainnet/api/v1/token/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/native_price
+const USDC_PRICE = 288778763.042292; // USD price: 3,462.8585200136 (calculated 1e12 / 288778763.042292). See https://api.cow.finance/mainnet/api/v1/token/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/native_price
 const CHAIN_ID = SupportedChainId.MAINNET.toString();
 
 const mockErc20Repository = {
@@ -133,7 +133,7 @@ describe('UsdRepositoryCow', () => {
         // Get USD price for a not supported token
         const price = await usdRepositoryCow.getUsdPrice(
           CHAIN_ID,
-          NULL_ADDRESS // See https://api.cow.fi/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
+          NULL_ADDRESS // See https://api.cow.finance/mainnet/api/v1/token/0x0000000000000000000000000000000000000000/native_price
         );
 
         // USD calculation based on native price is correct
@@ -176,7 +176,7 @@ describe('UsdRepositoryCow', () => {
         // Get USD price for something is not even an address
         const price = await usdRepositoryCow.getUsdPrice(
           CHAIN_ID,
-          'this-is-not-a-token' // See https://api.cow.fi/mainnet/api/v1/token/this-is-not-a-token/native_price
+          'this-is-not-a-token' // See https://api.cow.finance/mainnet/api/v1/token/this-is-not-a-token/native_price
         );
 
         // USD calculation based on native price is correct
