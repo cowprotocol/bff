@@ -1,12 +1,16 @@
 import { getCoingeckoProClient } from './coingecko';
 
 describe('getCoingeckoProClient', () => {
+  const originalApiKey = process.env.COINGECKO_API_KEY;
+
   beforeEach(() => {
     jest.resetModules();
-
-    // Clear the singleton instance by re-requiring the module
     jest.clearAllMocks();
+    process.env.COINGECKO_API_KEY = originalApiKey;
+  });
 
+  afterAll(() => {
+    process.env.COINGECKO_API_KEY = originalApiKey;
   });
 
   it('should create and return a client when COINGECKO_API_KEY is set', () => {
@@ -27,6 +31,8 @@ describe('getCoingeckoProClient', () => {
   });
 
   it('should throw an error when COINGECKO_API_KEY is not set', () => {
+    delete process.env.COINGECKO_API_KEY;
+
     expect(() => {
       getCoingeckoProClient();
     }).toThrow('COINGECKO_API_KEY is not set');
