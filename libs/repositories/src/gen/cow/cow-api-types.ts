@@ -481,6 +481,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/debug/simulation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate an arbitrary order.
+         * @description Simulates an arbitrary order specified in the request body and returns the Tenderly simulation request, along with any simulation error if applicable.
+         *
+         */
+        post: operations["debugSimulationPost"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/debug/simulation/{uid}": {
         parameters: {
             query?: never;
@@ -1472,6 +1493,40 @@ export interface components {
             /** @description EIP-2930 access list for the transaction. */
             access_list?: components["schemas"]["AccessListItem"][];
         };
+        /** @description Request body for simulating an arbitrary order without it being stored in the orderbook.
+         *      */
+        SimulationRequest: {
+            /** @description The token being sold. */
+            sellToken: components["schemas"]["Address"];
+            /** @description The token being bought. */
+            buyToken: components["schemas"]["Address"];
+            /** @description Amount of sell token (hex- or decimal-encoded uint256). Must be greater than zero.
+             *      */
+            sellAmount: components["schemas"]["TokenAmount"];
+            /** @description Amount of buy token (hex- or decimal-encoded uint256). */
+            buyAmount: components["schemas"]["TokenAmount"];
+            /** @description Whether this is a sell or buy order. */
+            kind: components["schemas"]["OrderKind"];
+            /** @description The address of the order owner. */
+            owner: components["schemas"]["Address"];
+            /** @description The address that will receive the buy tokens. Defaults to the owner if omitted.
+             *      */
+            receiver?: components["schemas"]["Address"] | null;
+            /**
+             * @description Where the sell token should be drawn from.
+             * @default erc20
+             */
+            sellTokenBalance: components["schemas"]["SellTokenSource"];
+            /**
+             * @description Where the buy token should be transferred to.
+             * @default erc20
+             */
+            buyTokenBalance: components["schemas"]["BuyTokenDestination"];
+            /** @description Full app data JSON string. Defaults to `"{}"` if omitted.
+             *      */
+            appData?: string | null;
+            blockNumber?: number;
+        };
         /** @description The Tenderly simulation request for an order, along with any simulation error.
          *      */
         OrderSimulation: {
@@ -2437,9 +2492,67 @@ export interface operations {
             };
         };
     };
-    debugSimulation: {
+    debugSimulationPost: {
         parameters: {
             query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulationRequest"];
+            };
+        };
+        responses: {
+            /** @description Simulation request returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderSimulation"];
+                };
+            };
+            /** @description Invalid JSON body, or `appData` is not valid JSON.
+             *      */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order simulation endpoint is not enabled. */
+            405: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body failed schema validation: missing required field, wrong field type, zero `sellAmount`, or unrecognised `kind` value.
+             *      */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    debugSimulation: {
+        parameters: {
+            query?: {
+                /** @description Block number to simulate the order at. If not specified, the simulation uses the latest block.
+                 *      */
+                block_number?: number;
+            };
             header?: never;
             path: {
                 uid: components["schemas"]["UID"];
@@ -2457,7 +2570,8 @@ export interface operations {
                     "application/json": components["schemas"]["OrderSimulation"];
                 };
             };
-            /** @description Invalid order UID. */
+            /** @description Malformed path parameter (invalid order UID format) or invalid `block_number` query parameter.
+             *      */
             400: {
                 headers: {
                     [name: string]: unknown;
