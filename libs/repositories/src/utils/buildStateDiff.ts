@@ -153,6 +153,7 @@ function processSingleDiff(
   diff: StateDiff
 ): StateDiff[] {
   // Handle regular diffs (with complete soltype, original, dirty data)
+  // Using != null (loose check) intentionally to catch both null and undefined
   if (diff?.soltype != null && diff?.original != null && diff?.dirty != null) {
     return processRegularDiff(accumulatedStateDiff, diff);
   }
