@@ -134,7 +134,7 @@ function processRawOnlyDiff(
     if (!updated) {
       const newDiff: StateDiff = {
         address: diff.address,
-        soltype: diff.soltype || null,
+        soltype: diff.soltype ?? null,
         original: diff.original ?? null,
         dirty: diff.dirty ?? null,
         raw: [structuredClone<typeof rawElement>(rawElement)],
