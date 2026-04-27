@@ -17,6 +17,7 @@ type AffiliateProgramRow = {
   revenue_split_affiliate_pct: number;
   revenue_split_trader_pct: number;
   revenue_split_dao_pct: number;
+  created_at: string;
   updated_at: string;
 };
 
@@ -64,6 +65,7 @@ export class AffiliateProgramExportServiceImpl
       revenue_split_affiliate_pct: affiliate.revenueSplitAffiliatePct,
       revenue_split_trader_pct: affiliate.revenueSplitTraderPct,
       revenue_split_dao_pct: affiliate.revenueSplitDaoPct,
+      created_at: affiliate.createdAt,
       updated_at: affiliate.updatedAt,
     }));
 
@@ -122,6 +124,7 @@ const CSV_HEADERS = [
   'revenue_split_affiliate_pct',
   'revenue_split_trader_pct',
   'revenue_split_dao_pct',
+  'created_at',
 ];
 
 function buildCsv(rows: AffiliateProgramRow[]): string {
@@ -138,6 +141,7 @@ function buildCsv(rows: AffiliateProgramRow[]): string {
       row.revenue_split_affiliate_pct,
       row.revenue_split_trader_pct,
       row.revenue_split_dao_pct,
+      row.created_at,
     ]
       .map(csvEscape)
       .join(',')
