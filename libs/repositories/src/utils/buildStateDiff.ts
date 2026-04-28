@@ -134,9 +134,9 @@ function processRawOnlyDiff(
     if (!updated) {
       const newDiff: StateDiff = {
         address: diff.address,
-        soltype: diff.soltype || null,
-        original: diff.original || null,
-        dirty: diff.dirty || null,
+        soltype: diff.soltype ?? null,
+        original: diff.original ?? null,
+        dirty: diff.dirty ?? null,
         raw: [structuredClone<typeof rawElement>(rawElement)],
       };
 
@@ -153,7 +153,8 @@ function processSingleDiff(
   diff: StateDiff
 ): StateDiff[] {
   // Handle regular diffs (with complete soltype, original, dirty data)
-  if (diff?.soltype && diff?.original && diff?.dirty) {
+  // Using != null (loose check) intentionally to catch both null and undefined
+  if (diff?.soltype != null && diff?.original != null && diff?.dirty != null) {
     return processRegularDiff(accumulatedStateDiff, diff);
   }
   // Handle raw-only diffs (missing soltype, original, or dirty)

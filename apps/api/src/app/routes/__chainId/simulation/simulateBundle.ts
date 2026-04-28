@@ -85,12 +85,12 @@ const successSchema = {
             original: {
               title: 'Original',
               description: 'Original value before the state change',
-              type: ['string', 'object', 'null'],
+              type: ['string', 'number', 'boolean', 'object', 'array', 'null'],
             },
             dirty: {
               title: 'Dirty',
               description: 'New value after the state change',
-              type: ['string', 'object', 'null'],
+              type: ['string', 'number', 'boolean', 'object', 'array', 'null'],
             },
             raw: {
               title: 'Raw Elements',
