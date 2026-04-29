@@ -95,6 +95,8 @@ function isValidCode(value: string): boolean {
 }
 
 function handleCmsError(error: unknown, reply: FastifyReply) {
+  logger.error({ error }, 'Affiliate program failed to get ref code')
+
   if (isCmsRequestError(error)) {
     reply.code(502).send({ message: 'CMS request failed' })
     return

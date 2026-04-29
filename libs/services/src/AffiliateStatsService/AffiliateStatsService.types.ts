@@ -1,4 +1,4 @@
-import type { AffiliateStatsRow, TraderStatsRow } from './AffiliateStatsService'
+import type { AffiliateStatsRow, TraderActivityDuneRow, TraderStatsRow } from './AffiliateStatsService'
 
 export interface CacheEntry<T> {
   expiresAt: number
@@ -9,5 +9,9 @@ export interface CacheEntry<T> {
 export type NumericValue = number | string
 
 export type TraderStatsRowRaw = TraderStatsRow<NumericValue>
+
+export type TraderActivityRowRaw = Omit<TraderActivityDuneRow<NumericValue>, 'chain_id'> & {
+  blockchain: string
+}
 
 export type AffiliateStatsRowRaw = AffiliateStatsRow<NumericValue>

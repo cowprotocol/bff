@@ -4,17 +4,29 @@ import {
   AffiliateStatsResult,
   AffiliateStatsRow,
   AffiliateStatsService,
+  TraderActivityDuneRow,
+  TraderActivityResult,
+  TraderActivityRow,
   TraderStatsResult,
   TraderStatsRow,
 } from './AffiliateStatsService'
 import { DUNE_MAX_ROWS, DUNE_PAGE_SIZE, getDuneQueryIds } from './AffiliateStatsService.config'
-import type { AffiliateStatsRowRaw, CacheEntry, TraderStatsRowRaw } from './AffiliateStatsService.types'
+import type {
+  AffiliateStatsRowRaw,
+  CacheEntry,
+  TraderActivityRowRaw,
+  TraderStatsRowRaw,
+} from './AffiliateStatsService.types'
 import {
   isAffiliateStatsRowRaw,
+  isTraderActivityRowRaw,
   isTraderStatsRowRaw,
   normalizeAffiliateStatsRow,
+  normalizeTraderActivityRow,
   normalizeTraderStatsRow,
 } from './AffiliateStatsService.utils'
+
+const DEFAULT_TRADER_ACTIVITY_LIMIT = 20
 
 export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   private readonly duneRepository: DuneRepository
@@ -38,6 +50,39 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     const filtered = rows.filter((row) => row.trader_address.toLowerCase() === normalizedAddress)
 
     return { rows: filtered, lastUpdatedAt }
+  }
+
+  async getTraderActivity(address: string): Promise<TraderActivityResult> {
+    const normalizedAddress = address.toLowerCase()
+    const cacheKey = `affiliate-trader-activity:${normalizedAddress}:${DEFAULT_TRADER_ACTIVITY_LIMIT}`
+    const cached = this.getCache<TraderActivityRow>(cacheKey)
+
+    if (cached) {
+      return {
+        rows: cached.rows as TraderActivityRow[],
+        lastUpdatedAt: cached.lastUpdatedAt,
+      }
+    }
+
+    logger.debug(`Affiliate stats cache miss for ${cacheKey}.`)
+
+    try {
+      const { rows: duneRows, lastUpdatedAt } = await this.getCachedQuery<TraderActivityRowRaw, TraderActivityDuneRow>({
+        cacheKey: 'affiliate-trader-activity',
+        queryId: getDuneQueryIds().traderActivity,
+        typeAssertion: isTraderActivityRowRaw,
+        mapRow: normalizeTraderActivityRow,
+      })
+      const filteredRows = duneRows.filter((row) => row.trader_address.toLowerCase() === normalizedAddress)
+      const rows = filteredRows.slice(0, DEFAULT_TRADER_ACTIVITY_LIMIT)
+
+      this.setCache(cacheKey, rows, lastUpdatedAt)
+
+      return { rows, lastUpdatedAt }
+    } catch (error) {
+      logger.error({ error }, `Affiliate trader activity Dune query failed (${cacheKey}).`)
+      throw error
+    }
   }
 
   async getAffiliateStats(address: string): Promise<AffiliateStatsResult> {
