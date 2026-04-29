@@ -1,11 +1,11 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
-export const userBalanceRepositorySymbol = Symbol.for('UserBalanceRepository');
+export const userBalanceRepositorySymbol = Symbol.for('UserBalanceRepository')
 
 export interface UserTokenBalance {
-  tokenAddress: string;
-  balance: string;
-  allowance: string;
+  tokenAddress: string
+  balance: string
+  allowance: string
 }
 
 export interface UserBalanceRepository {
@@ -13,5 +13,5 @@ export interface UserBalanceRepository {
     chainId: SupportedChainId,
     userAddress: string,
     tokenAddresses: string[]
-  ): Promise<UserTokenBalance[]>;
+  ): Promise<UserTokenBalance[]>
 }

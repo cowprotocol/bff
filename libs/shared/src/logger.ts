@@ -1,3 +1,3 @@
-import { createLogger } from './utils/logger';
+import { createLogger } from './utils/logger'
 
-export const logger = createLogger();
+export const logger = createLogger()

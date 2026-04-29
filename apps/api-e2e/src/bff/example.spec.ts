@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from 'axios'
 
 test('GET /example', async () => {
-  const res = await axios.get('/example');
+  const res = await axios.get('/example')
 
-  expect(res.data).toEqual('this is an example');
-});
+  expect(res.data).toEqual('this is an example')
+})

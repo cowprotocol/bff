@@ -1,7 +1,7 @@
-import * as dotenv from 'dotenv';
-import { DataSource } from 'typeorm';
+import * as dotenv from 'dotenv'
+import { DataSource } from 'typeorm'
 
-dotenv.config();
+dotenv.config()
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -12,8 +12,8 @@ const dataSource = new DataSource({
   database: process.env.DATABASE_NAME,
   entities: ['src/app/data/*.ts'],
   migrations: ['src/migrations/*.ts'],
-});
+})
 
-dataSource.initialize();
+dataSource.initialize()
 
-export default dataSource;
+export default dataSource

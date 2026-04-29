@@ -1,12 +1,12 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
-export const erc20RepositorySymbol = Symbol.for('Erc20Repository');
+export const erc20RepositorySymbol = Symbol.for('Erc20Repository')
 
 export interface Erc20 {
-  address: string;
-  name?: string;
-  symbol?: string;
-  decimals?: number;
+  address: string
+  name?: string
+  symbol?: string
+  decimals?: number
 }
 
 export interface Erc20Repository {
@@ -15,5 +15,5 @@ export interface Erc20Repository {
    * @param chainId
    * @param tokenAddress
    */
-  get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20 | null>;
+  get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20 | null>
 }

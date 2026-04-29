@@ -1,11 +1,8 @@
-import {
-  TokenDetailService,
-  tokenDetailServiceSymbol,
-} from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../../inversify.config';
-import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
+import { TokenDetailService, tokenDetailServiceSymbol } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { apiContainer } from '../../../../inversify.config'
+import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas'
 
 const paramsSchema = {
   type: 'object',
@@ -15,7 +12,7 @@ const paramsSchema = {
     chainId: SupportedChainIdSchema,
     tokenAddress: AddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'object',
@@ -43,7 +40,7 @@ const successSchema = {
       type: 'integer',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -56,21 +53,19 @@ const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type ParamsSchema = FromSchema<typeof paramsSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
+type ParamsSchema = FromSchema<typeof paramsSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
 
-const tokenDetailService: TokenDetailService = apiContainer.get(
-  tokenDetailServiceSymbol
-);
+const tokenDetailService: TokenDetailService = apiContainer.get(tokenDetailServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/details
   fastify.get<{
-    Params: ParamsSchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Params: ParamsSchema
+    Reply: SuccessSchema | ErrorSchema
   }>(
     '/details',
     {
@@ -85,21 +80,18 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress } = request.params;
+      const { chainId, tokenAddress } = request.params
 
-      const token = await tokenDetailService.getTokenDetails(
-        chainId,
-        tokenAddress
-      );
+      const token = await tokenDetailService.getTokenDetails(chainId, tokenAddress)
 
       if (token === null) {
-        reply.code(404).send({ message: 'Token not found' });
-        return;
+        reply.code(404).send({ message: 'Token not found' })
+        return
       }
 
-      reply.send(token);
+      reply.send(token)
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

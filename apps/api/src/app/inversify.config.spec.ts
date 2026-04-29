@@ -1,12 +1,12 @@
-import 'reflect-metadata';
-import { decorate, injectable } from 'inversify';
+import 'reflect-metadata'
+import { decorate, injectable } from 'inversify'
 
-const symbol = (name: string): symbol => Symbol.for(name);
-const emptyObject = (): Record<string, never> => ({});
-const getter = () => jest.fn(emptyObject);
+const symbol = (name: string): symbol => Symbol.for(name)
+const emptyObject = (): Record<string, never> => ({})
+const getter = () => jest.fn(emptyObject)
 
-const affiliateStatsServiceSymbol = symbol('AffiliateStatsService');
-const duneRepositorySymbol = symbol('DuneRepository');
+const affiliateStatsServiceSymbol = symbol('AffiliateStatsService')
+const duneRepositorySymbol = symbol('DuneRepository')
 
 const getters = {
   getAffiliatesRepository: getter(),
@@ -20,7 +20,7 @@ const getters = {
   getTokenHolderRepository: getter(),
   getUserBalanceRepository: getter(),
   getUsdRepository: getter(),
-};
+}
 
 const plainClasses = Object.fromEntries(
   [
@@ -49,19 +49,16 @@ const plainClasses = Object.fromEntries(
     'UserBalanceRepository',
     'BalanceTrackingService',
   ].map((name) => [name, class {}])
-);
+)
 
 class InjectableStub {}
-decorate(injectable(), InjectableStub);
+decorate(injectable(), InjectableStub)
 
 class MockAffiliateStatsServiceImpl {
-  static instances: MockAffiliateStatsServiceImpl[] = [];
+  static instances: MockAffiliateStatsServiceImpl[] = []
 
-  constructor(
-    public readonly duneRepository: unknown,
-    public readonly cacheTtlMs: number
-  ) {
-    MockAffiliateStatsServiceImpl.instances.push(this);
+  constructor(public readonly duneRepository: unknown, public readonly cacheTtlMs: number) {
+    MockAffiliateStatsServiceImpl.instances.push(this)
   }
 }
 
@@ -88,7 +85,7 @@ const symbols = {
   usdRepositorySymbol: symbol('UsdRepository'),
   usdServiceSymbol: symbol('UsdService'),
   userBalanceRepositorySymbol: symbol('UserBalanceRepository'),
-};
+}
 
 jest.mock('@cowprotocol/repositories', () => ({
   ...plainClasses,
@@ -96,12 +93,12 @@ jest.mock('@cowprotocol/repositories', () => ({
   ...getters,
   isCmsEnabled: false,
   isDuneEnabled: true,
-}));
+}))
 
 jest.mock('@cowprotocol/shared', () => ({
   Logger: plainClasses.Logger,
   logger: { warn: jest.fn() },
-}));
+}))
 
 jest.mock('@cowprotocol/services', () => ({
   ...plainClasses,
@@ -116,42 +113,36 @@ jest.mock('@cowprotocol/services', () => ({
   TokenDetailServiceMain: InjectableStub,
   TokenHolderServiceMain: InjectableStub,
   UsdServiceMain: InjectableStub,
-}));
+}))
 
 describe('getApiContainer', () => {
-  const originalTtl = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS;
+  const originalTtl = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS
 
   beforeEach(() => {
-    MockAffiliateStatsServiceImpl.instances = [];
-    process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS = '1234';
-    jest.resetModules();
-  });
+    MockAffiliateStatsServiceImpl.instances = []
+    process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS = '1234'
+    jest.resetModules()
+  })
 
   afterAll(() => {
     if (originalTtl === undefined) {
-      delete process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS;
-      return;
+      delete process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS
+      return
     }
 
-    process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS = originalTtl;
-  });
+    process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS = originalTtl
+  })
 
   it('reuses the same affiliate stats service instance', async () => {
-    const { getApiContainer } = await import('./inversify.config');
+    const { getApiContainer } = await import('./inversify.config')
 
-    const container = getApiContainer();
-    const first = container.get<MockAffiliateStatsServiceImpl>(
-      affiliateStatsServiceSymbol
-    );
-    const second = container.get<MockAffiliateStatsServiceImpl>(
-      affiliateStatsServiceSymbol
-    );
+    const container = getApiContainer()
+    const first = container.get<MockAffiliateStatsServiceImpl>(affiliateStatsServiceSymbol)
+    const second = container.get<MockAffiliateStatsServiceImpl>(affiliateStatsServiceSymbol)
 
-    expect(first).toBe(second);
-    expect(MockAffiliateStatsServiceImpl.instances).toHaveLength(1);
-    expect(first.cacheTtlMs).toBe(1234);
-    expect(first.duneRepository).toBe(
-      getters.getDuneRepository.mock.results.at(-1)?.value
-    );
-  });
-});
+    expect(first).toBe(second)
+    expect(MockAffiliateStatsServiceImpl.instances).toHaveLength(1)
+    expect(first.cacheTtlMs).toBe(1234)
+    expect(first.duneRepository).toBe(getters.getDuneRepository.mock.results.at(-1)?.value)
+  })
+})

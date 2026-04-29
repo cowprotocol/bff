@@ -1,10 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-import {
-  bigIntToString,
-  bufferToString,
-  stringToBigInt,
-  stringToBuffer,
-} from '@cowprotocol/shared';
+import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { bigIntToString, bufferToString, stringToBigInt, stringToBuffer } from '@cowprotocol/shared'
 
 @Entity({ name: 'trades' })
 export class Trade {
@@ -12,26 +7,26 @@ export class Trade {
     name: 'block_number',
     transformer: { from: stringToBigInt, to: bigIntToString },
   })
-  blockNumber: bigint;
+  blockNumber: bigint
 
   @PrimaryColumn('bigint', {
     name: 'log_index',
     transformer: { from: stringToBigInt, to: bigIntToString },
   })
-  logIndex: bigint;
+  logIndex: bigint
 
   @Column('bytea', {
     name: 'order_uid',
     transformer: { from: bufferToString, to: stringToBuffer },
   })
-  orderUid: string;
+  orderUid: string
 
   @Column('numeric', { name: 'sell_amount' })
-  sellAmount: number;
+  sellAmount: number
 
   @Column('numeric', { name: 'buy_amount' })
-  buyAmount: number;
+  buyAmount: number
 
   @Column('numeric', { name: 'fee_amount' })
-  feeAmount: number;
+  feeAmount: number
 }

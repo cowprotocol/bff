@@ -1,21 +1,11 @@
-import {
-  SlippageService,
-  slippageServiceSymbol,
-  VolatilityDetails,
-} from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import {
-  CACHE_CONTROL_HEADER,
-  getCacheControlHeaderValue,
-} from '../../../../../utils/cache';
-import { apiContainer } from '../../../../inversify.config';
-import {
-  ETHEREUM_ADDRESS_PATTERN,
-  SupportedChainIdSchema,
-} from '../../../../schemas';
+import { SlippageService, slippageServiceSymbol, VolatilityDetails } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../../utils/cache'
+import { apiContainer } from '../../../../inversify.config'
+import { ETHEREUM_ADDRESS_PATTERN, SupportedChainIdSchema } from '../../../../schemas'
 
-const CACHE_SECONDS = 120;
+const CACHE_SECONDS = 120
 
 const routeSchema = {
   type: 'object',
@@ -36,7 +26,7 @@ const routeSchema = {
       pattern: ETHEREUM_ADDRESS_PATTERN,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const queryStringSchema = {
   type: 'object',
@@ -48,7 +38,7 @@ const queryStringSchema = {
     expirationTimeInSeconds: { type: 'number' },
     feeAmount: { type: 'string' },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'object',
@@ -57,35 +47,31 @@ const successSchema = {
   properties: {
     slippageBps: {
       title: 'Slippage tolerance in basis points',
-      description:
-        'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
+      description: 'Slippage tolerance in basis points. One basis point is equivalent to 0.01% (1/100th of a percent)',
       type: 'number',
       examples: [50, 100, 200],
       minimum: 0,
       maximum: 10000,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof routeSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
+type RouteSchema = FromSchema<typeof routeSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
 
-const slippageService: SlippageService = apiContainer.get(
-  slippageServiceSymbol
-);
+const slippageService: SlippageService = apiContainer.get(slippageServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example (basic): http://localhost:3010/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance
   // example (with optional params): http://localhost:3010/1/markets/0x6b175474e89094c44da98b954eedeac495271d0f-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599/slippageTolerance?orderKind=sell&partiallyFillable=false&sellAmount=123456&expirationTimeInSeconds=1800
   fastify.get<{
-    Params: RouteSchema;
-    Reply: SuccessSchema;
+    Params: RouteSchema
+    Reply: SuccessSchema
   }>(
     '/slippageTolerance',
     {
       schema: {
-        description:
-          'Retrieve a proposed slippage tolerance for a given market',
+        description: 'Retrieve a proposed slippage tolerance for a given market',
         tags: ['markets'],
         params: routeSchema,
         response: {
@@ -94,31 +80,28 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
+      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params
 
-      const queryString = JSON.stringify(request.query);
+      const queryString = JSON.stringify(request.query)
       fastify.log.info(
         `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`
-      );
+      )
       const slippageBps = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
         quoteTokenAddress,
-      });
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
-      reply.send({ slippageBps });
+      })
+      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
+      reply.send({ slippageBps })
     }
-  );
+  )
 
   fastify.get<{
-    Params: RouteSchema;
+    Params: RouteSchema
     Reply: {
-      baseToken: VolatilityDetails | null;
-      quoteToken: VolatilityDetails | null;
-    };
+      baseToken: VolatilityDetails | null
+      quoteToken: VolatilityDetails | null
+    }
   }>(
     '/volatilityDetails',
     {
@@ -129,33 +112,24 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params;
+      const { chainId, baseTokenAddress, quoteTokenAddress } = request.params
 
-      const queryString = JSON.stringify(request.query);
+      const queryString = JSON.stringify(request.query)
       fastify.log.info(
         `Get volatility details for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`,
         JSON.stringify(request.query)
-      );
-      const volatilityDetailsBase = await slippageService.getVolatilityDetails(
-        chainId,
-        baseTokenAddress
-      );
+      )
+      const volatilityDetailsBase = await slippageService.getVolatilityDetails(chainId, baseTokenAddress)
 
-      const volatilityDetailsQuote = await slippageService.getVolatilityDetails(
-        chainId,
-        quoteTokenAddress
-      );
+      const volatilityDetailsQuote = await slippageService.getVolatilityDetails(chainId, quoteTokenAddress)
 
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
+      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
       reply.send({
         baseToken: volatilityDetailsBase,
         quoteToken: volatilityDetailsQuote,
-      });
+      })
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

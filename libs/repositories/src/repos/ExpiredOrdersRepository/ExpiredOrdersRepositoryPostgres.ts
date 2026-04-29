@@ -1,31 +1,31 @@
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult } from 'pg'
 import {
   ExpiredOrder,
   ExpiredOrdersContext,
   ExpiredOrdersRepository,
-  ParsedExpiredOrder
-} from './ExpiredOrdersRepository';
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
-import { bytesToHexString } from '../../utils/bytesUtils';
-import { parseExpiredOrder } from './expiredOrdersUtils';
+  ParsedExpiredOrder,
+} from './ExpiredOrdersRepository'
+import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { bytesToHexString } from '../../utils/bytesUtils'
+import { parseExpiredOrder } from './expiredOrdersUtils'
 
-const LIMIT = 1000;
-const ORDER_EXPIRATION_THRESHOLD = 60; // 1 minute
+const LIMIT = 1000
+const ORDER_EXPIRATION_THRESHOLD = 60 // 1 minute
 
 export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository {
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
-    const { chainId, accounts } = context;
+    const { chainId, accounts } = context
 
-    const prodDb = getOrderBookDbPool('prod', chainId);
-    const barnDb = getOrderBookDbPool('barn', chainId);
+    const prodDb = getOrderBookDbPool('prod', chainId)
+    const barnDb = getOrderBookDbPool('barn', chainId)
 
-    const prodExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, prodDb);
-    const barnExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, barnDb);
+    const prodExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, prodDb)
+    const barnExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, barnDb)
 
-    const allExpiredOrders = [...(prodExpiredOrdersResult?.rows || []), ...(barnExpiredOrdersResult?.rows || [])];
+    const allExpiredOrders = [...(prodExpiredOrdersResult?.rows || []), ...(barnExpiredOrdersResult?.rows || [])]
 
     const accountsMap = accounts.reduce<Set<string>>((acc, account) => {
-      acc.add(account.toLowerCase());
+      acc.add(account.toLowerCase())
       return acc
     }, new Set())
 
@@ -38,10 +38,13 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
     }, [])
   }
 
-  private async fetchExpiredOrdersFromDb(context: ExpiredOrdersContext, db: Pool): Promise<QueryResult<ExpiredOrder> | null> {
-    const { accounts, lastCheckTimestamp, nowTimestamp } = context;
+  private async fetchExpiredOrdersFromDb(
+    context: ExpiredOrdersContext,
+    db: Pool
+  ): Promise<QueryResult<ExpiredOrder> | null> {
+    const { accounts, lastCheckTimestamp, nowTimestamp } = context
 
-    if (accounts.length === 0) return null;
+    if (accounts.length === 0) return null
 
     const query = `
         WITH filtered_orders AS (
@@ -84,10 +87,6 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
         LIMIT $3;
     `
 
-    return db.query(query, [
-      lastCheckTimestamp,
-      nowTimestamp - ORDER_EXPIRATION_THRESHOLD,
-      LIMIT
-    ]);
+    return db.query(query, [lastCheckTimestamp, nowTimestamp - ORDER_EXPIRATION_THRESHOLD, LIMIT])
   }
 }

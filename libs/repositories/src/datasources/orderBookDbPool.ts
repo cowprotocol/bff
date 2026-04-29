@@ -1,13 +1,13 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { ensureEnvs } from '@cowprotocol/shared';
-import { Pool } from 'pg';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { ensureEnvs } from '@cowprotocol/shared'
+import { Pool } from 'pg'
 
 const REQUIRED_ENVS = [
   'ORDERBOOK_DATABASE_HOST',
   'ORDERBOOK_DATABASE_PORT',
   'ORDERBOOK_DATABASE_USERNAME',
   'ORDERBOOK_DATABASE_PASSWORD',
-];
+]
 
 const chainToDbNameMap = {
   [SupportedChainId.MAINNET]: 'mainnet',
@@ -21,15 +21,12 @@ const chainToDbNameMap = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
-} as const satisfies Record<SupportedChainId, string>;
+} as const satisfies Record<SupportedChainId, string>
 
-function createNewOrderBookDbPool(
-  env: 'prod' | 'barn',
-  chainId: SupportedChainId
-): Pool {
-  const ENV_PREFIX = env.toUpperCase();
+function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId): Pool {
+  const ENV_PREFIX = env.toUpperCase()
 
-  ensureEnvs(REQUIRED_ENVS.map((name) => `${ENV_PREFIX}_${name}`));
+  ensureEnvs(REQUIRED_ENVS.map((name) => `${ENV_PREFIX}_${name}`))
 
   const pool = new Pool({
     user: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_USERNAME`],
@@ -38,30 +35,27 @@ function createNewOrderBookDbPool(
     password: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PASSWORD`],
     port: Number(process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PORT`]),
     keepAlive: true,
-  });
+  })
 
   // Handle connection errors
   pool.on('error', (err) => {
-    console.error('Unexpected error on idle database client', err);
-  });
+    console.error('Unexpected error on idle database client', err)
+  })
 
-  return pool;
+  return pool
 }
 
-const orderBookDbCache = new Map<string, Pool>();
+const orderBookDbCache = new Map<string, Pool>()
 
-export function getOrderBookDbPool(
-  env: 'prod' | 'barn',
-  chainId: SupportedChainId
-) {
-  const key = `${env}|${chainId}`;
-  const cached = orderBookDbCache.get(key);
+export function getOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId) {
+  const key = `${env}|${chainId}`
+  const cached = orderBookDbCache.get(key)
 
-  if (cached) return cached;
+  if (cached) return cached
 
-  const db = createNewOrderBookDbPool(env, chainId);
+  const db = createNewOrderBookDbPool(env, chainId)
 
-  orderBookDbCache.set(key, db);
+  orderBookDbCache.set(key, db)
 
-  return db;
+  return db
 }

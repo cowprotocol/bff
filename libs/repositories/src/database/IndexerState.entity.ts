@@ -1,27 +1,20 @@
-import {
-  Column,
-  Entity,
-  PrimaryColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn, CreateDateColumn, UpdateDateColumn, Unique } from 'typeorm'
 
 @Entity({ name: 'indexer_state' })
 @Unique(['key', 'chainId'])
 export class IndexerState {
   @PrimaryColumn('text')
-  key!: string;
+  key!: string
 
   @Column('integer', { name: 'chain_id', nullable: true })
-  chainId!: number | null;
+  chainId!: number | null
 
   @Column('jsonb')
-  state!: Record<string, unknown>;
+  state!: Record<string, unknown>
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  updatedAt!: Date
 }

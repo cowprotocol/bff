@@ -1,20 +1,11 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
-import { Wallet } from './wallet';
-import {
-  buildTwapOrderParamsStruct,
-  getConditionalOrderId,
-} from '../utils/getConditionalOrderId';
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
+import { Wallet } from './wallet'
+import { buildTwapOrderParamsStruct, getConditionalOrderId } from '../utils/getConditionalOrderId'
 
 @Entity({ name: 'order' })
 export class Order {
   @PrimaryColumn('varchar')
-  id: string;
+  id: string
 
   @BeforeInsert()
   createOrderId() {
@@ -31,45 +22,45 @@ export class Order {
         span: this.span,
         appData: this.appData,
       })
-    );
+    )
   }
 
   @ManyToOne(() => Wallet, (wallet) => wallet.orders, {
     createForeignKeyConstraints: true,
     eager: true,
   })
-  wallet: Wallet;
+  wallet: Wallet
 
   @Column('varchar')
-  sellToken: string;
+  sellToken: string
 
   @Column('varchar')
-  buyToken: string;
+  buyToken: string
 
   @Column('varchar')
-  appData: string;
+  appData: string
 
   @Column('varchar')
-  receiver: string;
+  receiver: string
 
   @Column('int')
-  chainId: number;
+  chainId: number
 
   @Column('varchar')
-  partSellAmount: string;
+  partSellAmount: string
 
   @Column('varchar')
-  minPartLimit: string;
+  minPartLimit: string
 
   @Column('int')
-  t0: number;
+  t0: number
 
   @Column('int')
-  n: number;
+  n: number
 
   @Column('int')
-  t: number;
+  t: number
 
   @Column('int')
-  span: number;
+  span: number
 }

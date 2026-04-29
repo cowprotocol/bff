@@ -1,5 +1,5 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { AddressSchema } from '../../../../schemas';
+import { JSONSchema } from 'json-schema-to-ts'
+import { AddressSchema } from '../../../../schemas'
 
 export const paramsSchema = {
   type: 'object',
@@ -8,7 +8,7 @@ export const paramsSchema = {
   properties: {
     address: AddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const affiliateStatsSchema = {
   type: 'object',
@@ -39,9 +39,9 @@ export const affiliateStatsSchema = {
     total_traders: { type: 'number' },
     lastUpdatedAt: { type: 'string' },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-export const responseSchema = affiliateStatsSchema;
+export const responseSchema = affiliateStatsSchema
 
 export const errorSchema = {
   type: 'object',
@@ -50,4 +50,4 @@ export const errorSchema = {
   properties: {
     message: { type: 'string' },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema

@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class Migration1688063878937 implements MigrationInterface {
-  name = 'Migration1688063878937';
+  name = 'Migration1688063878937'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -10,7 +10,7 @@ export class Migration1688063878937 implements MigrationInterface {
                 "ordersId" character varying,
                 CONSTRAINT "PK_1dcc9f5fd49e3dc52c6d2393c53" PRIMARY KEY ("address")
             )
-        `);
+        `)
     await queryRunner.query(`
             CREATE TABLE "order" (
                 "id" character varying NOT NULL,
@@ -26,22 +26,22 @@ export class Migration1688063878937 implements MigrationInterface {
                 "submissionDate" date NOT NULL,
                 CONSTRAINT "PK_1031171c13130102495201e3e20" PRIMARY KEY ("id")
             )
-        `);
+        `)
     await queryRunner.query(`
             ALTER TABLE "wallet"
             ADD CONSTRAINT "FK_43396129d4329e711c4b92e8a99" FOREIGN KEY ("ordersId") REFERENCES "order"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
-        `);
+        `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             ALTER TABLE "wallet" DROP CONSTRAINT "FK_43396129d4329e711c4b92e8a99"
-        `);
+        `)
     await queryRunner.query(`
             DROP TABLE "order"
-        `);
+        `)
     await queryRunner.query(`
             DROP TABLE "wallet"
-        `);
+        `)
   }
 }

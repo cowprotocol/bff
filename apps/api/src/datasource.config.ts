@@ -1,7 +1,7 @@
-import * as dotenv from 'dotenv';
-import { DataSource } from 'typeorm';
+import * as dotenv from 'dotenv'
+import { DataSource } from 'typeorm'
 
-dotenv.config();
+dotenv.config()
 
 export const cowAnalyticsDb = new DataSource({
   type: 'postgres',
@@ -11,6 +11,6 @@ export const cowAnalyticsDb = new DataSource({
   password: process.env.COW_ANALYTICS_DATABASE_PASSWORD,
   database: process.env.COW_ANALYTICS_DATABASE_NAME,
   entities: ['src/app/data/*.ts'],
-});
+})
 
-cowAnalyticsDb.initialize();
+cowAnalyticsDb.initialize()

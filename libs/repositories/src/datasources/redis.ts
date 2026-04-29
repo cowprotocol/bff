@@ -1,10 +1,10 @@
-import IORedis from 'ioredis';
+import IORedis from 'ioredis'
 
 // Check if redis is enable REDIS_ENABLED env takes precence. Otherwise enable if we provide REDIS_HOST
 const isRedisEnabled =
   process.env.REDIS_ENABLED !== undefined
     ? process.env.REDIS_ENABLED.toLowerCase() === 'true'
-    : !!process.env.REDIS_HOST;
+    : !!process.env.REDIS_HOST
 
 export const redisClient = isRedisEnabled
   ? new IORedis({
@@ -14,4 +14,4 @@ export const redisClient = isRedisEnabled
       username: process.env.REDIS_USER,
       password: process.env.REDIS_PASSWORD,
     })
-  : null;
+  : null

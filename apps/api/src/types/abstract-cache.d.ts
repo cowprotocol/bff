@@ -1,4 +1,4 @@
 declare module 'abstract-cache' {
-  const abstractCache: any;
-  export default abstractCache;
+  const abstractCache: any
+  export default abstractCache
 }

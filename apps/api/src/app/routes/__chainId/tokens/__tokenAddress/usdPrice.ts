@@ -1,11 +1,8 @@
-import { UsdService, usdServiceSymbol } from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../../inversify.config';
-import {
-  ChainIdOrSlugSchema,
-  OptionalAddressSchema,
-} from '../../../../schemas';
+import { UsdService, usdServiceSymbol } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { apiContainer } from '../../../../inversify.config'
+import { ChainIdOrSlugSchema, OptionalAddressSchema } from '../../../../schemas'
 
 const paramsSchema = {
   type: 'object',
@@ -15,7 +12,7 @@ const paramsSchema = {
     chainId: ChainIdOrSlugSchema,
     tokenAddress: OptionalAddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'object',
@@ -29,7 +26,7 @@ const successSchema = {
       examples: [3561.1267842],
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -43,19 +40,19 @@ const errorSchema = {
       examples: ['Price not found'],
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof paramsSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
+type RouteSchema = FromSchema<typeof paramsSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
 
-const usdService: UsdService = apiContainer.get(usdServiceSymbol);
+const usdService: UsdService = apiContainer.get(usdServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/usdPrice
   fastify.get<{
-    Params: RouteSchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Params: RouteSchema
+    Reply: SuccessSchema | ErrorSchema
   }>(
     '/usdPrice',
     {
@@ -70,28 +67,23 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress: _tokenAddress } = request.params;
+      const { chainId, tokenAddress: _tokenAddress } = request.params
 
       /**
        * The token address is optional. If it is not provided, it should be '-'.
        * @see {@link OptionalAddressSchema}
        */
       const tokenAddress = _tokenAddress === '-' ? undefined : _tokenAddress
-      const price = await usdService.getUsdPrice(
-        chainId,
-        tokenAddress
-      );
-      fastify.log.info(
-        `Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`
-      );
+      const price = await usdService.getUsdPrice(chainId, tokenAddress)
+      fastify.log.info(`Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`)
       if (price === null) {
-        reply.code(404).send({ message: 'Price not found' });
-        return;
+        reply.code(404).send({ message: 'Price not found' })
+        return
       }
 
-      reply.send({ price });
+      reply.send({ price })
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

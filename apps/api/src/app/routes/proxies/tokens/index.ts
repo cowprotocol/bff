@@ -1,11 +1,11 @@
-import { FastifyPluginAsync } from 'fastify';
-import httpProxy from '@fastify/http-proxy';
+import { FastifyPluginAsync } from 'fastify'
+import httpProxy from '@fastify/http-proxy'
 
 const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  const upstream = fastify.config.PROXY_UPSTREAM;
+  const upstream = fastify.config.PROXY_UPSTREAM
   if (!upstream) {
-    fastify.log.warn('PROXY_UPSTREAM is not set. Skipping proxy.');
-    return;
+    fastify.log.warn('PROXY_UPSTREAM is not set. Skipping proxy.')
+    return
   }
 
   fastify.register(httpProxy, {
@@ -16,10 +16,10 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
           ...headers,
           Origin: fastify.config.PROXY_ORIGIN,
           Host: fastify.config.PROXY_HOST,
-        };
+        }
       },
     },
-  });
-};
+  })
+}
 
-export default proxy;
+export default proxy

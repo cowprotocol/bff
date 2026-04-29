@@ -1,6 +1,6 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
-export const ETHPLORER_API_KEY = process.env.ETHPLORER_API_KEY as string;
+export const ETHPLORER_API_KEY = process.env.ETHPLORER_API_KEY as string
 
 /**
  * From https://github.com/EverexIO/Ethplorer/wiki/Ethplorer-API#supported-chains
@@ -17,4 +17,4 @@ export const ETHPLORER_BASE_URL = {
   [SupportedChainId.LINEA]: 'https://api.lineaplorer.build',
   [SupportedChainId.PLASMA]: null,
   [SupportedChainId.INK]: null,
-} as const satisfies Record<SupportedChainId, string | null>;
+} as const satisfies Record<SupportedChainId, string | null>

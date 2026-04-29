@@ -1,42 +1,35 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { SSEClient } from '../SSEService/SSEService';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { SSEClient } from '../SSEService/SSEService'
 
-export const balanceTrackingServiceSymbol = Symbol.for(
-  'BalanceTrackingService'
-);
+export const balanceTrackingServiceSymbol = Symbol.for('BalanceTrackingService')
 
 /**
  * Balance or allowance change event
  */
-export type BalanceAllowanceChangeEvent =
-  | BalanceChangeEvent
-  | AllowanceChangeEvent;
+export type BalanceAllowanceChangeEvent = BalanceChangeEvent | AllowanceChangeEvent
 
 export interface BalanceAllowanceChangeEventCommon {
-  chainId: SupportedChainId;
-  timestamp: number;
-  userAddress: string;
-  tokenAddress: string;
+  chainId: SupportedChainId
+  timestamp: number
+  userAddress: string
+  tokenAddress: string
 }
 
 export interface BalanceChangeEvent extends BalanceAllowanceChangeEventCommon {
-  type: 'balance_change';
-  oldBalance: string;
-  newBalance: string;
+  type: 'balance_change'
+  oldBalance: string
+  newBalance: string
 }
 
-export interface AllowanceChangeEvent
-  extends BalanceAllowanceChangeEventCommon {
-  type: 'allowance_change';
-  oldAllowance: string;
-  newAllowance: string;
+export interface AllowanceChangeEvent extends BalanceAllowanceChangeEventCommon {
+  type: 'allowance_change'
+  oldAllowance: string
+  newAllowance: string
 }
 
-export type BalanceChangeCallback = (
-  event: BalanceAllowanceChangeEvent
-) => void;
+export type BalanceChangeCallback = (event: BalanceAllowanceChangeEvent) => void
 
-export type BalanceTrackingRequest = Omit<SSEClient, 'send' | 'close'>;
+export type BalanceTrackingRequest = Omit<SSEClient, 'send' | 'close'>
 
 /**
  * Service that keeps track of some user's balance and allowances, and notifies changes
@@ -48,17 +41,14 @@ export interface BalanceTrackingService {
    * @param userAddress
    * @param tokenAddresses List of tokens to monitor
    */
-  startTrackingUser(request: BalanceTrackingRequest): Promise<void>;
+  startTrackingUser(request: BalanceTrackingRequest): Promise<void>
 
   /**
    * Stops tracking some user's balances and allowances
    * @param chainId
    * @param userAddress
    */
-  stopTrackingUser(
-    chainId: SupportedChainId,
-    userAddress: string
-  ): Promise<void>;
+  stopTrackingUser(chainId: SupportedChainId, userAddress: string): Promise<void>
 
   /**
    * Updates the list of tracked tokens for a user.
@@ -66,20 +56,16 @@ export interface BalanceTrackingService {
    * @param userAddress
    * @param tokenAddresses List of tokens to monitor
    */
-  updateTrackedTokens(
-    chainId: SupportedChainId,
-    userAddress: string,
-    tokenAddresses: string[]
-  ): Promise<void>;
+  updateTrackedTokens(chainId: SupportedChainId, userAddress: string, tokenAddresses: string[]): Promise<void>
 
   /**
    * Get all users being tracked
    */
-  getTrackedUsers(): Promise<Array<BalanceTrackingRequest>>;
+  getTrackedUsers(): Promise<Array<BalanceTrackingRequest>>
 
   /**
    * Event triggered when there's a change on balance or allowance for a tracked user
    * @param callback
    */
-  onBalanceChange(callback: BalanceChangeCallback): void;
+  onBalanceChange(callback: BalanceChangeCallback): void
 }

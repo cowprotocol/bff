@@ -1,13 +1,13 @@
-import 'reflect-metadata';
-import { FastifyInstance } from 'fastify';
-import typeORMPlugin from 'typeorm-fastify-plugin';
-import fp from 'fastify-plugin';
-import { Order } from '../data/order';
-import { Wallet } from '../data/wallet';
-import { SafeTx } from '../data/safeTx';
-import { Order as OrderbookOrder } from '../orderbook/order';
-import { Settlement } from '../orderbook/settlement';
-import { Trade } from '../orderbook/trade';
+import 'reflect-metadata'
+import { FastifyInstance } from 'fastify'
+import typeORMPlugin from 'typeorm-fastify-plugin'
+import fp from 'fastify-plugin'
+import { Order } from '../data/order'
+import { Wallet } from '../data/wallet'
+import { SafeTx } from '../data/safeTx'
+import { Order as OrderbookOrder } from '../orderbook/order'
+import { Settlement } from '../orderbook/settlement'
+import { Trade } from '../orderbook/trade'
 
 export default fp(async function (fastify: FastifyInstance) {
   fastify.register(typeORMPlugin, {
@@ -19,7 +19,7 @@ export default fp(async function (fastify: FastifyInstance) {
     password: fastify.config.DATABASE_PASSWORD,
     entities: [Wallet, Order, SafeTx],
     migrations: ['twap/apps/twap/src/migrations/*.js'],
-  });
+  })
 
   fastify.register(typeORMPlugin, {
     namespace: 'goerli',
@@ -30,7 +30,7 @@ export default fp(async function (fastify: FastifyInstance) {
     username: fastify.config.ORDERBOOK_DATABASE_USERNAME,
     password: fastify.config.ORDERBOOK_DATABASE_PASSWORD,
     entities: [Settlement, Trade, OrderbookOrder],
-  });
+  })
 
   fastify.register(typeORMPlugin, {
     namespace: 'mainnet',
@@ -41,13 +41,13 @@ export default fp(async function (fastify: FastifyInstance) {
     username: fastify.config.ORDERBOOK_DATABASE_USERNAME,
     password: fastify.config.ORDERBOOK_DATABASE_PASSWORD,
     entities: [Settlement, Trade, OrderbookOrder],
-  });
+  })
 
   fastify.ready((err) => {
     if (err) {
-      throw err;
+      throw err
     }
 
-    fastify.orm.runMigrations({ transaction: 'all' });
-  });
-});
+    fastify.orm.runMigrations({ transaction: 'all' })
+  })
+})

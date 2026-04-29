@@ -1,16 +1,13 @@
-import type {
-  AffiliateStatsRow,
-  TraderStatsRow,
-} from './AffiliateStatsService';
+import type { AffiliateStatsRow, TraderStatsRow } from './AffiliateStatsService'
 
 export interface CacheEntry<T> {
-  expiresAt: number;
-  rows: T[];
-  lastUpdatedAt: string;
+  expiresAt: number
+  rows: T[]
+  lastUpdatedAt: string
 }
 
-export type NumericValue = number | string;
+export type NumericValue = number | string
 
-export type TraderStatsRowRaw = TraderStatsRow<NumericValue>;
+export type TraderStatsRowRaw = TraderStatsRow<NumericValue>
 
-export type AffiliateStatsRowRaw = AffiliateStatsRow<NumericValue>;
+export type AffiliateStatsRowRaw = AffiliateStatsRow<NumericValue>

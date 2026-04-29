@@ -1,6 +1,6 @@
-import { BLOCKCHAIN_VALUES, PERIOD_VALUES } from '@cowprotocol/services';
+import { BLOCKCHAIN_VALUES, PERIOD_VALUES } from '@cowprotocol/services'
 
-const HOOKS_QUERY_REQUIRED = ['blockchain', 'period'] as const;
+const HOOKS_QUERY_REQUIRED = ['blockchain', 'period'] as const
 
 export const hooksQuerySchema = {
   type: 'object',
@@ -31,7 +31,7 @@ export const hooksQuerySchema = {
       description: 'Number of hooks to skip',
     },
   },
-} as const;
+} as const
 
 const hookItemSchema = {
   type: 'object',
@@ -50,7 +50,7 @@ const hookItemSchema = {
     app_hash: { type: 'string' },
     tx_hash: { type: 'string' },
   },
-} as const;
+} as const
 
 export const hooksResponseSchema = {
   type: 'object',
@@ -59,4 +59,4 @@ export const hooksResponseSchema = {
     count: { type: 'number' },
     error: { type: 'string' },
   },
-} as const;
+} as const

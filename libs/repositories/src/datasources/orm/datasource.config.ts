@@ -1,6 +1,6 @@
-import { createNewPostgresOrm } from './postgresOrm';
+import { createNewPostgresOrm } from './postgresOrm'
 
-const dataSource = createNewPostgresOrm();
-dataSource.initialize();
+const dataSource = createNewPostgresOrm()
+dataSource.initialize()
 
-export default dataSource;
+export default dataSource
