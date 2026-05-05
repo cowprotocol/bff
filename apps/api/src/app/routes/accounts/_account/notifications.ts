@@ -1,21 +1,18 @@
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { ETHEREUM_ADDRESS_PATTERN } from '../../../schemas';
-import {
-  CACHE_CONTROL_HEADER,
-  getCacheControlHeaderValue,
-} from '../../../../utils/cache';
-import ms from 'ms';
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { ETHEREUM_ADDRESS_PATTERN } from '../../../schemas'
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../utils/cache'
+import ms from 'ms'
 import {
   isCmsEnabled,
   NotificationModel,
   PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
-} from '@cowprotocol/repositories';
-import { apiContainer } from '../../../inversify.config';
-import { logger } from '@cowprotocol/shared';
+} from '@cowprotocol/repositories'
+import { apiContainer } from '../../../inversify.config'
+import { logger } from '@cowprotocol/shared'
 
-const CACHE_SECONDS = ms('5m') / 1000;
+const CACHE_SECONDS = ms('5m') / 1000
 
 const routeSchema = {
   type: 'object',
@@ -28,28 +25,25 @@ const routeSchema = {
       pattern: ETHEREUM_ADDRESS_PATTERN,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof routeSchema>;
+type RouteSchema = FromSchema<typeof routeSchema>
 
-type GetNotificationsSchema = RouteSchema;
+type GetNotificationsSchema = RouteSchema
 
 const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
   if (!isCmsEnabled) {
-    logger.warn(
-      'CMS is not enabled. Please check CMS_ENABLED and CMS_API_KEY environment variables'
-    );
+    logger.warn('CMS is not enabled. Please check CMS_ENABLED and CMS_API_KEY environment variables')
 
-    return;
+    return
   }
 
-  const pushSubscriptionsRepository: PushSubscriptionsRepository =
-    apiContainer.get(pushSubscriptionsRepositorySymbol);
+  const pushSubscriptionsRepository: PushSubscriptionsRepository = apiContainer.get(pushSubscriptionsRepositorySymbol)
 
   // GET /accounts/:account/notifications
   fastify.get<{
-    Params: GetNotificationsSchema;
-    Reply: NotificationModel[];
+    Params: GetNotificationsSchema
+    Reply: NotificationModel[]
   }>(
     '/notifications',
     {
@@ -60,19 +54,15 @@ const accounts: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      reply.header(
-        CACHE_CONTROL_HEADER,
-        getCacheControlHeaderValue(CACHE_SECONDS)
-      );
+      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
 
-      const account = request.params.account;
-      const notifications =
-        await pushSubscriptionsRepository.getNotificationsByAccount({
-          account,
-        });
-      reply.send(notifications);
+      const account = request.params.account
+      const notifications = await pushSubscriptionsRepository.getNotificationsByAccount({
+        account,
+      })
+      reply.send(notifications)
     }
-  );
-};
+  )
+}
 
-export default accounts;
+export default accounts

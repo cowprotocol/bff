@@ -1,16 +1,10 @@
-import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { FastifyPluginAsync } from 'fastify';
-import { apiContainer } from '../../../../inversify.config';
-import {
-  TokenBalancesService,
-  tokenBalancesServiceSymbol,
-} from '@cowprotocol/services';
-import ms from 'ms';
-import {
-  CACHE_CONTROL_HEADER,
-  getCacheControlHeaderValue,
-} from '../../../../../utils/cache';
+import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { FastifyPluginAsync } from 'fastify'
+import { apiContainer } from '../../../../inversify.config'
+import { TokenBalancesService, tokenBalancesServiceSymbol } from '@cowprotocol/services'
+import ms from 'ms'
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../../utils/cache'
 
 const querySchema = {
   type: 'object',
@@ -20,9 +14,9 @@ const querySchema = {
       description: 'Skip cache and fetch fresh data',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type QuerySchema = FromSchema<typeof querySchema>;
+type QuerySchema = FromSchema<typeof querySchema>
 
 const paramsSchema = {
   type: 'object',
@@ -32,7 +26,7 @@ const paramsSchema = {
     chainId: SupportedChainIdSchema,
     address: AddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'object',
@@ -43,7 +37,7 @@ const successSchema = {
       additionalProperties: { type: 'string' },
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -57,30 +51,27 @@ const errorSchema = {
       examples: ['Balance not found'],
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof paramsSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
+type RouteSchema = FromSchema<typeof paramsSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
 
-const tokenBalancesService: TokenBalancesService = apiContainer.get(
-  tokenBalancesServiceSymbol
-);
+const tokenBalancesService: TokenBalancesService = apiContainer.get(tokenBalancesServiceSymbol)
 
-const CACHE_SECONDS = ms('5s') / 1000;
+const CACHE_SECONDS = ms('5s') / 1000
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: GET: http://localhost:3010/1/address/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/balances
   fastify.get<{
-    Params: RouteSchema;
-    Reply: SuccessSchema | ErrorSchema;
-    Querystring: QuerySchema;
+    Params: RouteSchema
+    Reply: SuccessSchema | ErrorSchema
+    Querystring: QuerySchema
   }>(
     '/balances',
     {
       schema: {
-        description:
-          'Get token balances for a given address on a specific chain.',
+        description: 'Get token balances for a given address on a specific chain.',
         tags: ['tokens'],
         params: paramsSchema,
         querystring: querySchema,
@@ -93,37 +84,31 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       if (request.query.ignoreCache) {
-        reply.header(CACHE_CONTROL_HEADER, 'no-store, max-age=0');
+        reply.header(CACHE_CONTROL_HEADER, 'no-store, max-age=0')
       } else {
-        reply.header(
-          CACHE_CONTROL_HEADER,
-          getCacheControlHeaderValue(CACHE_SECONDS)
-        );
+        reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
       }
 
-      const { chainId, address } = request.params;
+      const { chainId, address } = request.params
 
       try {
         const balances = await tokenBalancesService.getTokenBalances({
           address,
           chainId,
-        });
+        })
         if (balances) {
-          reply.send({ balances });
+          reply.send({ balances })
         } else {
-          reply.code(404).send({ message: 'Balances not found' });
+          reply.code(404).send({ message: 'Balances not found' })
         }
       } catch (e: unknown) {
-        fastify.log.error(
-          `Error fetching balances for address ${address} on chain ${chainId}: ${e}`
-        );
+        fastify.log.error(`Error fetching balances for address ${address} on chain ${chainId}: ${e}`)
 
-        const errorMessage =
-          e instanceof Error ? e.message : 'Internal Server Error';
-        reply.code(500).send({ message: errorMessage });
+        const errorMessage = e instanceof Error ? e.message : 'Internal Server Error'
+        reply.code(500).send({ message: errorMessage })
       }
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

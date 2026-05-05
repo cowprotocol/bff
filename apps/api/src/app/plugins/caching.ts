@@ -1,9 +1,9 @@
-import fastifyCaching, { FastifyCachingPluginOptions } from '@fastify/caching';
-import fp from 'fastify-plugin';
-import abstractCache from 'abstract-cache';
-import { redisClient } from '@cowprotocol/repositories';
+import fastifyCaching, { FastifyCachingPluginOptions } from '@fastify/caching'
+import fp from 'fastify-plugin'
+import abstractCache from 'abstract-cache'
+import { redisClient } from '@cowprotocol/repositories'
 
-import 'abstract-cache-redis';
+import 'abstract-cache-redis'
 
 export default fp(async (fastify, opts) => {
   const options: FastifyCachingPluginOptions = {
@@ -22,6 +22,6 @@ export default fp(async (fastify, opts) => {
           }),
         }
       : {}),
-  };
-  fastify.register(fastifyCaching, options);
-});
+  }
+  fastify.register(fastifyCaching, options)
+})

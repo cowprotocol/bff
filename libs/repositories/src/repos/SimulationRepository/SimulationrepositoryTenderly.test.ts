@@ -1,13 +1,9 @@
-import { Container } from 'inversify';
-import { SimulationRepositoryTenderly } from './SimulationRepositoryTenderly';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { WETH, NULL_ADDRESS } from '../../../test/mock';
-import {
-  TENDERLY_API_KEY,
-  TENDERLY_ORG_NAME,
-  TENDERLY_PROJECT_NAME,
-} from '../../datasources/tenderlyApi';
-import { AssetChange, StateDiff } from './tenderlyTypes';
+import { Container } from 'inversify'
+import { SimulationRepositoryTenderly } from './SimulationRepositoryTenderly'
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { WETH, NULL_ADDRESS } from '../../../test/mock'
+import { TENDERLY_API_KEY, TENDERLY_ORG_NAME, TENDERLY_PROJECT_NAME } from '../../datasources/tenderlyApi'
+import { AssetChange, StateDiff } from './tenderlyTypes'
 
 // Transfering ETH from WETH to NULL ADDRESS
 const TENDERLY_SIMULATION = {
@@ -15,14 +11,14 @@ const TENDERLY_SIMULATION = {
   to: NULL_ADDRESS,
   value: '1000000000000000000',
   input: '0x',
-};
+}
 
 const INVALID_TENDERLY_SIMULATION = {
   from: NULL_ADDRESS,
   to: WETH,
   value: '0',
   input: 'wrong input',
-};
+}
 
 const FAILED_TENDERLY_SIMULATION = {
   from: NULL_ADDRESS,
@@ -30,60 +26,52 @@ const FAILED_TENDERLY_SIMULATION = {
   value: '0',
   input:
     '0x23b872dd000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000a',
-};
+}
 
 // The tests are integration tests and require ENV variables
 describe.skip('SimulationRepositoryTenderly', () => {
-  let tenderlyRepository: SimulationRepositoryTenderly;
+  let tenderlyRepository: SimulationRepositoryTenderly
 
   beforeAll(() => {
-    const container = new Container();
-    container
-      .bind<SimulationRepositoryTenderly>(SimulationRepositoryTenderly)
-      .to(SimulationRepositoryTenderly);
-    tenderlyRepository = container.get(SimulationRepositoryTenderly);
-    expect(TENDERLY_API_KEY).toBeDefined();
-    expect(TENDERLY_ORG_NAME).toBeDefined();
-    expect(TENDERLY_PROJECT_NAME).toBeDefined();
-  });
+    const container = new Container()
+    container.bind<SimulationRepositoryTenderly>(SimulationRepositoryTenderly).to(SimulationRepositoryTenderly)
+    tenderlyRepository = container.get(SimulationRepositoryTenderly)
+    expect(TENDERLY_API_KEY).toBeDefined()
+    expect(TENDERLY_ORG_NAME).toBeDefined()
+    expect(TENDERLY_PROJECT_NAME).toBeDefined()
+  })
 
   describe('postBundleSimulation', () => {
     it('should return simulation data for success simulation', async () => {
-      const tenderlySimulationResult =
-        await tenderlyRepository.postBundleSimulation(
-          SupportedChainId.MAINNET,
-          [TENDERLY_SIMULATION]
-        );
+      const tenderlySimulationResult = await tenderlyRepository.postBundleSimulation(SupportedChainId.MAINNET, [
+        TENDERLY_SIMULATION,
+      ])
 
-      expect(tenderlySimulationResult).toBeDefined();
-      expect(tenderlySimulationResult?.length).toBe(1);
-      expect(tenderlySimulationResult?.[0].status).toBeTruthy();
-      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0);
-    }, 100000);
+      expect(tenderlySimulationResult).toBeDefined()
+      expect(tenderlySimulationResult?.length).toBe(1)
+      expect(tenderlySimulationResult?.[0].status).toBeTruthy()
+      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0)
+    }, 100000)
 
     it('should return null for invalid simulation', async () => {
-      const tenderlySimulationResult =
-        await tenderlyRepository.postBundleSimulation(
-          SupportedChainId.MAINNET,
-          [INVALID_TENDERLY_SIMULATION]
-        );
+      const tenderlySimulationResult = await tenderlyRepository.postBundleSimulation(SupportedChainId.MAINNET, [
+        INVALID_TENDERLY_SIMULATION,
+      ])
 
-      expect(tenderlySimulationResult).toBeNull();
-    }, 100000);
+      expect(tenderlySimulationResult).toBeNull()
+    }, 100000)
 
     it('should return simulation data for failed simulation', async () => {
-      const tenderlySimulationResult =
-        await tenderlyRepository.postBundleSimulation(
-          SupportedChainId.MAINNET,
-          [FAILED_TENDERLY_SIMULATION]
-        );
+      const tenderlySimulationResult = await tenderlyRepository.postBundleSimulation(SupportedChainId.MAINNET, [
+        FAILED_TENDERLY_SIMULATION,
+      ])
 
-      expect(tenderlySimulationResult).toBeDefined();
-      expect(tenderlySimulationResult?.length).toBe(1);
-      expect(tenderlySimulationResult?.[0].status).toBeFalsy();
-      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0);
-    }, 100000);
-  });
+      expect(tenderlySimulationResult).toBeDefined()
+      expect(tenderlySimulationResult?.length).toBe(1)
+      expect(tenderlySimulationResult?.[0].status).toBeFalsy()
+      expect(Number(tenderlySimulationResult?.[0].gasUsed)).toBeGreaterThan(0)
+    }, 100000)
+  })
   describe('buildBalancesDiff', () => {
     it('should correctly process a single asset change', () => {
       const input: AssetChange[][] = [
@@ -106,7 +94,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             raw_amount: '100000000000000000000',
           },
         ],
-      ];
+      ]
 
       const expected = [
         {
@@ -117,10 +105,10 @@ describe.skip('SimulationRepositoryTenderly', () => {
             '0x123': '100000000000000000000',
           },
         },
-      ];
+      ]
 
-      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected)
+    })
 
     it('should correctly process multiple asset changes', () => {
       const input: AssetChange[][] = [
@@ -162,7 +150,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             raw_amount: '50000000000000000000',
           },
         ],
-      ];
+      ]
 
       const expected = [
         {
@@ -185,10 +173,10 @@ describe.skip('SimulationRepositoryTenderly', () => {
             '0x456': '50000000000000000000',
           },
         },
-      ];
+      ]
 
-      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected)
+    })
 
     it('should handle diffs with missing soltype', () => {
       const input: StateDiff[][] = [
@@ -208,7 +196,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
       const expected: StateDiff[][] = [
         [
@@ -227,20 +215,20 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected)
+    })
 
     it('should handle empty input', () => {
-      const input: AssetChange[][] = [];
-      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([]);
-    });
+      const input: AssetChange[][] = []
+      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([])
+    })
 
     it('should handle input with empty asset changes', () => {
-      const input: AssetChange[][] = [[], []];
-      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([{}, {}]);
-    });
+      const input: AssetChange[][] = [[], []]
+      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual([{}, {}])
+    })
 
     it('should correctly handle cumulative changes', () => {
       const input: AssetChange[][] = [
@@ -282,7 +270,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             raw_amount: '50000000000000000000',
           },
         ],
-      ];
+      ]
 
       const expected = [
         {
@@ -301,11 +289,11 @@ describe.skip('SimulationRepositoryTenderly', () => {
             '0x123': '50000000000000000000',
           },
         },
-      ];
+      ]
 
-      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected);
-    });
-  });
+      expect(tenderlyRepository.buildBalancesDiff(input)).toEqual(expected)
+    })
+  })
   describe('buildStateDiff', () => {
     it('should correctly process a single state diff', () => {
       const input: StateDiff[][] = [
@@ -344,7 +332,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
       const expected: StateDiff[][] = [
         [
@@ -382,10 +370,10 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected)
+    })
 
     it('should accumulate state changes across multiple simulations', () => {
       const input: StateDiff[][] = [
@@ -459,7 +447,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
       const expected: StateDiff[][] = [
         [
@@ -532,10 +520,10 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected)
+    })
 
     it('should process multiple addresses with different properties', () => {
       const input: StateDiff[][] = [
@@ -606,7 +594,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
       const expected: StateDiff[][] = [
         [
@@ -697,20 +685,20 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
-    });
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected)
+    })
 
     it('should handle empty input', () => {
-      const input: StateDiff[][] = [];
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual([]);
-    });
+      const input: StateDiff[][] = []
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual([])
+    })
 
     it('should handle input with empty state diffs', () => {
-      const input: StateDiff[][] = [[], []];
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual([[], []]);
-    });
+      const input: StateDiff[][] = [[], []]
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual([[], []])
+    })
 
     it('should correctly update raw elements when address and key match', () => {
       const input: StateDiff[][] = [
@@ -753,7 +741,7 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
       // In the expected result, the accumulated state should maintain the original "original" value
       // but update the "dirty" value
@@ -804,9 +792,9 @@ describe.skip('SimulationRepositoryTenderly', () => {
             ],
           },
         ],
-      ];
+      ]
 
-      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected);
-    });
-  });
-});
+      expect(tenderlyRepository.buildStateDiff(input)).toEqual(expected)
+    })
+  })
+})

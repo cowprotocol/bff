@@ -1,81 +1,65 @@
-import {
-  RawElement,
-  StateDiff,
-} from '../repos/SimulationRepository/tenderlyTypes';
+import { RawElement, StateDiff } from '../repos/SimulationRepository/tenderlyTypes'
 
 // Helper function to find existing diff by key
-function findExistingDiffIndex(
-  accumulatedStateDiff: StateDiff[],
-  diff: StateDiff
-): number {
-  if (!diff.soltype) return -1;
+function findExistingDiffIndex(accumulatedStateDiff: StateDiff[], diff: StateDiff): number {
+  if (!diff.soltype) return -1
 
-  const diffKey = `${diff.address}-${diff.soltype.name}`;
+  const diffKey = `${diff.address}-${diff.soltype.name}`
 
-  return accumulatedStateDiff.findIndex(
-    (item) => item.soltype && `${item.address}-${item.soltype.name}` === diffKey
-  );
+  return accumulatedStateDiff.findIndex((item) => item.soltype && `${item.address}-${item.soltype.name}` === diffKey)
 }
 
 // Helper function to process regular diffs (with complete soltype, original, dirty data)
-function processRegularDiff(
-  accumulatedStateDiff: StateDiff[],
-  diff: StateDiff
-): StateDiff[] {
-  const existingIndex = findExistingDiffIndex(accumulatedStateDiff, diff);
+function processRegularDiff(accumulatedStateDiff: StateDiff[], diff: StateDiff): StateDiff[] {
+  const existingIndex = findExistingDiffIndex(accumulatedStateDiff, diff)
 
   if (existingIndex === -1) {
     // New entry - add it to our accumulated state
-    accumulatedStateDiff.push(structuredClone<typeof diff>(diff));
+    accumulatedStateDiff.push(structuredClone<typeof diff>(diff))
   } else {
     // Update existing entry - keep original values, update dirty values
 
     // Update dirty values
-    accumulatedStateDiff[existingIndex].dirty = structuredClone<
-      typeof diff.dirty
-    >(diff.dirty);
+    accumulatedStateDiff[existingIndex].dirty = structuredClone<typeof diff.dirty>(diff.dirty)
 
     // Handle raw updates if present
     if (diff.raw) {
-      accumulatedStateDiff[existingIndex] = updateRawElements(
-        accumulatedStateDiff[existingIndex],
-        diff
-      );
+      accumulatedStateDiff[existingIndex] = updateRawElements(accumulatedStateDiff[existingIndex], diff)
     }
   }
 
-  return accumulatedStateDiff;
+  return accumulatedStateDiff
 }
 
 // Helper function to update raw elements of a state diff
 function updateRawElements(stateDiff: StateDiff, diff: StateDiff): StateDiff {
-  if (!diff.raw) return stateDiff;
+  if (!diff.raw) return stateDiff
 
   if (!stateDiff.raw) {
-    stateDiff.raw = structuredClone<typeof diff.raw>(diff.raw);
+    stateDiff.raw = structuredClone<typeof diff.raw>(diff.raw)
   } else {
     // Update each raw element, preserving original values
-    const updatedRaw = [...stateDiff.raw];
+    const updatedRaw = [...stateDiff.raw]
 
     diff.raw.forEach((rawElement) => {
-      const idx = updatedRaw.findIndex((item) => item.key === rawElement.key);
+      const idx = updatedRaw.findIndex((item) => item.key === rawElement.key)
 
       if (idx === -1) {
         // New raw element
-        updatedRaw.push(structuredClone<typeof rawElement>(rawElement));
+        updatedRaw.push(structuredClone<typeof rawElement>(rawElement))
       } else {
         // Update existing raw element - keep original, update dirty
         updatedRaw[idx] = {
           ...updatedRaw[idx],
           dirty: rawElement.dirty,
-        };
+        }
       }
-    });
+    })
 
-    stateDiff.raw = updatedRaw;
+    stateDiff.raw = updatedRaw
   }
 
-  return stateDiff;
+  return stateDiff
 }
 
 // Helper function to find and update a raw element in accumulated state diffs
@@ -86,49 +70,38 @@ function updateRawElementInAccumulated(
 ): boolean {
   const foundIndex = accumulatedStateDiff.findIndex(
     (stateDiff) =>
-      stateDiff.address === diff.address &&
-      stateDiff.raw &&
-      stateDiff.raw.some((raw) => raw.key === rawElement.key)
-  );
+      stateDiff.address === diff.address && stateDiff.raw && stateDiff.raw.some((raw) => raw.key === rawElement.key)
+  )
 
   if (foundIndex !== -1) {
-    const stateDiff = accumulatedStateDiff[foundIndex];
-    if (!stateDiff?.raw) return false;
-    const rawIndex = stateDiff.raw.findIndex(
-      (raw) => raw.key === rawElement.key
-    );
+    const stateDiff = accumulatedStateDiff[foundIndex]
+    if (!stateDiff?.raw) return false
+    const rawIndex = stateDiff.raw.findIndex((raw) => raw.key === rawElement.key)
 
     // Found matching raw element - update only dirty value
-    const newRaw = [...stateDiff.raw];
+    const newRaw = [...stateDiff.raw]
     newRaw[rawIndex] = {
       ...newRaw[rawIndex],
       dirty: rawElement.dirty,
-    };
+    }
 
     accumulatedStateDiff[foundIndex] = {
       ...accumulatedStateDiff[foundIndex],
       raw: newRaw,
-    };
+    }
 
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
 // Helper function to process raw-only diffs
-function processRawOnlyDiff(
-  accumulatedStateDiff: StateDiff[],
-  diff: StateDiff
-): StateDiff[] {
-  if (!diff?.raw || diff.raw.length === 0) return accumulatedStateDiff;
+function processRawOnlyDiff(accumulatedStateDiff: StateDiff[], diff: StateDiff): StateDiff[] {
+  if (!diff?.raw || diff.raw.length === 0) return accumulatedStateDiff
 
   diff.raw.forEach((rawElement) => {
-    const updated = updateRawElementInAccumulated(
-      accumulatedStateDiff,
-      diff,
-      rawElement
-    );
+    const updated = updateRawElementInAccumulated(accumulatedStateDiff, diff, rawElement)
 
     // If no existing entry was updated, create a new one
     if (!updated) {
@@ -138,31 +111,28 @@ function processRawOnlyDiff(
         original: diff.original ?? null,
         dirty: diff.dirty ?? null,
         raw: [structuredClone<typeof rawElement>(rawElement)],
-      };
+      }
 
-      accumulatedStateDiff.push(newDiff);
+      accumulatedStateDiff.push(newDiff)
     }
-  });
+  })
 
-  return accumulatedStateDiff;
+  return accumulatedStateDiff
 }
 
 // Helper function to process a single diff
-function processSingleDiff(
-  accumulatedStateDiff: StateDiff[],
-  diff: StateDiff
-): StateDiff[] {
+function processSingleDiff(accumulatedStateDiff: StateDiff[], diff: StateDiff): StateDiff[] {
   // Handle regular diffs (with complete soltype, original, dirty data)
   // Using != null (loose check) intentionally to catch both null and undefined
   if (diff?.soltype != null && diff?.original != null && diff?.dirty != null) {
-    return processRegularDiff(accumulatedStateDiff, diff);
+    return processRegularDiff(accumulatedStateDiff, diff)
   }
   // Handle raw-only diffs (missing soltype, original, or dirty)
   else if (diff?.raw && diff.raw.length > 0) {
-    return processRawOnlyDiff(accumulatedStateDiff, diff);
+    return processRawOnlyDiff(accumulatedStateDiff, diff)
   }
 
-  return accumulatedStateDiff;
+  return accumulatedStateDiff
 }
 
 /**
@@ -183,23 +153,21 @@ function processSingleDiff(
  * @returns {StateDiff[][]} Array of cumulative states after each simulation
  */
 export function buildStateDiff(stateDiffList: StateDiff[][]): StateDiff[][] {
-  if (stateDiffList.length === 0) return [];
+  if (stateDiffList.length === 0) return []
 
-  const cumulativeStateDiff: StateDiff[][] = [];
+  const cumulativeStateDiff: StateDiff[][] = []
   // This will store our accumulated state across all simulations
-  const accumulatedStateDiff: StateDiff[] = [];
+  const accumulatedStateDiff: StateDiff[] = []
 
   stateDiffList.forEach((stateDiffs) => {
     // Process each diff in the current simulation
     stateDiffs.forEach((diff) => {
-      processSingleDiff(accumulatedStateDiff, diff);
-    });
+      processSingleDiff(accumulatedStateDiff, diff)
+    })
 
     // Add a deep copy of the current accumulated state to our results
-    cumulativeStateDiff.push(
-      structuredClone<typeof accumulatedStateDiff>(accumulatedStateDiff)
-    );
-  });
+    cumulativeStateDiff.push(structuredClone<typeof accumulatedStateDiff>(accumulatedStateDiff))
+  })
 
-  return cumulativeStateDiff;
+  return cumulativeStateDiff
 }

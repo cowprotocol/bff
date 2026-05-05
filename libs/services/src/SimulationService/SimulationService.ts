@@ -3,11 +3,11 @@ import {
   SimulationRepository,
   SimulationInput,
   SimulationData,
-} from '@cowprotocol/repositories';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { injectable, inject } from 'inversify';
+} from '@cowprotocol/repositories'
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { injectable, inject } from 'inversify'
 
-export const simulationServiceSymbol = Symbol.for('SimulationServiceSymbol');
+export const simulationServiceSymbol = Symbol.for('SimulationServiceSymbol')
 
 @injectable()
 export class SimulationService {
@@ -20,9 +20,6 @@ export class SimulationService {
     chainId: SupportedChainId,
     simulationInput: SimulationInput[]
   ): Promise<SimulationData[] | null> {
-    return this.simulationRepository.postBundleSimulation(
-      chainId,
-      simulationInput
-    );
+    return this.simulationRepository.postBundleSimulation(chainId, simulationInput)
   }
 }

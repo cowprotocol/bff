@@ -1,35 +1,29 @@
-import { logger } from '@cowprotocol/shared';
-import { injectable } from 'inversify';
-import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository';
+import { logger } from '@cowprotocol/shared'
+import { injectable } from 'inversify'
+import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository'
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
-  name = 'Fallback';
+  name = 'Fallback'
 
   constructor(private usdRepositories: UsdRepository[]) {}
 
-  async getUsdPrice(
-    chainIdOrSlug: string,
-    tokenAddress: string
-  ): Promise<number | null> {
+  async getUsdPrice(chainIdOrSlug: string, tokenAddress: string): Promise<number | null> {
     for (let i = 0; i < this.usdRepositories.length; i++) {
-      const usdRepository = this.usdRepositories[i];
-      const price = await usdRepository.getUsdPrice(
-        chainIdOrSlug,
-        tokenAddress
-      );
+      const usdRepository = this.usdRepositories[i]
+      const price = await usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
       if (price !== null) {
-        return price;
+        return price
       }
 
       if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1];
+        const nextRepository = this.usdRepositories[i + 1]
         logger.info(
           `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
-        );
+        )
       }
     }
-    return null;
+    return null
   }
 
   async getUsdPrices(
@@ -38,23 +32,19 @@ export class UsdRepositoryFallback implements UsdRepository {
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
     for (let i = 0; i < this.usdRepositories.length; i++) {
-      const usdRepository = this.usdRepositories[i];
-      const prices = await usdRepository.getUsdPrices(
-        chainIdOrSlug,
-        tokenAddress,
-        priceStrategy
-      );
+      const usdRepository = this.usdRepositories[i]
+      const prices = await usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
       if (prices !== null) {
-        return prices;
+        return prices
       }
 
       if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1];
+        const nextRepository = this.usdRepositories[i + 1]
         logger.info(
           `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
-        );
+        )
       }
     }
-    return null;
+    return null
   }
 }

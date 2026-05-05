@@ -1,9 +1,9 @@
-import { AdditionalTargetChainId, SupportedChainId, TargetChainId } from '@cowprotocol/cow-sdk';
+import { AdditionalTargetChainId, SupportedChainId, TargetChainId } from '@cowprotocol/cow-sdk'
 
-import createClient from 'openapi-fetch';
-import type { components, paths } from '../gen/coingecko/coingecko-pro-types';
+import createClient from 'openapi-fetch'
+import type { components, paths } from '../gen/coingecko/coingecko-pro-types'
 
-export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com';
+export const COINGECKO_PRO_BASE_URL = 'https://pro-api.coingecko.com'
 
 export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.SEPOLIA]: undefined,
@@ -20,7 +20,7 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
   [AdditionalTargetChainId.OPTIMISM]: 'optimistic-ethereum',
   [AdditionalTargetChainId.BITCOIN]: 'bitcoin',
   [AdditionalTargetChainId.SOLANA]: 'solana',
-} as const satisfies Record<TargetChainId, string | undefined>;
+} as const satisfies Record<TargetChainId, string | undefined>
 
 /**
  * Map of chain IDs to Coingecko platform IDs, for every platform that has a network id.
@@ -224,35 +224,32 @@ export const COINGECKO_PLATFORMS: Record<number, string | undefined> = {
   [9898]: 'larissa',
   [9980]: 'combo',
   [999]: 'hyperevm',
-};
+}
 
-export type CoingeckoProClient = ReturnType<typeof createClient<paths>>;
+export type CoingeckoProClient = ReturnType<typeof createClient<paths>>
 
-const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> =
-  {};
+const coingeckoProClientCache: Record<string, CoingeckoProClient | undefined> = {}
 
-export function getCoingeckoProClient(
-  apiKey = process.env.COINGECKO_API_KEY
-): CoingeckoProClient {
+export function getCoingeckoProClient(apiKey = process.env.COINGECKO_API_KEY): CoingeckoProClient {
   if (!apiKey) {
-    throw new Error('COINGECKO_API_KEY is not set');
+    throw new Error('COINGECKO_API_KEY is not set')
   }
 
-  const cached = coingeckoProClientCache[apiKey];
+  const cached = coingeckoProClientCache[apiKey]
 
-  if (cached) return cached;
+  if (cached) return cached
 
   const coingeckoProClient = createClient<paths>({
     baseUrl: COINGECKO_PRO_BASE_URL + '/api/v3',
     headers: {
       'x-cg-pro-api-key': apiKey,
     },
-  });
+  })
 
-  coingeckoProClientCache[apiKey] = coingeckoProClient;
+  coingeckoProClientCache[apiKey] = coingeckoProClient
 
-  return coingeckoProClient;
+  return coingeckoProClient
 }
 
-export type SimplePriceItem = components['schemas']['SimplePrice'];
-export type SimplePriceResponse = Record<string, SimplePriceItem>;
+export type SimplePriceItem = components['schemas']['SimplePrice']
+export type SimplePriceResponse = Record<string, SimplePriceItem>

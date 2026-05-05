@@ -1,9 +1,9 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import BigNumber from 'bignumber.js';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import BigNumber from 'bignumber.js'
 
 interface TokenAddressAndDecimals {
-  address: string;
-  decimals: number;
+  address: string
+  decimals: number
 }
 
 export const USDC = {
@@ -54,8 +54,8 @@ export const USDC = {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
     decimals: 18,
   },
-} as const satisfies Record<SupportedChainId, TokenAddressAndDecimals>;
+} as const satisfies Record<SupportedChainId, TokenAddressAndDecimals>
 
-export const ZeroBigNumber = new BigNumber(0);
-export const OneBigNumber = new BigNumber(1);
-export const TenBigNumber = new BigNumber(10);
+export const ZeroBigNumber = new BigNumber(0)
+export const OneBigNumber = new BigNumber(1)
+export const TenBigNumber = new BigNumber(10)

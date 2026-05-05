@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class InitialMigration1688063749511 implements MigrationInterface {
   // eslint-disable-next-line @typescript-eslint/no-empty-function

@@ -1,5 +1,5 @@
-import fp from "fastify-plugin";
-import { FastifyPluginCallback } from "fastify";
+import fp from 'fastify-plugin'
+import { FastifyPluginCallback } from 'fastify'
 
 const PROTECTED_PATHS = ['/proxies']
 
@@ -9,14 +9,13 @@ const AUTHORIZED_ORIGINS = (() => {
     return []
   }
 
-  return domains.split(',').map(domain => domain.trim())
+  return domains.split(',').map((domain) => domain.trim())
 })()
-
 
 export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.addHook('onRequest', async (request, reply) => {
     // Return early if its an unprotected path
-    if (AUTHORIZED_ORIGINS.length === 0 || !PROTECTED_PATHS.some(path => request.url.startsWith(path))) {
+    if (AUTHORIZED_ORIGINS.length === 0 || !PROTECTED_PATHS.some((path) => request.url.startsWith(path))) {
       return
     }
 
@@ -26,13 +25,10 @@ export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
     if (
       // Origin should be present
       !origin ||
-      (
-        // The origin should be explicitly authorized
-        !AUTHORIZED_ORIGINS.some(authorizedOrigin => origin.endsWith(authorizedOrigin)) &&
-
+      // The origin should be explicitly authorized
+      (!AUTHORIZED_ORIGINS.some((authorizedOrigin) => origin.endsWith(authorizedOrigin)) &&
         // Make an exception for localhost
-        !isLocalhost(origin)
-      )
+        !isLocalhost(origin))
     ) {
       reply.status(403).send('Unauthorized')
       return

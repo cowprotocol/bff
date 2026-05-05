@@ -1,5 +1,5 @@
-import { ExpiredOrder, ParsedExpiredOrder } from './ExpiredOrdersRepository';
-import { bytesToHexString } from '../../utils/bytesUtils';
+import { ExpiredOrder, ParsedExpiredOrder } from './ExpiredOrdersRepository'
+import { bytesToHexString } from '../../utils/bytesUtils'
 
 export function parseExpiredOrder(order: ExpiredOrder): ParsedExpiredOrder {
   return {
@@ -8,8 +8,8 @@ export function parseExpiredOrder(order: ExpiredOrder): ParsedExpiredOrder {
     validTo: order.valid_to,
     owner: bytesToHexString(order.owner),
     sellTokenAddress: bytesToHexString(order.sell_token),
-    sellAmount: (order.sell_amount),
+    sellAmount: order.sell_amount,
     buyTokenAddress: bytesToHexString(order.buy_token),
-    buyAmount: (order.buy_amount),
+    buyAmount: order.buy_amount,
   }
 }

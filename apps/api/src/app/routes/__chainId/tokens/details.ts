@@ -1,11 +1,8 @@
-import {
-  TokenDetailService,
-  tokenDetailServiceSymbol,
-} from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../inversify.config';
-import { SupportedChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../schemas';
+import { TokenDetailService, tokenDetailServiceSymbol } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { apiContainer } from '../../../inversify.config'
+import { SupportedChainIdSchema, ETHEREUM_ADDRESS_PATTERN } from '../../../schemas'
 
 const paramsSchema = {
   type: 'object',
@@ -14,7 +11,7 @@ const paramsSchema = {
   properties: {
     chainId: SupportedChainIdSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const bodySchema = {
   type: 'object',
@@ -33,7 +30,7 @@ const bodySchema = {
       maxItems: 100,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const tokenSchema = {
   type: 'object',
@@ -61,12 +58,12 @@ const tokenSchema = {
       type: 'integer',
     },
   },
-} as const;
+} as const
 
 const successSchema = {
   type: 'array',
   items: tokenSchema,
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -79,29 +76,26 @@ const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type ParamsSchema = FromSchema<typeof paramsSchema>;
-type BodySchema = FromSchema<typeof bodySchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
+type ParamsSchema = FromSchema<typeof paramsSchema>
+type BodySchema = FromSchema<typeof bodySchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
 
-const tokenDetailService: TokenDetailService = apiContainer.get(
-  tokenDetailServiceSymbol
-);
+const tokenDetailService: TokenDetailService = apiContainer.get(tokenDetailServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: POST http://localhost:3010/1/tokens/details { "tokenAddresses": ["0xC02...", "0xA0b..."] }
   fastify.post<{
-    Params: ParamsSchema;
-    Body: BodySchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Params: ParamsSchema
+    Body: BodySchema
+    Reply: SuccessSchema | ErrorSchema
   }>(
     '/details',
     {
       schema: {
-        description:
-          'Get details (name, symbol, decimals) for multiple tokens',
+        description: 'Get details (name, symbol, decimals) for multiple tokens',
         tags: ['tokens'],
         params: paramsSchema,
         body: bodySchema,
@@ -112,26 +106,21 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId } = request.params;
-      const { tokenAddresses } = request.body;
+      const { chainId } = request.params
+      const { tokenAddresses } = request.body
 
-      const tokens = await tokenDetailService.getTokensDetails(
-        chainId,
-        tokenAddresses
-      );
+      const tokens = await tokenDetailService.getTokensDetails(chainId, tokenAddresses)
 
-      const result = tokens.filter(
-        (token): token is NonNullable<typeof token> => token !== null
-      );
+      const result = tokens.filter((token): token is NonNullable<typeof token> => token !== null)
 
       if (result.length === 0) {
-        reply.code(404).send({ message: 'No tokens found' });
-        return;
+        reply.code(404).send({ message: 'No tokens found' })
+        return
       }
 
-      reply.send(result);
+      reply.send(result)
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

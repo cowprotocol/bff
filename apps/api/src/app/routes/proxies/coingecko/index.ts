@@ -1,28 +1,20 @@
-import httpProxy from '@fastify/http-proxy';
-import {
-  CACHE_CONTROL_HEADER,
-  getCacheControlHeaderValue,
-} from '../../../../utils/cache';
-import { FastifyPluginAsync } from 'fastify';
-import { COINGECKO_PRO_BASE_URL } from '@cowprotocol/repositories';
-import { KeysOf } from 'fastify/types/type-provider';
-import { IncomingHttpHeaders } from 'http2';
+import httpProxy from '@fastify/http-proxy'
+import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../utils/cache'
+import { FastifyPluginAsync } from 'fastify'
+import { COINGECKO_PRO_BASE_URL } from '@cowprotocol/repositories'
+import { KeysOf } from 'fastify/types/type-provider'
+import { IncomingHttpHeaders } from 'http2'
 
-const DROP_HEADERS: KeysOf<IncomingHttpHeaders>[] = [
-  'cf-ray',
-  'cf-cache-status',
-  'set-cookie',
-  'server',
-];
+const DROP_HEADERS: KeysOf<IncomingHttpHeaders>[] = ['cf-ray', 'cf-cache-status', 'set-cookie', 'server']
 
-const CACHE_TTL = parseInt(process.env.COINGECKO_CACHING_TIME || '150'); // Defaults to 2.5 minutes (150 seconds)
+const CACHE_TTL = parseInt(process.env.COINGECKO_CACHING_TIME || '150') // Defaults to 2.5 minutes (150 seconds)
 
 const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
-  const coingeckoApiKey = fastify.config.COINGECKO_API_KEY;
+  const coingeckoApiKey = fastify.config.COINGECKO_API_KEY
 
   if (!coingeckoApiKey) {
-    fastify.log.warn('COINGECKO_API_KEY is not set. Skipping proxy.');
-    return;
+    fastify.log.warn('COINGECKO_API_KEY is not set. Skipping proxy.')
+    return
   }
 
   fastify.register(httpProxy, {
@@ -38,8 +30,8 @@ const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
         // Drop some headers
         const newHeaders = DROP_HEADERS.reduce<IncomingHttpHeaders>(
           (acc, header) => {
-            delete acc[header];
-            return acc;
+            delete acc[header]
+            return acc
           },
           {
             ...headers,
@@ -49,21 +41,18 @@ const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
                 }
               : undefined),
           }
-        );
+        )
 
-        return newHeaders;
+        return newHeaders
       },
     },
     preHandler: async (request) => {
-      fastify.log.debug(
-        { url: request.url, method: request.method },
-        `Request coingecko proxy`
-      );
+      fastify.log.debug({ url: request.url, method: request.method }, `Request coingecko proxy`)
     },
     undici: {
       strictContentLength: false, // Prevent errors when content-length header mismatches
     },
-  });
-};
+  })
+}
 
-export default coingeckoProxy;
+export default coingeckoProxy

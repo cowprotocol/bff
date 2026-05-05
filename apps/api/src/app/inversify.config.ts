@@ -23,7 +23,7 @@ import {
   tokenHolderRepositorySymbol,
   UsdRepository,
   usdRepositorySymbol,
-} from '@cowprotocol/repositories';
+} from '@cowprotocol/repositories'
 
 import {
   getCacheRepository,
@@ -69,160 +69,114 @@ import {
   SSEServiceMain,
   balanceTrackingServiceSymbol,
   sseServiceSymbol,
-} from '@cowprotocol/services';
+} from '@cowprotocol/services'
 
-import { Container } from 'inversify';
-import { Logger, logger } from '@cowprotocol/shared';
+import { Container } from 'inversify'
+import { Logger, logger } from '@cowprotocol/shared'
 
-const DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 function getAffiliateStatsCacheTtlMs(): number {
-  const rawValue = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS;
+  const rawValue = process.env.DUNE_AFFILIATE_STATS_CACHE_TTL_MS
   if (!rawValue) {
-    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS;
+    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS
   }
 
-  const parsed = Number(rawValue);
+  const parsed = Number(rawValue)
   if (!Number.isFinite(parsed) || parsed < 0) {
     logger.warn(
       `Invalid DUNE_AFFILIATE_STATS_CACHE_TTL_MS value: ${rawValue}. Using default ${DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS}ms.`
-    );
-    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS;
+    )
+    return DEFAULT_AFFILIATE_STATS_CACHE_TTL_MS
   }
 
-  return parsed;
+  return parsed
 }
 
 export function getApiContainer(): Container {
-  const apiContainer = new Container();
+  const apiContainer = new Container()
 
   // Bind logger
-  apiContainer.bind<Logger>('Logger').toConstantValue(logger);
+  apiContainer.bind<Logger>('Logger').toConstantValue(logger)
 
   // Repositories
-  const cacheRepository = getCacheRepository();
-  const erc20Repository = getErc20Repository(cacheRepository);
-  const simulationRepository = getSimulationRepository();
-  const tokenHolderRepository = getTokenHolderRepository(cacheRepository);
-  const tokenBalancesRepository = getTokenBalancesRepository();
-  const userBalanceRepository = getUserBalanceRepository(cacheRepository);
-  const usdRepository = getUsdRepository(cacheRepository, erc20Repository);
-  const pushNotificationsRepository = getPushNotificationsRepository();
-  const pushSubscriptionsRepository = getPushSubscriptionsRepository();
-  const affiliatesRepository = getAffiliatesRepository();
+  const cacheRepository = getCacheRepository()
+  const erc20Repository = getErc20Repository(cacheRepository)
+  const simulationRepository = getSimulationRepository()
+  const tokenHolderRepository = getTokenHolderRepository(cacheRepository)
+  const tokenBalancesRepository = getTokenBalancesRepository()
+  const userBalanceRepository = getUserBalanceRepository(cacheRepository)
+  const usdRepository = getUsdRepository(cacheRepository, erc20Repository)
+  const pushNotificationsRepository = getPushNotificationsRepository()
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository()
+  const affiliatesRepository = getAffiliatesRepository()
 
-  apiContainer
-    .bind<Erc20Repository>(erc20RepositorySymbol)
-    .toConstantValue(erc20Repository);
+  apiContainer.bind<Erc20Repository>(erc20RepositorySymbol).toConstantValue(erc20Repository)
 
-  apiContainer
-    .bind<SimulationRepository>(tenderlyRepositorySymbol)
-    .toConstantValue(simulationRepository);
+  apiContainer.bind<SimulationRepository>(tenderlyRepositorySymbol).toConstantValue(simulationRepository)
 
-  apiContainer
-    .bind<CacheRepository>(cacheRepositorySymbol)
-    .toConstantValue(cacheRepository);
+  apiContainer.bind<CacheRepository>(cacheRepositorySymbol).toConstantValue(cacheRepository)
 
-  apiContainer
-    .bind<UsdRepository>(usdRepositorySymbol)
-    .toConstantValue(usdRepository);
+  apiContainer.bind<UsdRepository>(usdRepositorySymbol).toConstantValue(usdRepository)
 
   apiContainer
     .bind<PushNotificationsRepository>(pushNotificationsRepositorySymbol)
-    .toConstantValue(pushNotificationsRepository);
+    .toConstantValue(pushNotificationsRepository)
 
   apiContainer
     .bind<PushSubscriptionsRepository>(pushSubscriptionsRepositorySymbol)
-    .toConstantValue(pushSubscriptionsRepository);
+    .toConstantValue(pushSubscriptionsRepository)
 
-  apiContainer
-    .bind<AffiliatesRepository>(affiliatesRepositorySymbol)
-    .toConstantValue(affiliatesRepository);
+  apiContainer.bind<AffiliatesRepository>(affiliatesRepositorySymbol).toConstantValue(affiliatesRepository)
 
-  apiContainer
-    .bind<TokenHolderRepository>(tokenHolderRepositorySymbol)
-    .toConstantValue(tokenHolderRepository);
+  apiContainer.bind<TokenHolderRepository>(tokenHolderRepositorySymbol).toConstantValue(tokenHolderRepository)
 
   if (isDuneEnabled) {
-    const duneRepository = getDuneRepository();
-    const affiliateStatsCacheTtlMs = getAffiliateStatsCacheTtlMs();
+    const duneRepository = getDuneRepository()
+    const affiliateStatsCacheTtlMs = getAffiliateStatsCacheTtlMs()
 
-    apiContainer
-      .bind<DuneRepository>(duneRepositorySymbol)
-      .toConstantValue(duneRepository);
+    apiContainer.bind<DuneRepository>(duneRepositorySymbol).toConstantValue(duneRepository)
 
-    apiContainer
-      .bind<HooksService>(hooksServiceSymbol)
-      .toDynamicValue(() => new HooksServiceImpl(duneRepository));
+    apiContainer.bind<HooksService>(hooksServiceSymbol).toDynamicValue(() => new HooksServiceImpl(duneRepository))
 
     apiContainer
       .bind<AffiliateStatsService>(affiliateStatsServiceSymbol)
-      .toDynamicValue(
-        () =>
-          new AffiliateStatsServiceImpl(
-            duneRepository,
-            affiliateStatsCacheTtlMs
-          )
-      )
-      .inSingletonScope();
+      .toDynamicValue(() => new AffiliateStatsServiceImpl(duneRepository, affiliateStatsCacheTtlMs))
+      .inSingletonScope()
   }
 
   if (isDuneEnabled && isCmsEnabled) {
-    const duneRepository =
-      apiContainer.get<DuneRepository>(duneRepositorySymbol);
+    const duneRepository = apiContainer.get<DuneRepository>(duneRepositorySymbol)
     apiContainer
       .bind<AffiliateProgramExportService>(affiliateProgramExportServiceSymbol)
-      .toDynamicValue(
-        () =>
-          new AffiliateProgramExportServiceImpl(
-            affiliatesRepository,
-            duneRepository
-          )
-      );
+      .toDynamicValue(() => new AffiliateProgramExportServiceImpl(affiliatesRepository, duneRepository))
   }
 
-  apiContainer
-    .bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol)
-    .toConstantValue(tokenBalancesRepository);
+  apiContainer.bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol).toConstantValue(tokenBalancesRepository)
 
-  apiContainer
-    .bind<UserBalanceRepository>(userBalanceRepositorySymbol)
-    .toConstantValue(userBalanceRepository);
+  apiContainer.bind<UserBalanceRepository>(userBalanceRepositorySymbol).toConstantValue(userBalanceRepository)
 
   // Services
-  apiContainer
-    .bind<SlippageService>(slippageServiceSymbol)
-    .to(SlippageServiceMain);
+  apiContainer.bind<SlippageService>(slippageServiceSymbol).to(SlippageServiceMain)
 
-  apiContainer
-    .bind<TokenHolderService>(tokenHolderServiceSymbol)
-    .to(TokenHolderServiceMain);
+  apiContainer.bind<TokenHolderService>(tokenHolderServiceSymbol).to(TokenHolderServiceMain)
 
-  apiContainer
-    .bind<TokenBalancesService>(tokenBalancesServiceSymbol)
-    .to(TokenBalancesServiceMain);
+  apiContainer.bind<TokenBalancesService>(tokenBalancesServiceSymbol).to(TokenBalancesServiceMain)
 
-  apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain);
+  apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain)
 
-  apiContainer
-    .bind<TokenDetailService>(tokenDetailServiceSymbol)
-    .to(TokenDetailServiceMain);
+  apiContainer.bind<TokenDetailService>(tokenDetailServiceSymbol).to(TokenDetailServiceMain)
 
-  apiContainer
-    .bind<SimulationService>(simulationServiceSymbol)
-    .to(SimulationService);
+  apiContainer.bind<SimulationService>(simulationServiceSymbol).to(SimulationService)
 
   apiContainer
     .bind<BalanceTrackingService>(balanceTrackingServiceSymbol)
     .to(BalanceTrackingServiceMain)
-    .inSingletonScope();
+    .inSingletonScope()
 
-  apiContainer
-    .bind<SSEService>(sseServiceSymbol)
-    .to(SSEServiceMain)
-    .inSingletonScope();
+  apiContainer.bind<SSEService>(sseServiceSymbol).to(SSEServiceMain).inSingletonScope()
 
-  return apiContainer;
+  return apiContainer
 }
 
-export const apiContainer = getApiContainer();
+export const apiContainer = getApiContainer()

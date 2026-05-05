@@ -4,64 +4,62 @@ import {
   DuneResultResponse,
   UploadCsvParams,
   UploadCsvResponse,
-} from '@cowprotocol/repositories';
-import { HookData, Blockchain, Period } from './HooksService';
-import { HooksServiceImpl } from './HooksServiceImpl';
+} from '@cowprotocol/repositories'
+import { HookData, Blockchain, Period } from './HooksService'
+import { HooksServiceImpl } from './HooksServiceImpl'
 
 // Mock DuneRepository for testing
 class MockDuneRepository implements DuneRepository {
-  private mockExecutionId = 'test-execution-123';
-  private mockResult: DuneResultResponse<HookData>;
+  private mockExecutionId = 'test-execution-123'
+  private mockResult: DuneResultResponse<HookData>
 
   constructor(mockResult?: DuneResultResponse<HookData>) {
-    this.mockResult = mockResult || this.getDefaultMockResult();
+    this.mockResult = mockResult || this.getDefaultMockResult()
   }
 
   async executeQuery(): Promise<DuneExecutionResponse> {
     return {
       execution_id: this.mockExecutionId,
       state: 'QUERY_STATE_PENDING',
-    };
+    }
   }
 
   async getExecutionResults<T>(): Promise<DuneResultResponse<T>> {
-    return this.mockResult as DuneResultResponse<T>;
+    return this.mockResult as DuneResultResponse<T>
   }
 
   async getQueryResults<T>(): Promise<DuneResultResponse<T>> {
-    return this.mockResult as DuneResultResponse<T>;
+    return this.mockResult as DuneResultResponse<T>
   }
 
   async waitForExecution<T>(params: {
-    executionId: string;
-    maxWaitTimeMs?: number;
-    typeAssertion?: (data: unknown) => data is T;
+    executionId: string
+    maxWaitTimeMs?: number
+    typeAssertion?: (data: unknown) => data is T
   }): Promise<DuneResultResponse<T>> {
-    const { typeAssertion } = params;
+    const { typeAssertion } = params
 
     // Simulate type validation if provided
     if (typeAssertion && this.mockResult.result.rows.length > 0) {
-      const invalidRows: Array<{ index: number; data: unknown }> = [];
+      const invalidRows: Array<{ index: number; data: unknown }> = []
       const isValid = this.mockResult.result.rows.every((row, index) => {
         if (!typeAssertion(row)) {
-          invalidRows.push({ index, data: row });
-          return false;
+          invalidRows.push({ index, data: row })
+          return false
         }
-        return true;
-      });
+        return true
+      })
 
       if (!isValid) {
-        throw new Error(
-          `Data validation failed for execution ${params.executionId}`
-        );
+        throw new Error(`Data validation failed for execution ${params.executionId}`)
       }
     }
 
-    return this.mockResult as DuneResultResponse<T>;
+    return this.mockResult as DuneResultResponse<T>
   }
 
   async uploadCsv(_params: UploadCsvParams): Promise<UploadCsvResponse> {
-    return { success: true };
+    return { success: true }
   }
 
   private getDefaultMockResult(): DuneResultResponse<HookData> {
@@ -88,10 +86,8 @@ class MockDuneRepository implements DuneRepository {
             app_id: null,
             target: '0x1234567890123456789012345678901234567890',
             gas_limit: 250000,
-            app_hash:
-              '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-            tx_hash:
-              '0x9876543210987654321098765432109876543210987654321098765432109876',
+            app_hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            tx_hash: '0x9876543210987654321098765432109876543210987654321098765432109876',
           },
           {
             environment: 'prod',
@@ -100,16 +96,13 @@ class MockDuneRepository implements DuneRepository {
             success: true,
             app_code: 'https://bridge.example.com/',
             destination_chain_id: 137,
-            destination_token_address:
-              '0x1234567890123456789012345678901234567890',
+            destination_token_address: '0x1234567890123456789012345678901234567890',
             hook_type: 'pre',
             app_id: 'bridge-app',
             target: '0xabcdef1234567890abcdef1234567890abcdef1234',
             gas_limit: 300000,
-            app_hash:
-              '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-            tx_hash:
-              '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            app_hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            tx_hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
           },
         ],
         metadata: {
@@ -152,31 +145,31 @@ class MockDuneRepository implements DuneRepository {
           execution_time_millis: 500,
         },
       },
-    };
+    }
   }
 
   setMockResult(result: DuneResultResponse<HookData>) {
-    this.mockResult = result;
+    this.mockResult = result
   }
 }
 
 describe('HooksService', () => {
-  let mockRepository: MockDuneRepository;
-  let hooksService: HooksServiceImpl;
+  let mockRepository: MockDuneRepository
+  let hooksService: HooksServiceImpl
 
   beforeEach(() => {
-    mockRepository = new MockDuneRepository();
-    hooksService = new HooksServiceImpl(mockRepository);
-  });
+    mockRepository = new MockDuneRepository()
+    hooksService = new HooksServiceImpl(mockRepository)
+  })
 
   describe('getHooks', () => {
     it('should return valid hook data when Dune query succeeds', async () => {
       const hooks = await hooksService.getHooks({
         blockchain: 'mainnet',
         period: 'last 7d',
-      });
+      })
 
-      expect(hooks).toHaveLength(2);
+      expect(hooks).toHaveLength(2)
       expect(hooks[0]).toEqual({
         environment: 'prod',
         block_time: '2025-01-01 12:00:00.000 UTC',
@@ -189,11 +182,9 @@ describe('HooksService', () => {
         app_id: null,
         target: '0x1234567890123456789012345678901234567890',
         gas_limit: 250000,
-        app_hash:
-          '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-        tx_hash:
-          '0x9876543210987654321098765432109876543210987654321098765432109876',
-      });
+        app_hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+        tx_hash: '0x9876543210987654321098765432109876543210987654321098765432109876',
+      })
       expect(hooks[1]).toEqual({
         environment: 'prod',
         block_time: '2025-01-01 12:01:00.000 UTC',
@@ -206,24 +197,19 @@ describe('HooksService', () => {
         app_id: 'bridge-app',
         target: '0xabcdef1234567890abcdef1234567890abcdef1234',
         gas_limit: 300000,
-        app_hash:
-          '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        tx_hash:
-          '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-      });
-    });
+        app_hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+        tx_hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+      })
+    })
 
     it('should pass correct parameters to Dune repository', async () => {
-      const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
-      const waitForExecutionSpy = jest.spyOn(
-        mockRepository,
-        'waitForExecution'
-      );
+      const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery')
+      const waitForExecutionSpy = jest.spyOn(mockRepository, 'waitForExecution')
 
       await hooksService.getHooks({
         blockchain: 'arbitrum',
         period: 'last 1d',
-      });
+      })
 
       expect(executeQuerySpy).toHaveBeenCalledWith({
         queryId: 5302473,
@@ -231,21 +217,21 @@ describe('HooksService', () => {
           blockchain: 'arbitrum',
           period: 'last 1d',
         },
-      });
+      })
 
       expect(waitForExecutionSpy).toHaveBeenCalledWith({
         executionId: 'test-execution-123',
         typeAssertion: expect.any(Function),
-      });
-    });
+      })
+    })
 
     it('should handle different blockchain and period combinations', async () => {
-      const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
+      const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery')
 
       await hooksService.getHooks({
         blockchain: 'polygon',
         period: 'last 30d',
-      });
+      })
 
       expect(executeQuerySpy).toHaveBeenCalledWith({
         queryId: 5302473,
@@ -253,22 +239,20 @@ describe('HooksService', () => {
           blockchain: 'polygon',
           period: 'last 30d',
         },
-      });
-    });
+      })
+    })
 
     it('should throw error when Dune repository throws', async () => {
       // Mock repository to throw an error
-      jest
-        .spyOn(mockRepository, 'executeQuery')
-        .mockRejectedValue(new Error('Dune API error'));
+      jest.spyOn(mockRepository, 'executeQuery').mockRejectedValue(new Error('Dune API error'))
 
       await expect(
         hooksService.getHooks({
           blockchain: 'mainnet',
           period: 'last 7d',
         })
-      ).rejects.toThrow('Dune API error');
-    });
+      ).rejects.toThrow('Dune API error')
+    })
 
     it('should throw error when data validation fails', async () => {
       // Create invalid data that doesn't match HookData interface
@@ -294,20 +278,8 @@ describe('HooksService', () => {
             },
           ],
           metadata: {
-            column_names: [
-              'environment',
-              'block_time',
-              'is_bridging',
-              'success',
-              'app_code',
-            ],
-            column_types: [
-              'varchar',
-              'timestamp',
-              'boolean',
-              'boolean',
-              'varchar',
-            ],
+            column_names: ['environment', 'block_time', 'is_bridging', 'success', 'app_code'],
+            column_types: ['varchar', 'timestamp', 'boolean', 'boolean', 'varchar'],
             row_count: 1,
             result_set_bytes: 100,
             total_row_count: 1,
@@ -317,21 +289,17 @@ describe('HooksService', () => {
             execution_time_millis: 500,
           },
         },
-      };
+      }
 
-      mockRepository.setMockResult(
-        invalidResult as DuneResultResponse<HookData>
-      );
+      mockRepository.setMockResult(invalidResult as DuneResultResponse<HookData>)
 
       await expect(
         hooksService.getHooks({
           blockchain: 'mainnet',
           period: 'last 7d',
         })
-      ).rejects.toThrow(
-        'Data validation failed for execution test-execution-123'
-      );
-    });
+      ).rejects.toThrow('Data validation failed for execution test-execution-123')
+    })
 
     it('should handle empty result set', async () => {
       const emptyResult: DuneResultResponse<HookData> = {
@@ -385,16 +353,16 @@ describe('HooksService', () => {
             execution_time_millis: 500,
           },
         },
-      };
+      }
 
-      mockRepository.setMockResult(emptyResult);
+      mockRepository.setMockResult(emptyResult)
 
       const hooks = await hooksService.getHooks({
         blockchain: 'mainnet',
         period: 'last 7d',
-      });
-      expect(hooks).toHaveLength(0);
-    });
+      })
+      expect(hooks).toHaveLength(0)
+    })
 
     it('should work with all supported blockchain and period combinations', async () => {
       const testCases: Array<{ blockchain: Blockchain; period: Period }> = [
@@ -404,12 +372,12 @@ describe('HooksService', () => {
         { blockchain: 'base', period: 'last 30d' },
         { blockchain: 'gnosis', period: 'last 3m' },
         { blockchain: 'polygon', period: 'last 6m' },
-      ];
+      ]
 
       for (const { blockchain, period } of testCases) {
-        const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery');
+        const executeQuerySpy = jest.spyOn(mockRepository, 'executeQuery')
 
-        await hooksService.getHooks({ blockchain, period });
+        await hooksService.getHooks({ blockchain, period })
 
         expect(executeQuerySpy).toHaveBeenCalledWith({
           queryId: 5302473,
@@ -417,10 +385,10 @@ describe('HooksService', () => {
             blockchain,
             period,
           },
-        });
+        })
 
-        executeQuerySpy.mockClear();
+        executeQuerySpy.mockClear()
       }
-    });
-  });
-});
+    })
+  })
+})

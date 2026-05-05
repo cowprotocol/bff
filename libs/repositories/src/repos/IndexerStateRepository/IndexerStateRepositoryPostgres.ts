@@ -1,10 +1,6 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { Pool } from 'pg';
-import {
-  IndexerState,
-  IndexerStateRepository,
-  IndexerStateValue,
-} from './IndexerStateRepository';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { Pool } from 'pg'
+import { IndexerState, IndexerStateRepository, IndexerStateValue } from './IndexerStateRepository'
 
 export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
   constructor(readonly db: Pool) {}
@@ -12,21 +8,18 @@ export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
   /**
    * Get indexer state by key and optional chainId
    */
-  async get<T extends IndexerStateValue>(
-    key: string,
-    chainId?: SupportedChainId
-  ): Promise<IndexerState<T> | null> {
+  async get<T extends IndexerStateValue>(key: string, chainId?: SupportedChainId): Promise<IndexerState<T> | null> {
     const query = `
       SELECT state 
       FROM indexer_state 
       WHERE key = $1 
       ${chainId !== undefined ? 'AND chain_id = $2' : ''}
       LIMIT 1
-    `;
-    const params = chainId !== undefined ? [key, chainId] : [key];
+    `
+    const params = chainId !== undefined ? [key, chainId] : [key]
 
-    const result = await this.db.query(query, params);
-    return result.rows[0] || null;
+    const result = await this.db.query(query, params)
+    return result.rows[0] || null
   }
 
   /**
@@ -38,8 +31,8 @@ export class IndexerStateRepositoryPostgres implements IndexerStateRepository {
       VALUES ($1, $2, $3)
       ON CONFLICT (key, chain_id) 
       DO UPDATE SET state = $3
-    `;
+    `
 
-    await this.db.query(query, [key, chainId, state]);
+    await this.db.query(query, [key, chainId, state])
   }
 }

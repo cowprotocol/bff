@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class InitialMigration1745364046891 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -13,7 +13,7 @@ export class InitialMigration1745364046891 implements MigrationInterface {
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         UNIQUE (key, chain_id)
       )
-  `);
+  `)
 
     //Update the updated_at column with the current timestamp
     await queryRunner.query(`
@@ -24,7 +24,7 @@ export class InitialMigration1745364046891 implements MigrationInterface {
         RETURN NEW;
       END;
       $$ LANGUAGE plpgsql;
-`);
+`)
 
     // Create a trigger to automatically update the updated_at column
     await queryRunner.query(`
@@ -32,23 +32,23 @@ export class InitialMigration1745364046891 implements MigrationInterface {
       BEFORE UPDATE ON indexer_state
       FOR EACH ROW
       EXECUTE FUNCTION set_updated_at();
-    `);
+    `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop the trigger
     await queryRunner.query(`
       DROP TRIGGER IF EXISTS trigger_set_updated_at ON indexer_state
-    `);
+    `)
 
     // Drop the function
     await queryRunner.query(`
       DROP FUNCTION IF EXISTS set_updated_at
-    `);
+    `)
 
     // Drop the table
     await queryRunner.query(`
       DROP TABLE IF EXISTS indexer_state
-    `);
+    `)
   }
 }

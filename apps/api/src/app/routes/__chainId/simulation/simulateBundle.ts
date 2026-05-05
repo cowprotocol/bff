@@ -1,11 +1,8 @@
-import {
-  SimulationService,
-  simulationServiceSymbol,
-} from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../inversify.config';
-import { AddressSchema, SupportedChainIdSchema } from '../../../schemas';
+import { SimulationService, simulationServiceSymbol } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { apiContainer } from '../../../inversify.config'
+import { AddressSchema, SupportedChainIdSchema } from '../../../schemas'
 
 const paramsSchema = {
   type: 'object',
@@ -14,7 +11,7 @@ const paramsSchema = {
   properties: {
     chainId: SupportedChainIdSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'array',
@@ -117,7 +114,7 @@ const successSchema = {
       },
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const bodySchema = {
   type: 'array',
@@ -150,7 +147,7 @@ const bodySchema = {
       },
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -163,22 +160,20 @@ const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof paramsSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
-type BodySchema = FromSchema<typeof bodySchema>;
+type RouteSchema = FromSchema<typeof paramsSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
+type BodySchema = FromSchema<typeof bodySchema>
 
-const tenderlyService: SimulationService = apiContainer.get(
-  simulationServiceSymbol
-);
+const tenderlyService: SimulationService = apiContainer.get(simulationServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.post<{
-    Params: RouteSchema;
-    Reply: SuccessSchema | ErrorSchema;
-    Body: BodySchema;
+    Params: RouteSchema
+    Reply: SuccessSchema | ErrorSchema
+    Body: BodySchema
   }>(
     '/simulateBundle',
     {
@@ -193,33 +188,25 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       try {
-        const { chainId } = request.params;
+        const { chainId } = request.params
 
-        fastify.log.info(
-          `Starting simulation of ${request.body.length} transactions on chain ${chainId}`
-        );
+        fastify.log.info(`Starting simulation of ${request.body.length} transactions on chain ${chainId}`)
 
-        const simulationResult =
-          await tenderlyService.postTenderlyBundleSimulation(
-            chainId,
-            request.body
-          );
+        const simulationResult = await tenderlyService.postTenderlyBundleSimulation(chainId, request.body)
 
         if (simulationResult === null) {
-          reply.code(400).send({ message: 'Build simulation error' });
-          return;
+          reply.code(400).send({ message: 'Build simulation error' })
+          return
         }
-        fastify.log.info(
-          `Post bundle of ${request.body.length} simulation on chain ${chainId}`
-        );
+        fastify.log.info(`Post bundle of ${request.body.length} simulation on chain ${chainId}`)
 
-        reply.send(simulationResult);
+        reply.send(simulationResult)
       } catch (e) {
-        fastify.log.error('Error in /simulateBundle', e);
-        reply.code(500).send({ message: 'Error in /simulateBundle' });
+        fastify.log.error('Error in /simulateBundle', e)
+        reply.code(500).send({ message: 'Error in /simulateBundle' })
       }
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

@@ -3,30 +3,28 @@ import {
   ALL_SUPPORTED_CHAINS,
   SupportedChainId,
   WRAPPED_NATIVE_CURRENCIES,
-} from '@cowprotocol/cow-sdk';
-import { Address } from 'viem';
+} from '@cowprotocol/cow-sdk'
+import { Address } from 'viem'
 
 /**
  * Native currency address. For example, represents Ether in Mainnet and Arbitrum, and xDAI in Gnosis chain.
  */
-export const NativeCurrencyAddress =
-  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+export const NativeCurrencyAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 /**
  * Wrapped native token address. For example, represents WETH in Mainnet and Arbitrum, and wxDAI in Gnosis chain.
  */
-export const WrappedNativeTokenAddress: Record<SupportedChainId, Address> =
-  Object.values(WRAPPED_NATIVE_CURRENCIES).reduce((acc, curr) => {
-    acc[curr.chainId as SupportedChainId] = curr.address as Address;
-    return acc;
-  }, {} as Record<SupportedChainId, Address>);
-
-export const ChainNames: Record<SupportedChainId, string> = Object.values(
-  ALL_SUPPORTED_CHAINS
+export const WrappedNativeTokenAddress: Record<SupportedChainId, Address> = Object.values(
+  WRAPPED_NATIVE_CURRENCIES
 ).reduce((acc, curr) => {
-  acc[curr.id as SupportedChainId] = curr.label;
-  return acc;
-}, {} as Record<SupportedChainId, string>);
+  acc[curr.chainId as SupportedChainId] = curr.address as Address
+  return acc
+}, {} as Record<SupportedChainId, Address>)
+
+export const ChainNames: Record<SupportedChainId, string> = Object.values(ALL_SUPPORTED_CHAINS).reduce((acc, curr) => {
+  acc[curr.id as SupportedChainId] = curr.label
+  return acc
+}, {} as Record<SupportedChainId, string>)
 
 // TODO: Get from SDK
 export const EXPLORER_NETWORK_NAMES = {
@@ -41,7 +39,7 @@ export const EXPLORER_NETWORK_NAMES = {
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-} as const satisfies Record<SupportedChainId, string>;
+} as const satisfies Record<SupportedChainId, string>
 
 // TODO: Get from SDK
 export const COW_API_NETWORK_NAMES = {
@@ -56,6 +54,6 @@ export const COW_API_NETWORK_NAMES = {
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-} as const satisfies Record<SupportedChainId, string>;
+} as const satisfies Record<SupportedChainId, string>
 
-export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS;
+export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS

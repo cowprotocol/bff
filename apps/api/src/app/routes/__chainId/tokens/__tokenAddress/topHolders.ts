@@ -1,11 +1,8 @@
-import {
-  TokenHolderService,
-  tokenHolderServiceSymbol,
-} from '@cowprotocol/services';
-import { FastifyPluginAsync } from 'fastify';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
-import { apiContainer } from '../../../../inversify.config';
-import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas';
+import { TokenHolderService, tokenHolderServiceSymbol } from '@cowprotocol/services'
+import { FastifyPluginAsync } from 'fastify'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { apiContainer } from '../../../../inversify.config'
+import { AddressSchema, SupportedChainIdSchema } from '../../../../schemas'
 
 const paramsSchema = {
   type: 'object',
@@ -15,7 +12,7 @@ const paramsSchema = {
     chainId: SupportedChainIdSchema,
     tokenAddress: AddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const successSchema = {
   type: 'array',
@@ -36,7 +33,7 @@ const successSchema = {
       },
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 const errorSchema = {
   type: 'object',
@@ -49,21 +46,19 @@ const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
-type RouteSchema = FromSchema<typeof paramsSchema>;
-type SuccessSchema = FromSchema<typeof successSchema>;
-type ErrorSchema = FromSchema<typeof errorSchema>;
+type RouteSchema = FromSchema<typeof paramsSchema>
+type SuccessSchema = FromSchema<typeof successSchema>
+type ErrorSchema = FromSchema<typeof errorSchema>
 
-const tokenHolderService: TokenHolderService = apiContainer.get(
-  tokenHolderServiceSymbol
-);
+const tokenHolderService: TokenHolderService = apiContainer.get(tokenHolderServiceSymbol)
 
 const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   // example: http://localhost:3010/1/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/topHolders
   fastify.get<{
-    Params: RouteSchema;
-    Reply: SuccessSchema | ErrorSchema;
+    Params: RouteSchema
+    Reply: SuccessSchema | ErrorSchema
   }>(
     '/topHolders',
     {
@@ -77,23 +72,20 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
     },
     async function (request, reply) {
-      const { chainId, tokenAddress } = request.params;
+      const { chainId, tokenAddress } = request.params
 
-      const tokenHolders = await tokenHolderService.getTopTokenHolders(
-        chainId,
-        tokenAddress
-      );
+      const tokenHolders = await tokenHolderService.getTopTokenHolders(chainId, tokenAddress)
       fastify.log.info(
         `Get token holders for ${tokenAddress} on chain ${chainId}: ${tokenHolders?.length} holder found`
-      );
+      )
       if (tokenHolders === null) {
-        reply.code(404).send({ message: 'Token holders not found' });
-        return;
+        reply.code(404).send({ message: 'Token holders not found' })
+        return
       }
 
-      reply.send(tokenHolders);
+      reply.send(tokenHolders)
     }
-  );
-};
+  )
+}
 
-export default root;
+export default root

@@ -1,5 +1,5 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { AFFILIATE_CODE_REGEX } from '../../../config/affiliate';
+import { JSONSchema } from 'json-schema-to-ts'
+import { AFFILIATE_CODE_REGEX } from '../../../config/affiliate'
 
 export const paramsSchema = {
   type: 'object',
@@ -14,17 +14,11 @@ export const paramsSchema = {
       pattern: AFFILIATE_CODE_REGEX.source,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const responseSchema = {
   type: 'object',
-  required: [
-    'code',
-    'traderRewardAmount',
-    'triggerVolume',
-    'timeCapDays',
-    'volumeCap',
-  ],
+  required: ['code', 'traderRewardAmount', 'triggerVolume', 'timeCapDays', 'volumeCap'],
   additionalProperties: false,
   properties: {
     code: {
@@ -35,7 +29,7 @@ export const responseSchema = {
     timeCapDays: { type: 'number' },
     volumeCap: { type: 'number' },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const errorSchema = {
   type: 'object',
@@ -46,4 +40,4 @@ export const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema

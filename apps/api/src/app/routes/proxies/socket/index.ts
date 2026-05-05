@@ -1,47 +1,36 @@
-import httpProxy from '@fastify/http-proxy';
-import { FastifyPluginAsync } from 'fastify';
+import httpProxy from '@fastify/http-proxy'
+import { FastifyPluginAsync } from 'fastify'
 
-const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange';
+const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange'
 
 const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  const upstream = fastify.config.SOCKET_BASE_URL || DEFAULT_SOCKET_BASE_URL;
-  const apiKey = fastify.config.SOCKET_API_KEY;
-  const affiliateCode = fastify.config.SOCKET_AFFILIATE_CODE;
+  const upstream = fastify.config.SOCKET_BASE_URL || DEFAULT_SOCKET_BASE_URL
+  const apiKey = fastify.config.SOCKET_API_KEY
+  const affiliateCode = fastify.config.SOCKET_AFFILIATE_CODE
   if (!apiKey) {
-    fastify.log.warn('SOCKET_API_KEY is not set. Skipping proxy.');
-    return;
+    fastify.log.warn('SOCKET_API_KEY is not set. Skipping proxy.')
+    return
   }
   if (!affiliateCode) {
-    fastify.log.warn('SOCKET_AFFILIATE_CODE is not set. Skipping proxy.');
-    return;
+    fastify.log.warn('SOCKET_AFFILIATE_CODE is not set. Skipping proxy.')
+    return
   }
 
   // Handle CORS preflight locally for socket routes
   fastify.options('/*', async (request, reply) => {
-    const origin = (request.headers.origin as string) || '*';
-    const acrm =
-      (request.headers['access-control-request-method'] as string) || '';
-    const acrh =
-      (request.headers['access-control-request-headers'] as string) || '';
+    const origin = (request.headers.origin as string) || '*'
+    const acrm = (request.headers['access-control-request-method'] as string) || ''
+    const acrh = (request.headers['access-control-request-headers'] as string) || ''
 
     reply
       .header('Access-Control-Allow-Origin', origin)
-      .header(
-        'Vary',
-        'Origin, Access-Control-Request-Method, Access-Control-Request-Headers'
-      )
-      .header(
-        'Access-Control-Allow-Methods',
-        acrm || 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
-      )
-      .header(
-        'Access-Control-Allow-Headers',
-        acrh || 'authorization, content-type, x-requested-with'
-      )
+      .header('Vary', 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+      .header('Access-Control-Allow-Methods', acrm || 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD')
+      .header('Access-Control-Allow-Headers', acrh || 'authorization, content-type, x-requested-with')
       .header('Access-Control-Max-Age', '600')
       .status(204)
-      .send();
-  });
+      .send()
+  })
 
   fastify.register(httpProxy, {
     upstream,
@@ -59,9 +48,9 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       fastify.log.info(
         { url: request.url, method: request.method, headers: request.headers },
         `Proxying request to socket ${upstream}`
-      );
+      )
     },
-  });
-};
+  })
+}
 
-export default proxy;
+export default proxy

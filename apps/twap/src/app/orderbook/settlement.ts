@@ -1,10 +1,5 @@
-import { Column, PrimaryColumn, Entity } from 'typeorm';
-import {
-  bigIntToString,
-  bufferToString,
-  stringToBigInt,
-  stringToBuffer,
-} from '@cowprotocol/shared';
+import { Column, PrimaryColumn, Entity } from 'typeorm'
+import { bigIntToString, bufferToString, stringToBigInt, stringToBuffer } from '@cowprotocol/shared'
 
 @Entity({ name: 'settlements' })
 export class Settlement {
@@ -12,34 +7,34 @@ export class Settlement {
     name: 'block_number',
     transformer: { from: stringToBigInt, to: bigIntToString },
   })
-  blockNumber: bigint;
+  blockNumber: bigint
 
   @PrimaryColumn('bigint', {
     name: 'log_index',
     transformer: { from: stringToBigInt, to: bigIntToString },
   })
-  logIndex: bigint;
+  logIndex: bigint
 
   @Column('bytea', {
     transformer: { from: bufferToString, to: stringToBuffer },
   })
-  solver: string;
+  solver: string
 
   @Column('bytea', {
     name: 'tx_hash',
     transformer: { from: bufferToString, to: stringToBuffer },
   })
-  txHash: string;
+  txHash: string
 
   @Column('bytea', {
     name: 'tx_from',
     transformer: { from: bufferToString, to: stringToBuffer },
   })
-  txFrom: string;
+  txFrom: string
 
   @Column('bigint', {
     name: 'tx_nonce',
     transformer: { from: stringToBigInt, to: bigIntToString },
   })
-  txNonce: bigint;
+  txNonce: bigint
 }

@@ -1,9 +1,9 @@
-import { FastifyInstance } from 'fastify';
-import { Wallet } from '../../../../data/wallet';
-import { Order } from '../../../../data/order';
-import { FromSchema, JSONSchema } from 'json-schema-to-ts';
+import { FastifyInstance } from 'fastify'
+import { Wallet } from '../../../../data/wallet'
+import { Order } from '../../../../data/order'
+import { FromSchema, JSONSchema } from 'json-schema-to-ts'
 
-const ADDRESS_LENGTH = 42;
+const ADDRESS_LENGTH = 42
 
 const routeSchema = {
   type: 'object',
@@ -19,8 +19,8 @@ const routeSchema = {
       maxLength: ADDRESS_LENGTH,
     },
   },
-} as const satisfies JSONSchema;
-type RouteSchema = FromSchema<typeof routeSchema>;
+} as const satisfies JSONSchema
+type RouteSchema = FromSchema<typeof routeSchema>
 
 const postOrderBodySchema = {
   type: 'object',
@@ -85,15 +85,15 @@ const postOrderBodySchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
-type PostOrderBodySchema = FromSchema<typeof postOrderBodySchema>;
-type PostOrderParamsSchema = RouteSchema;
+} as const satisfies JSONSchema
+type PostOrderBodySchema = FromSchema<typeof postOrderBodySchema>
+type PostOrderParamsSchema = RouteSchema
 
-type GetOrdersParamsSchema = RouteSchema;
+type GetOrdersParamsSchema = RouteSchema
 
 export default async function (fastify: FastifyInstance) {
   fastify.get<{
-    Params: GetOrdersParamsSchema;
+    Params: GetOrdersParamsSchema
   }>(
     '/',
     {
@@ -102,8 +102,8 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async function (request, reply) {
-      const { chainId, walletAddress } = request.params;
-      const orderRepository = fastify.orm.getRepository(Order);
+      const { chainId, walletAddress } = request.params
+      const orderRepository = fastify.orm.getRepository(Order)
 
       const orders = await orderRepository.find({
         where: {
@@ -115,11 +115,11 @@ export default async function (fastify: FastifyInstance) {
         relations: {
           wallet: true,
         },
-      });
+      })
 
-      reply.status(200).send(orders);
+      reply.status(200).send(orders)
     }
-  );
+  )
 
   fastify.post<{ Body: PostOrderBodySchema; Params: PostOrderParamsSchema }>(
     '/',
@@ -130,33 +130,33 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async function (request, reply) {
-      const { chainId, walletAddress } = request.params;
-      const walletRepository = fastify.orm.getRepository(Wallet);
-      const orderRepository = fastify.orm.getRepository(Order);
+      const { chainId, walletAddress } = request.params
+      const walletRepository = fastify.orm.getRepository(Wallet)
+      const orderRepository = fastify.orm.getRepository(Order)
 
       let wallet = await walletRepository.findOne({
         where: {
           address: walletAddress,
         },
-      });
+      })
 
       if (wallet === null) {
         wallet = walletRepository.create({
           address: walletAddress,
-        });
+        })
 
-        await walletRepository.save(wallet);
+        await walletRepository.save(wallet)
       }
 
       const order = orderRepository.create({
         ...request.body.order,
         wallet,
         chainId: Number(chainId),
-      });
+      })
 
-      await orderRepository.save(order);
+      await orderRepository.save(order)
 
-      reply.status(200).send(order);
+      reply.status(200).send(order)
     }
-  );
+  )
 }

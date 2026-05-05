@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
 /**
  * Indexer state.
@@ -8,14 +8,14 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk';
  * The state is stored in a JSON object, so each indexer can define its own state schema.
  */
 export type IndexerState<T = unknown> = {
-  key: string;
-  chainId: number | null;
-  state: T;
-  createdAt: Date;
-  updatedAt: Date;
-};
+  key: string
+  chainId: number | null
+  state: T
+  createdAt: Date
+  updatedAt: Date
+}
 
-export type IndexerStateValue = Record<string, unknown>;
+export type IndexerStateValue = Record<string, unknown>
 
 /**
  * Indexer state repository.
@@ -23,14 +23,7 @@ export type IndexerStateValue = Record<string, unknown>;
  * This repository allows to store and retrieve the state of an indexer.
  */
 export interface IndexerStateRepository {
-  get<T extends IndexerStateValue>(
-    key: string,
-    chainId?: SupportedChainId
-  ): Promise<IndexerState<T> | null>;
+  get<T extends IndexerStateValue>(key: string, chainId?: SupportedChainId): Promise<IndexerState<T> | null>
 
-  upsert<T extends IndexerStateValue>(
-    key: string,
-    state: T,
-    chainId?: number
-  ): Promise<void>;
+  upsert<T extends IndexerStateValue>(key: string, state: T, chainId?: number): Promise<void>
 }

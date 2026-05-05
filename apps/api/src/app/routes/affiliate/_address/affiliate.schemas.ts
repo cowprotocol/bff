@@ -1,6 +1,6 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { AddressSchema } from '../../../schemas';
-import { AFFILIATE_CODE_REGEX } from '../../../config/affiliate';
+import { JSONSchema } from 'json-schema-to-ts'
+import { AddressSchema } from '../../../schemas'
+import { AFFILIATE_CODE_REGEX } from '../../../config/affiliate'
 
 export const paramsSchema = {
   type: 'object',
@@ -8,7 +8,7 @@ export const paramsSchema = {
   properties: {
     address: AddressSchema,
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const bodySchema = {
   type: 'object',
@@ -17,8 +17,7 @@ export const bodySchema = {
   properties: {
     code: {
       title: 'Affiliate code',
-      description:
-        'Affiliate code to bind to the wallet. Format: 5-20 uppercase chars (A-Z, 0-9, -, _).',
+      description: 'Affiliate code to bind to the wallet. Format: 5-20 uppercase chars (A-Z, 0-9, -, _).',
       type: 'string',
       minLength: 5,
       maxLength: 20,
@@ -32,7 +31,7 @@ export const bodySchema = {
       minLength: 1,
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const affiliateGetResponseSchema = {
   type: 'object',
@@ -63,7 +62,7 @@ export const affiliateGetResponseSchema = {
     revenueSplitTraderPct: { type: 'number' },
     revenueSplitDaoPct: { type: 'number' },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const affiliateCreateResponseSchema = {
   type: 'object',
@@ -77,7 +76,7 @@ export const affiliateCreateResponseSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema
 
 export const errorSchema = {
   type: 'object',
@@ -88,4 +87,4 @@ export const errorSchema = {
       type: 'string',
     },
   },
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchema

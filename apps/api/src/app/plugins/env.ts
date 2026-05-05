@@ -1,5 +1,5 @@
-import fastifyEnv from '@fastify/env';
-import fp from 'fastify-plugin';
+import fastifyEnv from '@fastify/env'
+import fp from 'fastify-plugin'
 
 const schema = {
   type: 'object',
@@ -71,23 +71,23 @@ const schema = {
       type: 'string',
     },
   },
-};
+}
 
 export default fp(async (fastify, opts) => {
   const options = {
     ...opts,
     schema,
     dotenv: true,
-  };
+  }
 
-  fastify.register(fastifyEnv, options);
-});
+  fastify.register(fastifyEnv, options)
+})
 
 declare module 'fastify' {
   interface FastifyInstance {
     config: {
       // Currently only supports string type like this.
-      [K in keyof typeof schema.properties]: string;
-    };
+      [K in keyof typeof schema.properties]: string
+    }
   }
 }

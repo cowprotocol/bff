@@ -1,59 +1,57 @@
-import { AffiliatesRepository, DuneRepository } from '@cowprotocol/repositories';
+import { AffiliatesRepository, DuneRepository } from '@cowprotocol/repositories'
 import {
   AffiliateProgramExportResult,
   AffiliateProgramExportService,
   AffiliateProgramSignature,
-} from './AffiliateProgramExportService';
-import { getAffiliateProgramTableName } from './AffiliateProgramExportService.config';
+} from './AffiliateProgramExportService'
+import { getAffiliateProgramTableName } from './AffiliateProgramExportService.config'
 
 type AffiliateProgramRow = {
-  code: string;
-  affiliate_address: string;
-  enabled: boolean;
-  reward_amount: number;
-  trigger_volume: number;
-  time_cap_days: number;
-  volume_cap: number;
-  revenue_split_affiliate_pct: number;
-  revenue_split_trader_pct: number;
-  revenue_split_dao_pct: number;
-  created_at: string;
-  updated_at: string;
-};
+  code: string
+  affiliate_address: string
+  enabled: boolean
+  reward_amount: number
+  trigger_volume: number
+  time_cap_days: number
+  volume_cap: number
+  revenue_split_affiliate_pct: number
+  revenue_split_trader_pct: number
+  revenue_split_dao_pct: number
+  created_at: string
+  updated_at: string
+}
 
-export class AffiliateProgramExportServiceImpl
-  implements AffiliateProgramExportService
-{
+export class AffiliateProgramExportServiceImpl implements AffiliateProgramExportService {
   constructor(
     private readonly affiliatesRepository: AffiliatesRepository,
     private readonly duneRepository: DuneRepository
   ) {}
 
   async exportAffiliateProgramData(): Promise<AffiliateProgramExportResult> {
-    const { rows, signature } = await this.buildAffiliateProgramData();
-    await this.upload(rows);
-    return { rows: rows.length, signature };
+    const { rows, signature } = await this.buildAffiliateProgramData()
+    await this.upload(rows)
+    return { rows: rows.length, signature }
   }
 
   async exportAffiliateProgramDataIfChanged(
     lastSignature: AffiliateProgramSignature | null
   ): Promise<{ uploaded: boolean; result: AffiliateProgramExportResult }> {
-    const { rows, signature } = await this.buildAffiliateProgramData();
-    const shouldUpload = !lastSignature || !isSameSignature(lastSignature, signature);
+    const { rows, signature } = await this.buildAffiliateProgramData()
+    const shouldUpload = !lastSignature || !isSameSignature(lastSignature, signature)
 
     if (!shouldUpload) {
-      return { uploaded: false, result: { rows: rows.length, signature } };
+      return { uploaded: false, result: { rows: rows.length, signature } }
     }
 
-    await this.upload(rows);
-    return { uploaded: true, result: { rows: rows.length, signature } };
+    await this.upload(rows)
+    return { uploaded: true, result: { rows: rows.length, signature } }
   }
 
   private async buildAffiliateProgramData(): Promise<{
-    rows: AffiliateProgramRow[];
-    signature: AffiliateProgramSignature;
+    rows: AffiliateProgramRow[]
+    signature: AffiliateProgramSignature
   }> {
-    const affiliates = await this.affiliatesRepository.listAffiliates();
+    const affiliates = await this.affiliatesRepository.listAffiliates()
     const rows = affiliates.map((affiliate) => ({
       code: affiliate.code.trim().toUpperCase(),
       affiliate_address: affiliate.walletAddress.toLowerCase(),
@@ -67,17 +65,17 @@ export class AffiliateProgramExportServiceImpl
       revenue_split_dao_pct: affiliate.revenueSplitDaoPct,
       created_at: affiliate.createdAt,
       updated_at: affiliate.updatedAt,
-    }));
+    }))
 
     const maxUpdatedAt = rows.reduce<string | null>((max, row) => {
       if (!row.updated_at) {
-        return max;
+        return max
       }
       if (!max || row.updated_at > max) {
-        return row.updated_at;
+        return row.updated_at
       }
-      return max;
-    }, null);
+      return max
+    }, null)
 
     return {
       rows,
@@ -85,32 +83,26 @@ export class AffiliateProgramExportServiceImpl
         maxUpdatedAt,
         rowCount: rows.length,
       },
-    };
+    }
   }
 
   private async upload(rows: AffiliateProgramRow[]): Promise<void> {
-    const csv = buildCsv(rows);
-    const tableName = getAffiliateProgramTableName();
+    const csv = buildCsv(rows)
+    const tableName = getAffiliateProgramTableName()
     const response = await this.duneRepository.uploadCsv({
       tableName,
       data: csv,
       isPrivate: true,
-    });
+    })
     if (!response.success) {
-      const message = response.message ? `: ${response.message}` : '';
-      throw new Error(`Dune CSV upload failed for ${tableName}${message}`);
+      const message = response.message ? `: ${response.message}` : ''
+      throw new Error(`Dune CSV upload failed for ${tableName}${message}`)
     }
   }
 }
 
-function isSameSignature(
-  left: AffiliateProgramSignature,
-  right: AffiliateProgramSignature
-): boolean {
-  return (
-    left.rowCount === right.rowCount &&
-    left.maxUpdatedAt === right.maxUpdatedAt
-  );
+function isSameSignature(left: AffiliateProgramSignature, right: AffiliateProgramSignature): boolean {
+  return left.rowCount === right.rowCount && left.maxUpdatedAt === right.maxUpdatedAt
 }
 
 const CSV_HEADERS = [
@@ -125,10 +117,10 @@ const CSV_HEADERS = [
   'revenue_split_trader_pct',
   'revenue_split_dao_pct',
   'created_at',
-];
+]
 
 function buildCsv(rows: AffiliateProgramRow[]): string {
-  const header = CSV_HEADERS.join(',');
+  const header = CSV_HEADERS.join(',')
   const lines = rows.map((row) =>
     [
       row.code,
@@ -145,15 +137,15 @@ function buildCsv(rows: AffiliateProgramRow[]): string {
     ]
       .map(csvEscape)
       .join(',')
-  );
+  )
 
-  return [header, ...lines].join('\n');
+  return [header, ...lines].join('\n')
 }
 
 function csvEscape(value: unknown): string {
-  const stringValue = String(value ?? '');
+  const stringValue = String(value ?? '')
   if (/[",\n]/.test(stringValue)) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
+    return `"${stringValue.replace(/"/g, '""')}"`
   }
-  return stringValue;
+  return stringValue
 }

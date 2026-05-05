@@ -1,4 +1,4 @@
-import { OrderParameters, SupportedChainId } from '@cowprotocol/cow-sdk';
+import { OrderParameters, SupportedChainId } from '@cowprotocol/cow-sdk'
 
 export enum OrderStatus {
   WaitSigning = 'WaitSigning',
@@ -11,35 +11,35 @@ export enum OrderStatus {
 }
 
 export interface OrderStruct {
-  sellToken: string;
-  buyToken: string;
-  receiver: string;
-  partSellAmount: string;
-  minPartLimit: string;
+  sellToken: string
+  buyToken: string
+  receiver: string
+  partSellAmount: string
+  minPartLimit: string
   // timeStart
-  t0: number;
+  t0: number
   // numOfParts
-  n: number;
+  n: number
   // timeInterval
-  t: number;
-  span: number;
-  appData: string;
+  t: number
+  span: number
+  appData: string
 }
 
 export interface OrderPart {
-  uid: string;
-  index: number;
-  chainId: SupportedChainId;
-  safeAddress: string;
-  orderId: string;
-  order: OrderParameters;
+  uid: string
+  index: number
+  chainId: SupportedChainId
+  safeAddress: string
+  orderId: string
+  order: OrderParameters
 }
 
 export interface ExecutionInfo {
-  executedSellAmount: bigint;
-  executedBuyAmount: bigint;
+  executedSellAmount: bigint
+  executedBuyAmount: bigint
 }
 
 export function returnNever(): never {
-  throw new Error('This should never happen.');
+  throw new Error('This should never happen.')
 }

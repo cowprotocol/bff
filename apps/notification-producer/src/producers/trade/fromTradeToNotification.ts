@@ -1,24 +1,24 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { PushNotification } from '@cowprotocol/notifications';
-import { Erc20Repository } from '@cowprotocol/repositories';
-import { getExplorerUrl, logger } from '@cowprotocol/shared';
-import { getNotificationSummary } from '../../utils/getNotificationSummary';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { PushNotification } from '@cowprotocol/notifications'
+import { Erc20Repository } from '@cowprotocol/repositories'
+import { getExplorerUrl, logger } from '@cowprotocol/shared'
+import { getNotificationSummary } from '../../utils/getNotificationSummary'
 
 export async function fromTradeToNotification(props: {
-  prefix: string;
-  id: string;
-  isEthFlowOrder: boolean;
-  chainId: SupportedChainId;
-  orderUid: string;
-  owner: string;
-  sellTokenAddress: string;
-  buyTokenAddress: string;
-  sellAmount: bigint;
-  buyAmount: bigint;
-  feeAmount: bigint;
-  erc20Repository: Erc20Repository;
-  transactionHash: string;
-  logIndex: number;
+  prefix: string
+  id: string
+  isEthFlowOrder: boolean
+  chainId: SupportedChainId
+  orderUid: string
+  owner: string
+  sellTokenAddress: string
+  buyTokenAddress: string
+  sellAmount: bigint
+  buyAmount: bigint
+  feeAmount: bigint
+  erc20Repository: Erc20Repository
+  transactionHash: string
+  logIndex: number
 }): Promise<PushNotification> {
   const {
     id,
@@ -33,8 +33,8 @@ export async function fromTradeToNotification(props: {
     prefix,
     orderUid,
     transactionHash,
-    logIndex
-  } = props;
+    logIndex,
+  } = props
 
   const summary = await getNotificationSummary({
     chainId,
@@ -43,16 +43,14 @@ export async function fromTradeToNotification(props: {
     sellTokenAddress,
     buyTokenAddress,
     sellAmount,
-    buyAmount
-  });
+    buyAmount,
+  })
 
-  const title = `Trade ${summary}`;
-  const message = `Account: ${owner}`;
+  const title = `Trade ${summary}`
+  const message = `Account: ${owner}`
 
-  const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined;
-  logger.info(
-    `${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}`
-  );
+  const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined
+  logger.info(`${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}`)
   return {
     id,
     account: owner,
@@ -61,7 +59,7 @@ export async function fromTradeToNotification(props: {
     url,
     context: {
       transactionHash,
-      logIndex: logIndex.toString()
-    }
-  };
+      logIndex: logIndex.toString(),
+    },
+  }
 }

@@ -1,5 +1,5 @@
-import type { SupportedChainId } from '@cowprotocol/cow-sdk';
+import type { SupportedChainId } from '@cowprotocol/cow-sdk'
 
 export interface OnChainPlacedOrdersRepository {
-  getAccountsForOrders(chainId: SupportedChainId, uids: string[]): Promise<{[account: string]: string[]}>;
+  getAccountsForOrders(chainId: SupportedChainId, uids: string[]): Promise<{ [account: string]: string[] }>
 }

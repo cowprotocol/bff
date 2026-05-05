@@ -1,10 +1,10 @@
-import { ChainNames, toSupportedChainId } from '@cowprotocol/shared';
-import fs from 'fs';
-import path from 'path';
-import { SlippageServiceMain } from './SlippageServiceMain';
+import { ChainNames, toSupportedChainId } from '@cowprotocol/shared'
+import fs from 'fs'
+import path from 'path'
+import { SlippageServiceMain } from './SlippageServiceMain'
 
-const getUsdPrice = jest.fn();
-const getUsdPrices = jest.fn();
+const getUsdPrice = jest.fn()
+const getUsdPrices = jest.fn()
 
 /**
  * Test the SlippageService main implementation using realistic test data.
@@ -14,11 +14,11 @@ const getUsdPrices = jest.fn();
  * These will allow to refine the slippage calculation algorithm to make it work well with real data.
  */
 describe('SlippageServiceMain: Real test data', () => {
-  let slippageService: SlippageServiceMain;
+  let slippageService: SlippageServiceMain
 
   // Read all files in test-data folder
-  const testDataDir = path.join(__dirname, 'test-data');
-  const testDataFiles = fs.readdirSync(testDataDir);
+  const testDataDir = path.join(__dirname, 'test-data')
+  const testDataFiles = fs.readdirSync(testDataDir)
 
   for (const fileName of testDataFiles) {
     const {
@@ -28,49 +28,46 @@ describe('SlippageServiceMain: Real test data', () => {
       chainId: chainIdValue,
       volatilityDetails,
       slippageBps,
-    } = readTestFile(path.join(testDataDir, fileName));
+    } = readTestFile(path.join(testDataDir, fileName))
 
-    const chainId = toSupportedChainId(chainIdValue);
-    const chainName = ChainNames[chainId];
+    const chainId = toSupportedChainId(chainIdValue)
+    const chainName = ChainNames[chainId]
 
     // Uncomment to tests a single pair
     // if (pair !== 'WETH-xDAI' || chainId !== SupportedChainId.GNOSIS_CHAIN)
     //   continue;
 
     test(`Expect ${chainName} ${pair} slippage to be ${slippageBps} BPS`, async () => {
-      const {
-        quoteToken: quoteTokenVolatilityDetails,
-        baseToken: baseTokenVolatilityDetails,
-      } = volatilityDetails;
+      const { quoteToken: quoteTokenVolatilityDetails, baseToken: baseTokenVolatilityDetails } = volatilityDetails
 
       // GIVEN: USD price for the base and quote tokens
       getUsdPrice.mockImplementation(async (_chainId, tokenAddress) => {
         if (tokenAddress === baseTokenAddress) {
-          return baseTokenVolatilityDetails.usdPrice;
+          return baseTokenVolatilityDetails.usdPrice
         } else {
-          return quoteTokenVolatilityDetails.usdPrice;
+          return quoteTokenVolatilityDetails.usdPrice
         }
-      });
+      })
 
       // GIVEN: USD prices for the base and quote tokens
       getUsdPrices.mockImplementation(async (_chainId, tokenAddress) => {
         if (tokenAddress === baseTokenAddress) {
-          return baseTokenVolatilityDetails.prices;
+          return baseTokenVolatilityDetails.prices
         } else {
-          return quoteTokenVolatilityDetails.prices;
+          return quoteTokenVolatilityDetails.prices
         }
-      });
+      })
 
       // WHEN: Get the slippage
       const slippage = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
         quoteTokenAddress,
-      });
+      })
 
       // THEN: The slippage should be as expected
-      expect(slippage).toBe(slippageBps);
-    });
+      expect(slippage).toBe(slippageBps)
+    })
   }
 
   beforeEach(() => {
@@ -78,25 +75,23 @@ describe('SlippageServiceMain: Real test data', () => {
       name: 'RealTestDataMock',
       getUsdPrice,
       getUsdPrices,
-    });
-  });
-});
+    })
+  })
+})
 
 function readTestFile(filePath: string) {
-  const testContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  const volatilityDetails = testContent.volatilityDetails;
+  const testContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+  const volatilityDetails = testContent.volatilityDetails
 
-  volatilityDetails.quoteToken.prices =
-    volatilityDetails.quoteToken.prices.map(fixDateForPrices);
-  volatilityDetails.baseToken.prices =
-    volatilityDetails.baseToken.prices.map(fixDateForPrices);
+  volatilityDetails.quoteToken.prices = volatilityDetails.quoteToken.prices.map(fixDateForPrices)
+  volatilityDetails.baseToken.prices = volatilityDetails.baseToken.prices.map(fixDateForPrices)
 
-  return testContent;
+  return testContent
 }
 
 function fixDateForPrices(price: any) {
   return {
     ...price,
     date: new Date(price.date),
-  };
+  }
 }

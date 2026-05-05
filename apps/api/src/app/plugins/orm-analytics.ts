@@ -1,16 +1,14 @@
-import 'reflect-metadata';
-import { FastifyInstance } from 'fastify';
-import typeORMPlugin from 'typeorm-fastify-plugin';
-import fp from 'fastify-plugin';
-import { PoolInfo } from '../data/poolInfo';
-import { isDbEnabled } from '@cowprotocol/repositories';
+import 'reflect-metadata'
+import { FastifyInstance } from 'fastify'
+import typeORMPlugin from 'typeorm-fastify-plugin'
+import fp from 'fastify-plugin'
+import { PoolInfo } from '../data/poolInfo'
+import { isDbEnabled } from '@cowprotocol/repositories'
 
 export default fp(async function (fastify: FastifyInstance) {
   if (!isDbEnabled) {
-    fastify.log.warn(
-      'Database is disabled. ORM for analytics will not be used.'
-    );
-    return;
+    fastify.log.warn('Database is disabled. ORM for analytics will not be used.')
+    return
   }
 
   const dbParams = {
@@ -19,17 +17,13 @@ export default fp(async function (fastify: FastifyInstance) {
     database: fastify.config.COW_ANALYTICS_DATABASE_NAME,
     username: fastify.config.COW_ANALYTICS_DATABASE_USERNAME,
     password: fastify.config.COW_ANALYTICS_DATABASE_PASSWORD,
-  };
+  }
 
-  const dbParamsAreInvalid = Object.values(dbParams).some(
-    (v) => Number.isNaN(v) || v === undefined
-  );
+  const dbParamsAreInvalid = Object.values(dbParams).some((v) => Number.isNaN(v) || v === undefined)
 
   if (dbParamsAreInvalid) {
-    console.error(
-      'Invalid CoW Analytics database parameters, please check COW_ANALYTICS_* env vars'
-    );
-    return;
+    console.error('Invalid CoW Analytics database parameters, please check COW_ANALYTICS_* env vars')
+    return
   }
 
   fastify.register(typeORMPlugin, {
@@ -43,13 +37,13 @@ export default fp(async function (fastify: FastifyInstance) {
         rejectUnauthorized: false,
       },
     },
-  });
+  })
 
   fastify.ready((err) => {
     if (err) {
-      throw err;
+      throw err
     }
 
-    fastify.orm.analytics.runMigrations({ transaction: 'all' });
-  });
-});
+    fastify.orm.analytics.runMigrations({ transaction: 'all' })
+  })
+})

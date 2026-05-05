@@ -1,19 +1,12 @@
-import {
-  TokenHolderRepository,
-  tokenHolderRepositorySymbol,
-  TokenHolderPoint,
-} from '@cowprotocol/repositories';
-import { SupportedChainId } from '@cowprotocol/cow-sdk';
-import { injectable, inject } from 'inversify';
+import { TokenHolderRepository, tokenHolderRepositorySymbol, TokenHolderPoint } from '@cowprotocol/repositories'
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { injectable, inject } from 'inversify'
 
 export interface TokenHolderService {
-  getTopTokenHolders(
-    chainId: SupportedChainId,
-    tokenAddress: string
-  ): Promise<TokenHolderPoint[] | null>;
+  getTopTokenHolders(chainId: SupportedChainId, tokenAddress: string): Promise<TokenHolderPoint[] | null>
 }
 
-export const tokenHolderServiceSymbol = Symbol.for('TokenHolderService');
+export const tokenHolderServiceSymbol = Symbol.for('TokenHolderService')
 
 @injectable()
 export class TokenHolderServiceMain implements TokenHolderService {
@@ -22,10 +15,7 @@ export class TokenHolderServiceMain implements TokenHolderService {
     private tokenHolderRepository: TokenHolderRepository
   ) {}
 
-  async getTopTokenHolders(
-    chainId: SupportedChainId,
-    tokenAddress: string
-  ): Promise<TokenHolderPoint[] | null> {
-    return this.tokenHolderRepository.getTopTokenHolders(chainId, tokenAddress);
+  async getTopTokenHolders(chainId: SupportedChainId, tokenAddress: string): Promise<TokenHolderPoint[] | null> {
+    return this.tokenHolderRepository.getTopTokenHolders(chainId, tokenAddress)
   }
 }
