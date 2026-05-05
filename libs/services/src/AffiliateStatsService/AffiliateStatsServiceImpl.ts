@@ -1,3 +1,4 @@
+import { getAddressKey } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
 import { DuneRepository } from '@cowprotocol/repositories'
 import {
@@ -26,7 +27,7 @@ import {
   normalizeTraderStatsRow,
 } from './AffiliateStatsService.utils'
 
-const DEFAULT_TRADER_ACTIVITY_LIMIT = 20
+const DEFAULT_TRADER_ACTIVITY_LIMIT = 50
 
 export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   private readonly duneRepository: DuneRepository
@@ -39,7 +40,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   }
 
   async getTraderStats(address: string): Promise<TraderStatsResult> {
-    const normalizedAddress = address.toLowerCase()
+    const normalizedAddress = getAddressKey(address)
     const { rows, lastUpdatedAt } = await this.getCachedQuery<TraderStatsRowRaw, TraderStatsRow>({
       cacheKey: 'affiliate-trader-stats',
       queryId: getDuneQueryIds().traderStats,
@@ -47,13 +48,13 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       mapRow: normalizeTraderStatsRow,
     })
 
-    const filtered = rows.filter((row) => row.trader_address.toLowerCase() === normalizedAddress)
+    const filtered = rows.filter((row) => getAddressKey(row.trader_address) === normalizedAddress)
 
     return { rows: filtered, lastUpdatedAt }
   }
 
   async getTraderActivity(address: string): Promise<TraderActivityResult> {
-    const normalizedAddress = address.toLowerCase()
+    const normalizedAddress = getAddressKey(address)
     const cacheKey = `affiliate-trader-activity:${normalizedAddress}:${DEFAULT_TRADER_ACTIVITY_LIMIT}`
     const cached = this.getCache<TraderActivityRow>(cacheKey)
 
@@ -73,7 +74,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
         typeAssertion: isTraderActivityRowRaw,
         mapRow: normalizeTraderActivityRow,
       })
-      const filteredRows = duneRows.filter((row) => row.trader_address.toLowerCase() === normalizedAddress)
+      const filteredRows = duneRows.filter((row) => getAddressKey(row.trader_address) === normalizedAddress)
       const rows = filteredRows.slice(0, DEFAULT_TRADER_ACTIVITY_LIMIT)
 
       this.setCache(cacheKey, rows, lastUpdatedAt)
@@ -86,7 +87,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
   }
 
   async getAffiliateStats(address: string): Promise<AffiliateStatsResult> {
-    const normalizedAddress = address.toLowerCase()
+    const normalizedAddress = getAddressKey(address)
     const { rows, lastUpdatedAt } = await this.getCachedQuery<AffiliateStatsRowRaw, AffiliateStatsRow>({
       cacheKey: 'affiliate-stats',
       queryId: getDuneQueryIds().affiliateStats,
@@ -94,7 +95,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       mapRow: normalizeAffiliateStatsRow,
     })
 
-    const filtered = rows.filter((row) => row.affiliate_address.toLowerCase() === normalizedAddress)
+    const filtered = rows.filter((row) => getAddressKey(row.affiliate_address) === normalizedAddress)
 
     return { rows: filtered, lastUpdatedAt }
   }

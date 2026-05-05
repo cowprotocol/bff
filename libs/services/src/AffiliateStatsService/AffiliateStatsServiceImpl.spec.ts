@@ -9,6 +9,9 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import type { TraderActivityRowRaw } from './AffiliateStatsService.types'
 import { AffiliateStatsServiceImpl } from './AffiliateStatsServiceImpl'
 
+const TRADER_ADDRESS = '0x0000000000000000000000000000000000000abc'
+const TRADER_ADDRESS_CHECKSUM = '0x0000000000000000000000000000000000000AbC'
+
 class MockDuneRepository implements DuneRepository {
   public readonly executeQueryMock = jest.fn<
     Promise<DuneExecutionResponse>,
@@ -87,7 +90,7 @@ function createTraderActivityRowRaw(overrides: Partial<TraderActivityRowRaw> = {
     creation_date: '2026-03-18 10:00:00.000 UTC',
     tx_hash: '0x123',
     order_uid: 'uid-1',
-    trader_address: '0xabc',
+    trader_address: TRADER_ADDRESS,
     sell_token: '0xsell-dune',
     buy_token: '0xbuy-dune',
     sell_token_symbol: 'SELL',
@@ -128,7 +131,7 @@ describe('AffiliateStatsServiceImpl', () => {
     duneRepository.getQueryResultsMock.mockResolvedValue(duneRepository.createResult([row]))
 
     const service = new AffiliateStatsServiceImpl(duneRepository, 60_000)
-    const result = await service.getTraderActivity('0xAbC')
+    const result = await service.getTraderActivity(TRADER_ADDRESS_CHECKSUM)
 
     expect(duneRepository.getQueryResultsMock).toHaveBeenCalledWith({
       queryId: 102,
@@ -168,7 +171,7 @@ describe('AffiliateStatsServiceImpl', () => {
     duneRepository.getQueryResultsMock.mockResolvedValue(duneRepository.createResult([]))
 
     const service = new AffiliateStatsServiceImpl(duneRepository, 60_000)
-    const result = await service.getTraderActivity('0xabc')
+    const result = await service.getTraderActivity(TRADER_ADDRESS)
 
     expect(result.rows).toEqual([])
     expect(result.lastUpdatedAt).toBe('2026-03-18T10:00:01.000Z')
@@ -180,8 +183,8 @@ describe('AffiliateStatsServiceImpl', () => {
 
     const service = new AffiliateStatsServiceImpl(duneRepository, 60_000)
 
-    await service.getTraderActivity('0xabc')
-    await service.getTraderActivity('0xAbC')
+    await service.getTraderActivity(TRADER_ADDRESS)
+    await service.getTraderActivity(TRADER_ADDRESS_CHECKSUM)
 
     expect(duneRepository.getQueryResultsMock).toHaveBeenCalledTimes(1)
     expect(duneRepository.executeQueryMock).not.toHaveBeenCalled()
@@ -196,7 +199,7 @@ describe('AffiliateStatsServiceImpl', () => {
 
     const service = new AffiliateStatsServiceImpl(duneRepository, 60_000)
 
-    await expect(service.getTraderActivity('0xabc')).rejects.toThrow(
+    await expect(service.getTraderActivity(TRADER_ADDRESS)).rejects.toThrow(
       'Unsupported affiliate trader activity blockchain: unknown-chain'
     )
   })
