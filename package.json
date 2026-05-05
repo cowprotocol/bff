@@ -1,5 +1,5 @@
 {
-  "name": "@cowprotocol/root",
+  "name": "cowswap-bff",
   "description": "Backend for frontend is a series of backend services and libraries that enhance user experience for the frontend",
   "version": "0.28.0",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "build": "nx run-many --all --target=build",
     "test": "nx run-many --all --target=test",
     "lint": "nx run-many --all --target=lint",
+    "lint:fix": "nx run-many --all --target=lint --fix --skip-nx-cache",
     "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
     "new:node": "nx generate @nx/node:application --directory=apps --docker",
     "new:lib": "nx g @nx/node:library --directory=libs",
@@ -98,6 +99,7 @@
     "esbuild": "^0.17.17",
     "eslint": "~8.15.0",
     "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "fastify-tsconfig": "^1.0.1",
     "jest": "^29.5.0",
     "jest-environment-node": "^29.4.1",

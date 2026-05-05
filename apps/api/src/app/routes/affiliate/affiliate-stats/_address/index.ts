@@ -54,7 +54,7 @@ const affiliateStats: FastifyPluginAsync = async (fastify): Promise<void> => {
           lastUpdatedAt: result.lastUpdatedAt,
         });
       } catch (error) {
-        fastify.log.error('Error fetching affiliate stats:', error);
+        fastify.log.error({ err: error }, 'Error fetching affiliate stats');
         return reply.status(500).send({ message: 'Unexpected error' });
       }
     }

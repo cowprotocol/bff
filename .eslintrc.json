@@ -1,11 +1,13 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "extends": ["prettier"],
+  "plugins": ["@nx", "prettier"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
+        "prettier/prettier": "warn",
         "@nx/enforce-module-boundaries": [
           "error",
           {
@@ -25,6 +27,12 @@
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
       "rules": {}
+    },
+    {
+      "files": ["libs/repositories/src/gen/**/*.ts"],
+      "rules": {
+        "prettier/prettier": "off"
+      }
     },
     {
       "files": ["*.js", "*.jsx"],
