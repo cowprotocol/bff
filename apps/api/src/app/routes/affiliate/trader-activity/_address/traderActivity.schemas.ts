@@ -39,6 +39,8 @@ export const traderActivityRowSchema = {
     trader_address: { type: 'string' },
     sell_token: { type: 'string' },
     buy_token: { type: 'string' },
+    sell_token_symbol: { type: 'string' },
+    buy_token_symbol: { type: 'string' },
     executed_sell_amount: { type: 'string' },
     executed_buy_amount: { type: 'string' },
     usd_value: { type: 'number' },

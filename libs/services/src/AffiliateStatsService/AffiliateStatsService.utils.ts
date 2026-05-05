@@ -52,6 +52,8 @@ export function isTraderActivityRowRaw(data: unknown): data is TraderActivityRow
     isString(data.trader_address) &&
     isString(data.sell_token) &&
     isString(data.buy_token) &&
+    (data.sell_token_symbol == null || isString(data.sell_token_symbol)) &&
+    (data.buy_token_symbol == null || isString(data.buy_token_symbol)) &&
     isNumeric(data.executed_sell_amount) &&
     isNumeric(data.executed_buy_amount) &&
     isNumeric(data.usd_value) &&
@@ -107,6 +109,8 @@ export function normalizeTraderActivityRow(row: TraderActivityRowRaw): TraderAct
     trader_address: row.trader_address,
     sell_token: row.sell_token,
     buy_token: row.buy_token,
+    sell_token_symbol: row.sell_token_symbol || undefined,
+    buy_token_symbol: row.buy_token_symbol || undefined,
     executed_sell_amount: toDecimalString(row.executed_sell_amount, 'executed_sell_amount'),
     executed_buy_amount: toDecimalString(row.executed_buy_amount, 'executed_buy_amount'),
     usd_value: toNumber(row.usd_value, 'usd_value'),
