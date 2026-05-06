@@ -1,4 +1,4 @@
-import { getAddressKey } from '@cowprotocol/cow-sdk'
+import { areAddressesEqual, getAddressKey } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
 import { DuneRepository } from '@cowprotocol/repositories'
 import {
@@ -47,7 +47,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       mapRow: normalizeTraderStatsRow,
     })
 
-    const filtered = rows.filter((row) => getAddressKey(row.trader_address) === normalizedAddress)
+    const filtered = rows.filter((row) => areAddressesEqual(row.trader_address, normalizedAddress))
 
     return { rows: filtered, lastUpdatedAt }
   }
@@ -73,7 +73,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
         typeAssertion: isTraderActivityRowRaw,
         mapRow: normalizeTraderActivityRow,
       })
-      const filteredRows = duneRows.filter((row) => getAddressKey(row.trader_address) === normalizedAddress)
+      const filteredRows = duneRows.filter((row) => areAddressesEqual(row.trader_address, normalizedAddress))
       const rows = filteredRows.slice(0, DEFAULT_TRADER_ACTIVITY_LIMIT)
 
       this.setCache(cacheKey, rows, lastUpdatedAt)
@@ -94,7 +94,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
       mapRow: normalizeAffiliateStatsRow,
     })
 
-    const filtered = rows.filter((row) => getAddressKey(row.affiliate_address) === normalizedAddress)
+    const filtered = rows.filter((row) => areAddressesEqual(row.affiliate_address, normalizedAddress))
 
     return { rows: filtered, lastUpdatedAt }
   }
