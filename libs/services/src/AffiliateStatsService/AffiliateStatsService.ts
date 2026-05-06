@@ -13,27 +13,6 @@ export interface TraderStatsRow<T = number> {
   next_payout: T
 }
 
-export interface TraderActivityDuneRow<T = number> {
-  chain_id: number
-  creation_date: string
-  tx_hash: string
-  order_uid: string
-  trader_address: string
-  sell_token: string
-  buy_token: string
-  sell_token_symbol?: string
-  buy_token_symbol?: string
-  executed_sell_amount: string
-  executed_buy_amount: string
-  usd_value: T
-  eligible_volume_usd: T
-  referrer_code: string
-  bound_referrer_code: string
-  eligibility_reason: string
-  is_bound_to_code: boolean
-  is_eligible: boolean
-}
-
 export interface TraderActivityRow<T = number> {
   chain_id: number
   creation_date: string

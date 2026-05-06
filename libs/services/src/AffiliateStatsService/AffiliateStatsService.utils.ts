@@ -1,6 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import { BigNumber } from 'bignumber.js'
-import type { AffiliateStatsRow, TraderActivityDuneRow, TraderStatsRow } from './AffiliateStatsService'
+import type { AffiliateStatsRow, TraderActivityRow, TraderStatsRow } from './AffiliateStatsService'
 import type { AffiliateStatsRowRaw, TraderActivityRowRaw, TraderStatsRowRaw } from './AffiliateStatsService.types'
 import { isNumeric, isRecord, isString, toNumber } from '../utils/type-checking-utils'
 
@@ -100,7 +100,7 @@ export function normalizeTraderStatsRow(row: TraderStatsRowRaw): TraderStatsRow 
   }
 }
 
-export function normalizeTraderActivityRow(row: TraderActivityRowRaw): TraderActivityDuneRow {
+export function normalizeTraderActivityRow(row: TraderActivityRowRaw): TraderActivityRow {
   return {
     chain_id: getChainId(row.blockchain),
     creation_date: row.creation_date,

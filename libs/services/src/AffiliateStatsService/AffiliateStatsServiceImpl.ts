@@ -5,7 +5,6 @@ import {
   AffiliateStatsResult,
   AffiliateStatsRow,
   AffiliateStatsService,
-  TraderActivityDuneRow,
   TraderActivityResult,
   TraderActivityRow,
   TraderStatsResult,
@@ -60,7 +59,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
 
     if (cached) {
       return {
-        rows: cached.rows as TraderActivityRow[],
+        rows: cached.rows,
         lastUpdatedAt: cached.lastUpdatedAt,
       }
     }
@@ -68,7 +67,7 @@ export class AffiliateStatsServiceImpl implements AffiliateStatsService {
     logger.debug(`Affiliate stats cache miss for ${cacheKey}.`)
 
     try {
-      const { rows: duneRows, lastUpdatedAt } = await this.getCachedQuery<TraderActivityRowRaw, TraderActivityDuneRow>({
+      const { rows: duneRows, lastUpdatedAt } = await this.getCachedQuery<TraderActivityRowRaw, TraderActivityRow>({
         cacheKey: 'affiliate-trader-activity',
         queryId: getDuneQueryIds().traderActivity,
         typeAssertion: isTraderActivityRowRaw,
