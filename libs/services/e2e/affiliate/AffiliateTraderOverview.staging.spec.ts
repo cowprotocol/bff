@@ -1,4 +1,4 @@
-import { getAffiliateStatsService, PROD_QUERY_IDS, STAGING_QUERY_IDS, STAGING_TRADERS } from './AffiliateTests.const'
+import { getAffiliateStatsService, PROD_QUERY_IDS, PROD_TRADERS, STAGING_QUERY_IDS, STAGING_TRADERS } from './AffiliateTests.const'
 import type { TraderStatsResult } from '../../src'
 
 jest.setTimeout(30_000)
@@ -8,7 +8,7 @@ describe('Affiliate trader overview Dune query results', () => {
     const service = getAffiliateStatsService(PROD_QUERY_IDS)
     const traderOverview: Record<string, TraderStatsResult> = {}
 
-    for (const traderAddress of STAGING_TRADERS) {
+    for (const traderAddress of PROD_TRADERS) {
       traderOverview[traderAddress] = await service.getTraderStats(traderAddress)
     }
 

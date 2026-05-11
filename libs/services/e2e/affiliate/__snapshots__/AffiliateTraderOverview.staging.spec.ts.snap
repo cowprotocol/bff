@@ -2,22 +2,33 @@
 
 exports[`Affiliate trader overview Dune query results snapshots prod trader overview: prod 1`] = `
 {
-  "0x494721305c8947532e9d2860f2cf5ed79f76ab5f": {
+  "0x00a7cbcfb2162239b5cb112c8e7ad0b799f670b2": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 8.953646717994811,
-        "left_to_next_rewards": 1.0463532820051888,
-        "linked_since": "2026-03-12 15:09:11.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-13 15:09:11.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x494721305c8947532e9d2860f2cf5ed79f76ab5f",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
+  },
+  "0x161394bbf9a95f33224a9e4e3561120922444359": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
+  },
+  "0x222f1e12f405fde96354c8dc14b126a847bead48": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
+  },
+  "0x3eb5988c37991e661b83106f951db33785a58912": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
+  },
+  "0x48215a1381995aa7f947699194037017e5192661": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
+  },
+  "0x4936167dae4160e5556d9294f2c78675659a3b63": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
+  },
+  "0x563a1b3c8f5012afa5470bd1459d8fe1fe825dba": {
+    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
+    "rows": [],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
@@ -36,260 +47,53 @@ exports[`Affiliate trader overview Dune query results snapshots prod trader over
       },
     ],
   },
-  "0x65febbc2c8beb66b0819bacb1f9fe29aaf3671e7": {
+  "0x5bb4314fc60eec585238513c64cdd44584d07f26": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 0.938728662289,
-        "left_to_next_rewards": 9.061271337711,
-        "linked_since": "2026-03-20 15:14:25.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-21 15:14:25.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x65febbc2c8beb66b0819bacb1f9fe29aaf3671e7",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x6e4bd8d3a2cd8026b33be812582eebd3cf1f737c": {
+  "0x6345d8cebe906c721513debcfff6de2833a87d16": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 5.688505608705521,
-        "left_to_next_rewards": 4.311494391294479,
-        "linked_since": "2026-03-19 13:42:25.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-20 13:42:25.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x6e4bd8d3a2cd8026b33be812582eebd3cf1f737c",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x6fc1fb2e17dff120fa8f838af139af443070fd0e": {
+  "0x64106af7eb803962e8f4e814e3f09935b2f0548a": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "FOOBAR",
-        "eligible_volume": 10.002770000000002,
-        "left_to_next_rewards": 9.997229999999998,
-        "linked_since": "2026-01-19 15:17:23.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-01-20 15:17:23.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0x6fc1fb2e17dff120fa8f838af139af443070fd0e",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x89e57bb2fd0aea41afe09c82509b3495e09cd4f1": {
+  "0x67202f3de01ad7bbe8a7e60c31662c6310209105": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "MOOOO",
-        "eligible_volume": 10.90290961071084,
-        "left_to_next_rewards": 9.09709038928916,
-        "linked_since": "2026-02-26 14:09:27.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-02-27 14:09:27.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0x89e57bb2fd0aea41afe09c82509b3495e09cd4f1",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x8b2da158bf62c024ebf2e89ee45128fcb17cc395": {
+  "0x69b67903ada8a31f0e3ec5b6721d23a7e688dfbd": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 10.72215403,
-        "left_to_next_rewards": 9.27784597,
-        "linked_since": "2026-02-11 16:04:53.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-02-12 16:04:53.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0x8b2da158bf62c024ebf2e89ee45128fcb17cc395",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x8c3d9160b69de224f25151d94cecf6558127785e": {
+  "0x6de7943421c3c924808b6e173b9a656b447b1d78": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "MOOOO",
-        "eligible_volume": 2.99982,
-        "left_to_next_rewards": 7.00018,
-        "linked_since": "2026-03-09 11:46:00.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-10 11:46:00.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x8c3d9160b69de224f25151d94cecf6558127785e",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x9425596dc3a37af56d8d531d74c22eb675ebbd11": {
+  "0x789b917ec151791f673367655f25fea5d50aa071": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 6.2806066,
-        "left_to_next_rewards": 3.7193934000000004,
-        "linked_since": "2026-02-11 15:17:17.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-02-12 15:17:17.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x9425596dc3a37af56d8d531d74c22eb675ebbd11",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x9474b4f33b18ca96c6b843a5a8b67e4247c3b57a": {
+  "0x7e930856351d6119fe3b1ebc56683d8096629e1a": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 1.99964,
-        "left_to_next_rewards": 8.00036,
-        "linked_since": "2026-03-06 16:00:08.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-07 16:00:08.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x9474b4f33b18ca96c6b843a5a8b67e4247c3b57a",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0x9d3149a92158d6d450ab88dac3f255101c4d2e5a": {
+  "0x8176104c11772b8a4c22dd931c9176836cb812ee": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 10.89360486292,
-        "left_to_next_rewards": 9.10639513708,
-        "linked_since": "2026-03-05 09:22:28.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-03-06 09:22:28.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0x9d3149a92158d6d450ab88dac3f255101c4d2e5a",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0xa7f90dcd9661d855f7d9fd3431efca46f3ca23d9": {
+  "0x8b0c2cf694447e286bc65f9d5f9b55299ebce4b6": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "00000000000000000000",
-        "eligible_volume": 15.822211571138885,
-        "left_to_next_rewards": 4.177788428861115,
-        "linked_since": "2026-04-09 13:00:59.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-04-10 13:00:59.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0xa7f90dcd9661d855f7d9fd3431efca46f3ca23d9",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0xb594b8645d43b72046d821c2404c3f63faa958db": {
+  "0xd3ca8d63a5659a252ff40bf8acfc9610c22ab918": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 1.7102421845831741,
-        "left_to_next_rewards": 8.289757815416825,
-        "linked_since": "2026-03-20 13:30:49.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-21 13:30:49.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0xb594b8645d43b72046d821c2404c3f63faa958db",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
-  "0xbbf6b62ec48e99f545446f72d38460fb66e16feb": {
+  "0xee96d72a4451311ccd5c43a0ba6ce36f1ce63a2b": {
     "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "MOOOO",
-        "eligible_volume": 3.9984329843027333,
-        "left_to_next_rewards": 6.001567015697267,
-        "linked_since": "2026-03-09 11:55:35.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-10 11:55:35.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0xbbf6b62ec48e99f545446f72d38460fb66e16feb",
-        "trigger_volume": 10,
-      },
-    ],
-  },
-  "0xbc2e953bf9a90b295918f0d6d2d2c9dcdedceed4": {
-    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "LEANDRO-05",
-        "eligible_volume": 4.017064707001236,
-        "left_to_next_rewards": 5.982935292998764,
-        "linked_since": "2026-02-05 18:36:45.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-02-06 18:36:45.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0xbc2e953bf9a90b295918f0d6d2d2c9dcdedceed4",
-        "trigger_volume": 10,
-      },
-    ],
-  },
-  "0xc1f88cf854d66b1f5a654cbeb7e39265d062012c": {
-    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 10.271059318047115,
-        "left_to_next_rewards": 9.728940681952885,
-        "linked_since": "2026-03-19 13:11:53.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-03-20 13:11:53.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0xc1f88cf854d66b1f5a654cbeb7e39265d062012c",
-        "trigger_volume": 10,
-      },
-    ],
-  },
-  "0xfb09f8792838b0c868deccf72d40c8235b59f6cb": {
-    "lastUpdatedAt": "2026-05-11T02:20:56.5293Z",
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 2.001104,
-        "left_to_next_rewards": 7.998896,
-        "linked_since": "2026-02-10 15:43:06.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-02-11 15:43:06.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0xfb09f8792838b0c868deccf72d40c8235b59f6cb",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
 }
 `;
