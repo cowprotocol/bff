@@ -6,6 +6,7 @@ import {
   STAGING_QUERY_IDS,
   STAGING_TRADERS,
 } from './AffiliateTests.const'
+import { sanitize } from './snapshot.utils'
 import type { TraderActivityResult } from '../../src'
 
 jest.setTimeout(30_000)
@@ -19,7 +20,7 @@ describe('Affiliate trader activity Dune query results', () => {
       traderActivity[traderAddress] = await service.getTraderActivity(traderAddress)
     }
 
-    expect(traderActivity).toMatchSnapshot('prod')
+    expect(sanitize(traderActivity)).toMatchSnapshot('prod')
   })
 
   it('snapshots staging trader activity', async () => {
@@ -30,6 +31,6 @@ describe('Affiliate trader activity Dune query results', () => {
       traderActivity[traderAddress] = await service.getTraderActivity(traderAddress)
     }
 
-    expect(traderActivity).toMatchSnapshot('staging')
+    expect(sanitize(traderActivity)).toMatchSnapshot('staging')
   })
 })

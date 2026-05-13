@@ -1,4 +1,11 @@
-import { getAffiliateStatsService, PROD_PARTNERS, PROD_QUERY_IDS, STAGING_PARTNERS, STAGING_QUERY_IDS } from './AffiliateTests.const'
+import {
+  getAffiliateStatsService,
+  PROD_PARTNERS,
+  PROD_QUERY_IDS,
+  STAGING_PARTNERS,
+  STAGING_QUERY_IDS,
+} from './AffiliateTests.const'
+import { sanitize } from './snapshot.utils'
 import type { AffiliateStatsResult } from '../../src'
 
 jest.setTimeout(30_000)
@@ -12,7 +19,7 @@ describe('Affiliate partner overview Dune query results', () => {
       partnerOverview[partnerAddress] = await service.getAffiliateStats(partnerAddress)
     }
 
-    expect(partnerOverview).toMatchSnapshot('prod')
+    expect(sanitize(partnerOverview)).toMatchSnapshot('prod')
   })
 
   it('snapshots staging partner overview', async () => {
@@ -23,6 +30,6 @@ describe('Affiliate partner overview Dune query results', () => {
       partnerOverview[partnerAddress] = await service.getAffiliateStats(partnerAddress)
     }
 
-    expect(partnerOverview).toMatchSnapshot('staging')
+    expect(sanitize(partnerOverview)).toMatchSnapshot('staging')
   })
 })

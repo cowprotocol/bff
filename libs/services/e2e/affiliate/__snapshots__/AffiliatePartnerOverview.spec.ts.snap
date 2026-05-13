@@ -3,31 +3,24 @@
 exports[`Affiliate partner overview Dune query results snapshots prod partner overview: prod 1`] = `
 {
   "0x2c6e2e2eb9153631aa098d671df870a0f9026d74": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x48825198628fe6109603d4693cd5074c47716518": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x72cc486baafb0804c1a1f4260432688c10d7ad99": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x798ff1e6d7afd28c333ee6ebe03125d30ec6ef10": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x7babf976fbd6f420fbae9f5b3622209cfdd5a759": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x8335459a89a17ed8ed128aa98f9af86802dacf30": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
   "0x9fa3c00a92ec5f96b1ad2527ab41b3932efeda58": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -44,7 +37,6 @@ exports[`Affiliate partner overview Dune query results snapshots prod partner ov
     ],
   },
   "0xd26a907dcaaa0e4393972283e662eb272a173944": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [],
   },
 }
@@ -53,7 +45,6 @@ exports[`Affiliate partner overview Dune query results snapshots prod partner ov
 exports[`Affiliate partner overview Dune query results snapshots staging partner overview: staging 1`] = `
 {
   "0x105eb43614808bbf301e7352aaccb4f9e2e596bb": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -70,7 +61,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x113692fef6415bdb421d8825913ddee50475b9c4": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -87,7 +77,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x28f5e28dff9df9cbbc611dab888cbbe87bdf020d": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -104,7 +93,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x3de0a3f95eb59dc208fbedeaac43f5197c39709d": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -121,7 +109,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x5345801b243ea1e53c92daca50ef498d0f197cb9": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -138,7 +125,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -155,7 +141,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x5b0abe214ab7875562adee331deff0fe1912fe42": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -172,7 +157,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x6fc1fb2e17dff120fa8f838af139af443070fd0e": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -189,7 +173,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x9425596dc3a37af56d8d531d74c22eb675ebbd11": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -206,7 +189,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0x9fa3c00a92ec5f96b1ad2527ab41b3932efeda58": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -223,7 +205,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xaa248d5328c7d781a96d93d7d013bcf393157bb4": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -240,7 +221,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xb2f08dede8c84ee19eb90035d07391a91cf1a871": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -257,7 +237,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xca011d01a4b75a36afb5e2b69e0ba8f01c6b500e": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -274,7 +253,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xd74718dcf9d21176a7ccacb904e3236712e80383": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -291,7 +269,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xde1e8eedd42cd284a3052d987502d0b24c633fee": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -308,7 +285,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xee7983b9449c74cc1eff5793dcc336275015fba0": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -325,7 +301,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xfb09f8792838b0c868deccf72d40c8235b59f6cb": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -342,7 +317,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xfc1dfbc69feda4611b913d5ae7b7b48fb5909c02": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,
@@ -359,7 +333,6 @@ exports[`Affiliate partner overview Dune query results snapshots staging partner
     ],
   },
   "0xfe84a86803952041ecccb584300eb66c601bfec1": {
-    "lastUpdatedAt": "2026-05-11T02:22:55.199959Z",
     "rows": [
       {
         "active_traders": 0,

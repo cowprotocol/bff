@@ -3,7 +3,6 @@
 exports[`Affiliate trader activity Dune query results snapshots prod trader activity: prod 1`] = `
 {
   "0x00a7cbcfb2162239b5cb112c8e7ad0b799f670b2": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -128,11 +127,9 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x04501b9b1d52e67f6862d157e00d13419d2d6e95": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [],
   },
   "0x161394bbf9a95f33224a9e4e3561120922444359": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -157,7 +154,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x222f1e12f405fde96354c8dc14b126a847bead48": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -282,7 +278,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x3eb5988c37991e661b83106f951db33785a58912": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -307,7 +302,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x48215a1381995aa7f947699194037017e5192661": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -432,7 +426,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x4936167dae4160e5556d9294f2c78675659a3b63": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-349243",
@@ -457,7 +450,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x563a1b3c8f5012afa5470bd1459d8fe1fe825dba": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -582,7 +574,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -607,7 +598,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x5bb4314fc60eec585238513c64cdd44584d07f26": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "DEFILLAMA",
@@ -672,7 +662,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x6345d8cebe906c721513debcfff6de2833a87d16": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-817614",
@@ -897,7 +886,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x64106af7eb803962e8f4e814e3f09935b2f0548a": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "SINONCHAIN",
@@ -962,7 +950,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x67202f3de01ad7bbe8a7e60c31662c6310209105": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -1087,7 +1074,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x69b67903ada8a31f0e3ec5b6721d23a7e688dfbd": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -1112,7 +1098,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x6de7943421c3c924808b6e173b9a656b447b1d78": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-764676",
@@ -1277,7 +1262,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x789b917ec151791f673367655f25fea5d50aa071": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "DEFILLAMA",
@@ -1302,7 +1286,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x7e930856351d6119fe3b1ebc56683d8096629e1a": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "DEFILLAMA",
@@ -1327,7 +1310,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x8176104c11772b8a4c22dd931c9176836cb812ee": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -1352,7 +1334,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0x8b0c2cf694447e286bc65f9d5f9b55299ebce4b6": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "COW-498576",
@@ -1377,15 +1358,12 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0xb37add6ac288bd3825a901cba6ec65a89f31b8cc": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [],
   },
   "0xba3cb449bd2b4adddbc894d8697f5170800eadec": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [],
   },
   "0xd3ca8d63a5659a252ff40bf8acfc9610c22ab918": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "DEFILLAMA",
@@ -1410,11 +1388,9 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
     ],
   },
   "0xe227398f066f11e7fa49893bb97cac6caa7790f9": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [],
   },
   "0xee96d72a4451311ccd5c43a0ba6ce36f1ce63a2b": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.15367Z",
     "rows": [
       {
         "bound_referrer_code": "DEFILLAMA",
@@ -1444,7 +1420,6 @@ exports[`Affiliate trader activity Dune query results snapshots prod trader acti
 exports[`Affiliate trader activity Dune query results snapshots staging trader activity: staging 1`] = `
 {
   "0x04501b9b1d52e67f6862d157e00d13419d2d6e95": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "LEANDRO-05",
@@ -1829,7 +1804,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x494721305c8947532e9d2860f2cf5ed79f76ab5f": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -1974,7 +1948,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -1999,7 +1972,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x65febbc2c8beb66b0819bacb1f9fe29aaf3671e7": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2024,7 +1996,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x6e4bd8d3a2cd8026b33be812582eebd3cf1f737c": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2109,7 +2080,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x6fc1fb2e17dff120fa8f838af139af443070fd0e": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "FOOBAR",
@@ -2174,7 +2144,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x89e57bb2fd0aea41afe09c82509b3495e09cd4f1": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "MOOOO",
@@ -2299,7 +2268,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x8b2da158bf62c024ebf2e89ee45128fcb17cc395": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2344,7 +2312,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x8c3d9160b69de224f25151d94cecf6558127785e": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "MOOOO",
@@ -2369,7 +2336,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x9425596dc3a37af56d8d531d74c22eb675ebbd11": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2514,7 +2480,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x9474b4f33b18ca96c6b843a5a8b67e4247c3b57a": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2539,7 +2504,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0x9d3149a92158d6d450ab88dac3f255101c4d2e5a": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -2624,7 +2588,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xa7f90dcd9661d855f7d9fd3431efca46f3ca23d9": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "00000000000000000000",
@@ -2969,7 +2932,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xb37add6ac288bd3825a901cba6ec65a89f31b8cc": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "00000000000000000000",
@@ -3034,7 +2996,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xb594b8645d43b72046d821c2404c3f63faa958db": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -3359,7 +3320,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xba3cb449bd2b4adddbc894d8697f5170800eadec": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "MOOOO",
@@ -3524,7 +3484,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xbbf6b62ec48e99f545446f72d38460fb66e16feb": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "MOOOO",
@@ -3629,7 +3588,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xbc2e953bf9a90b295918f0d6d2d2c9dcdedceed4": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "LEANDRO-05",
@@ -3714,7 +3672,6 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xc1f88cf854d66b1f5a654cbeb7e39265d062012c": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
@@ -3919,11 +3876,9 @@ exports[`Affiliate trader activity Dune query results snapshots staging trader a
     ],
   },
   "0xe227398f066f11e7fa49893bb97cac6caa7790f9": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [],
   },
   "0xfb09f8792838b0c868deccf72d40c8235b59f6cb": {
-    "lastUpdatedAt": "2026-05-11T02:07:05.686946Z",
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
