@@ -24,20 +24,7 @@ exports[`Affiliate trader overview Dune query results snapshots prod trader over
     "rows": [],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 3.824894912676,
-        "left_to_next_rewards": 6.175105087324,
-        "linked_since": "2026-04-02 15:07:23.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-04-03 15:07:23.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
   "0x5bb4314fc60eec585238513c64cdd44584d07f26": {
     "rows": [],
@@ -97,47 +84,21 @@ exports[`Affiliate trader overview Dune query results snapshots staging trader o
     ],
   },
   "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7": {
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 3.824894912676,
-        "left_to_next_rewards": 6.175105087324,
-        "linked_since": "2026-04-02 15:07:23.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-04-03 15:07:23.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x56fd29500c72cc7bae2df0fb3e4ac4e150c1f8e7",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
   "0x65febbc2c8beb66b0819bacb1f9fe29aaf3671e7": {
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 0.938728662289,
-        "left_to_next_rewards": 9.061271337711,
-        "linked_since": "2026-03-20 15:14:25.000 UTC",
-        "next_payout": 0,
-        "paid_out": 0,
-        "rewards_end": "2026-03-21 15:14:25.000 UTC",
-        "total_earned": 0,
-        "trader_address": "0x65febbc2c8beb66b0819bacb1f9fe29aaf3671e7",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
   "0x6e4bd8d3a2cd8026b33be812582eebd3cf1f737c": {
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 5.688505608705521,
-        "left_to_next_rewards": 4.311494391294479,
-        "linked_since": "2026-03-19 13:42:25.000 UTC",
+        "eligible_volume": 1.410266,
+        "left_to_next_rewards": 8.589734,
+        "linked_since": "2026-03-19 13:45:31.000 UTC",
         "next_payout": 0,
         "paid_out": 0,
-        "rewards_end": "2026-03-20 13:42:25.000 UTC",
+        "rewards_end": "2026-03-20 13:45:31.000 UTC",
         "total_earned": 0,
         "trader_address": "0x6e4bd8d3a2cd8026b33be812582eebd3cf1f737c",
         "trigger_volume": 10,
@@ -276,8 +237,8 @@ exports[`Affiliate trader overview Dune query results snapshots staging trader o
     "rows": [
       {
         "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 1.7102421845831741,
-        "left_to_next_rewards": 8.289757815416825,
+        "eligible_volume": 0.041619952184999996,
+        "left_to_next_rewards": 9.958380047815,
         "linked_since": "2026-03-20 13:30:49.000 UTC",
         "next_payout": 0,
         "paid_out": 0,
@@ -321,20 +282,7 @@ exports[`Affiliate trader overview Dune query results snapshots staging trader o
     ],
   },
   "0xc1f88cf854d66b1f5a654cbeb7e39265d062012c": {
-    "rows": [
-      {
-        "bound_referrer_code": "11111111111111111111",
-        "eligible_volume": 10.271059318047115,
-        "left_to_next_rewards": 9.728940681952885,
-        "linked_since": "2026-03-19 13:11:53.000 UTC",
-        "next_payout": 0.66,
-        "paid_out": 0,
-        "rewards_end": "2026-03-20 13:11:53.000 UTC",
-        "total_earned": 0.66,
-        "trader_address": "0xc1f88cf854d66b1f5a654cbeb7e39265d062012c",
-        "trigger_volume": 10,
-      },
-    ],
+    "rows": [],
   },
   "0xfb09f8792838b0c868deccf72d40c8235b59f6cb": {
     "rows": [
