@@ -16,6 +16,7 @@
     "telegram": "nx run telegram:start",
     "build": "nx run-many --all --target=build",
     "test": "nx run-many --all --target=test",
+    "test:e2e": "nx run-many --all --target=test:e2e",
     "lint": "nx run-many --all --target=lint",
     "lint:fix": "nx run-many --all --target=lint --fix --skip-nx-cache",
     "new:fastify": "nx generate @nx/node:application --framework=fastify --docker --directory=apps",
