@@ -9,7 +9,10 @@ const AUTHORIZED_ORIGINS = (() => {
     return []
   }
 
-  return domains.split(',').map((domain) => domain.trim())
+  return domains
+    .split(',')
+    .map((domain) => domain.trim().toLowerCase())
+    .filter(Boolean)
 })()
 
 export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
@@ -26,7 +29,7 @@ export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
       // Origin should be present
       !origin ||
       // The origin should be explicitly authorized
-      (!AUTHORIZED_ORIGINS.some((authorizedOrigin) => origin.endsWith(authorizedOrigin)) &&
+      (!isAuthorizedOrigin(origin) &&
         // Make an exception for localhost
         !isLocalhost(origin))
     ) {
@@ -45,6 +48,33 @@ function isLocalhost(origin: string): boolean {
     return false
   }
   return /^http:\/\/localhost:\d+\/?$/.test(origin)
+}
+
+function isAuthorizedOrigin(origin: string): boolean {
+  const url = parseOrigin(origin)
+  if (!url || url.protocol !== 'https:' || url.port) {
+    return false
+  }
+
+  const hostname = url.hostname.toLowerCase()
+
+  return AUTHORIZED_ORIGINS.some((authorizedOrigin) => isAuthorizedHostname(hostname, authorizedOrigin))
+}
+
+function isAuthorizedHostname(hostname: string, authorizedOrigin: string): boolean {
+  if (authorizedOrigin.startsWith('.')) {
+    return hostname.endsWith(authorizedOrigin) && hostname.length > authorizedOrigin.length
+  }
+
+  return hostname === authorizedOrigin
+}
+
+function parseOrigin(origin: string): URL | null {
+  try {
+    return new URL(origin)
+  } catch {
+    return null
+  }
 }
 
 export default fp(bffAuth, { fastify: '4.x', name: 'bffAuth' })
