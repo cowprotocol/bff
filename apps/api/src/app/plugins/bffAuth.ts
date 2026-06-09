@@ -3,21 +3,11 @@ import { FastifyPluginCallback } from 'fastify'
 
 const PROTECTED_PATHS = ['/proxies']
 
-const AUTHORIZED_ORIGINS = (() => {
-  const domains = process.env.AUTHORIZED_ORIGINS
-  if (!domains) {
-    return []
-  }
-
-  return domains
-    .split(',')
-    .map((domain) => domain.trim().toLowerCase())
-    .filter(Boolean)
-})()
+const AUTHORIZED_ORIGINS = parseAuthorizedOrigins(process.env.AUTHORIZED_ORIGINS)
 
 export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.addHook('onRequest', async (request, reply) => {
-    // Return early if its an unprotected path
+    // Return early if auth is not configured or its an unprotected path
     if (AUTHORIZED_ORIGINS.length === 0 || !PROTECTED_PATHS.some((path) => request.url.startsWith(path))) {
       return
     }
@@ -48,6 +38,23 @@ function isLocalhost(origin: string): boolean {
     return false
   }
   return /^http:\/\/localhost:\d+\/?$/.test(origin)
+}
+
+function parseAuthorizedOrigins(domains: string | undefined): string[] {
+  if (domains === undefined) {
+    return []
+  }
+
+  const authorizedOrigins = domains
+    .split(',')
+    .map((domain) => domain.trim().toLowerCase())
+    .filter(Boolean)
+
+  if (authorizedOrigins.length === 0) {
+    throw new Error('Malformed AUTHORIZED_ORIGINS: expected at least one hostname')
+  }
+
+  return authorizedOrigins
 }
 
 function isAuthorizedOrigin(origin: string): boolean {

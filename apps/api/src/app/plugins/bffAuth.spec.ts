@@ -24,28 +24,46 @@ async function buildApp(authorizedOrigins?: string): Promise<FastifyInstance> {
   return app
 }
 
-function protectedRequest(app: FastifyInstance, origin?: string) {
-  return app.inject({
+function protectedRequest(app: FastifyInstance | undefined, origin?: string) {
+  return requireApp(app).inject({
     method: 'GET',
     url: '/proxies/test',
     headers: origin ? { origin } : undefined,
   })
 }
 
-function publicRequest(app: FastifyInstance, origin: string) {
-  return app.inject({
+function publicRequest(app: FastifyInstance | undefined, origin: string) {
+  return requireApp(app).inject({
     method: 'GET',
     url: '/public/test',
     headers: { origin },
   })
 }
 
+function requireApp(app: FastifyInstance | undefined): FastifyInstance {
+  if (!app) {
+    throw new Error('Fastify app was not initialized')
+  }
+  return app
+}
+
 describe('bffAuth', () => {
-  let app: FastifyInstance
+  let app: FastifyInstance | undefined
 
   afterEach(async () => {
     await app?.close()
+    app = undefined
     delete process.env.AUTHORIZED_ORIGINS
+  })
+
+  it('fails startup when AUTHORIZED_ORIGINS is set but contains no valid entries', () => {
+    process.env.AUTHORIZED_ORIGINS = ' , '
+
+    expect(() => {
+      jest.isolateModules(() => {
+        require('./bffAuth')
+      })
+    }).toThrow('Malformed AUTHORIZED_ORIGINS: expected at least one hostname')
   })
 
   describe('when AUTHORIZED_ORIGINS is not set', () => {
