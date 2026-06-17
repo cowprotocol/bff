@@ -42,6 +42,9 @@ function isLocalhost(origin: string): boolean {
 
 function parseAuthorizedOrigins(domains: string | undefined): string[] {
   if (domains === undefined) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Missing AUTHORIZED_ORIGINS in production')
+    }
     return []
   }
 

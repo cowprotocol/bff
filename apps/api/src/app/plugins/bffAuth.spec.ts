@@ -66,6 +66,26 @@ describe('bffAuth', () => {
     }).toThrow('Malformed AUTHORIZED_ORIGINS: expected at least one hostname')
   })
 
+  it('fails startup in production when AUTHORIZED_ORIGINS is not set', () => {
+    const originalNodeEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'production'
+    delete process.env.AUTHORIZED_ORIGINS
+
+    try {
+      expect(() => {
+        jest.isolateModules(() => {
+          require('./bffAuth')
+        })
+      }).toThrow('Missing AUTHORIZED_ORIGINS in production')
+    } finally {
+      if (originalNodeEnv === undefined) {
+        delete process.env.NODE_ENV
+      } else {
+        process.env.NODE_ENV = originalNodeEnv
+      }
+    }
+  })
+
   describe('when AUTHORIZED_ORIGINS is not set', () => {
     beforeEach(async () => {
       app = await buildApp(undefined)
