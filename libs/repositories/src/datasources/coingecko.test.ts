@@ -26,9 +26,20 @@ describe('getCoingeckoProClient', () => {
   })
 
   it('should throw an error when COINGECKO_API_KEY is not set', () => {
-    expect(() => {
-      getCoingeckoProClient()
-    }).toThrow('COINGECKO_API_KEY is not set')
+    const originalApiKey = process.env.COINGECKO_API_KEY
+    delete process.env.COINGECKO_API_KEY
+
+    try {
+      expect(() => {
+        getCoingeckoProClient()
+      }).toThrow('COINGECKO_API_KEY is not set')
+    } finally {
+      if (originalApiKey === undefined) {
+        delete process.env.COINGECKO_API_KEY
+      } else {
+        process.env.COINGECKO_API_KEY = originalApiKey
+      }
+    }
   })
 
   it('should throw an error when COINGECKO_API_KEY is empty string', () => {
