@@ -2,6 +2,7 @@ import fp from 'fastify-plugin'
 import { FastifyPluginCallback } from 'fastify'
 
 const PROTECTED_PATHS = ['/proxies']
+const VERCEL_ORIGIN_PATTERN = /^vercel:([a-z0-9-]+):([a-z0-9-]+)$/
 
 const AUTHORIZED_ORIGINS = parseAuthorizedOrigins(process.env.AUTHORIZED_ORIGINS)
 
@@ -57,6 +58,10 @@ function parseAuthorizedOrigins(domains: string | undefined): string[] {
     throw new Error('Malformed AUTHORIZED_ORIGINS: expected at least one hostname')
   }
 
+  if (authorizedOrigins.some((origin) => origin.startsWith('vercel:') && !parseVercelEntry(origin))) {
+    throw new Error('Malformed AUTHORIZED_ORIGINS: invalid Vercel entry')
+  }
+
   return authorizedOrigins
 }
 
@@ -72,11 +77,43 @@ function isAuthorizedOrigin(origin: string): boolean {
 }
 
 function isAuthorizedHostname(hostname: string, authorizedOrigin: string): boolean {
+  const vercelEntry = parseVercelEntry(authorizedOrigin)
+  if (vercelEntry) {
+    return isAuthorizedVercelHostname(hostname, vercelEntry.project, vercelEntry.scope)
+  }
+
   if (authorizedOrigin.startsWith('.')) {
     return hostname.endsWith(authorizedOrigin) && hostname.length > authorizedOrigin.length
   }
 
   return hostname === authorizedOrigin
+}
+
+function isAuthorizedVercelHostname(hostname: string, project: string, scope: string): boolean {
+  const vercelSuffix = '.vercel.app'
+  if (!hostname.endsWith(vercelSuffix)) {
+    return false
+  }
+
+  const deployment = hostname.slice(0, -vercelSuffix.length)
+  const prefix = `${project}-git-`
+  const suffix = `-${scope}`
+
+  return (
+    !deployment.includes('.') &&
+    deployment.startsWith(prefix) &&
+    deployment.endsWith(suffix) &&
+    deployment.length > prefix.length + suffix.length
+  )
+}
+
+function parseVercelEntry(entry: string): { project: string; scope: string } | null {
+  const match = VERCEL_ORIGIN_PATTERN.exec(entry)
+  if (!match) {
+    return null
+  }
+
+  return { project: match[1], scope: match[2] }
 }
 
 function parseOrigin(origin: string): URL | null {

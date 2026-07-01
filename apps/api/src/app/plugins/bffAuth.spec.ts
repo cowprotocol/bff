@@ -86,6 +86,16 @@ describe('bffAuth', () => {
     }
   })
 
+  it('fails startup when AUTHORIZED_ORIGINS contains a malformed Vercel entry', () => {
+    process.env.AUTHORIZED_ORIGINS = 'vercel:swap-dev'
+
+    expect(() => {
+      jest.isolateModules(() => {
+        require('./bffAuth')
+      })
+    }).toThrow('Malformed AUTHORIZED_ORIGINS: invalid Vercel entry')
+  })
+
   describe('when AUTHORIZED_ORIGINS is not set', () => {
     beforeEach(async () => {
       app = await buildApp(undefined)
@@ -217,6 +227,27 @@ describe('bffAuth', () => {
 
     it('blocks the bare domain for the leading-dot entry', async () => {
       const res = await protectedRequest(app, 'https://notevil.valid-domain.com')
+      expect(res.statusCode).toBe(403)
+    })
+  })
+
+  describe('when AUTHORIZED_ORIGINS contains a Vercel preview entry', () => {
+    beforeEach(async () => {
+      app = await buildApp('vercel:swap-dev:cowswap-dev')
+    })
+
+    it('allows Vercel branch previews for the configured project and scope', async () => {
+      const res = await protectedRequest(app, 'https://swap-dev-git-fix-widget-isolation-cowswap-dev.vercel.app')
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('blocks Vercel branch previews for a different project in the same scope', async () => {
+      const res = await protectedRequest(app, 'https://explorer-dev-git-fix-widget-isolation-cowswap-dev.vercel.app')
+      expect(res.statusCode).toBe(403)
+    })
+
+    it('blocks Vercel hosts with extra labels before vercel.app', async () => {
+      const res = await protectedRequest(app, 'https://swap-dev-git-fix.attacker-cowswap-dev.vercel.app')
       expect(res.statusCode).toBe(403)
     })
   })
