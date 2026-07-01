@@ -87,7 +87,7 @@ describe('bffAuth', () => {
   })
 
   it('fails startup when AUTHORIZED_ORIGINS contains a malformed Vercel entry', () => {
-    process.env.AUTHORIZED_ORIGINS = 'vercel:swap-dev'
+    process.env.AUTHORIZED_ORIGINS = 'vercel:swap-dev:cowswap-dev'
 
     expect(() => {
       jest.isolateModules(() => {
@@ -233,12 +233,22 @@ describe('bffAuth', () => {
 
   describe('when AUTHORIZED_ORIGINS contains a Vercel preview entry', () => {
     beforeEach(async () => {
-      app = await buildApp('vercel:swap-dev:cowswap-dev')
+      app = await buildApp('vercel:swap-dev:cowswap-dev:swap')
     })
 
     it('allows Vercel branch previews for the configured project and scope', async () => {
       const res = await protectedRequest(app, 'https://swap-dev-git-fix-widget-isolation-cowswap-dev.vercel.app')
       expect(res.statusCode).toBe(200)
+    })
+
+    it('allows Vercel build previews for the configured project and scope', async () => {
+      const res = await protectedRequest(app, 'https://swap-g5l4tofpk-cowswap-dev.vercel.app')
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('blocks Vercel build previews with hyphenated build ids', async () => {
+      const res = await protectedRequest(app, 'https://swap-foo-bar-cowswap-dev.vercel.app')
+      expect(res.statusCode).toBe(403)
     })
 
     it('blocks Vercel branch previews for a different project in the same scope', async () => {

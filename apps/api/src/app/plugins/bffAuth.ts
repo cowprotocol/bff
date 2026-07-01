@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import { FastifyPluginCallback } from 'fastify'
 
 const PROTECTED_PATHS = ['/proxies']
-const VERCEL_ORIGIN_PATTERN = /^vercel:([a-z0-9-]+):([a-z0-9-]+)$/
+const VERCEL_ORIGIN_PATTERN = /^vercel:([a-z0-9-]+):([a-z0-9-]+):([a-z0-9-]+)$/
 
 const AUTHORIZED_ORIGINS = parseAuthorizedOrigins(process.env.AUTHORIZED_ORIGINS)
 
@@ -79,7 +79,7 @@ function isAuthorizedOrigin(origin: string): boolean {
 function isAuthorizedHostname(hostname: string, authorizedOrigin: string): boolean {
   const vercelEntry = parseVercelEntry(authorizedOrigin)
   if (vercelEntry) {
-    return isAuthorizedVercelHostname(hostname, vercelEntry.project, vercelEntry.scope)
+    return isAuthorizedVercelHostname(hostname, vercelEntry.branchProject, vercelEntry.scope, vercelEntry.buildProject)
   }
 
   if (authorizedOrigin.startsWith('.')) {
@@ -89,31 +89,41 @@ function isAuthorizedHostname(hostname: string, authorizedOrigin: string): boole
   return hostname === authorizedOrigin
 }
 
-function isAuthorizedVercelHostname(hostname: string, project: string, scope: string): boolean {
+function isAuthorizedVercelHostname(
+  hostname: string,
+  branchProject: string,
+  scope: string,
+  buildProject: string
+): boolean {
   const vercelSuffix = '.vercel.app'
   if (!hostname.endsWith(vercelSuffix)) {
     return false
   }
 
   const deployment = hostname.slice(0, -vercelSuffix.length)
-  const prefix = `${project}-git-`
+  const branchPrefix = `${branchProject}-git-`
+  const buildPrefix = `${buildProject}-`
   const suffix = `-${scope}`
 
-  return (
-    !deployment.includes('.') &&
-    deployment.startsWith(prefix) &&
-    deployment.endsWith(suffix) &&
-    deployment.length > prefix.length + suffix.length
-  )
+  if (deployment.includes('.') || !deployment.endsWith(suffix)) {
+    return false
+  }
+
+  if (deployment.startsWith(branchPrefix)) {
+    return deployment.length > branchPrefix.length + suffix.length
+  }
+
+  const buildId = deployment.slice(buildPrefix.length, -suffix.length)
+  return deployment.startsWith(buildPrefix) && /^[a-z0-9]+$/.test(buildId)
 }
 
-function parseVercelEntry(entry: string): { project: string; scope: string } | null {
+function parseVercelEntry(entry: string): { branchProject: string; scope: string; buildProject: string } | null {
   const match = VERCEL_ORIGIN_PATTERN.exec(entry)
   if (!match) {
     return null
   }
 
-  return { project: match[1], scope: match[2] }
+  return { branchProject: match[1], scope: match[2], buildProject: match[3] }
 }
 
 function parseOrigin(origin: string): URL | null {
