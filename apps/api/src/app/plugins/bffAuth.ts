@@ -107,6 +107,15 @@ function isAuthorizedVercelHostname(
   const suffix = `-${scope}`
   const hasFullSuffix = deployment.endsWith(suffix)
   const maxDeploymentLabelLength = 63
+  let truncatedScopeFragmentLength = 0
+
+  if (!hasFullSuffix) {
+    for (let length = 2; length < suffix.length; length++) {
+      if (deployment.endsWith(suffix.slice(0, length))) {
+        truncatedScopeFragmentLength = length
+      }
+    }
+  }
 
   if (
     // It shouldn't have additional subdomains
@@ -121,7 +130,9 @@ function isAuthorizedVercelHostname(
 
   if (deployment.startsWith(branchPrefix)) {
     // Branch previews need branch text before the optional scope suffix
-    return deployment.length > branchPrefix.length + (hasFullSuffix ? suffix.length : 0)
+    return hasFullSuffix
+      ? deployment.length > branchPrefix.length + suffix.length
+      : truncatedScopeFragmentLength > 0 && deployment.length > branchPrefix.length + truncatedScopeFragmentLength
   }
 
   if (!deployment.startsWith(buildPrefix)) {
@@ -142,7 +153,7 @@ function isAuthorizedVercelHostname(
   const suffixFragment = buildPart.slice(buildId.length)
 
   // Truncated build labels may keep only the start of "-scope"
-  return /^[a-z0-9]+$/.test(buildId) && suffix.startsWith(suffixFragment)
+  return /^[a-z0-9]+$/.test(buildId) && suffixFragment.length > 1 && suffix.startsWith(suffixFragment)
 }
 
 function parseVercelEntry(entry: string): { branchProject: string; scope: string; buildProject: string } | null {
