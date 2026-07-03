@@ -246,6 +246,12 @@ describe('bffAuth', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('allows max-length Vercel branch previews with a truncated scope suffix', async () => {
+      const branch = 'a'.repeat(50)
+      const res = await protectedRequest(app, `https://swap-dev-git-${branch}.vercel.app`)
+      expect(res.statusCode).toBe(200)
+    })
+
     it('blocks Vercel build previews with hyphenated build ids', async () => {
       const res = await protectedRequest(app, 'https://swap-foo-bar-cowswap-dev.vercel.app')
       expect(res.statusCode).toBe(403)
@@ -259,6 +265,20 @@ describe('bffAuth', () => {
     it('blocks Vercel hosts with extra labels before vercel.app', async () => {
       const res = await protectedRequest(app, 'https://swap-dev-git-fix.attacker-cowswap-dev.vercel.app')
       expect(res.statusCode).toBe(403)
+    })
+  })
+
+  describe('when AUTHORIZED_ORIGINS contains a Vercel preview entry with a long build project', () => {
+    beforeEach(async () => {
+      app = await buildApp('vercel:swap-dev:cowswap-dev:very-long-build-project-name-that-pushes-labels')
+    })
+
+    it('allows max-length Vercel build previews with a truncated scope suffix', async () => {
+      const res = await protectedRequest(
+        app,
+        'https://very-long-build-project-name-that-pushes-labels-g5l4tofpk-cowsw.vercel.app'
+      )
+      expect(res.statusCode).toBe(200)
     })
   })
 
