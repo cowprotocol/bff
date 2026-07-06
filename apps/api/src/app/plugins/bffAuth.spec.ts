@@ -246,10 +246,10 @@ describe('bffAuth', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('allows max-length Vercel branch previews with a truncated scope suffix', async () => {
+    it('blocks max-length Vercel branch previews with only a fake scope fragment in the branch name', async () => {
       const branch = 'a'.repeat(48)
       const res = await protectedRequest(app, `https://swap-dev-git-${branch}-c.vercel.app`)
-      expect(res.statusCode).toBe(200)
+      expect(res.statusCode).toBe(403)
     })
 
     it('blocks max-length Vercel branch previews without a scope fragment', async () => {

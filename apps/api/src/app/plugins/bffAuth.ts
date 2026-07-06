@@ -107,15 +107,6 @@ function isAuthorizedVercelHostname(
   const suffix = `-${scope}`
   const hasFullSuffix = deployment.endsWith(suffix)
   const maxDeploymentLabelLength = 63
-  let truncatedScopeFragmentLength = 0
-
-  if (!hasFullSuffix) {
-    for (let length = 2; length < suffix.length; length++) {
-      if (deployment.endsWith(suffix.slice(0, length))) {
-        truncatedScopeFragmentLength = length
-      }
-    }
-  }
 
   if (
     // It shouldn't have additional subdomains
@@ -129,10 +120,8 @@ function isAuthorizedVercelHostname(
   }
 
   if (deployment.startsWith(branchPrefix)) {
-    // Branch previews need branch text before the optional scope suffix
-    return hasFullSuffix
-      ? deployment.length > branchPrefix.length + suffix.length
-      : truncatedScopeFragmentLength > 0 && deployment.length > branchPrefix.length + truncatedScopeFragmentLength
+    // Truncated branch labels cannot prove the suffix is not part of the branch name
+    return hasFullSuffix && deployment.length > branchPrefix.length + suffix.length
   }
 
   if (!deployment.startsWith(buildPrefix)) {
