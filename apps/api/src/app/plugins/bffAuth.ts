@@ -8,7 +8,7 @@ const AUTHORIZED_ORIGINS = parseAuthorizedOrigins(process.env.AUTHORIZED_ORIGINS
 
 export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.addHook('onRequest', async (request, reply) => {
-    // Return early if auth is not configured or its an unprotected path
+    // Return early if auth is not configured or it's an unprotected path
     if (AUTHORIZED_ORIGINS.length === 0 || !PROTECTED_PATHS.some((path) => request.url.startsWith(path))) {
       return
     }
@@ -97,6 +97,7 @@ function isAuthorizedVercelHostname(
 ): boolean {
   const vercelSuffix = '.vercel.app'
   if (!hostname.endsWith(vercelSuffix)) {
+    // Only Vercel preview hosts use this suffix
     return false
   }
 
@@ -104,17 +105,44 @@ function isAuthorizedVercelHostname(
   const branchPrefix = `${branchProject}-git-`
   const buildPrefix = `${buildProject}-`
   const suffix = `-${scope}`
+  const hasFullSuffix = deployment.endsWith(suffix)
+  const maxDeploymentLabelLength = 63
 
-  if (deployment.includes('.') || !deployment.endsWith(suffix)) {
+  if (
+    // It shouldn't have additional subdomains
+    deployment.includes('.') ||
+    // It shouldn't exceed the DNS label limit
+    deployment.length > maxDeploymentLabelLength ||
+    // Missing full suffix is only valid when Vercel hit the DNS label limit
+    (!hasFullSuffix && deployment.length !== maxDeploymentLabelLength)
+  ) {
     return false
   }
 
   if (deployment.startsWith(branchPrefix)) {
-    return deployment.length > branchPrefix.length + suffix.length
+    // Truncated branch labels cannot prove the suffix is not part of the branch name
+    return hasFullSuffix && deployment.length > branchPrefix.length + suffix.length
   }
 
-  const buildId = deployment.slice(buildPrefix.length, -suffix.length)
-  return deployment.startsWith(buildPrefix) && /^[a-z0-9]+$/.test(buildId)
+  if (!deployment.startsWith(buildPrefix)) {
+    // Anything else is not a configured build preview
+    return false
+  }
+
+  const buildPart = hasFullSuffix
+    ? deployment.slice(buildPrefix.length, -suffix.length)
+    : deployment.slice(buildPrefix.length)
+
+  if (hasFullSuffix) {
+    // Full labels keep the original strict build-id check
+    return /^[a-z0-9]+$/.test(buildPart)
+  }
+
+  const buildId = buildPart.split('-', 1)[0]
+  const suffixFragment = buildPart.slice(buildId.length)
+
+  // Truncated build labels may keep only the start of "-scope"
+  return /^[a-z0-9]+$/.test(buildId) && suffixFragment.length > 1 && suffix.startsWith(suffixFragment)
 }
 
 function parseVercelEntry(entry: string): { branchProject: string; scope: string; buildProject: string } | null {
