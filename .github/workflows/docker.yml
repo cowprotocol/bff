@@ -69,7 +69,7 @@ jobs:
           # secrets: |
           #   id=npmrc,src=${{ github.workspace }}/.npmrc
 
-      - uses: cowprotocol/autodeploy-action@0c950eb2856af4f520a652b59e786bd349516480 # v2
+      - uses: cowprotocol/autodeploy-action@73f1163f19a584cdc34e29aa84d630d7e6a45432 # v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           images: ghcr.io/cowprotocol/bff/${{ env.PACKAGE_NAME }}:main
