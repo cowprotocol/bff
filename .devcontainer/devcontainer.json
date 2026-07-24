@@ -1,0 +1,52 @@
+{
+  "name": "bff",
+  "build": { "dockerfile": "Dockerfile", "args": { "NODE_VERSION": "22" } },
+  "remoteUser": "node",
+
+  "mounts": [
+    // ONE volume for all persistent tool state: agent logins (claude, codex, gh)
+    // AND your git identity (see the *_CONFIG env vars below). Rebuilds keep
+    // everything. Reset it all with: docker volume rm cow-agents
+    "source=cow-agents,target=/home/node/.agents,type=volume",
+
+    // YubiKey SSH signing/auth: Colima's forwardAgent (colima.yaml) makes Lima
+    // symlink the host's forwarded ssh-agent to this fixed guest path (Lima's
+    // own hostagent.go does this, not something we made up) — the same path
+    // Docker Desktop uses for SSH agent forwarding, so bind-mounting it here
+    // is a well-trodden pattern, not a guess. Requires colima.yaml's
+    // forwardAgent: true and ./yubikey-agent-up.sh run on the host first. See
+    // README's YubiKey section.
+    "source=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock,type=bind"
+  ],
+
+  // Ports published to your Mac's localhost. appPort does the real docker
+  // publish (works from `devcontainer exec` / terminal); forwardPorts is for
+  // VS Code's auto-forward. Keep both. Each published port must be free on the
+  // host when the container starts.
+  "appPort": [8080, 3001],
+  "forwardPorts": [8080, 3001],
+
+  "containerEnv": {
+    // file-watch polling (VM bind mounts don't deliver fs events reliably)
+    "CHOKIDAR_USEPOLLING": "true",
+    "WATCHPACK_POLLING": "true",
+    // each tool's whole state dir (incl. credentials) lives in the shared volume
+    "CLAUDE_CONFIG_DIR": "/home/node/.agents/claude",
+    "CODEX_HOME": "/home/node/.agents/codex",
+    "GH_CONFIG_DIR": "/home/node/.agents/gh",
+    // git's global config file (identity/aliases). Can't mount host ~/.gitconfig:
+    // the VM only sees ~/work/cow, so home is invisible to Docker. Set identity
+    // once inside the container (see README); it persists in the volume.
+    "GIT_CONFIG_GLOBAL": "/home/node/.agents/gitconfig",
+    // forwarded YubiKey ssh-agent (see the mounts entry above)
+    "SSH_AUTH_SOCK": "/run/host-services/ssh-auth.sock",
+    // lazygit's periodic background `git fetch` re-triggers the YubiKey PIN
+    // prompt constantly (fetch is an SSH auth op like any other) — disabled
+    // by default below. Redirected into the volume (not lazygit's normal
+    // container-local config dir) so the setting, and any further tweaks you
+    // make, survive rebuilds instead of resetting each time.
+    "CONFIG_DIR": "/home/node/.agents/lazygit"
+  },
+
+  "postCreateCommand": "mkdir -p /home/node/.agents/codex /home/node/.agents/lazygit && ([ -f /home/node/.agents/lazygit/config.yml ] || printf 'git:\\n  autoFetch: false\\n' > /home/node/.agents/lazygit/config.yml) && yarn install"
+}
