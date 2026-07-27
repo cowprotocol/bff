@@ -33,16 +33,11 @@ import {
   SimulationRepository,
   SimulationRepositoryTenderly,
   TelegramBot,
-  TokenBalancesRepository,
-  TokenBalancesRepositoryAlchemy,
   TokenHolderRepository,
   TokenHolderRepositoryCache,
   TokenHolderRepositoryEthplorer,
   TokenHolderRepositoryFallback,
   TokenHolderRepositoryMoralis,
-  UserBalanceRepository,
-  UserBalanceRepositoryCache,
-  UserBalanceRepositoryViem,
   UsdRepository,
   UsdRepositoryCache,
   UsdRepositoryCoingecko,
@@ -131,19 +126,6 @@ export function getTokenHolderRepository(cacheRepository: CacheRepository): Toke
     getTokenHolderRepositoryMoralis(cacheRepository),
     getTokenHolderRepositoryEthplorer(cacheRepository),
   ])
-}
-
-export function getTokenBalancesRepository(): TokenBalancesRepository {
-  return new TokenBalancesRepositoryAlchemy()
-}
-
-export function getUserBalanceRepository(cacheRepository: CacheRepository): UserBalanceRepository {
-  return new UserBalanceRepositoryCache(
-    new UserBalanceRepositoryViem(getViemClients()),
-    cacheRepository,
-    'user_balance',
-    1 // Cache balances for 1 second
-  )
 }
 
 export function getPushNotificationsRepository(): PushNotificationsRepository {
