@@ -15,11 +15,7 @@ import {
   pushSubscriptionsRepositorySymbol,
   SimulationRepository,
   tenderlyRepositorySymbol,
-  TokenBalancesRepository,
-  tokenBalancesRepositorySymbol,
   TokenHolderRepository,
-  UserBalanceRepository,
-  userBalanceRepositorySymbol,
   tokenHolderRepositorySymbol,
   UsdRepository,
   usdRepositorySymbol,
@@ -33,13 +29,8 @@ import {
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
   getSimulationRepository,
-  getTokenBalancesRepository,
   getTokenHolderRepository,
-  getUserBalanceRepository,
   getUsdRepository,
-  TokenBalancesService,
-  TokenBalancesServiceMain,
-  tokenBalancesServiceSymbol,
   AffiliateProgramExportService,
   AffiliateProgramExportServiceImpl,
   affiliateProgramExportServiceSymbol,
@@ -63,12 +54,6 @@ import {
   slippageServiceSymbol,
   tokenHolderServiceSymbol,
   usdServiceSymbol,
-  BalanceTrackingService,
-  BalanceTrackingServiceMain,
-  SSEService,
-  SSEServiceMain,
-  balanceTrackingServiceSymbol,
-  sseServiceSymbol,
 } from '@cowprotocol/services'
 
 import { Container } from 'inversify'
@@ -104,8 +89,6 @@ export function getApiContainer(): Container {
   const erc20Repository = getErc20Repository(cacheRepository)
   const simulationRepository = getSimulationRepository()
   const tokenHolderRepository = getTokenHolderRepository(cacheRepository)
-  const tokenBalancesRepository = getTokenBalancesRepository()
-  const userBalanceRepository = getUserBalanceRepository(cacheRepository)
   const usdRepository = getUsdRepository(cacheRepository, erc20Repository)
   const pushNotificationsRepository = getPushNotificationsRepository()
   const pushSubscriptionsRepository = getPushSubscriptionsRepository()
@@ -152,29 +135,16 @@ export function getApiContainer(): Container {
       .toDynamicValue(() => new AffiliateProgramExportServiceImpl(affiliatesRepository, duneRepository))
   }
 
-  apiContainer.bind<TokenBalancesRepository>(tokenBalancesRepositorySymbol).toConstantValue(tokenBalancesRepository)
-
-  apiContainer.bind<UserBalanceRepository>(userBalanceRepositorySymbol).toConstantValue(userBalanceRepository)
-
   // Services
   apiContainer.bind<SlippageService>(slippageServiceSymbol).to(SlippageServiceMain)
 
   apiContainer.bind<TokenHolderService>(tokenHolderServiceSymbol).to(TokenHolderServiceMain)
-
-  apiContainer.bind<TokenBalancesService>(tokenBalancesServiceSymbol).to(TokenBalancesServiceMain)
 
   apiContainer.bind<UsdService>(usdServiceSymbol).to(UsdServiceMain)
 
   apiContainer.bind<TokenDetailService>(tokenDetailServiceSymbol).to(TokenDetailServiceMain)
 
   apiContainer.bind<SimulationService>(simulationServiceSymbol).to(SimulationService)
-
-  apiContainer
-    .bind<BalanceTrackingService>(balanceTrackingServiceSymbol)
-    .to(BalanceTrackingServiceMain)
-    .inSingletonScope()
-
-  apiContainer.bind<SSEService>(sseServiceSymbol).to(SSEServiceMain).inSingletonScope()
 
   return apiContainer
 }

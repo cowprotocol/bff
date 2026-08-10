@@ -76,3 +76,6 @@ mcp.json
 # npmrc
 .npmrc
 .cursor
+
+#ai-agents
+.claude

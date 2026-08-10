@@ -16,9 +16,7 @@ const getters = {
   getPushNotificationsRepository: getter(),
   getPushSubscriptionsRepository: getter(),
   getSimulationRepository: getter(),
-  getTokenBalancesRepository: getter(),
   getTokenHolderRepository: getter(),
-  getUserBalanceRepository: getter(),
   getUsdRepository: getter(),
 }
 
@@ -38,16 +36,11 @@ const plainClasses = Object.fromEntries(
     'PushSubscriptionsRepository',
     'SimulationRepository',
     'SlippageService',
-    'SSEService',
-    'TokenBalancesRepository',
-    'TokenBalancesService',
     'TokenDetailService',
     'TokenHolderRepository',
     'TokenHolderService',
     'UsdRepository',
     'UsdService',
-    'UserBalanceRepository',
-    'BalanceTrackingService',
   ].map((name) => [name, class {}])
 )
 
@@ -66,7 +59,6 @@ const symbols = {
   affiliatesRepositorySymbol: symbol('AffiliatesRepository'),
   affiliateProgramExportServiceSymbol: symbol('AffiliateProgramExportService'),
   affiliateStatsServiceSymbol,
-  balanceTrackingServiceSymbol: symbol('BalanceTrackingService'),
   cacheRepositorySymbol: symbol('CacheRepository'),
   duneRepositorySymbol,
   erc20RepositorySymbol: symbol('Erc20Repository'),
@@ -75,16 +67,12 @@ const symbols = {
   pushSubscriptionsRepositorySymbol: symbol('PushSubscriptionsRepository'),
   simulationServiceSymbol: symbol('SimulationService'),
   slippageServiceSymbol: symbol('SlippageService'),
-  sseServiceSymbol: symbol('SSEService'),
   tenderlyRepositorySymbol: symbol('SimulationRepository'),
-  tokenBalancesRepositorySymbol: symbol('TokenBalancesRepository'),
-  tokenBalancesServiceSymbol: symbol('TokenBalancesService'),
   tokenDetailServiceSymbol: symbol('TokenDetailService'),
   tokenHolderRepositorySymbol: symbol('TokenHolderRepository'),
   tokenHolderServiceSymbol: symbol('TokenHolderService'),
   usdRepositorySymbol: symbol('UsdRepository'),
   usdServiceSymbol: symbol('UsdService'),
-  userBalanceRepositorySymbol: symbol('UserBalanceRepository'),
 }
 
 jest.mock('@cowprotocol/repositories', () => ({
@@ -105,11 +93,8 @@ jest.mock('@cowprotocol/services', () => ({
   ...symbols,
   ...getters,
   AffiliateStatsServiceImpl: MockAffiliateStatsServiceImpl,
-  BalanceTrackingServiceMain: InjectableStub,
-  SSEServiceMain: InjectableStub,
   SimulationService: InjectableStub,
   SlippageServiceMain: InjectableStub,
-  TokenBalancesServiceMain: InjectableStub,
   TokenDetailServiceMain: InjectableStub,
   TokenHolderServiceMain: InjectableStub,
   UsdServiceMain: InjectableStub,
