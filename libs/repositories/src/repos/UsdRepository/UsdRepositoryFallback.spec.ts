@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { BTC_CURRENCY_ADDRESS, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
 import { WETH } from '../../../test/mock'
 import { PricePoint, UsdRepository } from './UsdRepository'
@@ -63,6 +63,7 @@ const CHAIN_ID = SupportedChainId.MAINNET.toString()
 
 const PARAMS_PRICE = [CHAIN_ID, WETH] as const
 const PARAMS_PRICES = [CHAIN_ID, WETH, '5m'] as const
+const SOLANA_USDC = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 
 const usdRepositoryMock_1_1 = new UsdRepositoryMock_1_1()
 const usdRepositoryMock_2_2 = new UsdRepositoryMock_2_2()
@@ -152,6 +153,52 @@ describe('UsdRepositoryCoingecko', () => {
       const usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_3_null, usdRepositoryMock_null_null])
       const price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual(null)
+    })
+  })
+
+  describe('token address filtering', () => {
+    const createRepositoryMock = (name: string): jest.Mocked<UsdRepository> => ({
+      name,
+      getUsdPrice: jest.fn().mockResolvedValue(1),
+      getUsdPrices: jest.fn().mockResolvedValue([{ date: mockDate, price: 1, volume: 1 }]),
+    })
+
+    it.each(['0xConToken', 'redirtest.acx', 'test'])(
+      'does not query repositories for malformed token address %s',
+      async (tokenAddress) => {
+        const firstRepository = createRepositoryMock('First')
+        const secondRepository = createRepositoryMock('Second')
+        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository, secondRepository])
+
+        await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, tokenAddress)).resolves.toBeNull()
+        await expect(usdRepositoryFallback.getUsdPrices(CHAIN_ID, tokenAddress, '5m')).resolves.toBeNull()
+
+        expect(firstRepository.getUsdPrice).not.toHaveBeenCalled()
+        expect(firstRepository.getUsdPrices).not.toHaveBeenCalled()
+        expect(secondRepository.getUsdPrice).not.toHaveBeenCalled()
+        expect(secondRepository.getUsdPrices).not.toHaveBeenCalled()
+      }
+    )
+
+    it.each([WETH, SOLANA_USDC, BTC_CURRENCY_ADDRESS])(
+      'queries repositories for valid token address %s',
+      async (tokenAddress) => {
+        const firstRepository = createRepositoryMock('First')
+        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository])
+
+        await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, tokenAddress)).resolves.toBe(1)
+
+        expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, tokenAddress)
+      }
+    )
+
+    it('queries repositories when the token address is omitted', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const usdRepositoryFallback: UsdRepository = new UsdRepositoryFallback([firstRepository])
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID)).resolves.toBe(1)
+
+      expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, undefined)
     })
   })
 })
