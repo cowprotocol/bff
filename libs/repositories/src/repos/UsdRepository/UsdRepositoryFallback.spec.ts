@@ -163,7 +163,7 @@ describe('UsdRepositoryCoingecko', () => {
       getUsdPrices: jest.fn().mockResolvedValue([{ date: mockDate, price: 1, volume: 1 }]),
     })
 
-    it.each(['0xConToken', 'redirtest.acx', 'test'])(
+    it.each(['', '0xConToken', 'redirtest.acx', 'test'])(
       'does not query repositories for malformed token address %s',
       async (tokenAddress) => {
         const firstRepository = createRepositoryMock('First')

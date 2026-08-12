@@ -6,7 +6,11 @@ import { isAddress } from 'viem'
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository'
 
 function isValidTokenAddress(tokenAddress: string | undefined): boolean {
-  if (!tokenAddress || isAddress(tokenAddress, { strict: false }) || tokenAddress === BTC_CURRENCY_ADDRESS) {
+  if (
+    tokenAddress === undefined ||
+    isAddress(tokenAddress, { strict: false }) ||
+    tokenAddress === BTC_CURRENCY_ADDRESS
+  ) {
     return true
   }
 
