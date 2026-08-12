@@ -43,7 +43,12 @@ export function getAddressOrPlatform(tokenAddress: string | undefined, platform:
 
 export function getCoingeckoPlatform(chainIdOrSlug: string): string | undefined {
   // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
-  return COINGECKO_PLATFORMS[+chainIdOrSlug] || chainIdOrSlug
+  const chainId = +chainIdOrSlug
+  if (chainId in COINGECKO_PLATFORMS) {
+    return COINGECKO_PLATFORMS[chainId]
+  }
+
+  return chainIdOrSlug
 }
 
 export function getSupportedCoingeckoChainId(chainIdOrSlug: string): TargetChainId | null {
