@@ -2,15 +2,20 @@ import { COINGECKO_PLATFORMS, SUPPORTED_COINGECKO_PLATFORMS } from '../datasourc
 import {
   AdditionalTargetChainId,
   BTC_CURRENCY_ADDRESS,
+  EVM_NATIVE_CURRENCY_ADDRESS,
   getAddressKey,
   SOL_NATIVE_CURRENCY_ADDRESS,
   SupportedChainId,
   TargetChainId,
 } from '@cowprotocol/cow-sdk'
 
-// for sol/btc we use our internal convention of the native address
+// For EVM/Solana/Bitcoin we use internal native-currency placeholders.
 // for coingecko we should just replace the address by platform
-const NON_EVM_NATIVE_TOKENS = new Set([getAddressKey(SOL_NATIVE_CURRENCY_ADDRESS), getAddressKey(BTC_CURRENCY_ADDRESS)])
+const NATIVE_TOKEN_PLACEHOLDERS = new Set([
+  getAddressKey(EVM_NATIVE_CURRENCY_ADDRESS),
+  getAddressKey(SOL_NATIVE_CURRENCY_ADDRESS),
+  getAddressKey(BTC_CURRENCY_ADDRESS),
+])
 
 // Invert number→slug map to slug→SupportedChainId
 const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, TargetChainId> = Object.entries(SUPPORTED_COINGECKO_PLATFORMS).reduce(
@@ -32,7 +37,7 @@ export function getAddressOrPlatform(tokenAddress: string | undefined, platform:
   // CoinGecko expects platform-level lookup for native tokens.
   const addressKey = getAddressKey(tokenAddress)
 
-  if (NON_EVM_NATIVE_TOKENS.has(addressKey)) {
+  if (NATIVE_TOKEN_PLACEHOLDERS.has(addressKey)) {
     return platform
   }
 
