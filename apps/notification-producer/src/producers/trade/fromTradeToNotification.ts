@@ -1,9 +1,9 @@
-import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk';
+import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
-import { Erc20Repository } from '@cowprotocol/repositories'
+import { Erc20Repository, NotificationOrder } from '@cowprotocol/repositories'
 import { getExplorerUrl, logger } from '@cowprotocol/shared'
 import { getNotificationSummary } from '../../utils/getNotificationSummary'
-import { getOrderTitle } from '../../utils/getOrderTitle';
+import { getOrderTitle } from '../../utils/getOrderTitle'
 
 export async function fromTradeToNotification(props: {
   prefix: string
@@ -20,7 +20,7 @@ export async function fromTradeToNotification(props: {
   erc20Repository: Erc20Repository
   transactionHash: string
   logIndex: number
-  isPartiallyFillable: boolean
+  order?: NotificationOrder
   appData?: AnyAppDataDocVersion
 }): Promise<PushNotification> {
   const {
@@ -38,7 +38,7 @@ export async function fromTradeToNotification(props: {
     transactionHash,
     logIndex,
     appData,
-    isPartiallyFillable,
+    order,
   } = props
 
   const summary = await getNotificationSummary({
@@ -51,7 +51,7 @@ export async function fromTradeToNotification(props: {
     buyAmount,
   })
 
-  const title = getOrderTitle(appData, isPartiallyFillable);
+  const title = getOrderTitle(appData, order)
 
   const fullMessage = `${title}: ${summary}`
   const message = `Account: ${owner}`

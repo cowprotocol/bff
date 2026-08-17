@@ -1,86 +1,67 @@
-import { Order, SupportedChainId } from '@cowprotocol/cow-sdk';
-import { logger } from '@cowprotocol/shared';
-import { Pool } from 'pg';
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool';
-import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils';
-import { chunkArray } from '../../utils/chunkArray';
-import { OrdersRepository } from './OrdersRepository';
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { Pool } from 'pg'
+import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils'
+import { chunkArray } from '../../utils/chunkArray'
+import { NotificationOrder, OrdersRepository } from './OrdersRepository'
 
-const LIMIT = 100;
+const LIMIT = 100
 
 export class OrdersRepositoryPostgres implements OrdersRepository {
-  async getOrders(
-    chainId: SupportedChainId,
-    uids: string[]
-  ): Promise<Map<string, Partial<Order>>> {
-    const prodDb = getOrderBookDbPool('prod', chainId);
+  async getOrders(chainId: SupportedChainId, uids: string[]): Promise<Map<string, NotificationOrder>> {
+    const prodDb = getOrderBookDbPool('prod', chainId)
+    const prodOrders = await this.fetchOrdersFromDb(uids, prodDb)
+    const missingUids = uids.filter((uid) => !prodOrders.has(uid.toLowerCase()))
 
-    const prodChunks = chunkArray(uids, LIMIT);
-
-    const prodOrders = await Promise.all(
-      prodChunks.map((chunk) => {
-        return this.fetchOrdersFromDb(chunk, prodDb);
-      })
-    );
-
-    const orders: Partial<Order>[] = prodOrders.reduce<Partial<Order>[]>(
-      (acc, orders) => {
-        if (orders) {
-          acc.push(...orders);
-        }
-        return acc;
-      },
-      []
-    );
-
-    logger.info(`Prod orders: ${JSON.stringify(prodOrders, null, 2)}`);
-
-    if (orders.length !== uids.length) {
-      const barnDb = getOrderBookDbPool('barn', chainId);
-
-      const barnChunks = chunkArray(uids, LIMIT);
-
-      const barnOrders = await Promise.all(
-        barnChunks.map((chunk) => {
-          return this.fetchOrdersFromDb(chunk, barnDb);
-        })
-      );
-      barnOrders?.forEach((orders) => {
-        if (orders) {
-          orders.push(...orders);
-        }
-      });
-
-      logger.info(`Barn orders: ${JSON.stringify(barnOrders, null, 2)}`);
+    if (missingUids.length === 0) {
+      return prodOrders
     }
 
-    logger.info(`Orders: ${JSON.stringify(orders, null, 2)}`);
+    const barnDb = getOrderBookDbPool('barn', chainId)
+    const barnOrders = await this.fetchOrdersFromDb(missingUids, barnDb)
 
-    return orders.reduce<Map<string, Partial<Order>>>((acc, order) => {
-      acc.set(order.uid!, order);
-      return acc;
-    }, new Map());
+    return new Map([...prodOrders, ...barnOrders])
   }
 
-  private async fetchOrdersFromDb(
-    uids: string[],
-    db: Pool
-  ): Promise<Partial<Order>[] | null> {
-    if (uids.length === 0) return null;
+  private async fetchOrdersFromDb(uids: string[], db: Pool): Promise<Map<string, NotificationOrder>> {
+    if (uids.length === 0) return new Map()
 
-    const byteaUids = uids.map(hexStringToBytes);
-    // Note: add more fields as needed
+    const chunks = chunkArray(uids, LIMIT)
+    const orderChunks = await Promise.all(chunks.map((chunk) => this.fetchOrderChunk(chunk, db)))
+
+    return new Map(orderChunks.flatMap((orders) => [...orders]))
+  }
+
+  private async fetchOrderChunk(uids: string[], db: Pool): Promise<Map<string, NotificationOrder>> {
+    const byteaUids = uids.map(hexStringToBytes)
     const query = `
-      SELECT uid, partially_fillable FROM orders WHERE uid = ANY($1) LIMIT ${LIMIT}
-    `;
+      SELECT
+        uid,
+        partially_fillable,
+        kind,
+        sell_amount,
+        buy_amount,
+        executed_sell_amount,
+        executed_buy_amount
+      FROM orders
+      WHERE uid = ANY($1)
+      LIMIT ${LIMIT}
+    `
 
-    const result = await db.query(query, [byteaUids]);
+    const result = await db.query(query, [byteaUids])
 
-    return result.rows.map((row) => {
-      return {
+    return result.rows.reduce<Map<string, NotificationOrder>>((orders, row) => {
+      const order: NotificationOrder = {
         partiallyFillable: row.partially_fillable,
         uid: bytesToHexString(row.uid).toLowerCase(),
-      };
-    });
+        kind: row.kind,
+        sellAmount: row.sell_amount,
+        buyAmount: row.buy_amount,
+        executedSellAmount: row.executed_sell_amount,
+        executedBuyAmount: row.executed_buy_amount,
+      }
+      orders.set(order.uid, order)
+      return orders
+    }, new Map())
   }
 }

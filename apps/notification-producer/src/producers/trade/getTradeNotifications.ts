@@ -112,16 +112,10 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   }, [])
 
   const ethFlowOrderOwners = ethFlowOrderIds.length
-    ? await onChainPlacedOrdersRepository.getAccountsForOrders(
-        chainId,
-        ethFlowOrderIds
-      )
+    ? await onChainPlacedOrdersRepository.getAccountsForOrders(chainId, ethFlowOrderIds)
     : {}
 
-  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(
-    chainId,
-    orderUids
-  );
+  const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(chainId, orderUids)
 
   const orders = await ordersRepository.getOrders(chainId, orderUids)
 
@@ -153,17 +147,17 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const order = orders.get(orderUidLower);
-          const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
+        const order = orders.get(orderUidLower)
+        const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
-        const isBridgingOrder = getIsBridgingOrder(appData);
+        const isBridgingOrder = getIsBridgingOrder(appData)
 
         const orderOwner = isEthFlowOrder
           ? Object.keys(ethFlowOrderOwners).find((key) => {
-                const orderUids = ethFlowOrderOwners[key]
+              const orderUids = ethFlowOrderOwners[key]
 
-                return orderUids.includes(orderUidLower)
-              })
+              return orderUids.includes(orderUidLower)
+            })
           : getAddressKey(owner)
 
         if (!orderOwner) {
@@ -191,8 +185,9 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
               erc20Repository,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
-            isPartiallyFillable: order?.partiallyFillable ?? false,
-                appData: appData,})
+              order,
+              appData,
+            })
           )
         }
         break
@@ -214,5 +209,5 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 }
 
 function getIsBridgingOrder(appData: AnyAppDataDocVersion | undefined) {
-  return !!(appData as LatestAppDataDocVersion)?.metadata?.bridging;
+  return !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 }
