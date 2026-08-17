@@ -1,3 +1,4 @@
+import { getAddressKey } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
 import { CmsPushNotification, PushNotificationsRepository } from '@cowprotocol/repositories'
 import Mustache from 'mustache'
@@ -53,7 +54,7 @@ export class CmsNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
-    const accounts = (await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts()).map(account => account.toLowerCase())
+    const accounts = (await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts()).map(getAddressKey)
     logger.debug(
       `[CmsNotificationProducer] Watching ${accounts.length} subscribed account(s): ${JSON.stringify(accounts)}`
     )
@@ -64,7 +65,7 @@ export class CmsNotificationProducer implements Runnable {
 
     const cmsPushNotifications = allCmsPushNotifications.filter(
       // Include only the notifications for subscribed accounts
-      ({ account }) => accounts.includes(account.toLowerCase())
+      ({ account }) => accounts.includes(getAddressKey(account))
     )
     logger.debug(
       `[CmsNotificationProducer] ${cmsPushNotifications.length} of ${allCmsPushNotifications.length} CMS notification(s) match a subscribed account`
@@ -114,7 +115,7 @@ function fromCmsToNotifications(cmsNotification: CmsPushNotification): PushNotif
     id: cmsNotificationId,
     title,
     message,
-    account,
+    account: getAddressKey(account),
     url: url || undefined,
     context: {
       cmsId: cmsNotificationId,

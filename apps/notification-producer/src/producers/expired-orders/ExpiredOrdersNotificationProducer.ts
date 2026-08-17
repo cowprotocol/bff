@@ -1,4 +1,4 @@
-import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk'
+import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, getAddressKey, SupportedChainId } from '@cowprotocol/cow-sdk'
 import {
   Erc20Repository,
   ExpiredOrdersRepository,
@@ -104,9 +104,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw)
 
-      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) =>
-        t.toLowerCase()
-      )
+      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(getAddressKey)
 
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
@@ -130,15 +128,16 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
-          const isEthFlowOrder = ethFlowAddresses.includes(order.owner.toLowerCase())
+          const isEthFlowOrder = ethFlowAddresses.includes(getAddressKey(order.owner))
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find((key) => {
                 const orderUids = ethFlowOrderOwners[key]
 
+                // order.uid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
                 return orderUids.includes(order.uid.toLowerCase())
               })
-            : order.owner.toLowerCase()
+            : getAddressKey(order.owner)
 
           if (!orderOwner) return Promise.resolve(undefined)
 

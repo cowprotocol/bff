@@ -4,6 +4,7 @@ import {
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING,
   CowEnv,
   ETH_FLOW_ADDRESSES,
+  getAddressKey,
   SupportedChainId,
   LatestAppDataDocVersion,
 } from '@cowprotocol/cow-sdk'
@@ -48,7 +49,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
   const client = getViemClients()[chainId as EvmChainId]
 
-  const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) => t.toLowerCase())
+  const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(getAddressKey)
   const owners = [...accounts, ...ethFlowAddresses]
 
   const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
@@ -95,7 +96,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
     if (log.eventName !== 'Trade') return acc
     if (!orderUid) return acc
-    if (!owner || !ethFlowAddresses.includes(owner.toLowerCase())) return acc
+    if (!owner || !ethFlowAddresses.includes(getAddressKey(owner))) return acc
 
     acc.push(orderUid)
 
@@ -134,8 +135,9 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
           break
         }
 
+        // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const isEthFlowOrder = ethFlowAddresses.includes(owner.toLowerCase())
+        const isEthFlowOrder = ethFlowAddresses.includes(getAddressKey(owner))
         const appData = ordersAppData.get(orderUidLower)
         const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 
@@ -145,7 +147,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
               return orderUids.includes(orderUidLower)
             })
-          : owner.toLowerCase()
+          : getAddressKey(owner)
 
         if (!orderOwner) {
           logger.debug(

@@ -1,5 +1,4 @@
-import { EVM_NATIVE_CURRENCY_ADDRESS, SupportedChainId } from '@cowprotocol/cow-sdk'
-import { getAddress } from 'viem'
+import { EVM_NATIVE_CURRENCY_ADDRESS, getAddressKey, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { ChainNames, formatAmount, formatTokenName } from '@cowprotocol/shared'
 import { Erc20Repository } from '@cowprotocol/repositories'
 
@@ -18,10 +17,10 @@ export async function getNotificationSummary(params: OrderInfoForNotificationPar
 
   const sellToken = await erc20Repository.get(
     chainId,
-    isEthFlowOrder ? EVM_NATIVE_CURRENCY_ADDRESS : getAddress(params.sellTokenAddress)
+    isEthFlowOrder ? getAddressKey(EVM_NATIVE_CURRENCY_ADDRESS) : getAddressKey(params.sellTokenAddress)
   )
 
-  const buyToken = await erc20Repository.get(chainId, getAddress(params.buyTokenAddress))
+  const buyToken = await erc20Repository.get(chainId, getAddressKey(params.buyTokenAddress))
 
   const sellAmountFormatted = formatAmount(BigInt(params.sellAmount), sellToken?.decimals)
   const buyAmountFormatted = formatAmount(BigInt(params.buyAmount), buyToken?.decimals)
