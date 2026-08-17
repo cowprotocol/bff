@@ -7,6 +7,12 @@ import {
 import { Address } from 'viem'
 
 /**
+ * Chain ids this repo actually supports. All EVM chains in `SupportedChainId`, excluding Solana:
+ * this repo has no non-EVM support (no Solana RPC client, contracts, DB schema, etc.).
+ */
+export type EvmChainId = Exclude<SupportedChainId, SupportedChainId.SOLANA>
+
+/**
  * Native currency address. For example, represents Ether in Mainnet and Arbitrum, and xDAI in Gnosis chain.
  */
 export const NativeCurrencyAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
@@ -39,7 +45,7 @@ export const EXPLORER_NETWORK_NAMES = {
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-} as const satisfies Record<SupportedChainId, string>
+} as const satisfies Record<EvmChainId, string>
 
 // TODO: Get from SDK
 export const COW_API_NETWORK_NAMES = {
@@ -54,6 +60,8 @@ export const COW_API_NETWORK_NAMES = {
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
   [SupportedChainId.SEPOLIA]: 'sepolia',
-} as const satisfies Record<SupportedChainId, string>
+} as const satisfies Record<EvmChainId, string>
 
-export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS
+export const AllChainIds: EvmChainId[] = ALL_SUPPORTED_CHAIN_IDS.filter(
+  (chainId): chainId is EvmChainId => chainId !== SupportedChainId.SOLANA
+)

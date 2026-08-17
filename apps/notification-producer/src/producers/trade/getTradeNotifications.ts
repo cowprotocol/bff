@@ -1,6 +1,8 @@
 import {
   BARN_ETH_FLOW_ADDRESSES,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
+  COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING,
+  CowEnv,
   ETH_FLOW_ADDRESSES,
   SupportedChainId,
   LatestAppDataDocVersion,
@@ -12,7 +14,7 @@ import {
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository,
 } from '@cowprotocol/repositories'
-import { bigIntReplacer, logger } from '@cowprotocol/shared'
+import { bigIntReplacer, EvmChainId, logger } from '@cowprotocol/shared'
 import { getAddress, parseAbi } from 'viem'
 import { fromTradeToNotification } from './fromTradeToNotification'
 
@@ -44,22 +46,35 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
     prefix,
   } = params
 
-  const client = getViemClients()[chainId]
+  const client = getViemClients()[chainId as EvmChainId]
 
   const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) => t.toLowerCase())
+  const owners = [...accounts, ...ethFlowAddresses]
+
+  const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+  const settlementAddresses =
+    env === 'staging' ? COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING : COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS
+  const settlementAddress = settlementAddresses[chainId]
+
+  logger.debug(
+    `${prefix} Fetching Trade logs from block ${fromBlock} to ${toBlock} on settlement contract ${settlementAddress}, filtered to ${owners.length} owner(s) (${accounts.length} subscribed + ${ethFlowAddresses.length} eth-flow)`
+  )
 
   const logs = await client.getLogs({
     events: EVENTS,
     fromBlock,
     toBlock,
-    address: getAddress(COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId]),
+    address: getAddress(settlementAddress),
     args: {
-      owner: [...accounts, ...ethFlowAddresses],
+      owner: owners,
     } as any,
   })
 
   // Return empty array if no events
   if (logs.length === 0) {
+    logger.debug(
+      `${prefix} No Trade events found for blocks ${fromBlock}-${toBlock} matching the ${owners.length} watched owner(s). Note: trades from accounts not subscribed to push notifications (and not eth-flow) are filtered out at the RPC log query level and will never appear here.`
+    )
     return []
   }
 
@@ -131,6 +146,14 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
               return orderUids.includes(orderUidLower)
             })
           : owner.toLowerCase()
+
+        if (!orderOwner) {
+          logger.debug(
+            `${prefix} Skipping eth-flow order ${orderUidLower} (tx=${log.transactionHash}): no matching owner found in on-chain placed orders`
+          )
+        } else if (isBridgingOrder) {
+          logger.debug(`${prefix} Skipping bridging order ${orderUidLower} (tx=${log.transactionHash})`)
+        }
 
         if (orderOwner && !isBridgingOrder) {
           acc.push(

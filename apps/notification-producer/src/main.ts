@@ -14,10 +14,9 @@ import {
 import { Runnable } from '../types'
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer'
 import { ExpiredOrdersNotificationProducer } from './producers/expired-orders/ExpiredOrdersNotificationProducer'
-import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk'
 import ms from 'ms'
 import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer'
-import { logger } from '@cowprotocol/shared'
+import { AllChainIds, logger } from '@cowprotocol/shared'
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`)
 
@@ -97,10 +96,10 @@ function getProducerChains() {
 
   // If no producer networks are specified, use all supported chain ids
   if (producerNetworks.length === 0) {
-    return ALL_SUPPORTED_CHAIN_IDS
+    return AllChainIds
   }
 
-  return ALL_SUPPORTED_CHAIN_IDS.filter((chain) => producerNetworks.includes(chain))
+  return AllChainIds.filter((chain) => producerNetworks.includes(chain))
 }
 async function gracefulShutdown(producers: Runnable[], producersPromise: Promise<void[]>) {
   if (shuttingDown) return

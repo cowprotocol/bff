@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 
 export const ETHPLORER_API_KEY = process.env.ETHPLORER_API_KEY as string
 
@@ -17,4 +18,4 @@ export const ETHPLORER_BASE_URL = {
   [SupportedChainId.LINEA]: 'https://api.lineaplorer.build',
   [SupportedChainId.PLASMA]: null,
   [SupportedChainId.INK]: null,
-} as const satisfies Record<SupportedChainId, string | null>
+} as const satisfies Record<EvmChainId, string | null>

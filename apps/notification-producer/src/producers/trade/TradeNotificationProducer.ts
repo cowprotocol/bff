@@ -12,7 +12,7 @@ import { BlockNotFoundError } from 'viem'
 import { Runnable } from '../../../types'
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories'
 import { IndexerStateRepository } from '@cowprotocol/repositories'
-import { doForever, logger } from '@cowprotocol/shared'
+import { doForever, EvmChainId, logger } from '@cowprotocol/shared'
 import { getTradeNotifications } from './getTradeNotifications'
 
 const WAIT_TIME = 10000
@@ -87,7 +87,7 @@ export class TradeNotificationProducer implements Runnable {
     const stateRegistry = await indexerStateRepository.get<TradeNotificationProducerState>(PRODUCER_NAME, chainId)
 
     // Get last block
-    const client = getViemClients()[chainId]
+    const client = getViemClients()[chainId as EvmChainId]
     const lastBlock = await client.getBlock()
     const toBlockFinal = lastBlock.number
 
@@ -99,7 +99,7 @@ export class TradeNotificationProducer implements Runnable {
     // Print debug message
     if (totalBlocksToIndex < 1n) {
       // We are up to date. Nothing to index
-      logger.trace(`${this.prefix} No new blocks to index`)
+      logger.debug(`${this.prefix} No new blocks to index. Last indexed block: ${toBlockFinal}`)
       return NO_PENDING_BLOCKS
     } else {
       logger.debug(`${this.prefix} Indexing from block ${fromBlock} to ${toBlockFinal}: ${totalBlocksToIndex} blocks`)
@@ -178,6 +178,11 @@ export class TradeNotificationProducer implements Runnable {
 
     // Get all accounts subscribed to PUSH notifications
     const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
+    logger.debug(
+      `${this.prefix} Watching ${
+        accounts.length
+      } subscribed account(s) for blocks ${fromBlock}-${toBlock}: ${JSON.stringify(accounts)}`
+    )
 
     // Get all trade notifications for the block range
     const notificationPromises = getTradeNotifications({
@@ -198,7 +203,9 @@ export class TradeNotificationProducer implements Runnable {
     const notifications = await notificationPromises
 
     // Return early if there are no notifications
-    if (notifications.length > 0) {
+    if (notifications.length === 0) {
+      logger.debug(`${this.prefix} No trade notifications to send for blocks ${fromBlock}-${toBlock}`)
+    } else {
       logger.info(
         `${this.prefix} Sending ${notifications.length} notifications`,
         JSON.stringify(notifications, null, 2)

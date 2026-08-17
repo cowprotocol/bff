@@ -1,5 +1,8 @@
 import { AdditionalTargetChainId, SupportedChainId, TargetChainId } from '@cowprotocol/cow-sdk'
 
+// Solana is not supported by this repo (no Solana RPC client, contracts, etc.)
+type EvmTargetChainId = Exclude<TargetChainId, SupportedChainId.SOLANA>
+
 import createClient from 'openapi-fetch'
 import type { components, paths } from '../gen/coingecko/coingecko-pro-types'
 
@@ -19,8 +22,7 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.INK]: 'ink',
   [AdditionalTargetChainId.OPTIMISM]: 'optimistic-ethereum',
   [AdditionalTargetChainId.BITCOIN]: 'bitcoin',
-  [AdditionalTargetChainId.SOLANA]: 'solana',
-} as const satisfies Record<TargetChainId, string | undefined>
+} as const satisfies Record<EvmTargetChainId, string | undefined>
 
 /**
  * Map of chain IDs to Coingecko platform IDs, for every platform that has a network id.
