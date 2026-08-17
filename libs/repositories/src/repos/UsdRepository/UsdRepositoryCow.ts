@@ -1,4 +1,4 @@
-import { isEvmChain, isSupportedChain } from '@cowprotocol/cow-sdk'
+import { isSolanaChain, isSupportedChain } from '@cowprotocol/cow-sdk'
 import { EvmChainId, logger } from '@cowprotocol/shared'
 import { BigNumber } from 'bignumber.js'
 import { injectable } from 'inversify'
@@ -21,8 +21,9 @@ export class UsdRepositoryCow extends UsdRepositoryNoop {
 
   async getUsdPrice(chainIdOrSlug: string, tokenAddress?: string | undefined): Promise<number | null> {
     const chainId = getSupportedCoingeckoChainId(chainIdOrSlug)
-    // Solana is a SupportedChainId but this repo has no non-EVM support, so it's excluded explicitly here.
-    if (!chainId || !isSupportedChain(chainId) || !isEvmChain(chainId)) {
+    // CoW API (native_price) only exists for EVM chains with CoW Protocol settlement, so Solana is
+    // excluded here specifically. Solana USD prices are still served via UsdRepositoryCoingecko.
+    if (!chainId || !isSupportedChain(chainId) || isSolanaChain(chainId)) {
       return null
     }
 

@@ -1,5 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
-import { AllChainIds, EvmChainId, logger } from '@cowprotocol/shared'
+import { EVM_CHAIN_IDS, EvmChainId, logger } from '@cowprotocol/shared'
 import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem'
 import { arbitrum, avalanche, base, bsc, gnosis, linea, mainnet, plasma, polygon, sepolia, ink } from 'viem/chains'
 
@@ -24,7 +24,7 @@ export function getViemClients(): Record<EvmChainId, PublicClient> {
     return viemClients
   }
 
-  viemClients = AllChainIds.reduce<Record<EvmChainId, PublicClient>>((acc, chainId) => {
+  viemClients = EVM_CHAIN_IDS.reduce<Record<EvmChainId, PublicClient>>((acc, chainId) => {
     const chain = NETWORKS[chainId]
     const envVarName = `RPC_URL_${chainId}`
     const rpcEndpoint = process.env[envVarName]

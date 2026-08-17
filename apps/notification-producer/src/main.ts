@@ -16,7 +16,7 @@ import { TradeNotificationProducer } from './producers/trade/TradeNotificationPr
 import { ExpiredOrdersNotificationProducer } from './producers/expired-orders/ExpiredOrdersNotificationProducer'
 import ms from 'ms'
 import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer'
-import { AllChainIds, logger } from '@cowprotocol/shared'
+import { EVM_CHAIN_IDS, logger } from '@cowprotocol/shared'
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`)
 
@@ -94,12 +94,13 @@ function getProducerChains() {
   const producerNetworks =
     process.env.NOTIFICATIONS_PRODUCER_CHAINS?.split(',').map((chain) => Number(chain.trim())) || []
 
-  // If no producer networks are specified, use all supported chain ids
+  // Notification producers need an RPC client and on-chain settlement contracts, so only EVM chains
+  // apply here (Solana is supported elsewhere in the repo, e.g. USD prices, just not by this app).
   if (producerNetworks.length === 0) {
-    return AllChainIds
+    return EVM_CHAIN_IDS
   }
 
-  return AllChainIds.filter((chain) => producerNetworks.includes(chain))
+  return EVM_CHAIN_IDS.filter((chain) => producerNetworks.includes(chain))
 }
 async function gracefulShutdown(producers: Runnable[], producersPromise: Promise<void[]>) {
   if (shuttingDown) return

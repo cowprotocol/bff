@@ -1,6 +1,6 @@
 import { Address, getAddress } from 'viem'
 
-import { AllChainIds, EvmChainId, NativeCurrencyAddress, WrappedNativeTokenAddress } from '../const'
+import { AllChainIds, NativeCurrencyAddress, WrappedNativeTokenAddress } from '../const'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
 /**
@@ -16,11 +16,11 @@ export function toTokenAddress(address: string, chainId: SupportedChainId): Addr
   return getAddress(address.toLowerCase())
 }
 
-export function isSupportedChain(chain: number): chain is EvmChainId {
-  return AllChainIds.includes(chain as EvmChainId)
+export function isSupportedChain(chain: number): chain is SupportedChainId {
+  return AllChainIds.includes(chain as SupportedChainId)
 }
 
-export function toSupportedChainId(chain: string | number): EvmChainId {
+export function toSupportedChainId(chain: string | number): SupportedChainId {
   if (typeof chain === 'string') {
     chain = parseInt(chain)
   }

@@ -6,6 +6,14 @@ import {
 } from '@cowprotocol/cow-sdk'
 import { Address } from 'viem'
 
+/**
+ * Chain ids with CoW Protocol on-chain settlement infrastructure in this repo (RPC client, contract
+ * addresses, orderbook DB replica, CoW API). Excludes Solana, which has none of that here.
+ *
+ * This does NOT mean Solana is unsupported by the repo in general: USD prices (via CoinGecko) and
+ * price-impact/slippage estimation work for Solana through the general `SupportedChainId`/`AllChainIds`.
+ * Only use this type for the specific EVM/on-chain infra it's scoped to (e.g. `EVM_CHAIN_IDS` below).
+ */
 export type EvmChainId = Exclude<SupportedChainId, SupportedChainId.SOLANA>
 
 /**
@@ -58,6 +66,10 @@ export const COW_API_NETWORK_NAMES = {
   [SupportedChainId.SEPOLIA]: 'sepolia',
 } as const satisfies Record<EvmChainId, string>
 
-export const AllChainIds: EvmChainId[] = ALL_SUPPORTED_CHAIN_IDS.filter(
+// All chains this repo generally knows about, including Solana (used e.g. for USD prices and price-impact estimation).
+export const AllChainIds: SupportedChainId[] = ALL_SUPPORTED_CHAIN_IDS
+
+// Chains with on-chain settlement infra in this repo (RPC client, contracts, orderbook DB, CoW API). No Solana.
+export const EVM_CHAIN_IDS: EvmChainId[] = ALL_SUPPORTED_CHAIN_IDS.filter(
   (chainId): chainId is EvmChainId => chainId !== SupportedChainId.SOLANA
 )
