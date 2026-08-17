@@ -1,4 +1,10 @@
-import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, getAddressKey, SupportedChainId } from '@cowprotocol/cow-sdk'
+import {
+  BARN_ETH_FLOW_ADDRESSES,
+  CowEnv,
+  ETH_FLOW_ADDRESSES,
+  getAddressKey,
+  SupportedChainId,
+} from '@cowprotocol/cow-sdk'
 import {
   Erc20Repository,
   ExpiredOrdersRepository,
@@ -104,13 +110,15 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw)
 
-      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(getAddressKey)
-
+      const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+      const ethFlowAddress = getAddressKey(
+        env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
+      )
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
       const expiredOrders = await expiredOrdersRepository.fetchExpiredOrdersForAccounts({
         chainId,
-        accounts: [...accounts, ...ethFlowAddresses],
+        accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
         nowTimestamp,
       })
@@ -128,7 +136,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
-          const isEthFlowOrder = ethFlowAddresses.includes(getAddressKey(order.owner))
+          const isEthFlowOrder = ethFlowAddress === getAddressKey(order.owner)
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find((key) => {

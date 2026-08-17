@@ -49,16 +49,19 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
   const client = getViemClients()[chainId as EvmChainId]
 
-  const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map(getAddressKey)
-  const owners = [...accounts, ...ethFlowAddresses]
-
   const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+
+  const ethFlowAddress = getAddressKey(
+    env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
+  )
+  const owners = [...accounts, ethFlowAddress]
+
   const settlementAddresses =
     env === 'staging' ? COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING : COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS
   const settlementAddress = settlementAddresses[chainId]
 
   logger.debug(
-    `${prefix} Fetching Trade logs from block ${fromBlock} to ${toBlock} on settlement contract ${settlementAddress}, filtered to ${owners.length} owner(s) (${accounts.length} subscribed + ${ethFlowAddresses.length} eth-flow)`
+    `${prefix} Fetching Trade logs from block ${fromBlock} to ${toBlock} on settlement contract ${settlementAddress}, filtered to ${owners.length} owner(s) (${accounts.length} subscribed + ${ethFlowAddress} eth-flow)`
   )
 
   const logs = await client.getLogs({
@@ -96,7 +99,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
     if (log.eventName !== 'Trade') return acc
     if (!orderUid) return acc
-    if (!owner || !ethFlowAddresses.includes(getAddressKey(owner))) return acc
+    if (!owner || ethFlowAddress !== getAddressKey(owner)) return acc
 
     acc.push(orderUid)
 
@@ -137,7 +140,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const isEthFlowOrder = ethFlowAddresses.includes(getAddressKey(owner))
+        const isEthFlowOrder = ethFlowAddress === getAddressKey(owner)
         const appData = ordersAppData.get(orderUidLower)
         const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 
