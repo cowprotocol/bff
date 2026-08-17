@@ -1,4 +1,5 @@
 import {
+  areAddressesEqual,
   BARN_ETH_FLOW_ADDRESSES,
   CowEnv,
   ETH_FLOW_ADDRESSES,
@@ -136,7 +137,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
-          const isEthFlowOrder = ethFlowAddress === getAddressKey(order.owner)
+          const isEthFlowOrder = areAddressesEqual(ethFlowAddress, order.owner)
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find((key) => {

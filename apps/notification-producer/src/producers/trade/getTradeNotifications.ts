@@ -7,6 +7,7 @@ import {
   getAddressKey,
   SupportedChainId,
   LatestAppDataDocVersion,
+  areAddressesEqual,
 } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
 import {
@@ -99,7 +100,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
     if (log.eventName !== 'Trade') return acc
     if (!orderUid) return acc
-    if (!owner || ethFlowAddress !== getAddressKey(owner)) return acc
+    if (!owner || !areAddressesEqual(ethFlowAddress, owner)) return acc
 
     acc.push(orderUid)
 
@@ -140,7 +141,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const isEthFlowOrder = ethFlowAddress === getAddressKey(owner)
+        const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
         const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 
