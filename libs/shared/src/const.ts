@@ -6,10 +6,6 @@ import {
 } from '@cowprotocol/cow-sdk'
 import { Address } from 'viem'
 
-/**
- * Chain ids this repo actually supports. All EVM chains in `SupportedChainId`, excluding Solana:
- * this repo has no non-EVM support (no Solana RPC client, contracts, DB schema, etc.).
- */
 export type EvmChainId = Exclude<SupportedChainId, SupportedChainId.SOLANA>
 
 /**
