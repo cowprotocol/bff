@@ -111,7 +111,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw)
 
-      const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+      const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'prod' ? 'prod' : 'staging'
       const ethFlowAddress = getAddressKey(
         env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
       )

@@ -50,7 +50,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
   const client = getViemClients()[chainId as EvmChainId]
 
-  const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+  const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'prod' ? 'prod' : 'staging'
 
   const ethFlowAddress = getAddressKey(
     env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
