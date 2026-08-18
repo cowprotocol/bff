@@ -1,4 +1,11 @@
-import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk'
+import {
+  areAddressesEqual,
+  BARN_ETH_FLOW_ADDRESSES,
+  CowEnv,
+  ETH_FLOW_ADDRESSES,
+  getAddressKey,
+  SupportedChainId,
+} from '@cowprotocol/cow-sdk'
 import {
   Erc20Repository,
   ExpiredOrdersRepository,
@@ -104,15 +111,15 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw)
 
-      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) =>
-        t.toLowerCase()
+      const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+      const ethFlowAddress = getAddressKey(
+        env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
       )
-
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
       const expiredOrders = await expiredOrdersRepository.fetchExpiredOrdersForAccounts({
         chainId,
-        accounts: [...accounts, ...ethFlowAddresses],
+        accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
         nowTimestamp,
       })
@@ -130,15 +137,16 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
-          const isEthFlowOrder = ethFlowAddresses.includes(order.owner.toLowerCase())
+          const isEthFlowOrder = areAddressesEqual(ethFlowAddress, order.owner)
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find((key) => {
                 const orderUids = ethFlowOrderOwners[key]
 
+                // order.uid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
                 return orderUids.includes(order.uid.toLowerCase())
               })
-            : order.owner.toLowerCase()
+            : getAddressKey(order.owner)
 
           if (!orderOwner) return Promise.resolve(undefined)
 

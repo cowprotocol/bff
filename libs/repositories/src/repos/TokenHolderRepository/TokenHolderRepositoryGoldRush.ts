@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 import { injectable } from 'inversify'
 import { GOLD_RUSH_API_BASE_URL, GOLD_RUSH_API_KEY, GOLD_RUSH_CLIENT_NETWORK_MAPPING } from '../../datasources/goldRush'
 import { TokenHolderPoint, TokenHolderRepository } from './TokenHolderRepository'
@@ -37,7 +38,7 @@ interface GoldRushTokenHoldersResponse {
 @injectable()
 export class TokenHolderRepositoryGoldRush implements TokenHolderRepository {
   async getTopTokenHolders(chainId: SupportedChainId, tokenAddress: string): Promise<TokenHolderPoint[] | null> {
-    const network = GOLD_RUSH_CLIENT_NETWORK_MAPPING[chainId]
+    const network = GOLD_RUSH_CLIENT_NETWORK_MAPPING[chainId as EvmChainId]
     if (!network) {
       return null
     }

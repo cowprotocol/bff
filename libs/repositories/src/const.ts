@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 import BigNumber from 'bignumber.js'
 
 interface TokenAddressAndDecimals {
@@ -54,7 +55,7 @@ export const USDC = {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
     decimals: 18,
   },
-} as const satisfies Record<SupportedChainId, TokenAddressAndDecimals>
+} as const satisfies Record<EvmChainId, TokenAddressAndDecimals>
 
 export const ZeroBigNumber = new BigNumber(0)
 export const OneBigNumber = new BigNumber(1)

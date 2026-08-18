@@ -1,3 +1,4 @@
+import { getAddressKey } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
 import { CmsPushNotification, PushNotificationsRepository } from '@cowprotocol/repositories'
 import Mustache from 'mustache'
@@ -53,18 +54,34 @@ export class CmsNotificationProducer implements Runnable {
   }
 
   async fetchAndSend(): Promise<void> {
-    const accounts = await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts()
+    const accounts = (await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts()).map(getAddressKey)
+    logger.debug(
+      `[CmsNotificationProducer] Watching ${accounts.length} subscribed account(s): ${JSON.stringify(accounts)}`
+    )
 
     // Get PUSH notifications
-    const cmsPushNotifications = (await this.props.pushSubscriptionsRepository.getPushNotifications()).filter(
+    const allCmsPushNotifications = await this.props.pushSubscriptionsRepository.getPushNotifications()
+    logger.debug(`[CmsNotificationProducer] CMS returned ${allCmsPushNotifications.length} push notification(s)`)
+
+    const cmsPushNotifications = allCmsPushNotifications.filter(
       // Include only the notifications for subscribed accounts
-      ({ account }) => accounts.includes(account)
+      ({ account }) => accounts.includes(getAddressKey(account))
+    )
+    logger.debug(
+      `[CmsNotificationProducer] ${cmsPushNotifications.length} of ${allCmsPushNotifications.length} CMS notification(s) match a subscribed account`
     )
 
     const pendingNotifications = Array.from(this.pendingNotifications.values())
+    if (pendingNotifications.length > 0) {
+      logger.debug(
+        `[CmsNotificationProducer] ${pendingNotifications.length} pending notification(s) from a previous failed send`
+      )
+    }
+
     const pushNotifications = cmsPushNotifications.map(fromCmsToNotifications).concat(pendingNotifications)
 
     if (pushNotifications.length === 0) {
+      logger.debug(`[CmsNotificationProducer] No notifications to send`)
       return
     }
 
@@ -74,9 +91,11 @@ export class CmsNotificationProducer implements Runnable {
     pushNotifications.forEach((notification) => this.pendingNotifications.set(notification.id, notification))
 
     // Connect
+    logger.debug(`[CmsNotificationProducer] Connecting to push notifications queue`)
     await this.props.pushNotificationsRepository.connect()
 
     // Post notifications to queue
+    logger.info(`[CmsNotificationProducer] Sending ${pushNotifications.length} notification(s) to the queue`)
     this.props.pushNotificationsRepository.send(pushNotifications)
     this.pendingNotifications.clear()
   }
@@ -96,7 +115,7 @@ function fromCmsToNotifications(cmsNotification: CmsPushNotification): PushNotif
     id: cmsNotificationId,
     title,
     message,
-    account,
+    account: getAddressKey(account),
     url: url || undefined,
     context: {
       cmsId: cmsNotificationId,

@@ -265,66 +265,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/solver_competition/{auction_id}": {
+    "/api/v1/quote/stream": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
+        get?: never;
+        put?: never;
         /**
-         * Get information about a solver competition.
-         * @deprecated
-         * @description Returns the competition information by `auction_id`.
+         * Stream progressively improving quotes as solvers respond.
+         * @description Accepts the same request body as `POST /api/v1/quote`. Instead of waiting for all solvers and returning the single best quote, this endpoint opens a Server-Sent Events stream and emits quotes as solvers respond. A quote is emitted only when it ranks better than the best one already sent; the first goes out as soon as the fastest solver answers. Solvers without a usable quote, and quotes that do not beat the best already sent, emit no event, so you may receive fewer events than there are solvers. The stream closes when the quote timeout elapses or all solvers have responded. Each emitted quote carries an `id` that can be referenced when placing an order.
+         *     The `priceQuality` field of the request body is ignored: this endpoint always queries all solvers and attempts verification, and each emitted quote carries its own `verified` flag. A verified quote ranks above an unverified one regardless of amount, so a later quote may report a lower `out_amount`. Individual solver errors are not streamed; if no solver returns a usable quote, a terminal event named `error` is sent with a `PriceEstimationError` body before the stream closes.
          *
          */
-        get: operations["getSolverCompetitionByAuctionId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/solver_competition/by_tx_hash/{tx_hash}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get information about solver competition.
-         * @deprecated
-         * @description Returns the competition information by `tx_hash`.
-         *
-         */
-        get: operations["getSolverCompetitionByTxHash"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/solver_competition/latest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get information about the most recent solver competition.
-         * @deprecated
-         * @description Returns the competition information for the last seen auction_id.
-         *
-         */
-        get: operations["getSolverCompetitionLatest"];
-        put?: never;
-        post?: never;
+        post: operations["quoteStream"];
         delete?: never;
         options?: never;
         head?: never;
@@ -481,7 +437,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/debug/simulation": {
+    "/restricted/api/v1/debug/simulation": {
         parameters: {
             query?: never;
             header?: never;
@@ -502,7 +458,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/debug/simulation/{uid}": {
+    "/restricted/api/v1/debug/simulation/{uid}": {
         parameters: {
             query?: never;
             header?: never;
@@ -523,7 +479,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/debug/order/{uid}": {
+    "/restricted/api/v1/debug/order/{uid}": {
         parameters: {
             query?: never;
             header?: never;
@@ -628,11 +584,21 @@ export interface components {
         OrderClass: "market" | "limit" | "liquidity";
         /**
          * @description Where should the `sellToken` be drawn from?
+         *
+         *     **Only `erc20` is accepted for new orders.** The `internal` and `external`
+         *     (Balancer Vault) sources are deprecated: orders using them are rejected at
+         *     creation with `UnsupportedSellTokenSource`. The values remain in the enum
+         *     because they may still appear on historical orders returned by the API.
          * @enum {string}
          */
         SellTokenSource: "erc20" | "internal" | "external";
         /**
          * @description Where should the `buyToken` be transferred to?
+         *
+         *     **Only `erc20` is accepted for new orders.** The `internal` (Balancer Vault)
+         *     destination is rejected at creation with `UnsupportedBuyTokenDestination`.
+         *     The value remains in the enum because it may still appear on historical
+         *     orders returned by the API.
          * @enum {string}
          */
         BuyTokenDestination: "erc20" | "internal";
@@ -707,12 +673,14 @@ export interface components {
             /** @description Is the order fill-or-kill or partially fillable? */
             partiallyFillable: boolean;
             /**
+             * @deprecated
              * @description Where the sell token should be drawn from. Defaults to `erc20` for standard ERC-20 token transfers.
              *
              * @default erc20
              */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
             /**
+             * @deprecated
              * @description Where the buy token should be transferred to. Defaults to `erc20` for standard ERC-20 token transfers.
              *
              * @default erc20
@@ -746,11 +714,13 @@ export interface components {
             /** @description see `OrderParameters::partiallyFillable` */
             partiallyFillable: boolean;
             /**
+             * @deprecated
              * @description see `OrderParameters::sellTokenBalance`
              * @default erc20
              */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
             /**
+             * @deprecated
              * @description see `OrderParameters::buyTokenBalance`
              * @default erc20
              */
@@ -844,6 +814,9 @@ export interface components {
             /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
+            /** @description Earliest time (unix seconds) at which the order may enter a batch auction, taken from the order's `appData`. Omitted when the order has no lower bound (eligible immediately).
+             *      */
+            validFrom?: number | null;
             /** @description The address of the CoW Protocol settlement contract that this order is valid for. Orders are only valid on the settlement contract they were signed for.
              *      */
             settlementContract: components["schemas"]["Address"];
@@ -901,11 +874,13 @@ export interface components {
              *      */
             postInteractions: components["schemas"]["InteractionData"][];
             /**
+             * @deprecated
              * @description see `OrderParameters::sellTokenBalance`
              * @default erc20
              */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
             /**
+             * @deprecated
              * @description see `OrderParameters::buyTokenBalance`
              * @default erc20
              */
@@ -958,7 +933,7 @@ export interface components {
              *     The presence of executed amounts defines whether the solver provided
              *     a solution for the desired order. */
             value?: {
-                /** @description Name of the solver. */
+                /** @description The on-chain address of the solver. */
                 solver: string;
                 executedAmounts?: components["schemas"]["ExecutedAmounts"];
             }[];
@@ -1053,10 +1028,26 @@ export interface components {
             errorType: "InvalidSignature" | "WrongOwner" | "OrderNotFound" | "AlreadyCancelled" | "OrderFullyExecuted" | "OrderExpired" | "OnChainOrder";
             description: string;
         };
+        /** @description Error quoting an order.
+         *
+         *     Possible `errorType` values per HTTP status:
+         *     * 400: `AppDataHashMismatch`, `CustomSolverError`, `ExcessiveValidTo`,
+         *       `InsufficientLiquidity`, `InsufficientValidTo`, `InvalidAppData`,
+         *       `InvalidNativeSellToken`, `QuoteNotVerified`, `SameBuyAndSellToken`,
+         *       `SellAmountDoesNotCoverFee`, `TokenTemporarilySuspended`,
+         *       `TradingOutsideAllowedWindow`, `UnsupportedBuyTokenDestination`,
+         *       `UnsupportedOrderType`, `UnsupportedSellTokenSource`,
+         *       `UnsupportedToken`
+         *     * 403: `Forbidden`
+         *     * 404: `NoLiquidity`
+         *     * 500: `InternalServerError`
+         *      */
         PriceEstimationError: {
             /** @enum {string} */
-            errorType: "QuoteNotVerified" | "UnsupportedToken" | "NoLiquidity" | "UnsupportedOrderType";
+            errorType: "AppDataHashMismatch" | "CustomSolverError" | "ExcessiveValidTo" | "Forbidden" | "InsufficientLiquidity" | "InsufficientValidTo" | "InternalServerError" | "InvalidAppData" | "InvalidNativeSellToken" | "NoLiquidity" | "QuoteNotVerified" | "SameBuyAndSellToken" | "SellAmountDoesNotCoverFee" | "TokenTemporarilySuspended" | "TradingOutsideAllowedWindow" | "UnsupportedBuyTokenDestination" | "UnsupportedOrderType" | "UnsupportedSellTokenSource" | "UnsupportedToken";
             description: string;
+            /** @description Optional error-specific payload: `SellAmountDoesNotCoverFee` returns an object with `fee_amount`. */
+            data?: Record<string, never>;
         };
         /** @description The buy or sell side when quoting an order. */
         OrderQuoteSide: {
@@ -1111,13 +1102,25 @@ export interface components {
              *
              *     In case they differ, the call will fail. */
             appDataHash?: components["schemas"]["AppDataHash"];
-            /** @default erc20 */
+            /**
+             * @deprecated
+             * @default erc20
+             */
             sellTokenBalance: components["schemas"]["SellTokenSource"];
-            /** @default erc20 */
+            /**
+             * @deprecated
+             * @default erc20
+             */
             buyTokenBalance: components["schemas"]["BuyTokenDestination"];
             from: components["schemas"]["Address"];
             /** @default verified */
             priceQuality: components["schemas"]["PriceQuality"];
+            /**
+             * @description Signals that this quote is intended for fast-path (out-of-competition) execution. Propagated to the solver.
+             *
+             * @default false
+             */
+            fastPath: boolean;
             /** @default eip712 */
             signingScheme: components["schemas"]["SigningScheme"];
             /**
@@ -1126,7 +1129,7 @@ export interface components {
              * @default false
              */
             onchainOrder: unknown;
-            /** @description User provided timeout in milliseconds. Can only be used to reduce the response time for quote requests if the default is too slow as values greater than the default will be capped to the default. Note that reducing the timeout can result in worse quotes because the reduced timeout might be too slow for some price estimators.
+            /** @description User provided timeout in milliseconds. If no value is provided the systems default quote timeout will be used. Values get capped at a generous maximum timeout. Note that reducing the timeout can result in worse quotes because it might be too short for some price estimators.
              *      */
             timeout?: number;
         };
@@ -1200,8 +1203,13 @@ export interface components {
             /** @description Transaction in which the solution was executed onchain (if available).
              *      */
             txHash?: components["schemas"]["TransactionHash"] | null;
-            /** @description The prices of tokens for settled user orders as passed to the settlement contract.
-             *      */
+            /**
+             * @deprecated
+             * @description Deprecated. The autopilot no longer persists per-solution uniform clearing prices, so this field will be empty for solutions of auctions produced by recent autopilots. Solutions stored before this change keep their original values.
+             *
+             *     The prices of tokens for settled user orders as passed to the settlement contract.
+             *
+             */
             clearingPrices?: {
                 [key: string]: components["schemas"]["BigUint"] | undefined;
             };
@@ -1331,8 +1339,15 @@ export interface components {
             /** @description The best quote received. */
             quote: components["schemas"]["Quote"];
         };
-        /** @description Defines the ways to calculate the protocol fee. */
-        FeePolicy: components["schemas"]["Surplus"] | components["schemas"]["Volume"] | components["schemas"]["PriceImprovement"];
+        /** @description Defines the ways to calculate the protocol fee.
+         *      */
+        FeePolicy: {
+            surplus: components["schemas"]["Surplus"];
+        } | {
+            volume: components["schemas"]["Volume"];
+        } | {
+            priceImprovement: components["schemas"]["PriceImprovement"];
+        };
         ExecutedProtocolFee: {
             policy?: components["schemas"]["FeePolicy"];
             amount?: unknown & components["schemas"]["TokenAmount"];
@@ -1511,21 +1526,30 @@ export interface components {
             owner: components["schemas"]["Address"];
             /** @description The address that will receive the buy tokens. Defaults to the owner if omitted.
              *      */
-            receiver?: components["schemas"]["Address"] | null;
+            receiver?: components["schemas"]["Address"];
             /**
+             * @deprecated
              * @description Where the sell token should be drawn from.
-             * @default erc20
              */
-            sellTokenBalance: components["schemas"]["SellTokenSource"];
+            sellTokenBalance?: components["schemas"]["SellTokenSource"];
             /**
+             * @deprecated
              * @description Where the buy token should be transferred to.
-             * @default erc20
              */
-            buyTokenBalance: components["schemas"]["BuyTokenDestination"];
-            /** @description Full app data JSON string. Defaults to `"{}"` if omitted.
+            buyTokenBalance?: components["schemas"]["BuyTokenDestination"];
+            /** @description Full app data JSON string.
              *      */
-            appData?: string | null;
-            blockNumber?: number;
+            appData: string;
+            blockNumber?: number | null;
+            signingScheme: components["schemas"]["SigningScheme"];
+            signature: components["schemas"]["Signature"];
+            /** @description The fee amount in sell token atoms. Expected to be 0; only present because it must be part of the signed order data.
+             *      */
+            feeAmount: components["schemas"]["TokenAmount"];
+            /** @description Unix timestamp (`uint32`) until which the order is valid. */
+            validTo: number;
+            /** @description Whether the order can be partially filled or must be filled all at once. */
+            partiallyFillable: boolean;
         };
         /** @description The Tenderly simulation request for an order, along with any simulation error.
          *      */
@@ -2065,6 +2089,82 @@ export interface operations {
                     "application/json": components["schemas"]["PriceEstimationError"];
                 };
             };
+            /** @description Forbidden, the order owner is deny-listed (`errorType`: `Forbidden`). */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceEstimationError"];
+                };
+            };
+            /** @description No route was found for the specified order (`errorType`: `NoLiquidity`). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceEstimationError"];
+                };
+            };
+            /** @description Unable to parse request body as valid JSON. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many order quotes. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected error (`errorType`: `InternalServerError`). */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceEstimationError"];
+                };
+            };
+        };
+    };
+    quoteStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The order parameters to compute quotes for. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description A Server-Sent Events stream. Each event's `data` field is a JSON object matching `OrderQuoteResponse`. Events arrive as the best-ranked quote improves.
+             *      */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["OrderQuoteResponse"];
+                };
+            };
+            /** @description Error quoting order. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceEstimationError"];
+                };
+            };
             /** @description No route was found for the specified order. */
             404: {
                 headers: {
@@ -2088,106 +2188,6 @@ export interface operations {
             };
             /** @description Unexpected error quoting an order. */
             500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getSolverCompetitionByAuctionId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                auction_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Competition */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SolverCompetitionResponse"];
-                };
-            };
-            /** @description Invalid auction ID. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description No competition information available for this auction id. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getSolverCompetitionByTxHash: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Transaction hash in which the competition was settled. */
-                tx_hash: components["schemas"]["TransactionHash"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Competition */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SolverCompetitionResponse"];
-                };
-            };
-            /** @description Invalid transaction hash. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description No competition information available for this `tx_hash`. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getSolverCompetitionLatest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Competition */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SolverCompetitionResponse"];
-                };
-            };
-            /** @description No competition information available. */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };

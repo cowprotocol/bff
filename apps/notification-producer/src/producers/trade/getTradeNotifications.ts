@@ -1,9 +1,13 @@
 import {
   BARN_ETH_FLOW_ADDRESSES,
   COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS,
+  COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING,
+  CowEnv,
   ETH_FLOW_ADDRESSES,
+  getAddressKey,
   SupportedChainId,
   LatestAppDataDocVersion,
+  areAddressesEqual,
 } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
 import {
@@ -12,7 +16,7 @@ import {
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository,
 } from '@cowprotocol/repositories'
-import { bigIntReplacer, logger } from '@cowprotocol/shared'
+import { bigIntReplacer, EvmChainId, logger } from '@cowprotocol/shared'
 import { getAddress, parseAbi } from 'viem'
 import { fromTradeToNotification } from './fromTradeToNotification'
 
@@ -44,22 +48,38 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
     prefix,
   } = params
 
-  const client = getViemClients()[chainId]
+  const client = getViemClients()[chainId as EvmChainId]
 
-  const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) => t.toLowerCase())
+  const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+
+  const ethFlowAddress = getAddressKey(
+    env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
+  )
+  const owners = [...accounts, ethFlowAddress]
+
+  const settlementAddresses =
+    env === 'staging' ? COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS_STAGING : COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS
+  const settlementAddress = settlementAddresses[chainId]
+
+  logger.debug(
+    `${prefix} Fetching Trade logs from block ${fromBlock} to ${toBlock} on settlement contract ${settlementAddress}, filtered to ${owners.length} owner(s) (${accounts.length} subscribed + ${ethFlowAddress} eth-flow)`
+  )
 
   const logs = await client.getLogs({
     events: EVENTS,
     fromBlock,
     toBlock,
-    address: getAddress(COW_PROTOCOL_SETTLEMENT_CONTRACT_ADDRESS[chainId]),
+    address: getAddress(settlementAddress),
     args: {
-      owner: [...accounts, ...ethFlowAddresses],
+      owner: owners,
     } as any,
   })
 
   // Return empty array if no events
   if (logs.length === 0) {
+    logger.debug(
+      `${prefix} No Trade events found for blocks ${fromBlock}-${toBlock} matching the ${owners.length} watched owner(s). Note: trades from accounts not subscribed to push notifications (and not eth-flow) are filtered out at the RPC log query level and will never appear here.`
+    )
     return []
   }
 
@@ -80,7 +100,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
     if (log.eventName !== 'Trade') return acc
     if (!orderUid) return acc
-    if (!owner || !ethFlowAddresses.includes(owner.toLowerCase())) return acc
+    if (!owner || !areAddressesEqual(ethFlowAddress, owner)) return acc
 
     acc.push(orderUid)
 
@@ -119,8 +139,9 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
           break
         }
 
+        // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
-        const isEthFlowOrder = ethFlowAddresses.includes(owner.toLowerCase())
+        const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
         const isBridgingOrder = !!(appData as LatestAppDataDocVersion)?.metadata?.bridging
 
@@ -130,7 +151,15 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
               return orderUids.includes(orderUidLower)
             })
-          : owner.toLowerCase()
+          : getAddressKey(owner)
+
+        if (!orderOwner) {
+          logger.debug(
+            `${prefix} Skipping eth-flow order ${orderUidLower} (tx=${log.transactionHash}): no matching owner found in on-chain placed orders`
+          )
+        } else if (isBridgingOrder) {
+          logger.debug(`${prefix} Skipping bridging order ${orderUidLower} (tx=${log.transactionHash})`)
+        }
 
         if (orderOwner && !isBridgingOrder) {
           acc.push(

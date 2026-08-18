@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 import { injectable } from 'inversify'
 import { MORALIS_API_BASE_URL, MORALIS_API_KEY, MORALIS_CLIENT_NETWORK_MAPPING } from '../../datasources/moralis'
 import { TokenHolderPoint, TokenHolderRepository } from './TokenHolderRepository'
@@ -25,7 +26,7 @@ interface MoralisTokenHoldersResponse {
 @injectable()
 export class TokenHolderRepositoryMoralis implements TokenHolderRepository {
   async getTopTokenHolders(chainId: SupportedChainId, tokenAddress: string): Promise<TokenHolderPoint[] | null> {
-    const network = MORALIS_CLIENT_NETWORK_MAPPING[chainId]
+    const network = MORALIS_CLIENT_NETWORK_MAPPING[chainId as EvmChainId]
     if (!network) {
       return null
     }

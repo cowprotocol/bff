@@ -1,5 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
-import { AllChainIds, logger } from '@cowprotocol/shared'
+import { EVM_CHAIN_IDS, EvmChainId, logger } from '@cowprotocol/shared'
 import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem'
 import { arbitrum, avalanche, base, bsc, gnosis, linea, mainnet, plasma, polygon, sepolia, ink } from 'viem/chains'
 
@@ -15,16 +15,16 @@ const NETWORKS = {
   [SupportedChainId.LINEA]: linea,
   [SupportedChainId.PLASMA]: plasma,
   [SupportedChainId.INK]: ink,
-} as const satisfies Record<SupportedChainId, Chain>
+} as const satisfies Record<EvmChainId, Chain>
 
-let viemClients: Record<SupportedChainId, PublicClient> | undefined
+let viemClients: Record<EvmChainId, PublicClient> | undefined
 
-export function getViemClients(): Record<SupportedChainId, PublicClient> {
+export function getViemClients(): Record<EvmChainId, PublicClient> {
   if (viemClients) {
     return viemClients
   }
 
-  viemClients = AllChainIds.reduce<Record<SupportedChainId, PublicClient>>((acc, chainId) => {
+  viemClients = EVM_CHAIN_IDS.reduce<Record<EvmChainId, PublicClient>>((acc, chainId) => {
     const chain = NETWORKS[chainId]
     const envVarName = `RPC_URL_${chainId}`
     const rpcEndpoint = process.env[envVarName]
@@ -50,7 +50,7 @@ export function getViemClients(): Record<SupportedChainId, PublicClient> {
     }) as PublicClient
 
     return acc
-  }, {} as Record<SupportedChainId, PublicClient>)
+  }, {} as Record<EvmChainId, PublicClient>)
 
   return viemClients
 }

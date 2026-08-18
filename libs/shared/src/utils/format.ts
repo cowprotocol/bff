@@ -1,6 +1,6 @@
 import { formatUnits } from 'viem'
 
-import { EXPLORER_NETWORK_NAMES } from '../const'
+import { EvmChainId, EXPLORER_NETWORK_NAMES } from '../const'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
 export function getExplorerUrl(chainId: SupportedChainId, orderUid: string) {
@@ -9,7 +9,7 @@ export function getExplorerUrl(chainId: SupportedChainId, orderUid: string) {
 }
 
 export function getExplorerBaseUrl(chainId: SupportedChainId) {
-  const suffix = chainId === SupportedChainId.MAINNET ? '' : `/${EXPLORER_NETWORK_NAMES[chainId]}`
+  const suffix = chainId === SupportedChainId.MAINNET ? '' : `/${EXPLORER_NETWORK_NAMES[chainId as EvmChainId]}`
   return `https://explorer.cow.fi${suffix}`
 }
 

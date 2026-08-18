@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 
 export const MORALIS_API_KEY = process.env.MORALIS_API_KEY
 export const MORALIS_API_BASE_URL = 'https://deep-index.moralis.io/api'
@@ -18,4 +19,4 @@ export const MORALIS_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: null,
   [SupportedChainId.INK]: null,
-} as const satisfies Record<SupportedChainId, string | null>
+} as const satisfies Record<EvmChainId, string | null>

@@ -1,14 +1,15 @@
 import { injectable } from 'inversify'
 import { Erc20, Erc20Repository } from './Erc20Repository'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 import { erc20Abi, getAddress, PublicClient } from 'viem'
 
 @injectable()
 export class Erc20RepositoryViem implements Erc20Repository {
-  constructor(private viemClients: Record<SupportedChainId, PublicClient>) {}
+  constructor(private viemClients: Record<EvmChainId, PublicClient>) {}
 
   async get(chainId: SupportedChainId, tokenAddress: string): Promise<Erc20 | null> {
-    const viemClient = this.viemClients[chainId]
+    const viemClient = this.viemClients[chainId as EvmChainId]
     const tokenAddressHex = getAddress(tokenAddress)
 
     const ercTokenParams = {

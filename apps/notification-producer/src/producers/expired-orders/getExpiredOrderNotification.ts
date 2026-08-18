@@ -39,7 +39,9 @@ export async function getExpiredOrderNotification(
 
   return {
     id: 'OrderExpired-' + expiredOrder.uid + '-' + expiredOrder.validTo + '-' + lastCheckTimestamp,
-    account: expiredOrder.owner.toLowerCase(),
+    // Use the resolved owner (not expiredOrder.owner): for eth-flow orders expiredOrder.owner is the
+    // eth-flow contract address, not the actual trader who should receive the notification.
+    account: owner,
     title,
     message,
     url,
