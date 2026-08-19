@@ -19,7 +19,9 @@ export async function getBlockTimestamps(client: BlockClient, logs: Array<{ bloc
         try {
           return await client.getBlock({ blockNumber })
         } catch (e) {
-          logger.warn(`getBlockTimestamps: failed to fetch block ${blockNumber}, its trades will be skipped this round: ${e}`)
+          logger.warn(
+            `getBlockTimestamps: failed to fetch block ${blockNumber}, its trades will be skipped this round: ${e}`
+          )
           return undefined
         }
       })
