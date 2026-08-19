@@ -78,4 +78,4 @@ mcp.json
 .cursor
 
 #ai-agents
-.claude
+.claude.worktrees/
