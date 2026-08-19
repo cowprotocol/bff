@@ -37,6 +37,10 @@ export function formatTradeNotification({
     case 'market':
       return notification(`${ORDER_NOTIFICATION_EMOJI.completed} Swap filled`, tradeMessage(tradeAmounts))
     case 'limit':
+      if (!order) {
+        return notification('Limit order update', tradeMessage(tradeAmounts))
+      }
+
       if (!isOrderFullyFilled(order)) {
         return notification(
           `${ORDER_NOTIFICATION_EMOJI.partiallyFilled} Limit order partially filled`,
@@ -79,8 +83,8 @@ function fillPercentage(order: NonNullable<FormatTradeNotificationParams['order'
   return (BigInt(executedAmount) * 100n) / BigInt(totalAmount)
 }
 
-function isOrderFullyFilled(order: FormatTradeNotificationParams['order']): boolean {
-  if (!order?.partiallyFillable) return true
+function isOrderFullyFilled(order: NonNullable<FormatTradeNotificationParams['order']>): boolean {
+  if (!order.partiallyFillable) return true
 
   return order.kind === OrderKind.SELL
     ? BigInt(order.executedSellAmount) >= BigInt(order.sellAmount)

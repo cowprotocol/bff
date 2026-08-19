@@ -29,6 +29,14 @@ describe('formatTradeNotification', () => {
     })
   })
 
+  it('uses a neutral title when a limit order snapshot is unavailable', () => {
+    expect(formatTradeNotification({ ...common, orderClass: 'limit' })).toEqual({
+      title: 'Limit order update at 12:42 UTC',
+      message:
+        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+    })
+  })
+
   it('includes a custom recipient', () => {
     expect(
       formatTradeNotification({
