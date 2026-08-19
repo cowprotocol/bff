@@ -12,7 +12,7 @@ export async function doForever(params: {
 
   logger.info(`[${name}] Starting. Running logic every ${waitTimeMilliseconds / 1000}s`)
 
-  let running = true
+  let running = !signal?.aborted
   const stop = () => {
     logger.info(`[${name}] Stopping...`)
     running = false

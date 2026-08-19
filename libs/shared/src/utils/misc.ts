@@ -60,15 +60,17 @@ export function interruptibleSleep(ms: number, signal?: AbortSignal): Promise<vo
   }
 
   return new Promise((resolve) => {
-    const timer = setTimeout(resolve, ms)
-    signal?.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timer)
-        resolve()
-      },
-      { once: true }
-    )
+    const onAbort = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+
+    signal?.addEventListener('abort', onAbort, { once: true })
   })
 }
 

@@ -35,6 +35,22 @@ describe('doForever', () => {
     expect(elapsed).toBeLessThan(500)
   })
 
+  it('never enters the callback loop when the signal is already aborted', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const callback = jest.fn(async () => undefined)
+
+    await doForever({
+      name: 'test',
+      waitTimeMilliseconds: 5_000,
+      logger,
+      signal: controller.signal,
+      callback,
+    })
+
+    expect(callback).not.toHaveBeenCalled()
+  })
+
   it('keeps running on the configured interval when never aborted', async () => {
     let callCount = 0
     const controller = new AbortController()
