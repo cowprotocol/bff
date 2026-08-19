@@ -54,8 +54,8 @@ export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm'
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryPostgres'
 
 // OrdersRepository
-export * from './repos/OrdersRepository/OrdersRepository';
-export * from './repos/OrdersRepository/OrdersRepositoryPostgres';
+export * from './repos/OrdersRepository/OrdersRepository'
+export * from './repos/OrdersRepository/OrdersRepositoryPostgres'
 
 // OnChainPlacedOrdersRepository
 export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepository'

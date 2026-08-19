@@ -1,3 +1,5 @@
+import { logger } from '@cowprotocol/shared'
+
 interface BlockClient {
   getBlock: (params: { blockNumber: bigint }) => Promise<{ number: bigint; timestamp: bigint }>
 }
@@ -16,7 +18,8 @@ export async function getBlockTimestamps(client: BlockClient, logs: Array<{ bloc
       batch.map(async (blockNumber) => {
         try {
           return await client.getBlock({ blockNumber })
-        } catch {
+        } catch (e) {
+          logger.warn(`getBlockTimestamps: failed to fetch block ${blockNumber}, its trades will be skipped this round: ${e}`)
           return undefined
         }
       })

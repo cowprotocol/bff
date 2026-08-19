@@ -161,7 +161,7 @@ export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepositor
 }
 
 export function getOrdersRepository(): OrdersRepository {
-  return new OrdersRepositoryPostgres();
+  return new OrdersRepositoryPostgres()
 }
 
 export function getExpiredOrdersRepository(): ExpiredOrdersRepository {

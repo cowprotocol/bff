@@ -17,45 +17,12 @@ export function getExplorerBaseUrl(chainId: SupportedChainId) {
 
 export function formatAmount(amount: bigint, decimals: number | undefined) {
   if (decimals === undefined) return amount.toString()
+  if (decimals <= MAX_DISPLAY_DECIMALS) return formatUnits(amount, decimals)
 
-  const formatted = formatUnits(amount, decimals)
-  if (decimals <= MAX_DISPLAY_DECIMALS) return formatted
+  const divisor = 10n ** BigInt(decimals - MAX_DISPLAY_DECIMALS)
+  const rounded = (amount + divisor / 2n) / divisor
 
-  return roundToDisplayPrecision(formatted)
-}
-
-function roundToDisplayPrecision(formatted: string) {
-  const [integer, fraction = ''] = formatted.split('.')
-  if (fraction.length <= MAX_DISPLAY_DECIMALS) return formatted
-
-  let roundedInteger = integer
-  let roundedFraction = fraction.slice(0, MAX_DISPLAY_DECIMALS)
-
-  if (fraction[MAX_DISPLAY_DECIMALS] >= '5') {
-    roundedFraction = incrementDecimalString(roundedFraction)
-    if (roundedFraction.length > MAX_DISPLAY_DECIMALS) {
-      roundedInteger = incrementDecimalString(integer)
-      roundedFraction = '0'.repeat(MAX_DISPLAY_DECIMALS)
-    }
-  }
-
-  roundedFraction = roundedFraction.replace(/0+$/, '')
-  if (roundedInteger === '0' && roundedFraction.length === 0) return '<0.000001'
-
-  return roundedFraction ? `${roundedInteger}.${roundedFraction}` : roundedInteger
-}
-
-function incrementDecimalString(value: string) {
-  let carry = 1
-  const digits = value.split('')
-
-  for (let index = digits.length - 1; index >= 0 && carry; index--) {
-    const digit = digits[index].charCodeAt(0) - 48 + carry
-    digits[index] = String(digit % 10)
-    carry = digit >= 10 ? 1 : 0
-  }
-
-  return carry ? `1${digits.join('')}` : digits.join('')
+  return amount > 0n && rounded === 0n ? '<0.000001' : formatUnits(rounded, MAX_DISPLAY_DECIMALS)
 }
 
 export function formatTokenName(token: { symbol?: string; address: string } | null) {

@@ -1,7 +1,18 @@
 import { AnyAppDataDocVersion, OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
 
-export function getOrderTitle(appData: AnyAppDataDocVersion | undefined, order: NotificationOrder | undefined) {
+export type OrderTitle =
+  | 'Swap order filled'
+  | 'Limit order filled'
+  | 'Limit order partially filled'
+  | 'Liquidity order filled'
+  | 'TWAP part is filled'
+  | 'Order filled'
+
+export function getOrderTitle(
+  appData: AnyAppDataDocVersion | undefined,
+  order: NotificationOrder | undefined
+): OrderTitle {
   const orderClass = getOrderClass(appData)
 
   switch (orderClass) {

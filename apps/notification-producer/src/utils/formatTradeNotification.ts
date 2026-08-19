@@ -1,11 +1,12 @@
 import { OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
 import { formatOrderNotification } from './formatOrderNotification'
+import { OrderTitle } from './getOrderTitle'
 
 type FormattedAmounts = { sell: string; buy: string }
 
 interface FormatTradeNotificationParams {
-  orderTitle: string
+  orderTitle: OrderTitle
   timestamp: bigint
   account: string
   recipient?: string | null

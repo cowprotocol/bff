@@ -2,18 +2,16 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import {
   Erc20Repository,
   getViemClients,
+  IndexerStateRepository,
   IndexerStateValue,
   OnChainPlacedOrdersRepository,
   OrdersAppDataRepository,
   OrdersRepository,
   PushNotificationsRepository,
+  PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
 import { BlockNotFoundError } from 'viem'
 
-import {
-  IndexerStateRepository,
-  PushSubscriptionsRepository,
-} from '@cowprotocol/repositories'
 import { Runnable } from '../../../types'
 import { doForever, EvmChainId, logger } from '@cowprotocol/shared'
 import { getTradeNotifications } from './getTradeNotifications'
@@ -33,7 +31,7 @@ export type TradeNotificationProducerProps = {
   erc20Repository: Erc20Repository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
   ordersAppDataRepository: OrdersAppDataRepository
-  ordersRepository: OrdersRepository;
+  ordersRepository: OrdersRepository
 }
 
 export interface TradeNotificationProducerState extends IndexerStateValue {
