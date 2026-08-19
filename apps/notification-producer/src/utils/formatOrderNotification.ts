@@ -28,10 +28,15 @@ export function formatOrderNotification({
     minute: '2-digit',
     timeZone: 'UTC',
   })
-  const recipientMetadata = recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${recipient}` : ''
+  const recipientMetadata =
+    recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${abbreviateAddress(recipient)}` : ''
 
   return {
     title: `${title} at ${time} UTC`,
-    message: `${message}\n\nAccount: ${account}${recipientMetadata}\nChain: ${chainName}`,
+    message: `${message}\n\nAccount: ${abbreviateAddress(account)}${recipientMetadata}\nChain: ${chainName}`,
   }
+}
+
+function abbreviateAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
 }

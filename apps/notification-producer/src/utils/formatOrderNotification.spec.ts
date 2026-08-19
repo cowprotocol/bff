@@ -14,7 +14,7 @@ describe('formatOrderNotification', () => {
     ).toEqual({
       title: 'Swap expired at 12:42 UTC',
       message:
-        'Your swap to trade 10 USDC → 1 COW has expired.\n\nAccount: 0x1234567890123456789012345678901234567890\nRecipient: 0x0000000000000000000000000000000000000001\nChain: Arbitrum One',
+        'Your swap to trade 10 USDC → 1 COW has expired.\n\nAccount: 0x1234...7890\nRecipient: 0x0000...0001\nChain: Arbitrum One',
     })
   })
 
@@ -29,7 +29,7 @@ describe('formatOrderNotification', () => {
         chainName: 'Arbitrum One',
       })
     ).toMatchObject({
-      message: 'Your order has expired.\n\nAccount: 0xAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAa\nChain: Arbitrum One',
+      message: 'Your order has expired.\n\nAccount: 0xAaaA...aaAa\nChain: Arbitrum One',
     })
   })
 })

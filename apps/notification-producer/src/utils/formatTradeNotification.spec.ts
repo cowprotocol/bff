@@ -16,24 +16,21 @@ describe('formatTradeNotification', () => {
   it('routes a market order by its semantic class', () => {
     expect(formatTradeNotification({ ...common, orderClass: 'market' })).toEqual({
       title: '✅ Swap filled at 12:42 UTC',
-      message:
-        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+      message: 'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 
   it('formats a swap notification', () => {
     expect(formatTradeNotification({ ...common, orderClass: 'market' })).toEqual({
       title: '✅ Swap filled at 12:42 UTC',
-      message:
-        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+      message: 'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 
   it('uses a neutral title when a limit order snapshot is unavailable', () => {
     expect(formatTradeNotification({ ...common, orderClass: 'limit' })).toEqual({
       title: 'Limit order update at 12:42 UTC',
-      message:
-        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+      message: 'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 
@@ -47,7 +44,7 @@ describe('formatTradeNotification', () => {
     ).toEqual({
       title: '✅ Swap filled at 12:42 UTC',
       message:
-        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nRecipient: 0x0000000000000000000000000000000000000001\nChain: Arbitrum One',
+        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234...7890\nRecipient: 0x0000...0001\nChain: Arbitrum One',
     })
   })
 
@@ -61,8 +58,7 @@ describe('formatTradeNotification', () => {
       })
     ).toEqual({
       title: '✅ Swap filled at 12:42 UTC',
-      message:
-        'You traded 10 USDC and received 1 COW.\n\nAccount: 0xAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAa\nChain: Arbitrum One',
+      message: 'You traded 10 USDC and received 1 COW.\n\nAccount: 0xAaaA...aaAa\nChain: Arbitrum One',
     })
   })
 
@@ -85,7 +81,7 @@ describe('formatTradeNotification', () => {
     ).toEqual({
       title: '✅ Limit order filled at 12:42 UTC',
       message:
-        'Your limit order to trade 1000 USDC → 100000 COW is now 100% filled. You received 100001 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+        'Your limit order to trade 1000 USDC → 100000 COW is now 100% filled. You received 100001 COW.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 
@@ -107,7 +103,7 @@ describe('formatTradeNotification', () => {
     ).toEqual({
       title: '⏳ Limit order partially filled at 12:42 UTC',
       message:
-        'Your limit order to trade 100 USDC → 1000 COW is now 53% filled.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+        'Your limit order to trade 100 USDC → 1000 COW is now 53% filled.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 
@@ -115,7 +111,7 @@ describe('formatTradeNotification', () => {
     expect(formatTradeNotification({ ...common, orderClass: 'twap' })).toEqual({
       title: '✅ A TWAP part filled at 12:42 UTC',
       message:
-        'One part of your TWAP order filled. You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+        'One part of your TWAP order filled. You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234...7890\nChain: Arbitrum One',
     })
   })
 })
