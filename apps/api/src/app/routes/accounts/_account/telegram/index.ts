@@ -42,35 +42,36 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
     return
   }
 
-  if (!redisClient) {
-    logger.warn(
-      'REDIS is not configured — Telegram connect-tokens will not be resolvable by apps/telegram; set REDIS_HOST/REDIS_ENABLED.'
-    )
-  }
-
-  const cacheRepository: CacheRepository = apiContainer.get(cacheRepositorySymbol)
   const pushSubscriptionsRepository: PushSubscriptionsRepository = apiContainer.get(pushSubscriptionsRepositorySymbol)
 
-  // POST /accounts/:account/telegram/connect-token
-  fastify.post<{
-    Params: ParamsSchema
-    Reply: { token: string; deepLink: string }
-  }>(
-    '/connect-token',
-    {
-      schema: {
-        description: 'Create a single-use Telegram bot connect token for this account',
-        tags: ['accounts', 'telegram'],
-        params: paramsSchema,
-      },
-    },
-    async function (request, reply) {
-      const account = request.params.account.toLowerCase()
-      const token = await createConnectToken(cacheRepository, account)
+  if (!redisClient) {
+    logger.warn(
+      'REDIS is not configured — Telegram connect-tokens will not be resolvable by apps/telegram; the connect-token route will not be registered. Set REDIS_HOST/REDIS_ENABLED.'
+    )
+  } else {
+    const cacheRepository: CacheRepository = apiContainer.get(cacheRepositorySymbol)
 
-      reply.send({ token, deepLink: buildTelegramDeepLink(telegramBotUsername, token) })
-    }
-  )
+    // POST /accounts/:account/telegram/connect-token
+    fastify.post<{
+      Params: ParamsSchema
+      Reply: { token: string; deepLink: string }
+    }>(
+      '/connect-token',
+      {
+        schema: {
+          description: 'Create a single-use Telegram bot connect token for this account',
+          tags: ['accounts', 'telegram'],
+          params: paramsSchema,
+        },
+      },
+      async function (request, reply) {
+        const account = request.params.account.toLowerCase()
+        const token = await createConnectToken(cacheRepository, account)
+
+        reply.send({ token, deepLink: buildTelegramDeepLink(telegramBotUsername, token) })
+      }
+    )
+  }
 
   // GET /accounts/:account/telegram/connect-status
   fastify.get<{

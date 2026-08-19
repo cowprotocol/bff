@@ -33,20 +33,21 @@ async function mainLoop() {
   // Create telegram bot
   telegramBot = getTelegramBot()
 
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository()
+
   if (!redisClient) {
     logger.warn(
-      'REDIS is not configured — Telegram connect-tokens minted by apps/api will not be resolvable here; set REDIS_HOST/REDIS_ENABLED.'
+      'REDIS is not configured — Telegram connect-tokens minted by apps/api will not be resolvable here; the /start deep-link handler will not be registered. Set REDIS_HOST/REDIS_ENABLED.'
     )
+  } else {
+    // Handle incoming /start <token> deep-link messages
+    const cacheRepository = getCacheRepository()
+    telegramBot.on('message', (msg) => {
+      handleStartCommand({ bot: telegramBot, msg, cacheRepository, pushSubscriptionsRepository }).catch((error) =>
+        logger.error(error, '[telegram] Error handling /start command')
+      )
+    })
   }
-
-  // Handle incoming /start <token> deep-link messages
-  const cacheRepository = getCacheRepository()
-  const pushSubscriptionsRepository = getPushSubscriptionsRepository()
-  telegramBot.on('message', (msg) => {
-    handleStartCommand({ bot: telegramBot, msg, cacheRepository, pushSubscriptionsRepository }).catch((error) =>
-      logger.error(error, '[telegram] Error handling /start command')
-    )
-  })
 
   // Handle /unsubscribe (and /stop), plus the "Unsubscribe" inline button - unsubscribing
   // only happens from this side since Telegram itself proves which chat is asking.
