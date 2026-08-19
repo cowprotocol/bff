@@ -1,6 +1,7 @@
 import { OrderKind, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { Pool } from 'pg'
 import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderExecutionPositionKey, OrderExecutionPosition } from './OrdersRepository'
 import { OrdersRepositoryPostgres } from './OrdersRepositoryPostgres'
 
 jest.mock('../../datasources/orderBookDbPool', () => ({
@@ -39,6 +40,23 @@ function expectedOrder(uid: string, kind: OrderKind, receiver: string | null = n
     receiver,
     executedSellAmount: kind === OrderKind.SELL ? '50' : '0',
     executedBuyAmount: kind === OrderKind.BUY ? '50' : '0',
+  }
+}
+
+function executionSnapshotRow(
+  uid: string,
+  kind: OrderKind,
+  position: OrderExecutionPosition,
+  executedSellAmount: string,
+  executedBuyAmount: string
+) {
+  return {
+    ...row(uid, kind),
+    position_order_uid: Buffer.from(position.orderUid.slice(2), 'hex'),
+    position_block_number: position.blockNumber.toString(),
+    position_log_index: position.logIndex.toString(),
+    executed_sell_amount: executedSellAmount,
+    executed_buy_amount: executedBuyAmount,
   }
 }
 
@@ -89,6 +107,36 @@ describe('OrdersRepositoryPostgres', () => {
     expect(query).toContain('LEFT JOIN trades t ON t.order_uid = o.uid')
     expect(query).toContain('COALESCE(SUM(t.sell_amount), 0) AS executed_sell_amount')
     expect(query).toContain('COALESCE(SUM(t.buy_amount), 0) AS executed_buy_amount')
+  })
+
+  it('loads execution totals at each trade position', async () => {
+    const firstPosition = { orderUid: prodUid, blockNumber: 10n, logIndex: 1 }
+    const secondPosition = { orderUid: prodUid, blockNumber: 11n, logIndex: 2 }
+    prodQuery.mockResolvedValue({
+      rows: [
+        executionSnapshotRow(prodUid, OrderKind.SELL, firstPosition, '40', '80'),
+        executionSnapshotRow(prodUid, OrderKind.SELL, secondPosition, '100', '200'),
+      ],
+    })
+
+    await expect(
+      repository.getOrderExecutionSnapshots(SupportedChainId.MAINNET, [firstPosition, secondPosition])
+    ).resolves.toEqual(
+      new Map([
+        [
+          getOrderExecutionPositionKey(firstPosition),
+          { ...expectedOrder(prodUid, OrderKind.SELL), executedSellAmount: '40', executedBuyAmount: '80' },
+        ],
+        [
+          getOrderExecutionPositionKey(secondPosition),
+          { ...expectedOrder(prodUid, OrderKind.SELL), executedSellAmount: '100', executedBuyAmount: '200' },
+        ],
+      ])
+    )
+
+    const [query] = prodQuery.mock.calls[0]
+    expect(query).toContain('t.block_number < p.block_number')
+    expect(query).toContain('t.log_index <= p.log_index')
   })
 
   it('includes a custom recipient', async () => {

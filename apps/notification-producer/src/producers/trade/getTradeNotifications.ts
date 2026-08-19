@@ -15,8 +15,10 @@ import {
   Erc20Repository,
   getViemClients,
   OnChainPlacedOrdersRepository,
+  OrderExecutionPosition,
   OrdersAppDataRepository,
   OrdersRepository,
+  getOrderExecutionPositionKey,
 } from '@cowprotocol/repositories'
 import { bigIntReplacer, EvmChainId, logger } from '@cowprotocol/shared'
 import { getAddress, parseAbi } from 'viem'
@@ -89,8 +91,9 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   }
 
   logger.debug(`${prefix} Found ${logs.length} events`)
+  const notificationLogs = getLatestTradeLogs(logs)
 
-  const orderUids = logs.reduce<string[]>((acc, log) => {
+  const orderUids = notificationLogs.reduce<string[]>((acc, log) => {
     const { orderUid } = log.args
 
     if (log.eventName !== 'Trade' || !orderUid) return acc
@@ -100,7 +103,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
     return acc
   }, [])
 
-  const ethFlowOrderIds = logs.reduce<string[]>((acc, log) => {
+  const ethFlowOrderIds = notificationLogs.reduce<string[]>((acc, log) => {
     const { owner, orderUid } = log.args
 
     if (log.eventName !== 'Trade') return acc
@@ -118,10 +121,13 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
   const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(chainId, orderUids)
 
-  const orders = await ordersRepository.getOrders(chainId, orderUids)
-  const blockTimestamps = await getBlockTimestamps(client, logs)
+  const orderExecutionSnapshots = await ordersRepository.getOrderExecutionSnapshots(
+    chainId,
+    getOrderExecutionPositions(notificationLogs)
+  )
+  const blockTimestamps = await getBlockTimestamps(client, notificationLogs)
 
-  const notificationPromises = logs.reduce<Promise<PushNotification>[]>((acc, log) => {
+  const notificationPromises = notificationLogs.reduce<Promise<PushNotification>[]>((acc, log) => {
     switch (log.eventName) {
       case 'Trade': {
         const {
@@ -150,7 +156,10 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
         const timestamp = log.blockNumber === null ? undefined : blockTimestamps.get(log.blockNumber)
-        const order = orders.get(orderUidLower)
+        const orderExecutionPosition = getOrderExecutionPosition(log)
+        const order = orderExecutionPosition
+          ? orderExecutionSnapshots.get(getOrderExecutionPositionKey(orderExecutionPosition))
+          : undefined
         const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
         const isBridgingOrder = getIsBridgingOrder(appData)
@@ -210,6 +219,51 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   }
 
   return Promise.all(notificationPromises)
+}
+
+type TradeLog = {
+  eventName: string
+  blockNumber: bigint | null
+  logIndex: number | null
+  args: { orderUid?: string }
+}
+
+export function getLatestTradeLogs<T extends TradeLog>(logs: T[]): T[] {
+  const latestLogs = new Map<string, T>()
+
+  for (const log of logs) {
+    const position = getOrderExecutionPosition(log)
+    if (!position) continue
+
+    const currentLog = latestLogs.get(position.orderUid.toLowerCase())
+    const currentPosition = currentLog && getOrderExecutionPosition(currentLog)
+    if (
+      !currentPosition ||
+      position.blockNumber > currentPosition.blockNumber ||
+      (position.blockNumber === currentPosition.blockNumber && position.logIndex > currentPosition.logIndex)
+    ) {
+      latestLogs.set(position.orderUid.toLowerCase(), log)
+    }
+  }
+
+  return logs.filter((log) => {
+    const position = getOrderExecutionPosition(log)
+    return position !== undefined && latestLogs.get(position.orderUid.toLowerCase()) === log
+  })
+}
+
+function getOrderExecutionPositions(logs: TradeLog[]): OrderExecutionPosition[] {
+  return logs.flatMap((log) => {
+    const position = getOrderExecutionPosition(log)
+    return position ? [position] : []
+  })
+}
+
+function getOrderExecutionPosition(log: TradeLog): OrderExecutionPosition | undefined {
+  const { orderUid } = log.args
+  if (!orderUid || log.blockNumber === null || log.logIndex === null) return undefined
+
+  return { orderUid, blockNumber: log.blockNumber, logIndex: log.logIndex }
 }
 
 function getIsBridgingOrder(appData: AnyAppDataDocVersion | undefined) {
