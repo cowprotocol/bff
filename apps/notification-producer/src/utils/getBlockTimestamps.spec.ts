@@ -23,4 +23,26 @@ describe('getBlockTimestamps', () => {
 
     expect(getBlock).toHaveBeenCalledTimes(2)
   })
+
+  it('fetches blocks in bounded batches and skips failed requests', async () => {
+    let inFlight = 0
+    let maximumInFlight = 0
+    const getBlock = jest.fn(async ({ blockNumber }: { blockNumber: bigint }) => {
+      inFlight++
+      maximumInFlight = Math.max(maximumInFlight, inFlight)
+      await Promise.resolve()
+      inFlight--
+
+      if (blockNumber === 11n) throw new Error('block unavailable')
+
+      return { number: blockNumber, timestamp: blockNumber * 10n }
+    })
+    const logs = Array.from({ length: 12 }, (_, blockNumber) => ({ blockNumber: BigInt(blockNumber) }))
+
+    await expect(getBlockTimestamps({ getBlock }, logs)).resolves.toEqual(
+      new Map(logs.filter((log) => log.blockNumber !== 11n).map(({ blockNumber }) => [blockNumber, blockNumber * 10n]))
+    )
+
+    expect(maximumInFlight).toBeLessThanOrEqual(10)
+  })
 })
