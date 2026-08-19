@@ -114,6 +114,7 @@ function fromCmsToNotifications(cmsNotification: CmsPushNotification): PushNotif
     url: url || undefined,
     context: {
       cmsId: cmsNotificationId,
+      type: 'cow-cms-push',
     },
   }
 }

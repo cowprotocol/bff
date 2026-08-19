@@ -101,6 +101,7 @@ export async function fromTradeToNotification(props: {
     context: {
       transactionHash,
       logIndex: logIndex.toString(),
+      type: 'cow-trade-notification',
     },
   }
 }
