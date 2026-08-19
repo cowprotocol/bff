@@ -1,4 +1,5 @@
 import { areAddressesEqual } from '@cowprotocol/cow-sdk'
+import { formatAccount } from '@cowprotocol/shared'
 
 export const ORDER_NOTIFICATION_EMOJI = {
   completed: '✅',
@@ -29,14 +30,10 @@ export function formatOrderNotification({
     timeZone: 'UTC',
   })
   const recipientMetadata =
-    recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${abbreviateAddress(recipient)}` : ''
+    recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${formatAccount(recipient)}` : ''
 
   return {
     title: `${title} at ${time} UTC`,
-    message: `${message}\n\nAccount: ${abbreviateAddress(account)}${recipientMetadata}\nChain: ${chainName}`,
+    message: `${message}\n\nAccount: ${formatAccount(account)}${recipientMetadata}\nChain: ${chainName}`,
   }
-}
-
-function abbreviateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
