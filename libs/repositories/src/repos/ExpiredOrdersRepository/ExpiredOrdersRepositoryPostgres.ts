@@ -5,7 +5,7 @@ import {
   ExpiredOrdersRepository,
   ParsedExpiredOrder,
 } from './ExpiredOrdersRepository'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { bytesToHexString } from '../../utils/bytesUtils'
 import { parseExpiredOrder } from './expiredOrdersUtils'
 
@@ -14,13 +14,9 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
     const { chainId, accounts } = context
 
-    const prodDb = getOrderBookDbPool('prod', chainId)
-    const barnDb = getOrderBookDbPool('barn', chainId)
-
-    const prodExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, prodDb)
-    const barnExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, barnDb)
-
-    const allExpiredOrders = [...(prodExpiredOrdersResult?.rows || []), ...(barnExpiredOrdersResult?.rows || [])]
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    const expiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, db)
+    const allExpiredOrders = expiredOrdersResult?.rows || []
 
     const accountsMap = accounts.reduce<Set<string>>((acc, account) => {
       acc.add(account.toLowerCase())

@@ -31,7 +31,7 @@ cp .env.example .env
 | RabbitMQ                      | `QUEUE_HOST`, `QUEUE_PORT`, `QUEUE_USER`, `QUEUE_PASSWORD`                                                                                                                                          |
 | Telegram delivery             | `TELEGRAM_SECRET`                                                                                                                                                                                   |
 | CMS subscriptions             | `CMS_API_KEY`, `CMS_BASE_URL` (set this to the local CMS URL when not using the default CMS)                                                                                                        |
-| Order-book data               | `PROD_ORDERBOOK_DATABASE_HOST`, `PROD_ORDERBOOK_DATABASE_PORT`, `PROD_ORDERBOOK_DATABASE_USERNAME`, `PROD_ORDERBOOK_DATABASE_PASSWORD`, and the corresponding `BARN_ORDERBOOK_DATABASE_*` variables |
+| Order-book data               | `PROD_ORDERBOOK_DATABASE_HOST`, `PROD_ORDERBOOK_DATABASE_PORT`, `PROD_ORDERBOOK_DATABASE_USERNAME`, `PROD_ORDERBOOK_DATABASE_PASSWORD` for `COW_PROTOCOL_ENV=prod`; use the corresponding `BARN_ORDERBOOK_DATABASE_*` variables for `staging` |
 | Chain access                  | `RPC_URL_<chainId>` for every enabled producer chain, for example `RPC_URL_11155111`                                                                                                                |
 | Producer selection            | `NOTIFICATIONS_PRODUCER_CHAINS` and `COW_PROTOCOL_ENV`                                                                                                                                              |
 
@@ -43,7 +43,7 @@ COW_PROTOCOL_ENV=staging
 RPC_URL_11155111=https://your-sepolia-rpc
 ```
 
-`COW_PROTOCOL_ENV=staging` makes the producer use the BARN settlement and ETH-flow addresses. Use `prod` only when testing production contracts. The producer reads both PROD and BARN order-book databases, so configure both sets of database variables even for staging notifications.
+`COW_PROTOCOL_ENV=staging` makes the producer use the BARN settlement, ETH-flow address, and order-book database. Use `prod` only when testing production contracts; it uses the PROD order-book database.
 
 ## Start order
 
@@ -83,5 +83,5 @@ POST_TO_QUEUE_ACCOUNT=0x79063d9173C09887d536924E2F6eADbaBAc099f5 \
 ## Troubleshooting
 
 - `ECONNREFUSED 127.0.0.1:5432` from `yarn migration:run` in the devcontainer means the database is on the host but `DATABASE_HOST` still points at the container. Set it to `host.docker.internal`.
-- Missing `PROD_ORDERBOOK_DATABASE_*` or `BARN_ORDERBOOK_DATABASE_*` variables prevents the producer from loading order data and expiration.
+- Missing the order-book variables for the selected `COW_PROTOCOL_ENV` prevents the producer from loading order data and expiration.
 - If no chains are set, the producer tries every supported EVM chain. Set `NOTIFICATIONS_PRODUCER_CHAINS` to keep local testing focused.

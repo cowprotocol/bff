@@ -1,13 +1,15 @@
 import { OrderKind, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { Pool } from 'pg'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { getOrderExecutionPositionKey, OrderExecutionPosition } from './OrdersRepository'
 import { OrdersRepositoryPostgres } from './OrdersRepositoryPostgres'
 
 jest.mock('../../datasources/orderBookDbPool', () => ({
+  getOrderBookDbEnvironment: jest.fn(),
   getOrderBookDbPool: jest.fn(),
 }))
 
+const getOrderBookDbEnvironmentMock = getOrderBookDbEnvironment as jest.MockedFunction<typeof getOrderBookDbEnvironment>
 const getOrderBookDbPoolMock = getOrderBookDbPool as jest.MockedFunction<typeof getOrderBookDbPool>
 const prodQuery = jest.fn()
 const barnQuery = jest.fn()
@@ -62,39 +64,50 @@ function executionSnapshotRow(
 
 describe('OrdersRepositoryPostgres', () => {
   const repository = new OrdersRepositoryPostgres()
+  const cowProtocolEnv = process.env.COW_PROTOCOL_ENV
 
   beforeEach(() => {
     jest.clearAllMocks()
+    process.env.COW_PROTOCOL_ENV = 'prod'
+    getOrderBookDbEnvironmentMock.mockImplementation(() =>
+      process.env.COW_PROTOCOL_ENV === 'staging' ? 'barn' : 'prod'
+    )
     getOrderBookDbPoolMock.mockImplementation((environment) => (environment === 'prod' ? prodPool : barnPool))
   })
 
-  it('merges BARN-only orders with prod orders', async () => {
+  afterAll(() => {
+    if (cowProtocolEnv === undefined) delete process.env.COW_PROTOCOL_ENV
+    else process.env.COW_PROTOCOL_ENV = cowProtocolEnv
+  })
+
+  it('uses BARN only in staging', async () => {
+    process.env.COW_PROTOCOL_ENV = 'staging'
+    prodQuery.mockResolvedValue({ rows: [] })
+    barnQuery.mockResolvedValue({ rows: [row(barnUid, OrderKind.BUY)] })
+
+    await expect(repository.getOrders(SupportedChainId.MAINNET, [barnUid])).resolves.toEqual(
+      new Map([[barnUid, expectedOrder(barnUid, OrderKind.BUY)]])
+    )
+
+    expect(prodQuery).not.toHaveBeenCalled()
+    expect(barnQuery).toHaveBeenCalled()
+  })
+
+  it('uses prod only outside staging', async () => {
+    process.env.COW_PROTOCOL_ENV = 'prod'
     prodQuery.mockResolvedValue({ rows: [row(prodUid, OrderKind.SELL)] })
     barnQuery.mockResolvedValue({ rows: [row(barnUid, OrderKind.BUY)] })
 
     await expect(repository.getOrders(SupportedChainId.MAINNET, [prodUid, barnUid])).resolves.toEqual(
-      new Map([
-        [prodUid, expectedOrder(prodUid, OrderKind.SELL)],
-        [barnUid, expectedOrder(barnUid, OrderKind.BUY)],
-      ])
+      new Map([[prodUid, expectedOrder(prodUid, OrderKind.SELL)]])
     )
-    expect(barnQuery).toHaveBeenCalledWith(expect.any(String), [[Buffer.from(barnUid.slice(2), 'hex')]])
+    expect(barnQuery).not.toHaveBeenCalled()
   })
 
   it('does not query a database when no order UIDs are requested', async () => {
     await expect(repository.getOrders(SupportedChainId.MAINNET, [])).resolves.toEqual(new Map())
 
     expect(prodQuery).not.toHaveBeenCalled()
-    expect(barnQuery).not.toHaveBeenCalled()
-  })
-
-  it('does not query BARN when prod contains every requested order', async () => {
-    prodQuery.mockResolvedValue({ rows: [row(prodUid, OrderKind.SELL)] })
-
-    await expect(repository.getOrders(SupportedChainId.MAINNET, [prodUid])).resolves.toEqual(
-      new Map([[prodUid, expectedOrder(prodUid, OrderKind.SELL)]])
-    )
-
     expect(barnQuery).not.toHaveBeenCalled()
   })
 

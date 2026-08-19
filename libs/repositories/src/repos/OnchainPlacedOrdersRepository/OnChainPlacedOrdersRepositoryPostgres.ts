@@ -1,7 +1,7 @@
 import { Pool, QueryResult } from 'pg'
 import { OnChainPlacedOrdersRepository } from './OnChainPlacedOrdersRepository'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils'
 
 interface OnChainPlacedOrder {
@@ -13,21 +13,8 @@ type AccountsForOrders = { [account: string]: string[] }
 
 export class OnChainPlacedOrdersRepositoryPostgres implements OnChainPlacedOrdersRepository {
   async getAccountsForOrders(chainId: SupportedChainId, uids: string[]): Promise<AccountsForOrders> {
-    const orders: OnChainPlacedOrder[] = []
-
-    const prodDb = getOrderBookDbPool('prod', chainId)
-    const prodOrders = await this.fetchOnChainPlacedOrdersFromDb(uids, prodDb)
-
-    if (!prodOrders?.rowCount) {
-      const barnDb = getOrderBookDbPool('barn', chainId)
-      const barnOrders = await this.fetchOnChainPlacedOrdersFromDb(uids, barnDb)
-
-      if (barnOrders?.rowCount) {
-        orders.push(...barnOrders.rows)
-      }
-    } else {
-      orders.push(...prodOrders.rows)
-    }
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    const orders = (await this.fetchOnChainPlacedOrdersFromDb(uids, db))?.rows || []
 
     return orders.reduce<AccountsForOrders>((acc, row) => {
       const owner = bytesToHexString(row.sender).toLowerCase()

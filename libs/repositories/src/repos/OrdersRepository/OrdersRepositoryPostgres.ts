@@ -1,6 +1,6 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import { Pool } from 'pg'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils'
 import { chunkArray } from '../../utils/chunkArray'
 import {
@@ -14,36 +14,16 @@ const LIMIT = 100
 
 export class OrdersRepositoryPostgres implements OrdersRepository {
   async getOrders(chainId: SupportedChainId, uids: string[]): Promise<Map<string, NotificationOrder>> {
-    const prodDb = getOrderBookDbPool('prod', chainId)
-    const prodOrders = await this.fetchOrdersFromDb(uids, prodDb)
-    const missingUids = uids.filter((uid) => !prodOrders.has(uid.toLowerCase()))
-
-    if (missingUids.length === 0) {
-      return prodOrders
-    }
-
-    const barnDb = getOrderBookDbPool('barn', chainId)
-    const barnOrders = await this.fetchOrdersFromDb(missingUids, barnDb)
-
-    return new Map([...prodOrders, ...barnOrders])
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    return this.fetchOrdersFromDb(uids, db)
   }
 
   async getOrderExecutionSnapshots(
     chainId: SupportedChainId,
     positions: OrderExecutionPosition[]
   ): Promise<Map<string, NotificationOrder>> {
-    const prodDb = getOrderBookDbPool('prod', chainId)
-    const prodSnapshots = await this.fetchOrderExecutionSnapshotsFromDb(positions, prodDb)
-    const missingPositions = positions.filter((position) => !prodSnapshots.has(getOrderExecutionPositionKey(position)))
-
-    if (missingPositions.length === 0) {
-      return prodSnapshots
-    }
-
-    const barnDb = getOrderBookDbPool('barn', chainId)
-    const barnSnapshots = await this.fetchOrderExecutionSnapshotsFromDb(missingPositions, barnDb)
-
-    return new Map([...prodSnapshots, ...barnSnapshots])
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    return this.fetchOrderExecutionSnapshotsFromDb(positions, db)
   }
 
   private async fetchOrdersFromDb(uids: string[], db: Pool): Promise<Map<string, NotificationOrder>> {
