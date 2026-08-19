@@ -4,10 +4,10 @@ import {
   releaseConnectToken,
   PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
-import { logger } from '@cowprotocol/shared'
+import { formatAccount, logger } from '@cowprotocol/shared'
 import TelegramBot from 'node-telegram-bot-api'
 
-import { formatAccount, UNSUBSCRIBE_MENU_CALLBACK_DATA } from './unsubscribeFlow'
+import { UNSUBSCRIBE_MENU_CALLBACK_DATA } from './unsubscribeFlow'
 
 const START_COMMAND_PATTERN = /^\/start(?:\s+(\S+))?/
 

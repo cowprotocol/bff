@@ -1,5 +1,9 @@
 import { Address, getAddress, isAddress } from 'viem'
 
+export function formatAccount(account: string): string {
+  return `${account.slice(0, 6)}…${account.slice(-4)}`
+}
+
 export function parseEthereumAddressList(values: string[]): Address[] {
   const unique = new Set<Address>()
 

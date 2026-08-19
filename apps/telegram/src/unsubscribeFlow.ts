@@ -1,5 +1,5 @@
 import { PushSubscriptionsRepository } from '@cowprotocol/repositories'
-import { logger } from '@cowprotocol/shared'
+import { formatAccount, logger } from '@cowprotocol/shared'
 import TelegramBot from 'node-telegram-bot-api'
 
 // Unsubscribing only happens here, from the bot side, since Telegram itself proves which
@@ -21,10 +21,6 @@ export function buildUnsubscribeAccountCallbackData(account: string): string {
 export function parseUnsubscribeAccountCallbackData(data: string | undefined): string | null {
   if (!data || !data.startsWith(UNSUBSCRIBE_ACCOUNT_CALLBACK_PREFIX)) return null
   return data.slice(UNSUBSCRIBE_ACCOUNT_CALLBACK_PREFIX.length)
-}
-
-export function formatAccount(account: string): string {
-  return `${account.slice(0, 6)}…${account.slice(-4)}`
 }
 
 async function unsubscribeAccount(params: {

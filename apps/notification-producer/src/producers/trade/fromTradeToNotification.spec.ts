@@ -41,7 +41,7 @@ describe('fromTradeToNotification', () => {
       })
     ).resolves.toMatchObject({
       title: '✅ Swap filled at 12:42 UTC',
-      message: 'You traded 1 USDC and received 2 COW.\n\nAccount: 0x1234...7890\nChain: Ethereum',
+      message: 'You traded 1 USDC and received 2 COW.\n\nAccount: 0x1234…7890\nChain: Ethereum',
     })
   })
 })
