@@ -1,24 +1,26 @@
 import { OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
 import { formatOrderNotification } from './formatOrderNotification'
-import { OrderTitle } from './getOrderTitle'
 
 type FormattedAmounts = { sell: string; buy: string }
 
 interface FormatTradeNotificationParams {
-  orderTitle: OrderTitle
+  orderClass: string
   timestamp: bigint
   account: string
   recipient?: string | null
   chainName: string
   tradeAmounts: FormattedAmounts
-  order?: Pick<NotificationOrder, 'kind' | 'sellAmount' | 'buyAmount' | 'executedSellAmount' | 'executedBuyAmount'>
+  order?: Pick<
+    NotificationOrder,
+    'partiallyFillable' | 'kind' | 'sellAmount' | 'buyAmount' | 'executedSellAmount' | 'executedBuyAmount'
+  >
   orderAmounts?: FormattedAmounts
   executedAmounts?: FormattedAmounts
 }
 
 export function formatTradeNotification({
-  orderTitle,
+  orderClass,
   timestamp,
   account,
   recipient,
@@ -31,29 +33,33 @@ export function formatTradeNotification({
   const notification = (title: string, message: string) =>
     formatOrderNotification({ title, message, timestamp, account, recipient, chainName })
 
-  switch (orderTitle) {
-    case 'Swap order filled':
+  switch (orderClass) {
+    case 'market':
       return notification('Swap filled', tradeMessage(tradeAmounts))
-    case 'Limit order filled':
+    case 'limit':
+      if (!isOrderFullyFilled(order)) {
+        return notification(
+          'Limit order partially filled',
+          order && orderAmounts
+            ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now ${fillPercentage(
+                order
+              )}% filled.`
+            : tradeMessage(tradeAmounts)
+        )
+      }
+
       return notification(
         'Limit order filled',
         order && orderAmounts && executedAmounts
           ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now 100% filled. You received ${executedAmounts.buy}.`
           : tradeMessage(tradeAmounts)
       )
-    case 'Limit order partially filled':
-      return notification(
-        'Limit order partially filled',
-        order && orderAmounts
-          ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now ${fillPercentage(
-              order
-            )}% filled.`
-          : tradeMessage(tradeAmounts)
-      )
-    case 'TWAP part is filled':
+    case 'twap':
       return notification('A TWAP part filled', `One part of your TWAP order filled. ${tradeMessage(tradeAmounts)}`)
+    case 'liquidity':
+      return notification('Liquidity order filled', tradeMessage(tradeAmounts))
     default:
-      return notification(orderTitle, tradeMessage(tradeAmounts))
+      return notification('Order filled', tradeMessage(tradeAmounts))
   }
 }
 
@@ -68,4 +74,12 @@ function fillPercentage(order: NonNullable<FormatTradeNotificationParams['order'
       : [order.executedBuyAmount, order.buyAmount]
 
   return (BigInt(executedAmount) * 100n) / BigInt(totalAmount)
+}
+
+function isOrderFullyFilled(order: FormatTradeNotificationParams['order']): boolean {
+  if (!order?.partiallyFillable) return true
+
+  return order.kind === OrderKind.SELL
+    ? BigInt(order.executedSellAmount) >= BigInt(order.sellAmount)
+    : BigInt(order.executedBuyAmount) >= BigInt(order.buyAmount)
 }

@@ -1,6 +1,6 @@
 import { AnyAppDataDocVersion } from '@cowprotocol/cow-sdk'
 import { formatOrderNotification } from '../../utils/formatOrderNotification'
-import { getOrderClass } from '../../utils/getOrderTitle'
+import { getOrderClass } from '../../utils/getOrderClass'
 
 interface FormatExpiredOrderNotificationParams {
   appData?: AnyAppDataDocVersion

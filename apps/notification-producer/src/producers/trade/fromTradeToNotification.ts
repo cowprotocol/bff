@@ -4,7 +4,7 @@ import { Erc20Repository, NotificationOrder } from '@cowprotocol/repositories'
 import { ChainNames, getExplorerUrl, logger } from '@cowprotocol/shared'
 import { formatTradeNotification } from '../../utils/formatTradeNotification'
 import { getNotificationAmounts } from '../../utils/getNotificationAmounts'
-import { getOrderTitle } from '../../utils/getOrderTitle'
+import { getOrderClass } from '../../utils/getOrderClass'
 
 export async function fromTradeToNotification(props: {
   prefix: string
@@ -77,7 +77,7 @@ export async function fromTradeToNotification(props: {
     : undefined
 
   const notification = formatTradeNotification({
-    orderTitle: getOrderTitle(appData, order),
+    orderClass: getOrderClass(appData),
     timestamp,
     account: owner,
     recipient: order?.receiver,

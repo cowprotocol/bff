@@ -9,8 +9,16 @@ const common = {
 }
 
 describe('formatTradeNotification', () => {
+  it('routes a market order by its semantic class', () => {
+    expect(formatTradeNotification({ ...common, orderClass: 'market' })).toEqual({
+      title: 'Swap filled at 12:42 UTC',
+      message:
+        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
+    })
+  })
+
   it('formats a swap notification', () => {
-    expect(formatTradeNotification({ ...common, orderTitle: 'Swap order filled' })).toEqual({
+    expect(formatTradeNotification({ ...common, orderClass: 'market' })).toEqual({
       title: 'Swap filled at 12:42 UTC',
       message:
         'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
@@ -21,7 +29,7 @@ describe('formatTradeNotification', () => {
     expect(
       formatTradeNotification({
         ...common,
-        orderTitle: 'Swap order filled',
+        orderClass: 'market',
         recipient: '0x0000000000000000000000000000000000000001',
       })
     ).toEqual({
@@ -36,7 +44,7 @@ describe('formatTradeNotification', () => {
       formatTradeNotification({
         ...common,
         account: '0xAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAa',
-        orderTitle: 'Swap order filled',
+        orderClass: 'market',
         recipient: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       })
     ).toEqual({
@@ -50,8 +58,9 @@ describe('formatTradeNotification', () => {
     expect(
       formatTradeNotification({
         ...common,
-        orderTitle: 'Limit order filled',
+        orderClass: 'limit',
         order: {
+          partiallyFillable: true,
           kind: OrderKind.SELL,
           sellAmount: '1000',
           buyAmount: '100000',
@@ -72,8 +81,9 @@ describe('formatTradeNotification', () => {
     expect(
       formatTradeNotification({
         ...common,
-        orderTitle: 'Limit order partially filled',
+        orderClass: 'limit',
         order: {
+          partiallyFillable: true,
           kind: OrderKind.SELL,
           sellAmount: '100',
           buyAmount: '1000',
@@ -90,7 +100,7 @@ describe('formatTradeNotification', () => {
   })
 
   it('formats a TWAP notification without an unavailable part count', () => {
-    expect(formatTradeNotification({ ...common, orderTitle: 'TWAP part is filled' })).toEqual({
+    expect(formatTradeNotification({ ...common, orderClass: 'twap' })).toEqual({
       title: 'A TWAP part filled at 12:42 UTC',
       message:
         'One part of your TWAP order filled. You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Arbitrum One',
