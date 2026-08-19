@@ -11,6 +11,7 @@ import { PushSubscriptionsRepository } from './PushSubscriptionsRepository'
 
 const PAGE_SIZE = 50
 const CACHE_TIME = 30000
+const CMS_REQUEST_TIMEOUT_MS = 10_000
 
 type PaginationParam = {
   page?: number
@@ -251,6 +252,10 @@ async function callCmsInternalEndpoint<T>(path: string, body: Record<string, unk
     throw new Error('CMS_API_KEY is not set')
   }
 
+  // The same signal aborts both the request and an in-flight response.text() read below,
+  // so a stalled CMS connection can't leave this pending indefinitely.
+  const signal = AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS)
+
   const response = await fetch(`${cmsBaseUrl}${path}`, {
     method: 'POST',
     headers: {
@@ -260,6 +265,7 @@ async function callCmsInternalEndpoint<T>(path: string, body: Record<string, unk
       Authorization: `Bearer ${cmsApiKey}`,
     },
     body: JSON.stringify(body),
+    signal,
   })
 
   const text = await response.text()

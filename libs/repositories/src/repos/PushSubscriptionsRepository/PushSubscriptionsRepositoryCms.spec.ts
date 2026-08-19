@@ -49,6 +49,18 @@ describe('PushSubscriptionsRepositoryCms', () => {
 
       await expect(repository.linkTelegramSubscription({ account: '0xabc', chatId: 42 })).rejects.toThrow(/500/)
     })
+
+    it('passes a timeout-backed AbortSignal so the request cannot hang indefinitely', async () => {
+      mockedFetch.mockResolvedValue(jsonResponse(200, { success: true }))
+      const repository = new PushSubscriptionsRepositoryCms()
+
+      await repository.linkTelegramSubscription({ account: '0xabc', chatId: 42 })
+
+      expect(mockedFetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    })
   })
 
   describe('unlinkTelegramSubscription', () => {
