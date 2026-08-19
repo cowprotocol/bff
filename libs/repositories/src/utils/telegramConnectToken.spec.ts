@@ -1,10 +1,5 @@
 import { CacheRepository } from '../repos/CacheRepository/CacheRepository'
-import {
-  createConnectToken,
-  invalidateConnectToken,
-  lookupConnectToken,
-  resolveConnectToken,
-} from './telegramConnectToken'
+import { claimConnectToken, createConnectToken, releaseConnectToken } from './telegramConnectToken'
 
 // Simple in-memory cache implementation for testing
 class TestCacheRepository implements CacheRepository {
@@ -36,35 +31,71 @@ class TestCacheRepository implements CacheRepository {
       expiresAt: Date.now() + ttl * 1000,
     })
   }
+
+  async take(key: string): Promise<string | null> {
+    // No internal await: get+delete must complete synchronously in one microtask so this
+    // mock exercises the same single-winner guarantee the real Redis/node-cache take() gives.
+    const entry = this.cache.get(key)
+    this.cache.delete(key)
+
+    if (!entry || entry.expiresAt < Date.now()) return null
+
+    return entry.value
+  }
 }
 
 describe('telegramConnectToken', () => {
-  describe('resolveConnectToken', () => {
-    it('resolves a freshly created token back to its account', async () => {
+  describe('claimConnectToken', () => {
+    it('claims a freshly created token back to its account', async () => {
       const cacheRepository = new TestCacheRepository()
 
       const token = await createConnectToken(cacheRepository, '0xabc')
-      const resolved = await resolveConnectToken(cacheRepository, token)
+      const claimed = await claimConnectToken(cacheRepository, token)
 
-      expect(resolved).toBe('0xabc')
+      expect(claimed).toBe('0xabc')
     })
 
-    it('resolving a token deletes it (single-use)', async () => {
+    it('claiming a token deletes it (single-use)', async () => {
       const cacheRepository = new TestCacheRepository()
       const token = await createConnectToken(cacheRepository, '0xabc')
 
-      await resolveConnectToken(cacheRepository, token)
-      const secondResolve = await resolveConnectToken(cacheRepository, token)
+      await claimConnectToken(cacheRepository, token)
+      const secondClaim = await claimConnectToken(cacheRepository, token)
 
-      expect(secondResolve).toBeNull()
+      expect(secondClaim).toBeNull()
     })
 
     it('returns null for an unknown token', async () => {
       const cacheRepository = new TestCacheRepository()
 
-      const resolved = await resolveConnectToken(cacheRepository, 'does-not-exist')
+      const claimed = await claimConnectToken(cacheRepository, 'does-not-exist')
 
-      expect(resolved).toBeNull()
+      expect(claimed).toBeNull()
+    })
+
+    it('only one of two concurrent claims for the same token succeeds', async () => {
+      const cacheRepository = new TestCacheRepository()
+      const token = await createConnectToken(cacheRepository, '0xabc')
+
+      const [first, second] = await Promise.all([
+        claimConnectToken(cacheRepository, token),
+        claimConnectToken(cacheRepository, token),
+      ])
+
+      expect([first, second].filter((result) => result === '0xabc')).toHaveLength(1)
+      expect([first, second].filter((result) => result === null)).toHaveLength(1)
+    })
+  })
+
+  describe('releaseConnectToken', () => {
+    it('restores a claimed token so it can be claimed again', async () => {
+      const cacheRepository = new TestCacheRepository()
+      const token = await createConnectToken(cacheRepository, '0xabc')
+
+      await claimConnectToken(cacheRepository, token)
+      await releaseConnectToken(cacheRepository, token, '0xabc')
+
+      expect(await claimConnectToken(cacheRepository, token)).toBe('0xabc')
     })
   })
 
@@ -75,24 +106,5 @@ describe('telegramConnectToken', () => {
     const tokenB = await createConnectToken(cacheRepository, '0xabc')
 
     expect(tokenA).not.toBe(tokenB)
-  })
-
-  it('lookupConnectToken does not invalidate the token', async () => {
-    const cacheRepository = new TestCacheRepository()
-    const token = await createConnectToken(cacheRepository, '0xabc')
-
-    await lookupConnectToken(cacheRepository, token)
-    const secondLookup = await lookupConnectToken(cacheRepository, token)
-
-    expect(secondLookup).toBe('0xabc')
-  })
-
-  it('invalidateConnectToken makes a later lookup falsy (callers treat it as invalid)', async () => {
-    const cacheRepository = new TestCacheRepository()
-    const token = await createConnectToken(cacheRepository, '0xabc')
-
-    await invalidateConnectToken(cacheRepository, token)
-
-    expect(await lookupConnectToken(cacheRepository, token)).toBeFalsy()
   })
 })

@@ -1,7 +1,7 @@
 import {
   CacheRepository,
-  invalidateConnectToken,
-  lookupConnectToken,
+  claimConnectToken,
+  releaseConnectToken,
   PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
 import { logger } from '@cowprotocol/shared'
@@ -30,7 +30,7 @@ export async function handleStartCommand(params: {
 
   if (!token) return
 
-  const account = await lookupConnectToken(cacheRepository, token)
+  const account = await claimConnectToken(cacheRepository, token)
 
   if (!account) {
     await bot.sendMessage(msg.chat.id, 'This link has expired — please reconnect from CoW Swap.')
@@ -46,11 +46,10 @@ export async function handleStartCommand(params: {
     })
   } catch (error) {
     logger.error(error, '[telegram] Error linking Telegram subscription')
+    await releaseConnectToken(cacheRepository, token, account)
     await bot.sendMessage(msg.chat.id, 'Something went wrong linking your account — please try again.')
     return
   }
-
-  await invalidateConnectToken(cacheRepository, token)
 
   await bot.sendMessage(
     msg.chat.id,

@@ -35,6 +35,15 @@ class TestCacheRepository implements CacheRepository {
       expiresAt: Date.now() + ttl * 1000,
     })
   }
+
+  async take(key: string): Promise<string | null> {
+    const entry = this.cache.get(key)
+    this.cache.delete(key)
+
+    if (!entry || entry.expiresAt < Date.now()) return null
+
+    return entry.value
+  }
 }
 
 describe('parseStartCommand', () => {
