@@ -19,10 +19,10 @@ export function formatAmount(amount: bigint, decimals: number | undefined) {
   if (decimals === undefined) return amount.toString()
   if (decimals <= MAX_DISPLAY_DECIMALS) return formatUnits(amount, decimals)
 
-  const divisor = 10n ** BigInt(decimals - MAX_DISPLAY_DECIMALS)
-  const rounded = (amount + divisor / 2n) / divisor
+  const divisor = BigInt(`1${'0'.repeat(decimals - MAX_DISPLAY_DECIMALS)}`)
+  const rounded = (amount + divisor / BigInt(2)) / divisor
 
-  return amount > 0n && rounded === 0n ? '<0.000001' : formatUnits(rounded, MAX_DISPLAY_DECIMALS)
+  return amount > BigInt(0) && rounded === BigInt(0) ? '<0.000001' : formatUnits(rounded, MAX_DISPLAY_DECIMALS)
 }
 
 export function formatTokenName(token: { symbol?: string; address: string } | null) {
