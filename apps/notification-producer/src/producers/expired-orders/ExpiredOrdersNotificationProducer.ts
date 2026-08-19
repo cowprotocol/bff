@@ -12,6 +12,8 @@ import {
   IndexerStateRepository,
   IndexerStateValue,
   OnChainPlacedOrdersRepository,
+  ORDER_EXPIRATION_THRESHOLD_SECONDS,
+  OrdersAppDataRepository,
   PushNotificationsRepository,
   PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
@@ -33,6 +35,7 @@ export type ExpiredOrdersNotificationProducerProps = {
   expiredOrdersRepository: ExpiredOrdersRepository
   pushNotificationsRepository: PushNotificationsRepository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
+  ordersAppDataRepository: OrdersAppDataRepository
 }
 
 export interface ExpiredOrdersNotificationProducerState extends IndexerStateValue {
@@ -88,9 +91,11 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       expiredOrdersRepository,
       pushNotificationsRepository,
       onChainPlacedOrdersRepository,
+      ordersAppDataRepository,
     } = this.props
 
     const nowTimestamp = Math.ceil(Date.now() / 1000)
+    const expirationCheckTimestamp = getExpirationCheckTimestamp(nowTimestamp)
 
     const stateRegistry = await indexerStateRepository.get<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
@@ -109,7 +114,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
       logger.debug(
-        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${nowTimestamp}], watching ${
+        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${expirationCheckTimestamp}], watching ${
           accounts.length
         } subscribed account(s): ${JSON.stringify(accounts)}`
       )
@@ -118,7 +123,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         chainId,
         accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
-        nowTimestamp,
+        nowTimestamp: expirationCheckTimestamp,
       })
 
       logger.debug(
@@ -133,6 +138,12 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
             expiredOrders.map((o) => o.uid)
           )
         : {}
+      const ordersAppData = expiredOrders.length
+        ? await ordersAppDataRepository.getAppDataForOrders(
+            chainId,
+            expiredOrders.map((order) => order.uid)
+          )
+        : new Map()
 
       logger.debug(`${this.prefix} on-chain placed order owners resolved: ${JSON.stringify(ethFlowOrderOwners)}`)
 
@@ -160,14 +171,18 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
             `${this.prefix} resolved owner ${orderOwner} for expired order ${order.uid} (isEthFlowOrder=${isEthFlowOrder})`
           )
 
-          return getExpiredOrderNotification(order, {
-            chainId,
-            nowTimestamp,
-            lastCheckTimestamp,
-            isEthFlowOrder,
-            owner: orderOwner,
-            erc20Repository,
-          })
+          return getExpiredOrderNotification(
+            order,
+            {
+              chainId,
+              nowTimestamp,
+              lastCheckTimestamp,
+              isEthFlowOrder,
+              owner: orderOwner,
+              erc20Repository,
+            },
+            ordersAppData.get(order.uid.toLowerCase())
+          )
         })
       )
 
@@ -184,14 +199,18 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       logger.debug(
         `${this.prefix} no previous state found (stateRegistry=${JSON.stringify(
           stateRegistry
-        )}), skipping this cycle and just recording lastCheckTimestamp=${nowTimestamp}`
+        )}), skipping this cycle and just recording lastCheckTimestamp=${expirationCheckTimestamp}`
       )
     }
 
     await indexerStateRepository.upsert<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
-      { lastCheckTimestamp: nowTimestamp.toString() },
+      { lastCheckTimestamp: expirationCheckTimestamp.toString() },
       chainId
     )
   }
+}
+
+export function getExpirationCheckTimestamp(nowTimestamp: number): number {
+  return nowTimestamp - ORDER_EXPIRATION_THRESHOLD_SECONDS
 }

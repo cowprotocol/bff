@@ -5,24 +5,18 @@ import {
   ExpiredOrdersRepository,
   ParsedExpiredOrder,
 } from './ExpiredOrdersRepository'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { bytesToHexString } from '../../utils/bytesUtils'
 import { parseExpiredOrder } from './expiredOrdersUtils'
 
 const LIMIT = 1000
-const ORDER_EXPIRATION_THRESHOLD = 60 // 1 minute
-
 export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository {
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
     const { chainId, accounts } = context
 
-    const prodDb = getOrderBookDbPool('prod', chainId)
-    const barnDb = getOrderBookDbPool('barn', chainId)
-
-    const prodExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, prodDb)
-    const barnExpiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, barnDb)
-
-    const allExpiredOrders = [...(prodExpiredOrdersResult?.rows || []), ...(barnExpiredOrdersResult?.rows || [])]
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    const expiredOrdersResult = await this.fetchExpiredOrdersFromDb(context, db)
+    const allExpiredOrders = expiredOrdersResult?.rows || []
 
     const accountsMap = accounts.reduce<Set<string>>((acc, account) => {
       acc.add(account.toLowerCase())
@@ -54,7 +48,7 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
               AND o.valid_to <= $2
         )
         SELECT
-            o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+            o.uid, o.kind, o.owner, o.receiver, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         FROM filtered_orders o
             LEFT JOIN trades t ON t.order_uid = o.uid
             WHERE NOT EXISTS (
@@ -79,7 +73,7 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
                 WHERE o.signing_scheme = 'presign'
                   AND latest_pe.signed = false
             )
-        GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+        GROUP BY o.uid, o.kind, o.owner, o.receiver, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         HAVING (
                    (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount * 0.999)
                    OR (o.kind = 'buy' AND COALESCE(SUM(t.buy_amount), 0)  < o.buy_amount * 0.999)
@@ -87,6 +81,6 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
         LIMIT $3;
     `
 
-    return db.query(query, [lastCheckTimestamp, nowTimestamp - ORDER_EXPIRATION_THRESHOLD, LIMIT])
+    return db.query(query, [lastCheckTimestamp, nowTimestamp, LIMIT])
   }
 }

@@ -7,6 +7,7 @@ export function parseExpiredOrder(order: ExpiredOrder): ParsedExpiredOrder {
     kind: order.kind,
     validTo: order.valid_to,
     owner: bytesToHexString(order.owner),
+    receiver: order.receiver ? bytesToHexString(order.receiver) : null,
     sellTokenAddress: bytesToHexString(order.sell_token),
     sellAmount: order.sell_amount,
     buyTokenAddress: bytesToHexString(order.buy_token),

@@ -188,7 +188,7 @@ async function sendMessageTelegram(chatId: string, notification: PushNotificatio
 }
 
 function formatMessageMarkdown({ title, message, url }: PushNotification) {
-  const moreInfo = url ? `\n\nMore info in [Explorer](${url})` : ''
+  const moreInfo = url ? `\n\nOrder details: [Explorer](${url})` : ''
 
   return `\
 **${title}**.

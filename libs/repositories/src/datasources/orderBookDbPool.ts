@@ -47,6 +47,10 @@ function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainI
 
 const orderBookDbCache = new Map<string, Pool>()
 
+export function getOrderBookDbEnvironment(): 'prod' | 'barn' {
+  return process.env.COW_PROTOCOL_ENV === 'staging' ? 'barn' : 'prod'
+}
+
 export function getOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId) {
   const key = `${env}|${chainId}`
   const cached = orderBookDbCache.get(key)
