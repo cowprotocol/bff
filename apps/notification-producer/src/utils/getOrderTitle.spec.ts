@@ -1,5 +1,5 @@
 import { AnyAppDataDocVersion, Order, OrderKind } from '@cowprotocol/cow-sdk'
-import { getOrderTitle } from './getOrderTitle'
+import { getOrderClass, getOrderTitle } from './getOrderTitle'
 
 const appData = {
   metadata: { orderClass: { orderClass: 'limit' } },
@@ -19,6 +19,15 @@ function order(overrides: Partial<Order>): Order {
 }
 
 describe('getOrderTitle', () => {
+  it.each([
+    [{ metadata: { orderClass: { orderClass: 'market' } } }, 'market'],
+    [{ metadata: { orderClass: { orderClass: 'limit' } } }, 'limit'],
+    [{ metadata: { orderClass: { orderClass: 'twap' } } }, 'twap'],
+    [{}, 'unknown'],
+  ])('extracts the order class', (metadata, expected) => {
+    expect(getOrderClass(metadata as AnyAppDataDocVersion)).toBe(expected)
+  })
+
   it.each([
     [order({}), 'Limit order partially filled'],
     [order({ executedSellAmount: '100' }), 'Limit order filled'],

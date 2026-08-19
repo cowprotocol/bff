@@ -1,8 +1,9 @@
 import { PushNotification } from '@cowprotocol/notifications'
 import { Erc20Repository, ParsedExpiredOrder } from '@cowprotocol/repositories'
-import { getExplorerUrl } from '@cowprotocol/shared'
-import { type SupportedChainId } from '@cowprotocol/cow-sdk'
-import { getNotificationSummary } from '../../utils/getNotificationSummary'
+import { ChainNames, getExplorerUrl } from '@cowprotocol/shared'
+import { AnyAppDataDocVersion, type SupportedChainId } from '@cowprotocol/cow-sdk'
+import { getNotificationAmounts } from '../../utils/getNotificationAmounts'
+import { formatExpiredOrderNotification } from './formatExpiredOrderNotification'
 
 export interface ExpiredOrderNotificationContext {
   chainId: SupportedChainId
@@ -15,11 +16,12 @@ export interface ExpiredOrderNotificationContext {
 
 export async function getExpiredOrderNotification(
   expiredOrder: ParsedExpiredOrder,
-  notificationContext: ExpiredOrderNotificationContext
+  notificationContext: ExpiredOrderNotificationContext,
+  appData?: AnyAppDataDocVersion
 ): Promise<PushNotification> {
   const { chainId, lastCheckTimestamp, nowTimestamp, isEthFlowOrder, owner, erc20Repository } = notificationContext
 
-  const summary = await getNotificationSummary({
+  const orderAmounts = await getNotificationAmounts({
     chainId,
     isEthFlowOrder,
     erc20Repository,
@@ -29,11 +31,14 @@ export async function getExpiredOrderNotification(
     buyTokenAddress: expiredOrder.buyTokenAddress,
   })
 
-  const title = `🕐 Order ${summary} has expired`
-  const message = `
-  Expiration time: ${new Date(expiredOrder.validTo * 1000).toISOString()}.
-  Account: ${owner}.
-  `.trim()
+  const { title, message } = formatExpiredOrderNotification({
+    appData,
+    timestamp: expiredOrder.validTo,
+    account: owner,
+    recipient: expiredOrder.receiver,
+    chainName: ChainNames[chainId],
+    orderAmounts,
+  })
 
   const url = getExplorerUrl(chainId, expiredOrder.uid)
 

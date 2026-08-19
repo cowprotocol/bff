@@ -54,7 +54,7 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
               AND o.valid_to <= $2
         )
         SELECT
-            o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+            o.uid, o.kind, o.owner, o.receiver, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         FROM filtered_orders o
             LEFT JOIN trades t ON t.order_uid = o.uid
             WHERE NOT EXISTS (
@@ -79,7 +79,7 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
                 WHERE o.signing_scheme = 'presign'
                   AND latest_pe.signed = false
             )
-        GROUP BY o.uid, o.kind, o.owner, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
+        GROUP BY o.uid, o.kind, o.owner, o.receiver, o.valid_to, o.sell_token, o.buy_token, o.sell_amount, o.buy_amount
         HAVING (
                    (o.kind = 'sell' AND COALESCE(SUM(t.sell_amount), 0) < o.sell_amount * 0.999)
                    OR (o.kind = 'buy' AND COALESCE(SUM(t.buy_amount), 0)  < o.buy_amount * 0.999)

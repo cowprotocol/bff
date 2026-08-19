@@ -1,5 +1,6 @@
-import { areAddressesEqual, OrderKind } from '@cowprotocol/cow-sdk'
+import { OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
+import { formatOrderNotification } from './formatOrderNotification'
 
 type FormattedAmounts = { sell: string; buy: string }
 
@@ -26,48 +27,33 @@ export function formatTradeNotification({
   orderAmounts,
   executedAmounts,
 }: FormatTradeNotificationParams) {
-  const time = new Date(Number(timestamp) * 1000).toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'UTC',
-  })
-  const recipientMetadata = recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${recipient}` : ''
-  const metadata = `Account: ${account}${recipientMetadata}\nChain: ${chainName}`
+  const notification = (title: string, message: string) =>
+    formatOrderNotification({ title, message, timestamp, account, recipient, chainName })
 
   switch (orderTitle) {
     case 'Swap order filled':
-      return notification(`Swap filled at ${time} UTC`, tradeMessage(tradeAmounts), metadata)
+      return notification('Swap filled', tradeMessage(tradeAmounts))
     case 'Limit order filled':
       return notification(
-        `Limit order filled at ${time} UTC`,
+        'Limit order filled',
         order && orderAmounts && executedAmounts
           ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now 100% filled. You received ${executedAmounts.buy}.`
-          : tradeMessage(tradeAmounts),
-        metadata
+          : tradeMessage(tradeAmounts)
       )
     case 'Limit order partially filled':
       return notification(
-        `Limit order partially filled at ${time} UTC`,
+        'Limit order partially filled',
         order && orderAmounts
           ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now ${fillPercentage(
               order
             )}% filled.`
-          : tradeMessage(tradeAmounts),
-        metadata
+          : tradeMessage(tradeAmounts)
       )
     case 'TWAP part is filled':
-      return notification(
-        `A TWAP part filled at ${time} UTC`,
-        `One part of your TWAP order filled. ${tradeMessage(tradeAmounts)}`,
-        metadata
-      )
+      return notification('A TWAP part filled', `One part of your TWAP order filled. ${tradeMessage(tradeAmounts)}`)
     default:
-      return notification(`${orderTitle} at ${time} UTC`, tradeMessage(tradeAmounts), metadata)
+      return notification(orderTitle, tradeMessage(tradeAmounts))
   }
-}
-
-function notification(title: string, message: string, metadata: string) {
-  return { title, message: `${message}\n\n${metadata}` }
 }
 
 function tradeMessage({ sell, buy }: FormattedAmounts) {

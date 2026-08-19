@@ -2,10 +2,7 @@ import { AnyAppDataDocVersion, OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
 
 export function getOrderTitle(appData: AnyAppDataDocVersion | undefined, order: NotificationOrder | undefined) {
-  const { metadata } = appData || {}
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const orderClass = (metadata as any)?.orderClass?.orderClass || 'unknown'
+  const orderClass = getOrderClass(appData)
 
   switch (orderClass) {
     case 'market':
@@ -21,6 +18,13 @@ export function getOrderTitle(appData: AnyAppDataDocVersion | undefined, order: 
       // Order class not properly configured
       return 'Order filled'
   }
+}
+
+export function getOrderClass(appData: AnyAppDataDocVersion | undefined) {
+  const { metadata } = appData || {}
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (metadata as any)?.orderClass?.orderClass || 'unknown'
 }
 
 function isOrderFullyFilled(order: NotificationOrder | undefined): boolean {

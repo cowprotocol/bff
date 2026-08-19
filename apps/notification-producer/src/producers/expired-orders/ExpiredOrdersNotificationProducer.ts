@@ -12,6 +12,7 @@ import {
   IndexerStateRepository,
   IndexerStateValue,
   OnChainPlacedOrdersRepository,
+  OrdersAppDataRepository,
   PushNotificationsRepository,
   PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
@@ -37,6 +38,7 @@ export type ExpiredOrdersNotificationProducerProps = {
   expiredOrdersRepository: ExpiredOrdersRepository
   pushNotificationsRepository: PushNotificationsRepository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
+  ordersAppDataRepository: OrdersAppDataRepository
 }
 
 export interface ExpiredOrdersNotificationProducerState extends IndexerStateValue {
@@ -97,6 +99,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       expiredOrdersRepository,
       pushNotificationsRepository,
       onChainPlacedOrdersRepository,
+      ordersAppDataRepository,
     } = this.props
 
     const nowTimestamp = Math.ceil(Date.now() / 1000)
@@ -142,6 +145,12 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
             expiredOrders.map((o) => o.uid)
           )
         : {}
+      const ordersAppData = expiredOrders.length
+        ? await ordersAppDataRepository.getAppDataForOrders(
+            chainId,
+            expiredOrders.map((order) => order.uid)
+          )
+        : new Map()
 
       logger.debug(`${this.prefix} on-chain placed order owners resolved: ${JSON.stringify(ethFlowOrderOwners)}`)
 
@@ -169,14 +178,18 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
             `${this.prefix} resolved owner ${orderOwner} for expired order ${order.uid} (isEthFlowOrder=${isEthFlowOrder})`
           )
 
-          return getExpiredOrderNotification(order, {
-            chainId,
-            nowTimestamp,
-            lastCheckTimestamp,
-            isEthFlowOrder,
-            owner: orderOwner,
-            erc20Repository,
-          })
+          return getExpiredOrderNotification(
+            order,
+            {
+              chainId,
+              nowTimestamp,
+              lastCheckTimestamp,
+              isEthFlowOrder,
+              owner: orderOwner,
+              erc20Repository,
+            },
+            ordersAppData.get(order.uid.toLowerCase())
+          )
         })
       )
 
