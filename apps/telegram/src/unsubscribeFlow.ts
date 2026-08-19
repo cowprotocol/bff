@@ -23,7 +23,7 @@ export function parseUnsubscribeAccountCallbackData(data: string | undefined): s
   return data.slice(UNSUBSCRIBE_ACCOUNT_CALLBACK_PREFIX.length)
 }
 
-function formatAccount(account: string): string {
+export function formatAccount(account: string): string {
   return `${account.slice(0, 6)}…${account.slice(-4)}`
 }
 
@@ -88,7 +88,12 @@ export async function handleUnsubscribeCommand(params: {
 
   if (!isUnsubscribeCommand(msg.text)) return
 
-  await sendUnsubscribeMenu({ bot, chatId: msg.chat.id, pushSubscriptionsRepository })
+  try {
+    await sendUnsubscribeMenu({ bot, chatId: msg.chat.id, pushSubscriptionsRepository })
+  } catch (error) {
+    logger.error(error, '[telegram] Error handling /unsubscribe command')
+    await bot.sendMessage(msg.chat.id, 'Something went wrong — please try again.')
+  }
 }
 
 export async function handleUnsubscribeCallback(params: {

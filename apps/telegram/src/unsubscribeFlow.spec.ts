@@ -93,6 +93,17 @@ describe('handleUnsubscribeCommand', () => {
     expect(unlinkTelegramSubscription).not.toHaveBeenCalled()
     expect(sendMessage).toHaveBeenCalledWith(555, expect.stringMatching(/don't have any active/i))
   })
+
+  it('replies with an error message when the lookup fails, instead of leaving the user with no response', async () => {
+    const getTelegramSubscriptionsForChatId = jest.fn().mockRejectedValue(new Error('cms unreachable'))
+    const pushSubscriptionsRepository = { getTelegramSubscriptionsForChatId } as any
+    const sendMessage = jest.fn()
+    const bot = { sendMessage } as any
+
+    await handleUnsubscribeCommand({ bot, msg: buildMsg('/unsubscribe'), pushSubscriptionsRepository })
+
+    expect(sendMessage).toHaveBeenCalledWith(555, expect.stringMatching(/something went wrong/i))
+  })
 })
 
 function buildCallbackQuery(data: string): TelegramBot.CallbackQuery {

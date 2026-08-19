@@ -7,7 +7,7 @@ import {
 import { logger } from '@cowprotocol/shared'
 import TelegramBot from 'node-telegram-bot-api'
 
-import { UNSUBSCRIBE_MENU_CALLBACK_DATA } from './unsubscribeFlow'
+import { formatAccount, UNSUBSCRIBE_MENU_CALLBACK_DATA } from './unsubscribeFlow'
 
 const START_COMMAND_PATTERN = /^\/start(?:\s+(\S+))?/
 
@@ -61,8 +61,4 @@ export async function handleStartCommand(params: {
       },
     }
   )
-}
-
-function formatAccount(account: string): string {
-  return `${account.slice(0, 6)}…${account.slice(-4)}`
 }
