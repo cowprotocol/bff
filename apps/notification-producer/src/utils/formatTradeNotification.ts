@@ -1,4 +1,4 @@
-import { OrderKind } from '@cowprotocol/cow-sdk'
+import { areAddressesEqual, OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
 
 type FormattedAmounts = { sell: string; buy: string }
@@ -7,6 +7,7 @@ interface FormatTradeNotificationParams {
   orderTitle: string
   timestamp: bigint
   account: string
+  recipient?: string | null
   chainName: string
   tradeAmounts: FormattedAmounts
   order?: Pick<NotificationOrder, 'kind' | 'sellAmount' | 'buyAmount' | 'executedSellAmount' | 'executedBuyAmount'>
@@ -18,6 +19,7 @@ export function formatTradeNotification({
   orderTitle,
   timestamp,
   account,
+  recipient,
   chainName,
   tradeAmounts,
   order,
@@ -29,7 +31,8 @@ export function formatTradeNotification({
     minute: '2-digit',
     timeZone: 'UTC',
   })
-  const metadata = `Account: ${account}\nChain: ${chainName}`
+  const recipientMetadata = recipient && !areAddressesEqual(account, recipient) ? `\nRecipient: ${recipient}` : ''
+  const metadata = `Account: ${account}${recipientMetadata}\nChain: ${chainName}`
 
   switch (orderTitle) {
     case 'Swap order filled':

@@ -16,7 +16,7 @@ const barnPool = { query: barnQuery } as unknown as Pool
 const prodUid = `0x${'11'.repeat(56)}`
 const barnUid = `0x${'22'.repeat(56)}`
 
-function row(uid: string, kind: OrderKind) {
+function row(uid: string, kind: OrderKind, receiver: Buffer | null = null) {
   return {
     uid: Buffer.from(uid.slice(2), 'hex'),
     partially_fillable: true,
@@ -25,16 +25,18 @@ function row(uid: string, kind: OrderKind) {
     buy_amount: '100',
     executed_sell_amount: kind === OrderKind.SELL ? '50' : '0',
     executed_buy_amount: kind === OrderKind.BUY ? '50' : '0',
+    receiver,
   }
 }
 
-function expectedOrder(uid: string, kind: OrderKind) {
+function expectedOrder(uid: string, kind: OrderKind, receiver: string | null = null) {
   return {
     uid,
     partiallyFillable: true,
     kind,
     sellAmount: '100',
     buyAmount: '100',
+    receiver,
     executedSellAmount: kind === OrderKind.SELL ? '50' : '0',
     executedBuyAmount: kind === OrderKind.BUY ? '50' : '0',
   }
@@ -87,5 +89,14 @@ describe('OrdersRepositoryPostgres', () => {
     expect(query).toContain('LEFT JOIN trades t ON t.order_uid = o.uid')
     expect(query).toContain('COALESCE(SUM(t.sell_amount), 0) AS executed_sell_amount')
     expect(query).toContain('COALESCE(SUM(t.buy_amount), 0) AS executed_buy_amount')
+  })
+
+  it('includes a custom recipient', async () => {
+    const receiver = '0x0000000000000000000000000000000000000001'
+    prodQuery.mockResolvedValue({ rows: [row(prodUid, OrderKind.SELL, Buffer.from(receiver.slice(2), 'hex'))] })
+
+    const orders = await repository.getOrders(SupportedChainId.MAINNET, [prodUid])
+
+    expect(orders.get(prodUid)).toMatchObject({ receiver })
   })
 })

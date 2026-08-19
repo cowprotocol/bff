@@ -80,6 +80,7 @@ export async function fromTradeToNotification(props: {
     orderTitle: getOrderTitle(appData, order),
     timestamp,
     account: owner,
+    recipient: order?.receiver,
     chainName: ChainNames[chainId],
     tradeAmounts,
     order,

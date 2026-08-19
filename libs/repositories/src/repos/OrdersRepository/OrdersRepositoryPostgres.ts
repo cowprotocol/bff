@@ -41,12 +41,13 @@ export class OrdersRepositoryPostgres implements OrdersRepository {
         o.kind,
         o.sell_amount,
         o.buy_amount,
+        o.receiver,
         COALESCE(SUM(t.sell_amount), 0) AS executed_sell_amount,
         COALESCE(SUM(t.buy_amount), 0) AS executed_buy_amount
       FROM orders o
       LEFT JOIN trades t ON t.order_uid = o.uid
       WHERE o.uid = ANY($1)
-      GROUP BY o.uid, o.partially_fillable, o.kind, o.sell_amount, o.buy_amount
+      GROUP BY o.uid, o.partially_fillable, o.kind, o.sell_amount, o.buy_amount, o.receiver
       LIMIT ${LIMIT}
     `
 
@@ -59,6 +60,7 @@ export class OrdersRepositoryPostgres implements OrdersRepository {
         kind: row.kind,
         sellAmount: row.sell_amount,
         buyAmount: row.buy_amount,
+        receiver: row.receiver ? bytesToHexString(row.receiver) : null,
         executedSellAmount: row.executed_sell_amount,
         executedBuyAmount: row.executed_buy_amount,
       }

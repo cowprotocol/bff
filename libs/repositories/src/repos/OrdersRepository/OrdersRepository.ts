@@ -2,7 +2,14 @@ import { Order, SupportedChainId } from '@cowprotocol/cow-sdk'
 
 export type NotificationOrder = Pick<
   Order,
-  'uid' | 'partiallyFillable' | 'kind' | 'sellAmount' | 'buyAmount' | 'executedSellAmount' | 'executedBuyAmount'
+  | 'uid'
+  | 'partiallyFillable'
+  | 'kind'
+  | 'sellAmount'
+  | 'buyAmount'
+  | 'executedSellAmount'
+  | 'executedBuyAmount'
+  | 'receiver'
 >
 
 export interface OrdersRepository {

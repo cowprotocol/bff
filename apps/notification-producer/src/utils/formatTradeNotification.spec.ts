@@ -17,6 +17,35 @@ describe('formatTradeNotification', () => {
     })
   })
 
+  it('includes a custom recipient', () => {
+    expect(
+      formatTradeNotification({
+        ...common,
+        orderTitle: 'Swap order filled',
+        recipient: '0x0000000000000000000000000000000000000001',
+      })
+    ).toEqual({
+      title: 'Swap filled at 12:42 UTC',
+      message:
+        'You traded 10 USDC and received 1 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nRecipient: 0x0000000000000000000000000000000000000001\nChain: Arbitrum One',
+    })
+  })
+
+  it('omits a recipient that matches the account', () => {
+    expect(
+      formatTradeNotification({
+        ...common,
+        account: '0xAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAa',
+        orderTitle: 'Swap order filled',
+        recipient: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      })
+    ).toEqual({
+      title: 'Swap filled at 12:42 UTC',
+      message:
+        'You traded 10 USDC and received 1 COW.\n\nAccount: 0xAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAaAaaAa\nChain: Arbitrum One',
+    })
+  })
+
   it('formats a completely filled limit order', () => {
     expect(
       formatTradeNotification({
