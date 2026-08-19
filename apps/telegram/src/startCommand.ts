@@ -1,8 +1,13 @@
-import { CacheRepository, PushSubscriptionsRepository } from '@cowprotocol/repositories'
+import {
+  CacheRepository,
+  invalidateConnectToken,
+  lookupConnectToken,
+  PushSubscriptionsRepository,
+} from '@cowprotocol/repositories'
 import { logger } from '@cowprotocol/shared'
 import TelegramBot from 'node-telegram-bot-api'
 
-const TOKEN_PREFIX = 'telegram-connect:'
+import { UNSUBSCRIBE_MENU_CALLBACK_DATA } from './unsubscribeFlow'
 
 const START_COMMAND_PATTERN = /^\/start(?:\s+(\S+))?/
 
@@ -12,14 +17,6 @@ export function parseStartCommand(text: string | undefined): string | null {
   const match = text.match(START_COMMAND_PATTERN)
 
   return match?.[1] ?? null
-}
-
-async function lookupConnectToken(cacheRepository: CacheRepository, token: string): Promise<string | null> {
-  return cacheRepository.get(TOKEN_PREFIX + token)
-}
-
-async function invalidateConnectToken(cacheRepository: CacheRepository, token: string): Promise<void> {
-  await cacheRepository.set(TOKEN_PREFIX + token, '', 1)
 }
 
 export async function handleStartCommand(params: {
@@ -55,5 +52,17 @@ export async function handleStartCommand(params: {
 
   await invalidateConnectToken(cacheRepository, token)
 
-  await bot.sendMessage(msg.chat.id, "You're connected! You'll now receive CoW Swap notifications here.")
+  await bot.sendMessage(
+    msg.chat.id,
+    `You're connected! You'll now receive CoW Swap notifications for ${formatAccount(account)} here.`,
+    {
+      reply_markup: {
+        inline_keyboard: [[{ text: 'Unsubscribe', callback_data: UNSUBSCRIBE_MENU_CALLBACK_DATA }]],
+      },
+    }
+  )
+}
+
+function formatAccount(account: string): string {
+  return `${account.slice(0, 6)}…${account.slice(-4)}`
 }

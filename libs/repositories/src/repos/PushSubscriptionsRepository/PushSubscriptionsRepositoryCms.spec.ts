@@ -64,4 +64,30 @@ describe('PushSubscriptionsRepositoryCms', () => {
       )
     })
   })
+
+  describe('getTelegramSubscriptionsForChatId', () => {
+    it('POSTs to /telegram-subscription/accounts-by-chat-via-bot and returns the parsed accounts', async () => {
+      mockedFetch.mockResolvedValue(jsonResponse(200, [{ account: '0xabc', chatId: '42' }]))
+      const repository = new PushSubscriptionsRepositoryCms()
+
+      const result = await repository.getTelegramSubscriptionsForChatId(42)
+
+      expect(mockedFetch).toHaveBeenCalledWith(
+        'https://cms.mock/telegram-subscription/accounts-by-chat-via-bot',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({ Authorization: 'Bearer mock-api-key' }),
+          body: JSON.stringify({ chatId: 42 }),
+        })
+      )
+      expect(result).toEqual([{ account: '0xabc', chatId: '42' }])
+    })
+
+    it('throws when the cms responds with a non-2xx status', async () => {
+      mockedFetch.mockResolvedValue(jsonResponse(500, { error: 'boom' }))
+      const repository = new PushSubscriptionsRepositoryCms()
+
+      await expect(repository.getTelegramSubscriptionsForChatId(42)).rejects.toThrow(/500/)
+    })
+  })
 })

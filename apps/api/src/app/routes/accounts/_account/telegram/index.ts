@@ -1,9 +1,10 @@
 import { FastifyPluginAsync } from 'fastify'
-import { FromSchema, JSONSchema } from 'json-schema-to-ts'
+import { FromSchema } from 'json-schema-to-ts'
 import TelegramBot from 'node-telegram-bot-api'
 import {
   CacheRepository,
   cacheRepositorySymbol,
+  createConnectToken,
   isCmsEnabled,
   PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
@@ -11,23 +12,9 @@ import {
 } from '@cowprotocol/repositories'
 import { logger } from '@cowprotocol/shared'
 
-import { ETHEREUM_ADDRESS_PATTERN } from '../../../../schemas'
 import { apiContainer } from '../../../../inversify.config'
-import { createConnectToken } from './connectToken'
-import { buildTelegramDeepLink } from './buildTelegramDeepLink'
-
-const paramsSchema = {
-  type: 'object',
-  required: ['account'],
-  properties: {
-    account: {
-      title: 'account',
-      description: 'Account of the user',
-      type: 'string',
-      pattern: ETHEREUM_ADDRESS_PATTERN,
-    },
-  },
-} as const satisfies JSONSchema
+import { buildTelegramDeepLink, buildTelegramUnsubscribeDeepLink } from './buildTelegramDeepLink'
+import { paramsSchema } from './telegram.schemas'
 
 type ParamsSchema = FromSchema<typeof paramsSchema>
 
@@ -48,7 +35,10 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
     if (!username) throw new Error('Telegram getMe() returned no username')
     telegramBotUsername = username
   } catch (error) {
-    logger.error(error, 'Failed to resolve the Telegram bot username via getMe(). Telegram connect-token routes will not be registered.')
+    logger.error(
+      error,
+      'Failed to resolve the Telegram bot username via getMe(). Telegram connect-token routes will not be registered.'
+    )
     return
   }
 
@@ -85,7 +75,7 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
   // GET /accounts/:account/telegram/connect-status
   fastify.get<{
     Params: ParamsSchema
-    Reply: { connected: boolean; username?: string }
+    Reply: { connected: boolean; botDeepLink: string }
   }>(
     '/connect-status',
     {
@@ -99,28 +89,15 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
       const account = request.params.account.toLowerCase()
       const subscriptions = await pushSubscriptionsRepository.getAllTelegramSubscriptionsForAccounts([account])
 
-      reply.send({ connected: subscriptions.length > 0 })
-    }
-  )
-
-  // DELETE /accounts/:account/telegram/subscription
-  fastify.delete<{
-    Params: ParamsSchema
-    Reply: { success: true }
-  }>(
-    '/subscription',
-    {
-      schema: {
-        description: "Unlink this account's Telegram subscription",
-        tags: ['accounts', 'telegram'],
-        params: paramsSchema,
-      },
-    },
-    async function (request, reply) {
-      const account = request.params.account.toLowerCase()
-      await pushSubscriptionsRepository.unlinkTelegramSubscription({ account })
-
-      reply.send({ success: true })
+      reply.send({
+        connected: subscriptions.length > 0,
+        // Unsubscribing only happens from the bot side (it can prove which Telegram
+        // chat is asking), so the frontend just needs a link to open the bot with
+        // "/unsubscribe" pre-filled - not a fresh single-use connect-token. Pre-filling
+        // (rather than a bare chat link) means it still works if the user deleted their
+        // chat with the bot and lost the original "Unsubscribe" button.
+        botDeepLink: buildTelegramUnsubscribeDeepLink(telegramBotUsername),
+      })
     }
   )
 }

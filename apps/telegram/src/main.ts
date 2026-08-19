@@ -16,6 +16,7 @@ import { PushNotification } from '@cowprotocol/notifications'
 import TelegramBot from 'node-telegram-bot-api'
 import { CmsTelegramSubscription, PushSubscriptionsRepository, redisClient } from '@cowprotocol/repositories'
 import { handleStartCommand } from './startCommand'
+import { handleUnsubscribeCallback, handleUnsubscribeCommand } from './unsubscribeFlow'
 
 const WAIT_TIME = ms(`10s`)
 const SUBSCRIPTION_CACHE_TIME = ms(`5m`)
@@ -44,6 +45,20 @@ async function mainLoop() {
   telegramBot.on('message', (msg) => {
     handleStartCommand({ bot: telegramBot, msg, cacheRepository, pushSubscriptionsRepository }).catch((error) =>
       logger.error(error, '[telegram] Error handling /start command')
+    )
+  })
+
+  // Handle /unsubscribe (and /stop), plus the "Unsubscribe" inline button - unsubscribing
+  // only happens from this side since Telegram itself proves which chat is asking.
+  telegramBot.on('message', (msg) => {
+    handleUnsubscribeCommand({ bot: telegramBot, msg, pushSubscriptionsRepository }).catch((error) =>
+      logger.error(error, '[telegram] Error handling /unsubscribe command')
+    )
+  })
+
+  telegramBot.on('callback_query', (query) => {
+    handleUnsubscribeCallback({ bot: telegramBot, query, pushSubscriptionsRepository }).catch((error) =>
+      logger.error(error, '[telegram] Error handling unsubscribe callback')
     )
   })
 

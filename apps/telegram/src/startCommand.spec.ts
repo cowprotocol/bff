@@ -80,7 +80,13 @@ describe('handleStartCommand', () => {
       firstName: 'Ada',
       username: 'ada',
     })
-    expect(sendMessage).toHaveBeenCalledWith(555, expect.stringMatching(/connected/i))
+    expect(sendMessage).toHaveBeenCalledWith(
+      555,
+      expect.stringMatching(/connected/i),
+      expect.objectContaining({
+        reply_markup: expect.objectContaining({ inline_keyboard: expect.any(Array) }),
+      })
+    )
   })
 
   it('replies with an expired-link message when the token is unknown', async () => {
