@@ -23,4 +23,8 @@ export class CacheRepositoryRedis implements CacheRepository {
   async set(key: string, value: string, ttl: number): Promise<void> {
     await this.redisClient.set(key, value, 'EX', ttl)
   }
+
+  async take(key: string): Promise<string | null> {
+    return this.redisClient.getdel(key)
+  }
 }

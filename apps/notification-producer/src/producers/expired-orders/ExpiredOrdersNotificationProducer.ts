@@ -19,13 +19,9 @@ import {
 } from '@cowprotocol/repositories'
 
 import { Runnable } from '../../../types'
-import { doForever, logger } from '@cowprotocol/shared'
+import { doForever, interruptibleSleep, logger } from '@cowprotocol/shared'
 import { getExpiredOrderNotification } from './getExpiredOrderNotification'
 import { isTruthy } from '../../utils/commonUtils'
-
-async function wait(time: number) {
-  return new Promise((res) => setTimeout(res, time))
-}
 
 const WAIT_TIME = 10_000
 const POLLING_INTERVAL = 120_000 // 2 minutes
@@ -47,7 +43,7 @@ export interface ExpiredOrdersNotificationProducerState extends IndexerStateValu
 }
 
 export class ExpiredOrdersNotificationProducer implements Runnable {
-  isStopping = false
+  private abortController = new AbortController()
   prefix: string
 
   constructor(private props: ExpiredOrdersNotificationProducerProps) {
@@ -63,29 +59,24 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
   async start(): Promise<void> {
     await doForever({
       name: 'ExpiredOrdersNotificationProducer:' + this.props.chainId,
-      callback: async (stop) => {
-        if (this.isStopping) {
-          stop()
-          return
-        }
-        await this.processExpiredOrders()
-      },
+      callback: () => this.processExpiredOrders(),
       waitTimeMilliseconds: WAIT_TIME,
       logger,
+      signal: this.abortController.signal,
     })
   }
 
   async stop(): Promise<void> {
-    this.isStopping = true
+    this.abortController.abort()
   }
 
   async processExpiredOrders(): Promise<void> {
     return this.pollExpiredOrders()
       .then(() => {
-        return wait(POLLING_INTERVAL)
+        return interruptibleSleep(POLLING_INTERVAL, this.abortController.signal)
       })
       .then(() => {
-        if (this.isStopping) return
+        if (this.abortController.signal.aborted) return
 
         return this.processExpiredOrders()
       })

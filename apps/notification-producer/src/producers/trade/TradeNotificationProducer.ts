@@ -41,7 +41,7 @@ export interface TradeNotificationProducerState extends IndexerStateValue {
 }
 
 export class TradeNotificationProducer implements Runnable {
-  isStopping = false
+  private abortController = new AbortController()
   prefix: string
 
   constructor(private props: TradeNotificationProducerProps) {
@@ -57,20 +57,15 @@ export class TradeNotificationProducer implements Runnable {
   async start(): Promise<void> {
     await doForever({
       name: 'TradeNotificationProducer:' + this.props.chainId,
-      callback: async (stop) => {
-        if (this.isStopping) {
-          stop()
-          return
-        }
-        await this.fetchAndSend()
-      },
+      callback: () => this.fetchAndSend(),
       waitTimeMilliseconds: WAIT_TIME,
       logger,
+      signal: this.abortController.signal,
     })
   }
 
   async stop(): Promise<void> {
-    this.isStopping = true
+    this.abortController.abort()
   }
 
   async fetchAndSend(): Promise<void> {
@@ -184,7 +179,7 @@ export class TradeNotificationProducer implements Runnable {
     logger.debug(
       `${this.prefix} Watching ${
         accounts.length
-      } subscribed account(s) for blocks ${fromBlock}-${toBlock}: ${JSON.stringify(accounts)}`
+      } subscribed account(s) for blocks ${fromBlock}-${toBlock}`
     )
 
     // Get all trade notifications for the block range

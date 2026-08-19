@@ -6,10 +6,17 @@ import { JSDOM } from 'jsdom'
 import createDOMPurify from 'dompurify'
 
 import { doForever, logger, sleep } from '@cowprotocol/shared'
-import { getPushNotificationsRepository, getPushSubscriptionsRepository, getTelegramBot } from '@cowprotocol/services'
+import {
+  getCacheRepository,
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
+  getTelegramBot,
+} from '@cowprotocol/services'
 import { PushNotification } from '@cowprotocol/notifications'
 import TelegramBot from 'node-telegram-bot-api'
-import { CmsTelegramSubscription, PushSubscriptionsRepository } from '@cowprotocol/repositories'
+import { CmsTelegramSubscription, PushSubscriptionsRepository, redisClient } from '@cowprotocol/repositories'
+import { handleStartCommand } from './startCommand'
+import { handleUnsubscribeCallback, handleUnsubscribeCommand } from './unsubscribeFlow'
 
 const WAIT_TIME = ms(`10s`)
 const SUBSCRIPTION_CACHE_TIME = ms(`5m`)
@@ -25,6 +32,36 @@ let telegramBot: TelegramBot
 async function mainLoop() {
   // Create telegram bot
   telegramBot = getTelegramBot()
+
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository()
+
+  if (!redisClient) {
+    logger.warn(
+      'REDIS is not configured — Telegram connect-tokens minted by apps/api will not be resolvable here; the /start deep-link handler will not be registered. Set REDIS_HOST/REDIS_ENABLED.'
+    )
+  } else {
+    // Handle incoming /start <token> deep-link messages
+    const cacheRepository = getCacheRepository()
+    telegramBot.on('message', (msg) => {
+      handleStartCommand({ bot: telegramBot, msg, cacheRepository, pushSubscriptionsRepository }).catch((error) =>
+        logger.error(error, '[telegram] Error handling /start command')
+      )
+    })
+  }
+
+  // Handle /unsubscribe (and /stop), plus the "Unsubscribe" inline button - unsubscribing
+  // only happens from this side since Telegram itself proves which chat is asking.
+  telegramBot.on('message', (msg) => {
+    handleUnsubscribeCommand({ bot: telegramBot, msg, pushSubscriptionsRepository }).catch((error) =>
+      logger.error(error, '[telegram] Error handling /unsubscribe command')
+    )
+  })
+
+  telegramBot.on('callback_query', (query) => {
+    handleUnsubscribeCallback({ bot: telegramBot, query, pushSubscriptionsRepository }).catch((error) =>
+      logger.error(error, '[telegram] Error handling unsubscribe callback')
+    )
+  })
 
   // Subscribe to notifications
   logger.info('[telegram] Start telegram consumer')

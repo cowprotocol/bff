@@ -1,6 +1,7 @@
 // Utils
 export * from './utils/cache'
 export * from './utils/isDbEnabled'
+export * from './utils/telegramConnectToken'
 
 // Data-sources
 export * from './datasources/cms'
