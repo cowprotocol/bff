@@ -45,6 +45,17 @@ export interface NotificationModel {
 export interface PushSubscriptionsRepository {
   getAllSubscribedAccounts(): Promise<string[]>
   getAllTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]>
+  // Unsubscribing only happens from the bot side (see apps/telegram's unsubscribeFlow),
+  // since it can prove which Telegram chat is asking - a chat may have linked more than
+  // one account, so this lists all of them to build the "which account?" picker.
+  getTelegramSubscriptionsForChatId(chatId: number): Promise<CmsTelegramSubscription[]>
   getPushNotifications(): Promise<CmsPushNotification[]>
   getNotificationsByAccount(params: { account: string }): Promise<NotificationModel[]>
+  linkTelegramSubscription(params: {
+    account: string
+    chatId: number
+    firstName?: string
+    username?: string
+  }): Promise<void>
+  unlinkTelegramSubscription(params: { account: string }): Promise<void>
 }

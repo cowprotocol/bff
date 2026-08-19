@@ -77,6 +77,12 @@ async function mainLoop() {
 
   // Cleanup resources on application termination
   const shutdown = () => {
+    if (shuttingDown) {
+      // Already shutting down and another signal arrived (e.g. a second Ctrl+C): stop waiting and exit now
+      logger.warn('Received another shutdown signal while already stopping. Forcing exit')
+      process.exit(1)
+    }
+
     gracefulShutdown(producers, producersPromise).catch((error) => {
       logger.error(error, 'Error during shutdown')
       process.exit(1)

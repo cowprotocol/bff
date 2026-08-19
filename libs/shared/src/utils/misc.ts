@@ -50,6 +50,30 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/**
+ * Like `sleep`, but resolves early if `signal` is aborted, instead of always waiting the full `ms`.
+ * Used to make polling loops shut down promptly instead of waiting out their current interval.
+ */
+export function interruptibleSleep(ms: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve) => {
+    const onAbort = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+}
+
 export function ensureEnvs(envs: string[]) {
   const missingEnvs = envs.filter((env) => !process.env[env])
   if (missingEnvs.length > 0) {

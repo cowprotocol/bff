@@ -14,7 +14,7 @@ export type CmsNotificationProducerProps = {
 }
 
 export class CmsNotificationProducer implements Runnable {
-  isStopping = false
+  private abortController = new AbortController()
 
   /**
    * This in-memory state just adds some resilience in case there's an error posting the message.
@@ -35,28 +35,23 @@ export class CmsNotificationProducer implements Runnable {
   async start(): Promise<void> {
     await doForever({
       name: 'CmsNotificationProducer',
-      callback: async (stop) => {
-        if (this.isStopping) {
-          stop()
-          return
-        }
-        await this.fetchAndSend()
-      },
+      callback: () => this.fetchAndSend(),
       waitTimeMilliseconds: WAIT_TIME,
       logger,
+      signal: this.abortController.signal,
     })
 
     logger.info('CmsNotificationProducer', 'stopped')
   }
 
   async stop(): Promise<void> {
-    this.isStopping = true
+    this.abortController.abort()
   }
 
   async fetchAndSend(): Promise<void> {
     const accounts = (await this.props.pushSubscriptionsRepository.getAllSubscribedAccounts()).map(getAddressKey)
     logger.debug(
-      `[CmsNotificationProducer] Watching ${accounts.length} subscribed account(s): ${JSON.stringify(accounts)}`
+      `[CmsNotificationProducer] Watching ${accounts.length} subscribed account(s)`
     )
 
     // Get PUSH notifications
