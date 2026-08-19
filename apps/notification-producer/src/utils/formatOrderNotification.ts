@@ -1,5 +1,11 @@
 import { areAddressesEqual } from '@cowprotocol/cow-sdk'
 
+export const ORDER_NOTIFICATION_EMOJI = {
+  completed: '✅',
+  partiallyFilled: '⏳',
+  expired: '⏱️',
+} as const
+
 interface FormatOrderNotificationParams {
   title: string
   message: string

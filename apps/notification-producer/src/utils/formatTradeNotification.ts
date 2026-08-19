@@ -1,6 +1,6 @@
 import { OrderKind } from '@cowprotocol/cow-sdk'
 import { NotificationOrder } from '@cowprotocol/repositories'
-import { formatOrderNotification } from './formatOrderNotification'
+import { formatOrderNotification, ORDER_NOTIFICATION_EMOJI } from './formatOrderNotification'
 
 type FormattedAmounts = { sell: string; buy: string }
 
@@ -35,11 +35,11 @@ export function formatTradeNotification({
 
   switch (orderClass) {
     case 'market':
-      return notification('Swap filled', tradeMessage(tradeAmounts))
+      return notification(`${ORDER_NOTIFICATION_EMOJI.completed} Swap filled`, tradeMessage(tradeAmounts))
     case 'limit':
       if (!isOrderFullyFilled(order)) {
         return notification(
-          'Limit order partially filled',
+          `${ORDER_NOTIFICATION_EMOJI.partiallyFilled} Limit order partially filled`,
           order && orderAmounts
             ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now ${fillPercentage(
                 order
@@ -49,17 +49,20 @@ export function formatTradeNotification({
       }
 
       return notification(
-        'Limit order filled',
+        `${ORDER_NOTIFICATION_EMOJI.completed} Limit order filled`,
         order && orderAmounts && executedAmounts
           ? `Your limit order to trade ${orderAmounts.sell} → ${orderAmounts.buy} is now 100% filled. You received ${executedAmounts.buy}.`
           : tradeMessage(tradeAmounts)
       )
     case 'twap':
-      return notification('A TWAP part filled', `One part of your TWAP order filled. ${tradeMessage(tradeAmounts)}`)
+      return notification(
+        `${ORDER_NOTIFICATION_EMOJI.completed} A TWAP part filled`,
+        `One part of your TWAP order filled. ${tradeMessage(tradeAmounts)}`
+      )
     case 'liquidity':
-      return notification('Liquidity order filled', tradeMessage(tradeAmounts))
+      return notification(`${ORDER_NOTIFICATION_EMOJI.completed} Liquidity order filled`, tradeMessage(tradeAmounts))
     default:
-      return notification('Order filled', tradeMessage(tradeAmounts))
+      return notification(`${ORDER_NOTIFICATION_EMOJI.completed} Order filled`, tradeMessage(tradeAmounts))
   }
 }
 

@@ -15,10 +15,10 @@ function appData(orderClass: string): AnyAppDataDocVersion {
 
 describe('formatExpiredOrderNotification', () => {
   it.each([
-    ['market', 'Swap expired at 12:42 UTC', 'Your swap to trade 10 USDC → 1 COW has expired.'],
-    ['limit', 'Limit order expired at 12:42 UTC', 'Your limit order to trade 10 USDC → 1 COW has expired.'],
-    ['twap', 'TWAP order expired at 12:42 UTC', 'Your TWAP order to trade 10 USDC → 1 COW has expired.'],
-    ['unknown', 'Order expired at 12:42 UTC', 'Your order to trade 10 USDC → 1 COW has expired.'],
+    ['market', '⏱️ Swap expired at 12:42 UTC', 'Your swap to trade 10 USDC → 1 COW has expired.'],
+    ['limit', '⏱️ Limit order expired at 12:42 UTC', 'Your limit order to trade 10 USDC → 1 COW has expired.'],
+    ['twap', '⏱️ TWAP order expired at 12:42 UTC', 'Your TWAP order to trade 10 USDC → 1 COW has expired.'],
+    ['unknown', '⏱️ Order expired at 12:42 UTC', 'Your order to trade 10 USDC → 1 COW has expired.'],
   ])('formats %s order expiry', (orderClass, title, message) => {
     expect(formatExpiredOrderNotification({ ...common, appData: appData(orderClass) })).toEqual({
       title,

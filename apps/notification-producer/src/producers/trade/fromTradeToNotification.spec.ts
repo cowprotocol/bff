@@ -40,7 +40,7 @@ describe('fromTradeToNotification', () => {
         appData: { metadata: { orderClass: { orderClass: 'market' } } } as AnyAppDataDocVersion,
       })
     ).resolves.toMatchObject({
-      title: 'Swap filled at 12:42 UTC',
+      title: '✅ Swap filled at 12:42 UTC',
       message:
         'You traded 1 USDC and received 2 COW.\n\nAccount: 0x1234567890123456789012345678901234567890\nChain: Ethereum',
     })

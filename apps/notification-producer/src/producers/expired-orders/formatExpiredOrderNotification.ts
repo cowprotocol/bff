@@ -1,5 +1,5 @@
 import { AnyAppDataDocVersion } from '@cowprotocol/cow-sdk'
-import { formatOrderNotification } from '../../utils/formatOrderNotification'
+import { formatOrderNotification, ORDER_NOTIFICATION_EMOJI } from '../../utils/formatOrderNotification'
 import { getOrderClass } from '../../utils/getOrderClass'
 
 interface FormatExpiredOrderNotificationParams {
@@ -34,12 +34,12 @@ export function formatExpiredOrderNotification({
 function getExpiredOrderCopy(orderClass: string) {
   switch (orderClass) {
     case 'market':
-      return { title: 'Swap expired', orderType: 'swap' }
+      return { title: `${ORDER_NOTIFICATION_EMOJI.expired} Swap expired`, orderType: 'swap' }
     case 'limit':
-      return { title: 'Limit order expired', orderType: 'limit order' }
+      return { title: `${ORDER_NOTIFICATION_EMOJI.expired} Limit order expired`, orderType: 'limit order' }
     case 'twap':
-      return { title: 'TWAP order expired', orderType: 'TWAP order' }
+      return { title: `${ORDER_NOTIFICATION_EMOJI.expired} TWAP order expired`, orderType: 'TWAP order' }
     default:
-      return { title: 'Order expired', orderType: 'order' }
+      return { title: `${ORDER_NOTIFICATION_EMOJI.expired} Order expired`, orderType: 'order' }
   }
 }
