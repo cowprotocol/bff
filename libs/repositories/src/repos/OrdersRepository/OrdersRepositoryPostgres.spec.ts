@@ -77,4 +77,15 @@ describe('OrdersRepositoryPostgres', () => {
 
     expect(barnQuery).not.toHaveBeenCalled()
   })
+
+  it('derives execution amounts from trades', async () => {
+    prodQuery.mockResolvedValue({ rows: [row(prodUid, OrderKind.SELL)] })
+
+    await repository.getOrders(SupportedChainId.MAINNET, [prodUid])
+
+    const [query] = prodQuery.mock.calls[0]
+    expect(query).toContain('LEFT JOIN trades t ON t.order_uid = o.uid')
+    expect(query).toContain('COALESCE(SUM(t.sell_amount), 0) AS executed_sell_amount')
+    expect(query).toContain('COALESCE(SUM(t.buy_amount), 0) AS executed_buy_amount')
+  })
 })

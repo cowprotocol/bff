@@ -36,15 +36,17 @@ export class OrdersRepositoryPostgres implements OrdersRepository {
     const byteaUids = uids.map(hexStringToBytes)
     const query = `
       SELECT
-        uid,
-        partially_fillable,
-        kind,
-        sell_amount,
-        buy_amount,
-        executed_sell_amount,
-        executed_buy_amount
-      FROM orders
-      WHERE uid = ANY($1)
+        o.uid,
+        o.partially_fillable,
+        o.kind,
+        o.sell_amount,
+        o.buy_amount,
+        COALESCE(SUM(t.sell_amount), 0) AS executed_sell_amount,
+        COALESCE(SUM(t.buy_amount), 0) AS executed_buy_amount
+      FROM orders o
+      LEFT JOIN trades t ON t.order_uid = o.uid
+      WHERE o.uid = ANY($1)
+      GROUP BY o.uid, o.partially_fillable, o.kind, o.sell_amount, o.buy_amount
       LIMIT ${LIMIT}
     `
 
