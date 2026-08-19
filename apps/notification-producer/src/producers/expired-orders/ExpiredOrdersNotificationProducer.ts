@@ -12,6 +12,7 @@ import {
   IndexerStateRepository,
   IndexerStateValue,
   OnChainPlacedOrdersRepository,
+  ORDER_EXPIRATION_THRESHOLD_SECONDS,
   OrdersAppDataRepository,
   PushNotificationsRepository,
   PushSubscriptionsRepository,
@@ -103,6 +104,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     } = this.props
 
     const nowTimestamp = Math.ceil(Date.now() / 1000)
+    const expirationCheckTimestamp = getExpirationCheckTimestamp(nowTimestamp)
 
     const stateRegistry = await indexerStateRepository.get<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
@@ -121,7 +123,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
       logger.debug(
-        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${nowTimestamp}], watching ${
+        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${expirationCheckTimestamp}], watching ${
           accounts.length
         } subscribed account(s): ${JSON.stringify(accounts)}`
       )
@@ -130,7 +132,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         chainId,
         accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
-        nowTimestamp,
+        nowTimestamp: expirationCheckTimestamp,
       })
 
       logger.debug(
@@ -206,14 +208,18 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       logger.debug(
         `${this.prefix} no previous state found (stateRegistry=${JSON.stringify(
           stateRegistry
-        )}), skipping this cycle and just recording lastCheckTimestamp=${nowTimestamp}`
+        )}), skipping this cycle and just recording lastCheckTimestamp=${expirationCheckTimestamp}`
       )
     }
 
     await indexerStateRepository.upsert<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
-      { lastCheckTimestamp: nowTimestamp.toString() },
+      { lastCheckTimestamp: expirationCheckTimestamp.toString() },
       chainId
     )
   }
+}
+
+export function getExpirationCheckTimestamp(nowTimestamp: number): number {
+  return nowTimestamp - ORDER_EXPIRATION_THRESHOLD_SECONDS
 }

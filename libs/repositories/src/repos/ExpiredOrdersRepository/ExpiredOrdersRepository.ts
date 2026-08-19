@@ -1,5 +1,7 @@
 import type { OrderKind, SupportedChainId } from '@cowprotocol/cow-sdk'
 
+export const ORDER_EXPIRATION_THRESHOLD_SECONDS = 60
+
 export interface ExpiredOrdersContext {
   chainId: SupportedChainId
   accounts: string[]

@@ -10,8 +10,6 @@ import { bytesToHexString } from '../../utils/bytesUtils'
 import { parseExpiredOrder } from './expiredOrdersUtils'
 
 const LIMIT = 1000
-const ORDER_EXPIRATION_THRESHOLD = 60 // 1 minute
-
 export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository {
   async fetchExpiredOrdersForAccounts(context: ExpiredOrdersContext): Promise<ParsedExpiredOrder[]> {
     const { chainId, accounts } = context
@@ -87,6 +85,6 @@ export class ExpiredOrdersRepositoryPostgres implements ExpiredOrdersRepository 
         LIMIT $3;
     `
 
-    return db.query(query, [lastCheckTimestamp, nowTimestamp - ORDER_EXPIRATION_THRESHOLD, LIMIT])
+    return db.query(query, [lastCheckTimestamp, nowTimestamp, LIMIT])
   }
 }
