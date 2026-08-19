@@ -20,6 +20,7 @@ import {
 } from '@cowprotocol/repositories'
 import { bigIntReplacer, EvmChainId, logger } from '@cowprotocol/shared'
 import { getAddress, parseAbi } from 'viem'
+import { getBlockTimestamps } from '../../utils/getBlockTimestamps'
 import { fromTradeToNotification } from './fromTradeToNotification'
 
 const EVENTS = parseAbi([
@@ -118,6 +119,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
   const ordersAppData = await ordersAppDataRepository.getAppDataForOrders(chainId, orderUids)
 
   const orders = await ordersRepository.getOrders(chainId, orderUids)
+  const blockTimestamps = await getBlockTimestamps(client, logs)
 
   const notificationPromises = logs.reduce<Promise<PushNotification>[]>((acc, log) => {
     switch (log.eventName) {
@@ -147,6 +149,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
 
         // orderUid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
         const orderUidLower = orderUid.toLowerCase()
+        const timestamp = log.blockNumber === null ? undefined : blockTimestamps.get(log.blockNumber)
         const order = orders.get(orderUidLower)
         const isEthFlowOrder = areAddressesEqual(ethFlowAddress, owner)
         const appData = ordersAppData.get(orderUidLower)
@@ -168,7 +171,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
           logger.debug(`${prefix} Skipping bridging order ${orderUidLower} (tx=${log.transactionHash})`)
         }
 
-        if (orderOwner && !isBridgingOrder) {
+        if (orderOwner && timestamp && !isBridgingOrder) {
           acc.push(
             fromTradeToNotification({
               prefix,
@@ -185,6 +188,7 @@ export async function getTradeNotifications(params: GetTradeNotificationParams) 
               erc20Repository,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
+              timestamp,
               order,
               appData,
             })

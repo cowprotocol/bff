@@ -1,6 +1,7 @@
-import { EVM_NATIVE_CURRENCY_ADDRESS, getAddressKey, SupportedChainId } from '@cowprotocol/cow-sdk'
-import { ChainNames, formatAmount, formatTokenName } from '@cowprotocol/shared'
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { ChainNames } from '@cowprotocol/shared'
 import { Erc20Repository } from '@cowprotocol/repositories'
+import { getNotificationAmounts } from './getNotificationAmounts'
 
 interface OrderInfoForNotificationParams {
   chainId: SupportedChainId
@@ -13,20 +14,8 @@ interface OrderInfoForNotificationParams {
 }
 
 export async function getNotificationSummary(params: OrderInfoForNotificationParams): Promise<string> {
-  const { chainId, isEthFlowOrder, erc20Repository } = params
+  const { chainId } = params
+  const amounts = await getNotificationAmounts(params)
 
-  const sellToken = await erc20Repository.get(
-    chainId,
-    isEthFlowOrder ? getAddressKey(EVM_NATIVE_CURRENCY_ADDRESS) : getAddressKey(params.sellTokenAddress)
-  )
-
-  const buyToken = await erc20Repository.get(chainId, getAddressKey(params.buyTokenAddress))
-
-  const sellAmountFormatted = formatAmount(BigInt(params.sellAmount), sellToken?.decimals)
-  const buyAmountFormatted = formatAmount(BigInt(params.buyAmount), buyToken?.decimals)
-
-  const sellTokenName = formatTokenName(sellToken)
-  const buyTokenName = formatTokenName(buyToken)
-
-  return `${sellAmountFormatted} ${sellTokenName} for ${buyAmountFormatted} ${buyTokenName} in ${ChainNames[chainId]}`
+  return `${amounts.sell} for ${amounts.buy} in ${ChainNames[chainId]}`
 }
