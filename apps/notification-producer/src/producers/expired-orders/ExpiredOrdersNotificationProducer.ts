@@ -108,12 +108,24 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       )
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
 
+      logger.debug(
+        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${nowTimestamp}], watching ${
+          accounts.length
+        } subscribed account(s): ${JSON.stringify(accounts)}`
+      )
+
       const expiredOrders = await expiredOrdersRepository.fetchExpiredOrdersForAccounts({
         chainId,
         accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
         nowTimestamp,
       })
+
+      logger.debug(
+        `${this.prefix} got ${expiredOrders.length} expired order(s): ${JSON.stringify(
+          expiredOrders.map((o) => ({ uid: o.uid, owner: o.owner, validTo: o.validTo }))
+        )}`
+      )
 
       const ethFlowOrderOwners = expiredOrders.length
         ? await onChainPlacedOrdersRepository.getAccountsForOrders(
@@ -122,9 +134,7 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
           )
         : {}
 
-      logger.debug(
-        `${this.prefix} got ${expiredOrders.length} expired orders of ${accounts.length} accounts, lastCheckTimestamp=${lastCheckTimestamp}`
-      )
+      logger.debug(`${this.prefix} on-chain placed order owners resolved: ${JSON.stringify(ethFlowOrderOwners)}`)
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
@@ -139,7 +149,16 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
               })
             : getAddressKey(order.owner)
 
-          if (!orderOwner) return Promise.resolve(undefined)
+          if (!orderOwner) {
+            logger.warn(
+              `${this.prefix} could not resolve owner for expired order ${order.uid} (raw owner=${order.owner}, isEthFlowOrder=${isEthFlowOrder}), skipping notification`
+            )
+            return Promise.resolve(undefined)
+          }
+
+          logger.debug(
+            `${this.prefix} resolved owner ${orderOwner} for expired order ${order.uid} (isEthFlowOrder=${isEthFlowOrder})`
+          )
 
           return getExpiredOrderNotification(order, {
             chainId,
@@ -161,6 +180,12 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         // Post notifications to queue
         pushNotificationsRepository.send(notifications.filter(isTruthy))
       }
+    } else {
+      logger.debug(
+        `${this.prefix} no previous state found (stateRegistry=${JSON.stringify(
+          stateRegistry
+        )}), skipping this cycle and just recording lastCheckTimestamp=${nowTimestamp}`
+      )
     }
 
     await indexerStateRepository.upsert<ExpiredOrdersNotificationProducerState>(
