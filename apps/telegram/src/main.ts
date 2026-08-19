@@ -6,10 +6,16 @@ import { JSDOM } from 'jsdom'
 import createDOMPurify from 'dompurify'
 
 import { doForever, logger, sleep } from '@cowprotocol/shared'
-import { getPushNotificationsRepository, getPushSubscriptionsRepository, getTelegramBot } from '@cowprotocol/services'
+import {
+  getCacheRepository,
+  getPushNotificationsRepository,
+  getPushSubscriptionsRepository,
+  getTelegramBot,
+} from '@cowprotocol/services'
 import { PushNotification } from '@cowprotocol/notifications'
 import TelegramBot from 'node-telegram-bot-api'
-import { CmsTelegramSubscription, PushSubscriptionsRepository } from '@cowprotocol/repositories'
+import { CmsTelegramSubscription, PushSubscriptionsRepository, redisClient } from '@cowprotocol/repositories'
+import { handleStartCommand } from './startCommand'
 
 const WAIT_TIME = ms(`10s`)
 const SUBSCRIPTION_CACHE_TIME = ms(`5m`)
@@ -25,6 +31,21 @@ let telegramBot: TelegramBot
 async function mainLoop() {
   // Create telegram bot
   telegramBot = getTelegramBot()
+
+  if (!redisClient) {
+    logger.warn(
+      'REDIS is not configured — Telegram connect-tokens minted by apps/api will not be resolvable here; set REDIS_HOST/REDIS_ENABLED.'
+    )
+  }
+
+  // Handle incoming /start <token> deep-link messages
+  const cacheRepository = getCacheRepository()
+  const pushSubscriptionsRepository = getPushSubscriptionsRepository()
+  telegramBot.on('message', (msg) => {
+    handleStartCommand({ bot: telegramBot, msg, cacheRepository, pushSubscriptionsRepository }).catch((error) =>
+      logger.error(error, '[telegram] Error handling /start command')
+    )
+  })
 
   // Subscribe to notifications
   logger.info('[telegram] Start telegram consumer')

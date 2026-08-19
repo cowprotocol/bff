@@ -69,6 +69,19 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
 
     return data
   }
+
+  async linkTelegramSubscription(params: {
+    account: string
+    chatId: number
+    firstName?: string
+    username?: string
+  }): Promise<void> {
+    await postToCmsInternalEndpoint('/telegram-subscription/link-via-bot', params)
+  }
+
+  async unlinkTelegramSubscription(params: { account: string }): Promise<void> {
+    await postToCmsInternalEndpoint('/telegram-subscription/unlink-via-bot', params)
+  }
 }
 
 function uniqueLowercase(items: string[]): string[] {
@@ -212,4 +225,29 @@ async function getSubscribedAccounts({ page = 0, pageSize = PAGE_SIZE }: Paginat
     }
     return acc
   }, [])
+}
+
+// TODO: switch to the typed `getCmsClient()` once @cowprotocol/cms is regenerated/published
+// with these two routes — see docs/superpowers/plans/2026-08-18-telegram-bot-deeplink-backend.md
+async function postToCmsInternalEndpoint(path: string, body: Record<string, unknown>): Promise<void> {
+  const cmsBaseUrl = process.env.CMS_BASE_URL
+  const cmsApiKey = process.env.CMS_API_KEY
+
+  if (!cmsApiKey) {
+    throw new Error('CMS_API_KEY is not set')
+  }
+
+  const response = await fetch(`${cmsBaseUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cmsApiKey}`,
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw new Error(`CMS request to ${path} failed with ${response.status}: ${text}`)
+  }
 }

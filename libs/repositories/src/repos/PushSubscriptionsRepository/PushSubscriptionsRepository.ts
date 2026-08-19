@@ -47,4 +47,11 @@ export interface PushSubscriptionsRepository {
   getAllTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]>
   getPushNotifications(): Promise<CmsPushNotification[]>
   getNotificationsByAccount(params: { account: string }): Promise<NotificationModel[]>
+  linkTelegramSubscription(params: {
+    account: string
+    chatId: number
+    firstName?: string
+    username?: string
+  }): Promise<void>
+  unlinkTelegramSubscription(params: { account: string }): Promise<void>
 }
