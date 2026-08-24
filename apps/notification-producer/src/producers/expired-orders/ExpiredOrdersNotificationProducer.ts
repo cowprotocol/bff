@@ -1,22 +1,27 @@
-import { BARN_ETH_FLOW_ADDRESSES, ETH_FLOW_ADDRESSES, SupportedChainId } from '@cowprotocol/cow-sdk'
+import {
+  areAddressesEqual,
+  BARN_ETH_FLOW_ADDRESSES,
+  CowEnv,
+  ETH_FLOW_ADDRESSES,
+  getAddressKey,
+  SupportedChainId,
+} from '@cowprotocol/cow-sdk'
 import {
   Erc20Repository,
   ExpiredOrdersRepository,
   IndexerStateRepository,
   IndexerStateValue,
   OnChainPlacedOrdersRepository,
+  ORDER_EXPIRATION_THRESHOLD_SECONDS,
+  OrdersAppDataRepository,
   PushNotificationsRepository,
   PushSubscriptionsRepository,
 } from '@cowprotocol/repositories'
 
 import { Runnable } from '../../../types'
-import { doForever, logger } from '@cowprotocol/shared'
+import { doForever, interruptibleSleep, logger } from '@cowprotocol/shared'
 import { getExpiredOrderNotification } from './getExpiredOrderNotification'
 import { isTruthy } from '../../utils/commonUtils'
-
-async function wait(time: number) {
-  return new Promise((res) => setTimeout(res, time))
-}
 
 const WAIT_TIME = 10_000
 const POLLING_INTERVAL = 120_000 // 2 minutes
@@ -30,6 +35,7 @@ export type ExpiredOrdersNotificationProducerProps = {
   expiredOrdersRepository: ExpiredOrdersRepository
   pushNotificationsRepository: PushNotificationsRepository
   onChainPlacedOrdersRepository: OnChainPlacedOrdersRepository
+  ordersAppDataRepository: OrdersAppDataRepository
 }
 
 export interface ExpiredOrdersNotificationProducerState extends IndexerStateValue {
@@ -37,7 +43,7 @@ export interface ExpiredOrdersNotificationProducerState extends IndexerStateValu
 }
 
 export class ExpiredOrdersNotificationProducer implements Runnable {
-  isStopping = false
+  private abortController = new AbortController()
   prefix: string
 
   constructor(private props: ExpiredOrdersNotificationProducerProps) {
@@ -53,29 +59,24 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
   async start(): Promise<void> {
     await doForever({
       name: 'ExpiredOrdersNotificationProducer:' + this.props.chainId,
-      callback: async (stop) => {
-        if (this.isStopping) {
-          stop()
-          return
-        }
-        await this.processExpiredOrders()
-      },
+      callback: () => this.processExpiredOrders(),
       waitTimeMilliseconds: WAIT_TIME,
       logger,
+      signal: this.abortController.signal,
     })
   }
 
   async stop(): Promise<void> {
-    this.isStopping = true
+    this.abortController.abort()
   }
 
   async processExpiredOrders(): Promise<void> {
     return this.pollExpiredOrders()
       .then(() => {
-        return wait(POLLING_INTERVAL)
+        return interruptibleSleep(POLLING_INTERVAL, this.abortController.signal)
       })
       .then(() => {
-        if (this.isStopping) return
+        if (this.abortController.signal.aborted) return
 
         return this.processExpiredOrders()
       })
@@ -90,9 +91,11 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
       expiredOrdersRepository,
       pushNotificationsRepository,
       onChainPlacedOrdersRepository,
+      ordersAppDataRepository,
     } = this.props
 
     const nowTimestamp = Math.ceil(Date.now() / 1000)
+    const expirationCheckTimestamp = getExpirationCheckTimestamp(nowTimestamp)
 
     const stateRegistry = await indexerStateRepository.get<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
@@ -104,18 +107,30 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
     if (lastCheckTimestampRaw) {
       const lastCheckTimestamp = Number(lastCheckTimestampRaw)
 
-      const ethFlowAddresses = [ETH_FLOW_ADDRESSES[chainId], BARN_ETH_FLOW_ADDRESSES[chainId]].map((t) =>
-        t.toLowerCase()
+      const env: CowEnv = process.env.COW_PROTOCOL_ENV === 'staging' ? 'staging' : 'prod'
+      const ethFlowAddress = getAddressKey(
+        env === 'staging' ? BARN_ETH_FLOW_ADDRESSES[chainId] : ETH_FLOW_ADDRESSES[chainId]
       )
-
       const accounts = await pushSubscriptionsRepository.getAllSubscribedAccounts()
+
+      logger.debug(
+        `${this.prefix} env=${env}, ethFlowAddress=${ethFlowAddress}, checking window (${lastCheckTimestamp}, ${expirationCheckTimestamp}], watching ${
+          accounts.length
+        } subscribed account(s): ${JSON.stringify(accounts)}`
+      )
 
       const expiredOrders = await expiredOrdersRepository.fetchExpiredOrdersForAccounts({
         chainId,
-        accounts: [...accounts, ...ethFlowAddresses],
+        accounts: [...accounts, ethFlowAddress],
         lastCheckTimestamp,
-        nowTimestamp,
+        nowTimestamp: expirationCheckTimestamp,
       })
+
+      logger.debug(
+        `${this.prefix} got ${expiredOrders.length} expired order(s): ${JSON.stringify(
+          expiredOrders.map((o) => ({ uid: o.uid, owner: o.owner, validTo: o.validTo }))
+        )}`
+      )
 
       const ethFlowOrderOwners = expiredOrders.length
         ? await onChainPlacedOrdersRepository.getAccountsForOrders(
@@ -123,33 +138,51 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
             expiredOrders.map((o) => o.uid)
           )
         : {}
+      const ordersAppData = expiredOrders.length
+        ? await ordersAppDataRepository.getAppDataForOrders(
+            chainId,
+            expiredOrders.map((order) => order.uid)
+          )
+        : new Map()
 
-      logger.debug(
-        `${this.prefix} got ${expiredOrders.length} expired orders of ${accounts.length} accounts, lastCheckTimestamp=${lastCheckTimestamp}`
-      )
+      logger.debug(`${this.prefix} on-chain placed order owners resolved: ${JSON.stringify(ethFlowOrderOwners)}`)
 
       const notifications = await Promise.all(
         expiredOrders.map((order) => {
-          const isEthFlowOrder = ethFlowAddresses.includes(order.owner.toLowerCase())
+          const isEthFlowOrder = areAddressesEqual(ethFlowAddress, order.owner)
 
           const orderOwner = isEthFlowOrder
             ? Object.keys(ethFlowOrderOwners).find((key) => {
                 const orderUids = ethFlowOrderOwners[key]
 
+                // order.uid is a 56-byte order digest, not an address, so getAddressKey() would leave it untouched: plain lowercase is correct here.
                 return orderUids.includes(order.uid.toLowerCase())
               })
-            : order.owner.toLowerCase()
+            : getAddressKey(order.owner)
 
-          if (!orderOwner) return Promise.resolve(undefined)
+          if (!orderOwner) {
+            logger.warn(
+              `${this.prefix} could not resolve owner for expired order ${order.uid} (raw owner=${order.owner}, isEthFlowOrder=${isEthFlowOrder}), skipping notification`
+            )
+            return Promise.resolve(undefined)
+          }
 
-          return getExpiredOrderNotification(order, {
-            chainId,
-            nowTimestamp,
-            lastCheckTimestamp,
-            isEthFlowOrder,
-            owner: orderOwner,
-            erc20Repository,
-          })
+          logger.debug(
+            `${this.prefix} resolved owner ${orderOwner} for expired order ${order.uid} (isEthFlowOrder=${isEthFlowOrder})`
+          )
+
+          return getExpiredOrderNotification(
+            order,
+            {
+              chainId,
+              nowTimestamp,
+              lastCheckTimestamp,
+              isEthFlowOrder,
+              owner: orderOwner,
+              erc20Repository,
+            },
+            ordersAppData.get(order.uid.toLowerCase())
+          )
         })
       )
 
@@ -162,12 +195,22 @@ export class ExpiredOrdersNotificationProducer implements Runnable {
         // Post notifications to queue
         pushNotificationsRepository.send(notifications.filter(isTruthy))
       }
+    } else {
+      logger.debug(
+        `${this.prefix} no previous state found (stateRegistry=${JSON.stringify(
+          stateRegistry
+        )}), skipping this cycle and just recording lastCheckTimestamp=${expirationCheckTimestamp}`
+      )
     }
 
     await indexerStateRepository.upsert<ExpiredOrdersNotificationProducerState>(
       PRODUCER_NAME,
-      { lastCheckTimestamp: nowTimestamp.toString() },
+      { lastCheckTimestamp: expirationCheckTimestamp.toString() },
       chainId
     )
   }
+}
+
+export function getExpirationCheckTimestamp(nowTimestamp: number): number {
+  return nowTimestamp - ORDER_EXPIRATION_THRESHOLD_SECONDS
 }

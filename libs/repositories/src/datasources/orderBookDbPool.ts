@@ -1,5 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
-import { ensureEnvs } from '@cowprotocol/shared'
+import { ensureEnvs, EvmChainId } from '@cowprotocol/shared'
 import { Pool } from 'pg'
 
 const REQUIRED_ENVS = [
@@ -21,7 +21,7 @@ const chainToDbNameMap = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
-} as const satisfies Record<SupportedChainId, string>
+} as const satisfies Record<EvmChainId, string>
 
 function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId): Pool {
   const ENV_PREFIX = env.toUpperCase()
@@ -31,7 +31,7 @@ function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainI
   const pool = new Pool({
     user: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_USERNAME`],
     host: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_HOST`],
-    database: chainToDbNameMap[chainId],
+    database: chainToDbNameMap[chainId as EvmChainId],
     password: process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PASSWORD`],
     port: Number(process.env[`${ENV_PREFIX}_ORDERBOOK_DATABASE_PORT`]),
     keepAlive: true,
@@ -46,6 +46,10 @@ function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainI
 }
 
 const orderBookDbCache = new Map<string, Pool>()
+
+export function getOrderBookDbEnvironment(): 'prod' | 'barn' {
+  return process.env.COW_PROTOCOL_ENV === 'staging' ? 'barn' : 'prod'
+}
 
 export function getOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId) {
   const key = `${env}|${chainId}`

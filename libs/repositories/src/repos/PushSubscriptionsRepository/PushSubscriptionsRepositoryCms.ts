@@ -11,6 +11,7 @@ import { PushSubscriptionsRepository } from './PushSubscriptionsRepository'
 
 const PAGE_SIZE = 50
 const CACHE_TIME = 30000
+const CMS_REQUEST_TIMEOUT_MS = 10_000
 
 type PaginationParam = {
   page?: number
@@ -47,6 +48,12 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
     })
   }
 
+  async getTelegramSubscriptionsForChatId(chatId: number): Promise<CmsTelegramSubscription[]> {
+    return callCmsInternalEndpoint<CmsTelegramSubscription[]>('/telegram-subscription/accounts-by-chat-via-bot', {
+      chatId,
+    })
+  }
+
   async getPushNotifications(): Promise<CmsPushNotification[]> {
     const { data, error, response } = await getCmsClient().GET('/push-notifications')
 
@@ -68,6 +75,19 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
     }
 
     return data
+  }
+
+  async linkTelegramSubscription(params: {
+    account: string
+    chatId: number
+    firstName?: string
+    username?: string
+  }): Promise<void> {
+    await postToCmsInternalEndpoint('/telegram-subscription/link-via-bot', params)
+  }
+
+  async unlinkTelegramSubscription(params: { account: string }): Promise<void> {
+    await postToCmsInternalEndpoint('/telegram-subscription/unlink-via-bot', params)
   }
 }
 
@@ -212,4 +232,47 @@ async function getSubscribedAccounts({ page = 0, pageSize = PAGE_SIZE }: Paginat
     }
     return acc
   }, [])
+}
+
+// TODO: switch to the typed `getCmsClient()` once @cowprotocol/cms is regenerated/published
+// with these routes — see docs/superpowers/plans/2026-08-18-telegram-bot-deeplink-backend.md
+async function postToCmsInternalEndpoint(path: string, body: Record<string, unknown>): Promise<void> {
+  await callCmsInternalEndpoint(path, body)
+}
+
+async function callCmsInternalEndpoint<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const cmsBaseUrl = process.env.CMS_BASE_URL
+  const cmsApiKey = process.env.CMS_API_KEY
+
+  if (!cmsBaseUrl) {
+    throw new Error('CMS_BASE_URL is not set')
+  }
+
+  if (!cmsApiKey) {
+    throw new Error('CMS_API_KEY is not set')
+  }
+
+  // The same signal aborts both the request and an in-flight response.text() read below,
+  // so a stalled CMS connection can't leave this pending indefinitely.
+  const signal = AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS)
+
+  const response = await fetch(`${cmsBaseUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // These routes aren't public by default in Strapi - the same CMS_API_KEY used by
+      // getCmsClient() elsewhere is enough to reach them.
+      Authorization: `Bearer ${cmsApiKey}`,
+    },
+    body: JSON.stringify(body),
+    signal,
+  })
+
+  const text = await response.text()
+
+  if (!response.ok) {
+    throw new Error(`CMS request to ${path} failed with ${response.status}: ${text}`)
+  }
+
+  return text ? (JSON.parse(text) as T) : (undefined as T)
 }

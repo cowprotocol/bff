@@ -19,7 +19,9 @@ export const SUPPORTED_COINGECKO_PLATFORMS = {
   [SupportedChainId.INK]: 'ink',
   [AdditionalTargetChainId.OPTIMISM]: 'optimistic-ethereum',
   [AdditionalTargetChainId.BITCOIN]: 'bitcoin',
-  [AdditionalTargetChainId.SOLANA]: 'solana',
+  // Solana moved from AdditionalTargetChainId to SupportedChainId in the SDK; this repo has no on-chain
+  // Solana support (RPC client, contracts, etc.), but USD prices via CoinGecko still work for it.
+  [SupportedChainId.SOLANA]: 'solana',
 } as const satisfies Record<TargetChainId, string | undefined>
 
 /**

@@ -1,8 +1,10 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { PushNotification } from '@cowprotocol/notifications'
-import { Erc20Repository } from '@cowprotocol/repositories'
-import { getExplorerUrl, logger } from '@cowprotocol/shared'
-import { getNotificationSummary } from '../../utils/getNotificationSummary'
+import { Erc20Repository, NotificationOrder } from '@cowprotocol/repositories'
+import { ChainNames, getExplorerUrl, logger } from '@cowprotocol/shared'
+import { formatTradeNotification } from '../../utils/formatTradeNotification'
+import { getNotificationAmounts } from '../../utils/getNotificationAmounts'
+import { getOrderClass } from '../../utils/getOrderClass'
 
 export async function fromTradeToNotification(props: {
   prefix: string
@@ -19,6 +21,9 @@ export async function fromTradeToNotification(props: {
   erc20Repository: Erc20Repository
   transactionHash: string
   logIndex: number
+  timestamp: bigint
+  order?: NotificationOrder
+  appData?: AnyAppDataDocVersion
 }): Promise<PushNotification> {
   const {
     id,
@@ -34,9 +39,12 @@ export async function fromTradeToNotification(props: {
     orderUid,
     transactionHash,
     logIndex,
+    timestamp,
+    appData,
+    order,
   } = props
 
-  const summary = await getNotificationSummary({
+  const tradeAmounts = await getNotificationAmounts({
     chainId,
     isEthFlowOrder,
     erc20Repository,
@@ -45,17 +53,50 @@ export async function fromTradeToNotification(props: {
     sellAmount,
     buyAmount,
   })
+  const orderAmounts = order
+    ? await getNotificationAmounts({
+        chainId,
+        isEthFlowOrder,
+        erc20Repository,
+        sellTokenAddress,
+        buyTokenAddress,
+        sellAmount: order.sellAmount,
+        buyAmount: order.buyAmount,
+      })
+    : undefined
+  const executedAmounts = order
+    ? await getNotificationAmounts({
+        chainId,
+        isEthFlowOrder,
+        erc20Repository,
+        sellTokenAddress,
+        buyTokenAddress,
+        sellAmount: order.executedSellAmount,
+        buyAmount: order.executedBuyAmount,
+      })
+    : undefined
 
-  const title = `Trade ${summary}`
-  const message = `Account: ${owner}`
+  const notification = formatTradeNotification({
+    orderClass: getOrderClass(appData),
+    timestamp,
+    account: owner,
+    recipient: order?.receiver,
+    chainName: ChainNames[chainId],
+    tradeAmounts,
+    order,
+    orderAmounts,
+    executedAmounts,
+  })
 
   const url = orderUid ? getExplorerUrl(chainId, orderUid) : undefined
-  logger.info(`${prefix} New ${message} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}`)
+  logger.info(
+    `${prefix} New ${notification.title} for ${owner}. Tx=${transactionHash}, logIndex=${logIndex}, ${notification.message}`
+  )
   return {
     id,
     account: owner,
-    title,
-    message,
+    title: notification.title,
+    message: notification.message,
     url,
     context: {
       transactionHash,

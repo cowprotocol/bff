@@ -2,22 +2,22 @@ import 'reflect-metadata'
 
 import {
   getCacheRepository,
-  getOnChainPlacedOrdersRepository,
   getErc20Repository,
+  getExpiredOrdersRepository,
   getIndexerStateRepository,
+  getOnChainPlacedOrdersRepository,
+  getOrdersAppDataRepository,
+  getOrdersRepository,
   getPushNotificationsRepository,
   getPushSubscriptionsRepository,
-  getExpiredOrdersRepository,
-  getOrdersAppDataRepository,
 } from '@cowprotocol/services'
 
 import { Runnable } from '../types'
 import { TradeNotificationProducer } from './producers/trade/TradeNotificationProducer'
 import { ExpiredOrdersNotificationProducer } from './producers/expired-orders/ExpiredOrdersNotificationProducer'
-import { ALL_SUPPORTED_CHAIN_IDS } from '@cowprotocol/cow-sdk'
 import ms from 'ms'
 import { CmsNotificationProducer } from './producers/cms/CmsNotificationProducer'
-import { logger } from '@cowprotocol/shared'
+import { EVM_CHAIN_IDS, logger } from '@cowprotocol/shared'
 
 const TIMEOUT_STOP_PRODUCERS = ms(`30s`)
 
@@ -37,6 +37,7 @@ async function mainLoop() {
   const onChainPlacedOrdersRepository = getOnChainPlacedOrdersRepository()
   const expiredOrdersRepository = getExpiredOrdersRepository()
   const ordersAppDataRepository = getOrdersAppDataRepository()
+  const ordersRepository = getOrdersRepository()
 
   const repositories = {
     pushNotificationsRepository,
@@ -44,6 +45,8 @@ async function mainLoop() {
     indexerStateRepository,
     erc20Repository,
     onChainPlacedOrdersRepository,
+    ordersAppDataRepository,
+    ordersRepository,
   }
 
   // Create all producers
@@ -55,7 +58,6 @@ async function mainLoop() {
     ...chainIds.map((chainId) => {
       return new TradeNotificationProducer({
         ...repositories,
-        ordersAppDataRepository,
         chainId,
       })
     }),
@@ -78,6 +80,12 @@ async function mainLoop() {
 
   // Cleanup resources on application termination
   const shutdown = () => {
+    if (shuttingDown) {
+      // Already shutting down and another signal arrived (e.g. a second Ctrl+C): stop waiting and exit now
+      logger.warn('Received another shutdown signal while already stopping. Forcing exit')
+      process.exit(1)
+    }
+
     gracefulShutdown(producers, producersPromise).catch((error) => {
       logger.error(error, 'Error during shutdown')
       process.exit(1)
@@ -95,12 +103,13 @@ function getProducerChains() {
   const producerNetworks =
     process.env.NOTIFICATIONS_PRODUCER_CHAINS?.split(',').map((chain) => Number(chain.trim())) || []
 
-  // If no producer networks are specified, use all supported chain ids
+  // Notification producers need an RPC client and on-chain settlement contracts, so only EVM chains
+  // apply here (Solana is supported elsewhere in the repo, e.g. USD prices, just not by this app).
   if (producerNetworks.length === 0) {
-    return ALL_SUPPORTED_CHAIN_IDS
+    return EVM_CHAIN_IDS
   }
 
-  return ALL_SUPPORTED_CHAIN_IDS.filter((chain) => producerNetworks.includes(chain))
+  return EVM_CHAIN_IDS.filter((chain) => producerNetworks.includes(chain))
 }
 async function gracefulShutdown(producers: Runnable[], producersPromise: Promise<void[]>) {
   if (shuttingDown) return

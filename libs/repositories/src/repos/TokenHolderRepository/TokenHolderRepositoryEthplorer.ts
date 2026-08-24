@@ -1,6 +1,7 @@
 import { injectable } from 'inversify'
 import { TokenHolderPoint, TokenHolderRepository } from './TokenHolderRepository'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 import { ETHPLORER_API_KEY, ETHPLORER_BASE_URL } from '../../datasources/ethplorer'
 
 interface EthplorerSuccess {
@@ -22,7 +23,7 @@ interface EthplorerError {
 @injectable()
 export class TokenHolderRepositoryEthplorer implements TokenHolderRepository {
   async getTopTokenHolders(chainId: SupportedChainId, tokenAddress: string): Promise<TokenHolderPoint[] | null> {
-    const baseAPI = ETHPLORER_BASE_URL[chainId]
+    const baseAPI = ETHPLORER_BASE_URL[chainId as EvmChainId]
 
     if (!baseAPI) {
       return null

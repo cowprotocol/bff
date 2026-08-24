@@ -1,4 +1,5 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EvmChainId } from '@cowprotocol/shared'
 
 export const GOLD_RUSH_API_KEY = process.env.GOLD_RUSH_API_KEY
 export const GOLD_RUSH_API_BASE_URL = 'https://api.covalenthq.com'
@@ -18,4 +19,4 @@ export const GOLD_RUSH_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.LINEA]: 'linea-mainnet',
   [SupportedChainId.PLASMA]: 'plasma-mainnet',
   [SupportedChainId.INK]: 'ink-mainnet',
-} as const satisfies Record<SupportedChainId, string>
+} as const satisfies Record<EvmChainId, string>

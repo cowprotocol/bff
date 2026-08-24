@@ -1,6 +1,7 @@
 // Utils
 export * from './utils/cache'
 export * from './utils/isDbEnabled'
+export * from './utils/telegramConnectToken'
 
 // Data-sources
 export * from './datasources/cms'
@@ -52,6 +53,10 @@ export * from './repos/SimulationRepository/tenderlyTypes'
 export * from './repos/IndexerStateRepository/IndexerStateRepository'
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryOrm'
 export * from './repos/IndexerStateRepository/IndexerStateRepositoryPostgres'
+
+// OrdersRepository
+export * from './repos/OrdersRepository/OrdersRepository'
+export * from './repos/OrdersRepository/OrdersRepositoryPostgres'
 
 // OnChainPlacedOrdersRepository
 export * from './repos/OnchainPlacedOrdersRepository/OnChainPlacedOrdersRepository'

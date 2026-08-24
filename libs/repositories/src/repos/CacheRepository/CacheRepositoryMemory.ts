@@ -25,4 +25,10 @@ export class CacheRepositoryMemory implements CacheRepository {
   async set(key: string, value: string, ttl: number): Promise<void> {
     await CacheRepositoryMemory.cache.set(key, value, ttl)
   }
+
+  async take(key: string): Promise<string | null> {
+    const value = CacheRepositoryMemory.cache.take<string>(key)
+
+    return value ?? null
+  }
 }

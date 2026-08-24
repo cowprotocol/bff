@@ -30,30 +30,7 @@ yarn compose:up
 
 ## Notification Producer
 
-Make sure your `.env` file is defined, if not create one using `.env.example` as a template.
-
-```bash
-# Start RabbitMQ
-docker-compose up -d queue
-
-# Start DB
-docker-compose up -d db
-# Run the migrations
-yarn migration:run
-
-# [Optional] Start Redis
-docker-compose up -d redis
-
-# Start the notification producer
-yarn producer
-```
-
-The application will start the notification producer for the networks, but you can run it for a specific network or networks by setting the `NOTIFICATIONS_PRODUCER_CHAINS` environment variable.
-
-```yaml
-# Run producer only on networks 1 and 100
-NOTIFICATIONS_PRODUCER_CHAINS=1,100
-```
+See the [local notification stack guide](apps/notification-producer/README.md). It covers the producer, Telegram consumer, required services, environment variables, migrations, and verification without requiring the API or USD-price services.
 
 ## Create a new service or library
 
@@ -125,17 +102,6 @@ If you have faced the error above - check this fix and its description:
 <https://github.com/cowprotocol/bff/pull/101>
 
 # Development notes
-
-## Notifications
-
-To run locally the notifications, you will need to run:
-
-- RabbitMQ locally: `docker-compose up -d queue`
-- DB locally: `docker-compose up -d db`
-- Telegram consumer: `yarn telegram`
-- Notification producer: `yarn producer`
-
-You need to make sure you have the relevant environment variables set.
 
 ## Quick PUSH notifications Test
 

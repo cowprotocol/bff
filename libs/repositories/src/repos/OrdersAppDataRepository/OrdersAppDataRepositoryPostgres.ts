@@ -1,7 +1,7 @@
 import { Pool } from 'pg'
 import { OrdersAppDataRepository } from './OrdersAppDataRepository'
 import { AnyAppDataDocVersion, SupportedChainId } from '@cowprotocol/cow-sdk'
-import { getOrderBookDbPool } from '../../datasources/orderBookDbPool'
+import { getOrderBookDbEnvironment, getOrderBookDbPool } from '../../datasources/orderBookDbPool'
 import { bytesToHexString, hexStringToBytes } from '../../utils/bytesUtils'
 import { logger } from '@cowprotocol/shared'
 import { chunkArray } from '../../utils/chunkArray'
@@ -30,51 +30,23 @@ export class OrdersAppDataRepositoryPostgres implements OrdersAppDataRepository 
 
     if (cachedResults.size === uids.length) return cachedResults
 
-    const prodDb = getOrderBookDbPool('prod', chainId)
-
     const uidsToFetch = uids.filter((uid) => !cachedResults.has(uid.toLowerCase()))
-    const prodChunks = chunkArray(uidsToFetch, LIMIT)
-
-    const prodResults = await Promise.all(
-      prodChunks.map((chunk) => {
-        return this.fetchAppDataFromDb(chunk, prodDb)
+    const db = getOrderBookDbPool(getOrderBookDbEnvironment(), chainId)
+    const chunks = chunkArray(uidsToFetch, LIMIT)
+    const results = await Promise.all(
+      chunks.map((chunk) => {
+        return this.fetchAppDataFromDb(chunk, db)
       })
     )
 
-    const missingAppDataUidsOnProd = prodResults.reduce<string[]>((acc, result) => {
-      acc.push(...result.missingAppDataUids)
-
-      return acc
-    }, [])
-
-    const prodUidToAppData = prodResults.reduce<UidToAppData>((acc, result) => {
+    const uidToAppData = results.reduce<UidToAppData>((acc, result) => {
       return this.mergeUidToAppDataMaps(acc, result.uidToAppData)
     }, new Map<string, AnyAppDataDocVersion>())
 
-    const totalUidToAppData = this.mergeUidToAppDataMaps(cachedResults, prodUidToAppData)
+    const totalUidToAppData = this.mergeUidToAppDataMaps(cachedResults, uidToAppData)
+    this.mergeUidToAppDataMaps(uidToAppDataCache, totalUidToAppData)
 
-    if (!missingAppDataUidsOnProd.length) {
-      return totalUidToAppData
-    }
-
-    const barnDb = getOrderBookDbPool('barn', chainId)
-    const barnChunks = chunkArray(missingAppDataUidsOnProd, LIMIT)
-
-    const barnResults = await Promise.all(
-      barnChunks.map((chunk) => {
-        return this.fetchAppDataFromDb(chunk, barnDb)
-      })
-    )
-
-    const barnUidToAppData = barnResults.reduce<UidToAppData>((acc, result) => {
-      return this.mergeUidToAppDataMaps(acc, result.uidToAppData)
-    }, new Map<string, AnyAppDataDocVersion>())
-
-    const results = this.mergeUidToAppDataMaps(totalUidToAppData, barnUidToAppData)
-
-    this.mergeUidToAppDataMaps(uidToAppDataCache, results)
-
-    return results
+    return totalUidToAppData
   }
 
   private async fetchAppDataFromDb(uids: string[], db: Pool): Promise<AppDataFromDbResult> {

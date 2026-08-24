@@ -25,6 +25,8 @@ import {
   OnChainPlacedOrdersRepositoryPostgres,
   OrdersAppDataRepository,
   OrdersAppDataRepositoryPostgres,
+  OrdersRepository,
+  OrdersRepositoryPostgres,
   PushNotificationsRepository,
   PushNotificationsRepositoryRabbit,
   PushSubscriptionsRepository,
@@ -156,6 +158,10 @@ export function getIndexerStateRepository(): IndexerStateRepository {
 
 export function getOnChainPlacedOrdersRepository(): OnChainPlacedOrdersRepository {
   return new OnChainPlacedOrdersRepositoryPostgres()
+}
+
+export function getOrdersRepository(): OrdersRepository {
+  return new OrdersRepositoryPostgres()
 }
 
 export function getExpiredOrdersRepository(): ExpiredOrdersRepository {
