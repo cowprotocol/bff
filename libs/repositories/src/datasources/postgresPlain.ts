@@ -1,6 +1,8 @@
 import { ensureEnvs } from '@cowprotocol/shared'
 import { Pool } from 'pg'
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const REQUIRED_ENVS = ['DATABASE_USERNAME', 'DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_PASSWORD']
 
 export function createNewPostgresPool(): Pool {
@@ -13,6 +15,7 @@ export function createNewPostgresPool(): Pool {
     password: process.env.DATABASE_PASSWORD,
     port: Number(process.env.DATABASE_PORT) || 5432,
     keepAlive: true,
+    ssl: isProduction ? { rejectUnauthorized: false } : undefined,
   })
 
   // Handle connection errors
