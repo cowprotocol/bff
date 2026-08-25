@@ -1,6 +1,25 @@
+import { BTC_CURRENCY_ADDRESS } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
+import { base58 } from '@scure/base'
 import { injectable } from 'inversify'
+import { isAddress } from 'viem'
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository'
+
+function isValidTokenAddress(tokenAddress: string | undefined): boolean {
+  if (
+    tokenAddress === undefined ||
+    isAddress(tokenAddress, { strict: false }) ||
+    tokenAddress === BTC_CURRENCY_ADDRESS
+  ) {
+    return true
+  }
+
+  try {
+    return base58.decode(tokenAddress).length === 32
+  } catch {
+    return false
+  }
+}
 
 @injectable()
 export class UsdRepositoryFallback implements UsdRepository {
@@ -8,7 +27,11 @@ export class UsdRepositoryFallback implements UsdRepository {
 
   constructor(private usdRepositories: UsdRepository[]) {}
 
-  async getUsdPrice(chainIdOrSlug: string, tokenAddress: string): Promise<number | null> {
+  async getUsdPrice(chainIdOrSlug: string, tokenAddress?: string): Promise<number | null> {
+    if (!isValidTokenAddress(tokenAddress)) {
+      return null
+    }
+
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i]
       const price = await usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
@@ -28,9 +51,13 @@ export class UsdRepositoryFallback implements UsdRepository {
 
   async getUsdPrices(
     chainIdOrSlug: string,
-    tokenAddress: string,
+    tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
+    if (!isValidTokenAddress(tokenAddress)) {
+      return null
+    }
+
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i]
       const prices = await usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
