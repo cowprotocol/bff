@@ -51,6 +51,15 @@ describe.skip('UsdRepositoryCoingecko', () => {
       expect(price).toBeGreaterThan(0)
     })
 
+    it('should return NULL for a Solana token requested on Ethereum', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice(
+        CHAIN_ID,
+        'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' // USDC on Solana
+      )
+
+      expect(price).toBeNull()
+    })
+
     it('should return the current price without token address', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice('bitcoin')
 
