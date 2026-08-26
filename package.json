@@ -27,7 +27,8 @@
     "swagger": "ts-node scripts/fetchCoingeckoSwagger",
     "gen:types": "npx openapi-typescript",
     "postinstall": "yarn gen:types",
-    "test:api:slippage": "node apps/api/scripts/test-slippage.js"
+    "test:api:slippage": "node apps/api/scripts/test-slippage.js",
+    "gen:coingecko-platforms": "ts-node scripts/fetchAssetPlatforms.ts"
   },
   "private": true,
   "dependencies": {

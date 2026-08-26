@@ -1,4 +1,4 @@
-import { COINGECKO_PLATFORMS, SUPPORTED_COINGECKO_PLATFORMS } from '../datasources/coingecko'
+import { COINGECKO_PLATFORMS, KNOWN_COINGECKO_PLATFORMS, NATIVE_COIN_ID_BY_PLATFORM } from '../datasources/coingecko'
 import {
   AdditionalTargetChainId,
   BTC_CURRENCY_ADDRESS,
@@ -17,11 +17,12 @@ const NATIVE_TOKEN_PLACEHOLDERS = new Set([
   getAddressKey(BTC_CURRENCY_ADDRESS),
 ])
 
-// Invert number→slug map to slug→SupportedChainId
-const SUPPORTED_CHAIN_SLUG_TO_ID: Record<string, TargetChainId> = Object.entries(SUPPORTED_COINGECKO_PLATFORMS).reduce(
+// Invert chainId→platform to platform→chainId. Covers every platform CoinGecko publishes a chain id
+// for; getSupportedCoingeckoChainId narrows that back down to the chains this repo supports.
+const CHAIN_SLUG_TO_ID: Record<string, TargetChainId> = Object.entries(COINGECKO_PLATFORMS).reduce(
   (map, [id, slug]) => {
     if (slug) {
-      map[slug as string] = +id as TargetChainId
+      map[slug] = +id as TargetChainId
     }
     return map
   },
@@ -47,21 +48,33 @@ export function getAddressOrPlatform(tokenAddress: string | undefined, platform:
 }
 
 export function getCoingeckoPlatform(chainIdOrSlug: string): string | undefined {
-  // If the chainIdOrSlug is a number, it is a chainId and should match an existing platform on Coingecko
   const chainId = +chainIdOrSlug
-  if (chainId in COINGECKO_PLATFORMS) {
+
+  // A chain id only resolves if we have a platform for it. Falling through to the raw id would send
+  // e.g. '232' to Coingecko as a platform, which is a guaranteed 404.
+  if (!isNaN(chainId)) {
     return COINGECKO_PLATFORMS[chainId]
   }
 
-  return chainIdOrSlug
+  // A slug only resolves if Coingecko actually publishes it as a platform. Anything else (a CoW-side
+  // slug like 'mainnet', or junk from a scanner) would 404 upstream, so don't spend the call.
+  return KNOWN_COINGECKO_PLATFORMS.has(chainIdOrSlug) ? chainIdOrSlug : undefined
+}
+
+/**
+ * Coingecko coin id for a platform's native currency.
+ *
+ * Platform ids are not coin ids. '/simple/price?ids=base' resolves to an unrelated token called
+ * 'Base' rather than the ETH that Base settles in, so native lookups must go through this.
+ */
+export function getNativeCoinId(platform: string): string | undefined {
+  return NATIVE_COIN_ID_BY_PLATFORM[platform]
 }
 
 export function getSupportedCoingeckoChainId(chainIdOrSlug: string): TargetChainId | null {
   const chainIdAsNumber = +chainIdOrSlug
   // Only SupportedChainIds are supported
-  const numericId = isNaN(chainIdAsNumber)
-    ? SUPPORTED_CHAIN_SLUG_TO_ID[chainIdOrSlug]
-    : (chainIdAsNumber as TargetChainId)
+  const numericId = isNaN(chainIdAsNumber) ? CHAIN_SLUG_TO_ID[chainIdOrSlug] : (chainIdAsNumber as TargetChainId)
 
   return SupportedChainId[numericId] || AdditionalTargetChainId[numericId] ? numericId : null
 }
