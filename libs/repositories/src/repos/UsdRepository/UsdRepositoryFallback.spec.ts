@@ -222,17 +222,18 @@ describe('UsdRepositoryCoingecko', () => {
       }
     )
 
-    it.each([WETH, SOLANA_USDC, BTC_CURRENCY_ADDRESS])(
-      'queries repositories for valid token address %s',
-      async (tokenAddress) => {
-        const firstRepository = createRepositoryMock('First')
-        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20RepositoryMock)
+    it.each([
+      [WETH, CHAIN_ID],
+      [SOLANA_USDC, SupportedChainId.SOLANA.toString()],
+      [BTC_CURRENCY_ADDRESS, 'bitcoin'],
+    ])('queries repositories for valid token address %s on chain %s', async (tokenAddress, chainIdOrSlug) => {
+      const firstRepository = createRepositoryMock('First')
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20RepositoryMock)
 
-        await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, tokenAddress)).resolves.toBe(1)
+      await expect(usdRepositoryFallback.getUsdPrice(chainIdOrSlug, tokenAddress)).resolves.toBe(1)
 
-        expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, tokenAddress)
-      }
-    )
+      expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(chainIdOrSlug, tokenAddress)
+    })
 
     it('queries repositories when the token address is omitted', async () => {
       const firstRepository = createRepositoryMock('First')
@@ -272,6 +273,17 @@ describe('UsdRepositoryCoingecko', () => {
       await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, WETH)).resolves.toBe(1)
 
       expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, WETH)
+    })
+
+    it('does not query repositories for non-EVM addresses on EVM chains', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository = createErc20RepositoryMock()
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, SOLANA_USDC)).resolves.toBeNull()
+
+      expect(erc20Repository.get).not.toHaveBeenCalled()
+      expect(firstRepository.getUsdPrice).not.toHaveBeenCalled()
     })
 
     it('fails open and queries repositories when the existence check throws', async () => {

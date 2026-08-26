@@ -103,6 +103,12 @@ export class UsdRepositoryFallback implements UsdRepository {
       return true
     }
 
+    // In case a Solana address reaches this step, filter it out keeping only EVM addresses
+    // Solana chain token queries will skip this step entirely so an EVM chain shouldn't check a Solana token
+    if (!isAddress(tokenAddress, { strict: false })) {
+      return false
+    }
+
     try {
       const erc20 = await this.erc20Repository.get(chainId, tokenAddress)
 
