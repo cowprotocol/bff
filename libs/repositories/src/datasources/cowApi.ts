@@ -1,4 +1,5 @@
 import createClient from 'openapi-fetch'
+import { fetchWithTimeout } from '../utils/fetchWithTimeout'
 
 const COW_API_BASE_URL = process.env.COW_API_BASE_URL || 'https://api.cow.fi'
 
@@ -13,6 +14,7 @@ export const cowApiClients = EVM_CHAIN_IDS.reduce<Record<EvmChainId, CowApiClien
 
   acc[chainId] = createClient<paths>({
     baseUrl: cowApiUrl,
+    fetch: fetchWithTimeout(),
   })
 
   return acc
