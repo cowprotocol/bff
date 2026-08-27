@@ -1,4 +1,4 @@
-import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { EVM_NATIVE_CURRENCY_ADDRESS, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { Container } from 'inversify'
 import ms from 'ms'
 import { NULL_ADDRESS, WETH } from '../../../test/mock'
@@ -9,6 +9,12 @@ const ONE_HOUR = ms('1h')
 const ONE_DAY = ms('1d')
 const BUFFER_ERROR_TOLERANCE = 1.5 // 50% error tolerance
 const CHAIN_ID = SupportedChainId.MAINNET.toString()
+const BASE_CHAIN_ID = SupportedChainId.BASE.toString()
+const LENS_CHAIN_ID = '232'
+
+function expectSimilarPrices(firstPrice: number, secondPrice: number): void {
+  expect(Math.abs(firstPrice - secondPrice) / secondPrice).toBeLessThan(0.05)
+}
 
 // The tests are not mocked and use real HTTP resources
 describe.skip('UsdRepositoryCoingecko', () => {
@@ -66,6 +72,26 @@ describe.skip('UsdRepositoryCoingecko', () => {
       expect(price).toBeGreaterThan(0)
     })
 
+    it('should price Base native currency as ETH', async () => {
+      const [basePrice, ethereumPrice] = await Promise.all([
+        usdRepositoryCoingecko.getUsdPrice(BASE_CHAIN_ID, EVM_NATIVE_CURRENCY_ADDRESS),
+        usdRepositoryCoingecko.getUsdPrice(CHAIN_ID, EVM_NATIVE_CURRENCY_ADDRESS),
+      ])
+
+      expect(basePrice).not.toBeNull()
+      expect(ethereumPrice).not.toBeNull()
+      if (basePrice === null || ethereumPrice === null) {
+        throw new Error('Native prices should not be null')
+      }
+      expectSimilarPrices(basePrice, ethereumPrice)
+    })
+
+    it('should return the native price for a generated platform', async () => {
+      const price = await usdRepositoryCoingecko.getUsdPrice(LENS_CHAIN_ID, EVM_NATIVE_CURRENCY_ADDRESS)
+
+      expect(price).toBeGreaterThan(0)
+    })
+
     it('should return NULL for an unknown token', async () => {
       const price = await usdRepositoryCoingecko.getUsdPrice(CHAIN_ID, NULL_ADDRESS)
 
@@ -114,6 +140,20 @@ describe.skip('UsdRepositoryCoingecko', () => {
       // We expect around 288 prices. We just assert we receive between 250 and 300 prices
       expect(prices.length).toBeGreaterThan(250)
       expect(prices.length).toBeLessThan(300)
+    })
+
+    it('should return Base native price history as ETH', async () => {
+      const [basePrices, ethereumPrices] = await Promise.all([
+        usdRepositoryCoingecko.getUsdPrices(BASE_CHAIN_ID, EVM_NATIVE_CURRENCY_ADDRESS, '5m'),
+        usdRepositoryCoingecko.getUsdPrices(CHAIN_ID, EVM_NATIVE_CURRENCY_ADDRESS, '5m'),
+      ])
+
+      expect(basePrices).not.toBeNull()
+      expect(ethereumPrices).not.toBeNull()
+      if (!basePrices?.length || !ethereumPrices?.length) {
+        throw new Error('Native price history should not be empty')
+      }
+      expectSimilarPrices(basePrices[basePrices.length - 1].price, ethereumPrices[ethereumPrices.length - 1].price)
     })
 
     it('[5m] should return NULL for an unknown token', async () => {
