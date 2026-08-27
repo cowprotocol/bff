@@ -64,21 +64,27 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform)
 
-    const marketData = await (async () => {
-      if (addressOrPlatform !== platform) {
-        return this.getMarketDataByTokenAddress(platform, days, interval, addressOrPlatform)
-      }
+    if (addressOrPlatform !== platform) {
+      return this.handleMarketDataResponse(
+        this.getMarketDataByTokenAddress(platform, days, interval, addressOrPlatform)
+      )
+    }
 
-      // Native currency: same coin id resolution as getUsdPrice
-      const coinId = getNativeCoinId(platform)
-      return coinId ? this.getMarketDataByCoinId(coinId, days, interval) : null
-    })()
-
-    if (!marketData) {
+    // Native currency: same coin id resolution as getUsdPrice
+    const coinId = getNativeCoinId(platform)
+    if (!coinId) {
       return null
     }
 
-    const { data, response } = marketData
+    return this.handleMarketDataResponse(this.getMarketDataByCoinId(coinId, days, interval))
+  }
+
+  private async handleMarketDataResponse(
+    marketDataPromise:
+      | ReturnType<UsdRepositoryCoingecko['getMarketDataByTokenAddress']>
+      | ReturnType<UsdRepositoryCoingecko['getMarketDataByCoinId']>
+  ): Promise<PricePoint[] | null> {
+    const { data, response } = await marketDataPromise
 
     if (response.status === 404 || !data) {
       return null
@@ -96,13 +102,11 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null
     }
 
-    const pricePoints = prices.map(([timestamp, price]) => ({
+    return prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,
       volume: volumesMap?.get(timestamp) ?? 0,
     }))
-
-    return pricePoints
   }
 
   private async getSinglePriceByContractAddress(platform: string, tokenAddress: string) {
