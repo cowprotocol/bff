@@ -16,8 +16,12 @@ function expectSimilarPrices(firstPrice: number, secondPrice: number): void {
   expect(Math.abs(firstPrice - secondPrice) / secondPrice).toBeLessThan(0.05)
 }
 
-// The tests are not mocked and use real HTTP resources
-describe.skip('UsdRepositoryCoingecko', () => {
+// These tests are not mocked and hit CoinGecko over real HTTP, so they need a Pro key. CI does not
+// set one, and we do not want unit tests depending on an upstream being reachable, so they run only
+// where a key is present. The mocked equivalents in UsdRepositoryCoingecko.spec.ts always run.
+const describeWithApiKey = process.env.COINGECKO_API_KEY ? describe : describe.skip
+
+describeWithApiKey('UsdRepositoryCoingecko', () => {
   let usdRepositoryCoingecko: UsdRepositoryCoingecko
 
   beforeAll(() => {
