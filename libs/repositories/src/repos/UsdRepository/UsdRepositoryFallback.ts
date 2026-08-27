@@ -38,21 +38,9 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
-    for (let i = 0; i < this.usdRepositories.length; i++) {
-      const usdRepository = this.usdRepositories[i]
-      const price = await usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
-      if (price !== null) {
-        return price
-      }
-
-      if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1]
-        logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
-        )
-      }
-    }
-    return null
+    return this.firstNonNull(chainIdOrSlug, tokenAddress, (usdRepository) =>
+      usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
+    )
   }
 
   async getUsdPrices(
@@ -68,20 +56,61 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
+    return this.firstNonNull(chainIdOrSlug, tokenAddress, (usdRepository) =>
+      usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
+    )
+  }
+
+  /**
+   * Queries the repositories in order and returns the first non-null result.
+   *
+   * A repository that throws is treated like one that returned null, so an upstream failure doesn't
+   * deny a price the next source can still serve. That is the point of this class, and previously a
+   * Coingecko or Redis error escaped as a 500 instead of falling back to Cow.
+   *
+   * If nothing produced a price and any repository failed, the error is rethrown rather than reported
+   * as "no price". A null here becomes a 404, and the frontend treats a 404 as proof the token has no
+   * price and stops asking us for it for the rest of the session, so an outage must never look like
+   * one. See getBffUsdPrice/fetchCurrencyUsdPrice in cowswap.
+   */
+  private async firstNonNull<T>(
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
+    getResult: (usdRepository: UsdRepository) => Promise<T | null>
+  ): Promise<T | null> {
+    let failure: unknown
+
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i]
-      const prices = await usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
-      if (prices !== null) {
-        return prices
-      }
+      const nextRepository = this.usdRepositories[i + 1]
+      const fallingBackTo = nextRepository ? `, falling back to ${nextRepository.name}` : ''
 
-      if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1]
-        logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
+      try {
+        const result = await getResult(usdRepository)
+
+        if (result !== null) {
+          return result
+        }
+
+        if (nextRepository) {
+          logger.info(
+            `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}`
+          )
+        }
+      } catch (error) {
+        failure = error
+        logger.warn(
+          `UsdRepositoryFallback: ${usdRepository.name} failed for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}: ${
+            error instanceof Error ? error.message : String(error)
+          }`
         )
       }
     }
+
+    if (failure !== undefined) {
+      throw failure
+    }
+
     return null
   }
 

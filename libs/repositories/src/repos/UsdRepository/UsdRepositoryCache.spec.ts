@@ -158,7 +158,11 @@ describe('UsdRepositoryCache', () => {
       const pricePromise = usdRepositoryCache.getUsdPrice(chainId, WETH)
 
       // THEN: The call throws an awful error
-      expect(pricePromise).rejects.toThrow('💥 Booom!')
+      await expect(pricePromise).rejects.toThrow('💥 Booom!')
+
+      // THEN: The failure is NOT cached as "no price". Caching it would hide the outage behind a
+      // 404 for the whole NULL TTL, long after the upstream recovered.
+      expect(redisMock.set).not.toHaveBeenCalled()
     })
   })
 
@@ -277,7 +281,10 @@ describe('UsdRepositoryCache', () => {
       const pricesPromise = usdRepositoryCache.getUsdPrices(chainId, WETH, '5m')
 
       // THEN: The call throws an awful error
-      expect(pricesPromise).rejects.toThrow('💥 Booom!')
+      await expect(pricesPromise).rejects.toThrow('💥 Booom!')
+
+      // THEN: The failure is NOT cached as "no price", same as the single price path
+      expect(redisMock.set).not.toHaveBeenCalled()
     })
   })
 })

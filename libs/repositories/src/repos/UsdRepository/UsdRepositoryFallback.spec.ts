@@ -322,4 +322,82 @@ describe('UsdRepositoryCoingecko', () => {
       expect(erc20Repository.get).not.toHaveBeenCalled()
     })
   })
+
+  describe('upstream failures', () => {
+    const createRepositoryMock = (name: string): jest.Mocked<UsdRepository> => ({
+      name,
+      getUsdPrice: jest.fn().mockResolvedValue(1),
+      getUsdPrices: jest.fn().mockResolvedValue([{ date: mockDate, price: 1, volume: 1 }]),
+    })
+
+    const createThrowingMock = (name: string, error = new Error(`${name} is down`)): jest.Mocked<UsdRepository> => ({
+      name,
+      getUsdPrice: jest.fn().mockRejectedValue(error),
+      getUsdPrices: jest.fn().mockRejectedValue(error),
+    })
+
+    it('falls back to the next repository when one throws', async () => {
+      const failing = createThrowingMock('Failing')
+      const working = createRepositoryMock('Working')
+      const usdRepositoryFallback = new UsdRepositoryFallback([failing, working], erc20RepositoryMock)
+
+      await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).resolves.toBe(1)
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).resolves.toEqual([
+        { date: mockDate, price: 1, volume: 1 },
+      ])
+
+      expect(working.getUsdPrice).toHaveBeenCalled()
+      expect(working.getUsdPrices).toHaveBeenCalled()
+    })
+
+    it('logs the failure and the repository it falls back to', async () => {
+      const loggerSpy = jest.spyOn(logger, 'warn')
+      const failing = createThrowingMock('Failing')
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [failing, createRepositoryMock('Working')],
+        erc20RepositoryMock
+      )
+
+      await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `UsdRepositoryFallback: Failing failed for ${PARAMS_PRICE[0]}/${PARAMS_PRICE[1]}, falling back to Working: Failing is down`
+      )
+    })
+
+    /**
+     * A null becomes a 404, and the frontend treats a 404 as proof the token has no price and stops
+     * querying us for it for the rest of the session. An outage must never look like one.
+     */
+    it('rethrows when every repository throws', async () => {
+      const error = new Error('Everything is down')
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [createThrowingMock('First', error), createThrowingMock('Second', error)],
+        erc20RepositoryMock
+      )
+
+      await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).rejects.toThrow('Everything is down')
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).rejects.toThrow('Everything is down')
+    })
+
+    it('rethrows when one repository throws and the rest find no price', async () => {
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_null_null, createThrowingMock('Failing')],
+        erc20RepositoryMock
+      )
+
+      await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).rejects.toThrow('Failing is down')
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).rejects.toThrow('Failing is down')
+    })
+
+    it('returns null without throwing when every repository cleanly reports no price', async () => {
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_null_null, usdRepositoryMock_null_null],
+        erc20RepositoryMock
+      )
+
+      await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).resolves.toBeNull()
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).resolves.toBeNull()
+    })
+  })
 })
