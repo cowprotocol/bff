@@ -8,6 +8,8 @@ jest.mock('../../datasources/coingecko', () => ({
   getCoingeckoProClient: () => ({ GET: get }),
 }))
 
+import { COINGECKO_ASSET_PLATFORMS } from '../../gen/coingecko/asset-platforms'
+import { getCoingeckoPlatform } from '../../utils/coingeckoUtils'
 import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko'
 
 const okResponse = (data: unknown) => ({ data, response: { status: 200, ok: true } as Response })
@@ -56,10 +58,27 @@ describe('UsdRepositoryCoingecko', () => {
       })
     })
 
-    it('returns null without calling CoinGecko when the chain has no native coin id', async () => {
-      const price = await repository.getUsdPrice(SupportedChainId.SEPOLIA.toString(), EVM_NATIVE_CURRENCY_ADDRESS)
+    it('returns null without calling CoinGecko for a chain with no platform at all', async () => {
+      const chainId = SupportedChainId.SEPOLIA.toString()
 
-      expect(price).toBeNull()
+      await expect(repository.getUsdPrice(chainId, EVM_NATIVE_CURRENCY_ADDRESS)).resolves.toBeNull()
+      await expect(repository.getUsdPrices(chainId, EVM_NATIVE_CURRENCY_ADDRESS, '5m')).resolves.toBeNull()
+
+      expect(get).not.toHaveBeenCalled()
+    })
+
+    it('returns null without calling CoinGecko when the platform has no native coin id', async () => {
+      // Distinct from the case above: the platform resolves, but CoinGecko publishes no native coin
+      // for it. Derived from the data so an upstream backfill doesn't fail this for the wrong reason.
+      const platform = COINGECKO_ASSET_PLATFORMS.find(({ chainId, nativeCoinId }) => chainId !== null && !nativeCoinId)
+      expect(platform).toBeDefined()
+
+      const chainId = String(platform?.chainId)
+      expect(getCoingeckoPlatform(chainId)).toBeDefined()
+
+      await expect(repository.getUsdPrice(chainId, EVM_NATIVE_CURRENCY_ADDRESS)).resolves.toBeNull()
+      await expect(repository.getUsdPrices(chainId, EVM_NATIVE_CURRENCY_ADDRESS, '5m')).resolves.toBeNull()
+
       expect(get).not.toHaveBeenCalled()
     })
   })
