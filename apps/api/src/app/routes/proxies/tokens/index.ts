@@ -18,6 +18,7 @@ const proxy: FastifyPluginAsync = async (fastify): Promise<void> => {
         Host: fastify.config.PROXY_HOST,
       }),
     },
+    logResponseBody: 'always',
   })
 }
 
