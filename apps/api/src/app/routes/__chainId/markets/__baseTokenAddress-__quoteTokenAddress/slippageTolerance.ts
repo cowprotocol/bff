@@ -83,7 +83,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params
 
       const queryString = JSON.stringify(request.query)
-      fastify.log.info(
+      // Debug: fires once per request and duplicates Fastify's own incoming request / request completed
+      // pair, which already carry the chain, market pair and status under a shared request id.
+      request.log.debug(
         `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`
       )
       const slippageBps = await slippageService.getSlippageBps({

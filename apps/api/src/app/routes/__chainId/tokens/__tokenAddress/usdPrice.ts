@@ -75,7 +75,9 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
        */
       const tokenAddress = _tokenAddress === '-' ? undefined : _tokenAddress
       const price = await usdService.getUsdPrice(chainId, tokenAddress)
-      fastify.log.info(`Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`)
+      // Debug: fires once per request and duplicates Fastify's own incoming request / request completed
+      // pair, which already carry the chain, token and status under a shared request id.
+      request.log.debug(`Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`)
       if (price === null) {
         reply.code(404).send({ message: 'Price not found' })
         return
