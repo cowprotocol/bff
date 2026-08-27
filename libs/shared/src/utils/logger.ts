@@ -1,4 +1,5 @@
 import pino from 'pino'
+import { requestContext } from './requestContext'
 
 export function createLogger() {
   // Uses pretty print if env.LOG_FORMAT is set to 'pretty'. By default, it will also use it for non-production environments.
@@ -18,5 +19,8 @@ export function createLogger() {
   return pino({
     ...loggerConfigEnv,
     level: process.env.LOG_LEVEL ?? 'info',
+    // Adds the request id to every line logged while serving a request, including lines from
+    // repositories and services that never see the Fastify request. Empty outside a request.
+    mixin: () => requestContext.getStore() ?? {},
   })
 }
