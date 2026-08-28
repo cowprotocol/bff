@@ -11,14 +11,32 @@ const cacheRepository: CacheRepository = apiContainer.get(cacheRepositorySymbol)
 const UPSTREAM_TIMEOUT_MS = 10_000
 
 /**
- * How long a transport-level failure is remembered per upstream.
+ * How long a sustained transport failure stops us forwarding to an upstream.
  *
- * Deliberately keyed by upstream rather than by URL. The price path remembers failures per token,
- * because a failure there is about one token and there is another price source to fall back to.
- * A proxy has neither: it has no fallback, and a refused connection or timeout means the upstream is
- * unreachable for every URL, not just the one that happened to be asked for.
+ * Keyed by upstream rather than by URL. The price path remembers failures per token, because a
+ * failure there is about one token and there is another price source to fall back to. A proxy has
+ * neither: an unreachable upstream is unreachable for every URL, not just the one asked for.
  */
 const FAILURE_MEMORY_SECONDS = 20
+
+/**
+ * Consecutive failures before we stop forwarding.
+ *
+ * One ECONNRESET, one DNS hiccup, or one response too large for the body timeout says nothing about
+ * the upstream's health, and blocking on it would turn an isolated blip into an outage of every URL
+ * and method of that proxy, on every pod. The count is deliberately high: a false block is far more
+ * expensive than a few wasted attempts against an upstream that really is down.
+ *
+ * A useful side effect is that the block only engages where hammering is possible at all. A proxy
+ * serving a handful of requests a day never accumulates ten failures, and never needs to.
+ */
+export const FAILURES_BEFORE_BLOCKING = 10
+
+/**
+ * How long a failure counts toward the threshold. Shorter than the block itself, so the tally clears
+ * during a block and recovery starts from zero rather than re-blocking on the next single failure.
+ */
+const FAILURE_WINDOW_SECONDS = 10
 
 /**
  * Start time per in-flight proxied request. Weak, so a request that never completes retains nothing,
@@ -76,6 +94,7 @@ export async function registerProxy(
   }: ProxyDefinition & Omit<FastifyHttpProxyOptions, 'upstream'>
 ): Promise<void> {
   const failureKey = getCacheKey('proxy-failure', name)
+  const failureCountKey = getCacheKey('proxy-failure-count', name)
 
   await fastify.register(httpProxy, {
     ...options,
@@ -168,9 +187,21 @@ export async function registerProxy(
           `Proxy to ${name} failed`
         )
 
-        cacheRepository.set(failureKey, '1', FAILURE_MEMORY_SECONDS).catch((cacheError) => {
-          request.log.warn(`Could not remember ${name} failure: ${cacheError}`)
-        })
+        // Tally rather than a flag. Reading then writing races across pods, which only means the
+        // odd lost increment and a block that trips a little later: fine for a heuristic, and far
+        // cheaper than adding an atomic counter to CacheRepository for this one caller.
+        cacheRepository
+          .get(failureCountKey)
+          .then((recorded) => {
+            const failures = Number(recorded ?? 0) + 1
+
+            return failures >= FAILURES_BEFORE_BLOCKING
+              ? cacheRepository.set(failureKey, '1', FAILURE_MEMORY_SECONDS)
+              : cacheRepository.set(failureCountKey, String(failures), FAILURE_WINDOW_SECONDS)
+          })
+          .catch((cacheError) => {
+            request.log.warn(`Could not remember ${name} failure: ${cacheError}`)
+          })
 
         if (options.replyOptions?.onError) {
           options.replyOptions.onError(reply, { error })

@@ -1,7 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify'
 import pino from 'pino'
 import { Writable } from 'stream'
-import { registerProxy } from './registerProxy'
+import { FAILURES_BEFORE_BLOCKING, registerProxy } from './registerProxy'
 
 const UNREACHABLE = 'http://127.0.0.1:1'
 
@@ -188,18 +188,35 @@ describe('registerProxy', () => {
     })
   })
 
-  it('remembers a transport failure and stops forwarding', async () => {
+  /**
+   * One ECONNRESET, one DNS hiccup or one oversized response says nothing about the upstream's
+   * health. Blocking on a single event turned an isolated blip into an outage of every URL and
+   * method of that proxy, on every pod, for the full memory window.
+   */
+  it('keeps forwarding while failures are isolated', async () => {
     const app = Fastify()
     await registerProxy(app, { name: proxyName, upstream: UNREACHABLE })
 
-    // First call actually tries, and fails at the transport level
-    const first = await app.inject({ method: 'GET', url: '/' })
-    expect(first.statusCode).toBeGreaterThanOrEqual(500)
+    // Well short of the threshold: every one of these must still reach the upstream
+    for (let attempt = 0; attempt < FAILURES_BEFORE_BLOCKING - 1; attempt++) {
+      const response = await app.inject({ method: 'GET', url: '/' })
+      expect(response.statusCode).not.toBe(503)
+    }
 
-    // Second call short-circuits without touching the upstream
-    const second = await app.inject({ method: 'GET', url: '/' })
-    expect(second.statusCode).toBe(503)
-    expect(second.json()).toEqual({ message: `${proxyName} upstream is unavailable` })
+    await app.close()
+  })
+
+  it('stops forwarding once failures are sustained', async () => {
+    const app = Fastify()
+    await registerProxy(app, { name: proxyName, upstream: UNREACHABLE })
+
+    for (let attempt = 0; attempt < FAILURES_BEFORE_BLOCKING; attempt++) {
+      await app.inject({ method: 'GET', url: '/' })
+    }
+
+    const blocked = await app.inject({ method: 'GET', url: '/' })
+    expect(blocked.statusCode).toBe(503)
+    expect(blocked.json()).toEqual({ message: `${proxyName} upstream is unavailable` })
 
     await app.close()
   })
