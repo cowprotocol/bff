@@ -1,4 +1,5 @@
 import { injectable } from 'inversify'
+import { logger } from '@cowprotocol/shared'
 import { getAddressKey } from '@cowprotocol/cow-sdk'
 import { getCoingeckoProClient, SimplePriceResponse } from '../../datasources/coingecko'
 import { getAddressOrPlatform, getCoingeckoPlatform, getNativeCoinId } from '../../utils/coingeckoUtils'
@@ -25,7 +26,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   name = 'Coingecko'
 
   async getUsdPrice(chainIdOrSlug: string, tokenAddress?: string | undefined): Promise<number | null> {
-    const platform = getCoingeckoPlatform(chainIdOrSlug)
+    const platform = resolvePlatform(chainIdOrSlug)
     if (!platform) {
       return null
     }
@@ -41,7 +42,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     // Native currency. It has no contract, and the platform id is not a coin id, so it has to be
     // resolved to one. Without it we return null and let the Cow price source handle the chain.
-    const coinId = getNativeCoinId(platform)
+    const coinId = resolveNativeCoinId(platform)
     if (!coinId) {
       return null
     }
@@ -54,7 +55,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     tokenAddress: string | undefined,
     priceStrategy: PriceStrategy
   ): Promise<PricePoint[] | null> {
-    const platform = getCoingeckoPlatform(chainIdOrSlug)
+    const platform = resolvePlatform(chainIdOrSlug)
     if (!platform) {
       return null
     }
@@ -71,7 +72,7 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     }
 
     // Native currency: same coin id resolution as getUsdPrice
-    const coinId = getNativeCoinId(platform)
+    const coinId = resolveNativeCoinId(platform)
     if (!coinId) {
       return null
     }
@@ -200,4 +201,33 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       },
     })
   }
+}
+
+/**
+ * Resolves a chain to its Coingecko platform, saying so when it can't.
+ *
+ * These two are the only paths that return without calling Coingecko at all, so without a line here
+ * the fallback reports "no price" for a chain Coingecko was never asked about. That ambiguity is why
+ * unsupported chains ended up in a list of tokens Coingecko supposedly had no price for.
+ * UsdRepositoryCow already narrates each of its own early exits; this brings Coingecko in line.
+ */
+function resolvePlatform(chainIdOrSlug: string): string | undefined {
+  const platform = getCoingeckoPlatform(chainIdOrSlug)
+
+  if (!platform) {
+    logger.info(`Coingecko does not support chain ${chainIdOrSlug}, not calling it`)
+  }
+
+  return platform
+}
+
+/** Resolves a platform's native coin id, saying so when it can't. */
+function resolveNativeCoinId(platform: string): string | undefined {
+  const coinId = getNativeCoinId(platform)
+
+  if (!coinId) {
+    logger.info(`Coingecko has no native coin for platform ${platform}, not calling it`)
+  }
+
+  return coinId
 }

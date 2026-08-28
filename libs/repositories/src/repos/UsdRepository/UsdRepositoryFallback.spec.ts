@@ -120,7 +120,7 @@ describe('UsdRepositoryCoingecko', () => {
       const price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
       expect(price).toEqual(1)
       expect(loggerSpy).toHaveBeenCalledWith(
-        `UsdRepositoryFallback: ${usdRepositoryMock_null_3.name} returned null for ${PARAMS_PRICE[0]}/${PARAMS_PRICE[1]}, falling back to ${usdRepositoryMock_1_1.name}`
+        `UsdRepositoryFallback: ${usdRepositoryMock_null_3.name} has no price for ${PARAMS_PRICE[0]}/${PARAMS_PRICE[1]}, falling back to ${usdRepositoryMock_1_1.name}`
       )
     })
 
