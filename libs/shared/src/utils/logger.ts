@@ -36,6 +36,10 @@ export function createLogger(destination?: DestinationStream) {
         '*.headers.cookie',
         '*.headers["x-api-key"]',
         '*.headers["x-cg-pro-api-key"]',
+        // Outbound call params are logged to show what we asked an upstream for. Coingecko also
+        // accepts its key as a query param, which would land there if anyone ever switched.
+        'params["x_cg_pro_api_key"]',
+        'params["x_cg_demo_api_key"]',
       ],
       censor: '[redacted]',
     },
