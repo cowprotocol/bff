@@ -2,6 +2,15 @@ import { logger } from '@cowprotocol/shared'
 import type { Middleware } from 'openapi-fetch'
 
 /**
+ * Start time per in-flight call, keyed by the Request openapi-fetch hands to both hooks.
+ *
+ * Weak on purpose: a Map keyed by request id would retain an entry for every call that never reaches
+ * onResponse, which is every timeout and abort, i.e. exactly what an upstream outage produces. Here
+ * the entry goes when the request does, with no cleanup to forget.
+ */
+const startedAt = new WeakMap<Request, number>()
+
+/**
  * Logs one line per outbound call an openapi-fetch client makes.
  *
  * Only misses were observable before: a price source that answered was silent, so call volume, hit
@@ -12,18 +21,13 @@ import type { Middleware } from 'openapi-fetch'
  * and a failing response already reaches the logs through the error `throwIfUnsuccessful` raises.
  */
 export function upstreamLogging(upstream: string): Middleware {
-  // Keyed by openapi-fetch's per-request id rather than the Request, so nothing is retained if a
-  // call never reaches onResponse
-  const startedAt = new Map<string, number>()
-
   return {
-    onRequest({ id }) {
-      startedAt.set(id, Date.now())
+    onRequest({ request }) {
+      startedAt.set(request, Date.now())
     },
 
-    onResponse({ id, schemaPath, params, request, response }) {
-      const started = startedAt.get(id)
-      startedAt.delete(id)
+    onResponse({ schemaPath, params, request, response }) {
+      const started = startedAt.get(request)
 
       logger.info(
         {
