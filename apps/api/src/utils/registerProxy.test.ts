@@ -41,19 +41,19 @@ describeWithUpstream('registerProxy against the real upstream', () => {
 
     const app = Fastify({ logger: pino({ level: 'info' }, sink) })
     // 'always' so the body is logged whatever the upstream answers, which is the point of the run
-    await registerProxy(app, { name: 'tokens', upstream: upstream as string, logResponseBody: 'always' })
+    await registerProxy(app, { name: 'tokens-manual-test', upstream: upstream as string, logResponseBody: 'always' })
 
     const response = await app.inject({ method: 'GET', url: path })
     await new Promise((resolve) => setTimeout(resolve, 200))
 
-    const proxied = lines.find((line) => line.msg === 'Proxied to tokens')
+    const proxied = lines.find((line) => line.msg === 'Proxied to tokens-manual-test')
 
     // Printed so a manual run shows what the upstream actually returned
     console.log('response status:', response.statusCode)
     console.log('log line:', JSON.stringify(proxied, null, 2))
 
     expect(proxied).toBeDefined()
-    expect(proxied).toMatchObject({ proxy: 'tokens', url: path, method: 'GET' })
+    expect(proxied).toMatchObject({ proxy: 'tokens-manual-test', url: path, method: 'GET' })
     expect(proxied?.status).toBe(response.statusCode)
     // The size logged must match what the client actually received
     expect(proxied?.bytes).toBe(Buffer.byteLength(response.rawPayload))

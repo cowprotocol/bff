@@ -1,6 +1,7 @@
 import { CacheRepository, cacheRepositorySymbol, getCacheKey } from '@cowprotocol/repositories'
 import httpProxy, { FastifyHttpProxyOptions } from '@fastify/http-proxy'
 import { FastifyInstance } from 'fastify'
+import { pipeline, Readable } from 'stream'
 import { apiContainer } from '../app/inversify.config'
 import { tapBody } from './tapBody'
 
@@ -19,7 +20,11 @@ const UPSTREAM_TIMEOUT_MS = 10_000
  */
 const FAILURE_MEMORY_SECONDS = 20
 
-const START_TIME = Symbol('proxyStartTime')
+/**
+ * Start time per in-flight proxied request. Weak, so a request that never completes retains nothing,
+ * and the timing needs no cleanup of its own.
+ */
+const startedAt = new WeakMap<object, number>()
 
 /**
  * How much of a response body is kept for logging.
@@ -137,10 +142,15 @@ export async function registerProxy(
           )
         })
 
+        // pipeline rather than body.pipe: pipe does not forward a source error to the destination, so
+        // an upstream body that fails mid-transfer would leave the tap alive, never report, and the
+        // call would go unlogged. Partial responses are exactly what the logging is for.
+        pipeline(body as unknown as Readable, tap, () => undefined)
+
         // reply-from types the third argument as an http response, but only ever passes a readable
         // body stream, so a tapped stream is the same shape it already had
         const callerOnResponse = options.replyOptions?.onResponse
-        const tapped = body.pipe(tap) as unknown as Parameters<NonNullable<typeof callerOnResponse>>[2]
+        const tapped = tap as unknown as Parameters<NonNullable<typeof callerOnResponse>>[2]
 
         if (callerOnResponse) {
           callerOnResponse(request, reply, tapped)
@@ -172,14 +182,14 @@ export async function registerProxy(
   })
 }
 
-// Only ever read a symbol off the request, so they stay clear of Fastify's request generics, which
-// differ between the plugin hooks and the route handler.
-function markStart(request: unknown): void {
-  ;(request as Record<symbol, number>)[START_TIME] = Date.now()
+// Typed as object rather than FastifyRequest: the plugin hooks and the route handler disagree on the
+// request generics, and neither helper cares about anything beyond identity.
+function markStart(request: object): void {
+  startedAt.set(request, Date.now())
 }
 
-function elapsed(request: unknown): number | undefined {
-  const startedAt = (request as Record<symbol, number | undefined>)[START_TIME]
+function elapsed(request: object): number | undefined {
+  const started = startedAt.get(request)
 
-  return startedAt === undefined ? undefined : Date.now() - startedAt
+  return started === undefined ? undefined : Date.now() - started
 }
