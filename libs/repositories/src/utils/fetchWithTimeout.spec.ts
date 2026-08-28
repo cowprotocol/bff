@@ -24,6 +24,25 @@ describe('fetchWithTimeout', () => {
     await expect(fetchWithTimeout(1000)('https://example.test')).resolves.toBeInstanceOf(Response)
   })
 
+  /**
+   * openapi-fetch passes a Request and puts the caller's signal on it, leaving init.signal empty, so
+   * this is the path that actually occurs in production. Reading only init.signal discarded it.
+   */
+  it('honours a signal carried on the Request, as openapi-fetch sends it', async () => {
+    global.fetch = jest.fn((_input, init?: RequestInit) => {
+      return new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal?.reason))
+      })
+    }) as unknown as typeof fetch
+
+    const controller = new AbortController()
+    const request = new Request('https://example.test', { signal: controller.signal })
+    const promise = fetchWithTimeout(10_000)(request)
+    controller.abort(new Error('caller gave up'))
+
+    await expect(promise).rejects.toThrow('caller gave up')
+  })
+
   it('still honours a caller-supplied signal', async () => {
     global.fetch = jest.fn((_input, init?: RequestInit) => {
       return new Promise((_resolve, reject) => {

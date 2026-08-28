@@ -16,7 +16,11 @@ export const DEFAULT_UPSTREAM_TIMEOUT_MS = 10_000
 export function fetchWithTimeout(timeoutMs = DEFAULT_UPSTREAM_TIMEOUT_MS): typeof fetch {
   return (input, init) => {
     const timeoutSignal = AbortSignal.timeout(timeoutMs)
-    const signal = init?.signal ? AbortSignal.any([init.signal, timeoutSignal]) : timeoutSignal
+    // openapi-fetch passes a Request and puts any caller signal on it, leaving init.signal empty.
+    // Reading only init.signal meant the timeout signal replaced the caller's, silently discarding
+    // their cancellation.
+    const callerSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined)
+    const signal = callerSignal ? AbortSignal.any([callerSignal, timeoutSignal]) : timeoutSignal
 
     return fetch(input, { ...init, signal })
   }
