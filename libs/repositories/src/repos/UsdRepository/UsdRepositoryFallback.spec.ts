@@ -369,7 +369,7 @@ describe('UsdRepositoryCoingecko', () => {
      * A null becomes a 404, and the frontend treats a 404 as proof the token has no price and stops
      * querying us for it for the rest of the session. An outage must never look like one.
      */
-    it('rethrows when every repository throws', async () => {
+    it('rethrows on the spot path when every repository throws, but not on the historical one', async () => {
       const error = new Error('Everything is down')
       const usdRepositoryFallback = new UsdRepositoryFallback(
         [createThrowingMock('First', error), createThrowingMock('Second', error)],
@@ -377,17 +377,33 @@ describe('UsdRepositoryCoingecko', () => {
       )
 
       await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).rejects.toThrow('Everything is down')
-      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).rejects.toThrow('Everything is down')
+
+      // The historical path resolves instead: a null there is 0 bps with a 200, not a 404
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).resolves.toBeNull()
     })
 
-    it('rethrows when one repository throws and the rest find no price', async () => {
+    it('rethrows on the spot path when one throws and the rest find no price', async () => {
       const usdRepositoryFallback = new UsdRepositoryFallback(
         [usdRepositoryMock_null_null, createThrowingMock('Failing')],
         erc20RepositoryMock
       )
 
       await expect(usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)).rejects.toThrow('Failing is down')
-      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).rejects.toThrow('Failing is down')
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).resolves.toBeNull()
+    })
+
+    /**
+     * UsdRepositoryCow does not implement getUsdPrices at all, so on the historical path a Coingecko
+     * failure has no second source behind it. Rethrowing there turned every Coingecko outage into a 500
+     * for all of /slippageTolerance, instead of the 0 bps the consumers already read as "unknown".
+     */
+    it('does not turn a historical-path failure into an error when no source can answer', async () => {
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [createThrowingMock('Coingecko'), usdRepositoryMock_null_null],
+        erc20RepositoryMock
+      )
+
+      await expect(usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)).resolves.toBeNull()
     })
 
     it('returns null without throwing when every repository cleanly reports no price', async () => {

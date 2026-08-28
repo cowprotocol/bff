@@ -38,8 +38,12 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
-    return this.firstNonNull(chainIdOrSlug, tokenAddress, (usdRepository) =>
-      usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
+    return this.firstNonNull(
+      chainIdOrSlug,
+      tokenAddress,
+      (usdRepository) => usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress),
+      // A null here becomes a 404, which the frontend takes as proof the token has no price
+      { rethrowOnFailure: true }
     )
   }
 
@@ -56,8 +60,12 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
-    return this.firstNonNull(chainIdOrSlug, tokenAddress, (usdRepository) =>
-      usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
+    return this.firstNonNull(
+      chainIdOrSlug,
+      tokenAddress,
+      (usdRepository) => usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy),
+      // A null here becomes 0 bps with a 200, not a 404, so there is nothing to protect against
+      { rethrowOnFailure: false }
     )
   }
 
@@ -68,15 +76,23 @@ export class UsdRepositoryFallback implements UsdRepository {
    * deny a price the next source can still serve. That is the point of this class, and previously a
    * Coingecko or Redis error escaped as a 500 instead of falling back to Cow.
    *
-   * If nothing produced a price and any repository failed, the error is rethrown rather than reported
-   * as "no price". A null here becomes a 404, and the frontend treats a 404 as proof the token has no
-   * price and stops asking us for it for the rest of the session, so an outage must never look like
-   * one. See getBffUsdPrice/fetchCurrencyUsdPrice in cowswap.
+   * `rethrowOnFailure` decides what happens when nothing produced a price and something failed. It
+   * exists to stop a null being mistaken for "this token has no price", which only matters where a
+   * null becomes a **404**:
+   *
+   * - getUsdPrice: a null is a 404, and cowswap records that token in `bffUnknownCurrencies` and stops
+   *   asking us for it for the rest of the session. An outage must never look like one, so it rethrows.
+   *   See getBffUsdPrice/fetchCurrencyUsdPrice in cowswap.
+   * - getUsdPrices: a null is 0 bps with a **200**, which every consumer already reads as "unknown"
+   *   and answers with its own default. There is no 404 to avoid, and UsdRepositoryCow does not
+   *   implement this method at all, so rethrowing would turn every Coingecko failure into a 500 for
+   *   the whole of /slippageTolerance rather than degrading to that default.
    */
   private async firstNonNull<T>(
     chainIdOrSlug: string,
     tokenAddress: string | undefined,
-    getResult: (usdRepository: UsdRepository) => Promise<T | null>
+    getResult: (usdRepository: UsdRepository) => Promise<T | null>,
+    { rethrowOnFailure }: { rethrowOnFailure: boolean }
   ): Promise<T | null> {
     let failure: unknown
 
@@ -107,7 +123,7 @@ export class UsdRepositoryFallback implements UsdRepository {
       }
     }
 
-    if (failure !== undefined) {
+    if (failure !== undefined && rethrowOnFailure) {
       throw failure
     }
 
