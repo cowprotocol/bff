@@ -1,3 +1,4 @@
+import { createServer, Server } from 'http'
 import Fastify, { FastifyInstance } from 'fastify'
 import pino from 'pino'
 import { Writable } from 'stream'
@@ -267,6 +268,38 @@ describe('registerProxy', () => {
 
     await app.close()
     await upstream.close()
+  })
+
+  /**
+   * A body that dies after the headers are out never reaches onError: reply-from only calls it while
+   * the reply is unsent. Without the pipeline callback the truncated response logged as a clean
+   * 'Proxied to' line and never counted toward the failure tally.
+   */
+  it('records a transport failure when the upstream body dies mid-transfer', async () => {
+    const upstream: Server = createServer((_request, response) => {
+      // Promise a long body, deliver a fraction of it, then drop the socket
+      response.writeHead(200, { 'content-type': 'application/json', 'content-length': '9999' })
+      response.write('{"partial":')
+      setTimeout(() => response.destroy(), 20)
+    })
+    await new Promise<void>((resolve) => upstream.listen(0, '127.0.0.1', resolve))
+
+    const { lines, logger } = captureLogs()
+    const app = Fastify({ logger })
+    const { port: upstreamPort } = upstream.address() as { port: number }
+    await registerProxy(app, { name: proxyName, upstream: `http://127.0.0.1:${upstreamPort}` })
+    await app.listen({ port: 0, host: '127.0.0.1' })
+
+    // Over a real socket: inject surfaces the abort differently
+    await fetch(`${upstreamUrl(app)}/thing`)
+      .then((response) => response.text())
+      .catch(() => undefined)
+    await new Promise((resolve) => setTimeout(resolve, 150))
+
+    expect(lines.find((line) => line.msg === `Proxy to ${proxyName} failed`)).toBeDefined()
+
+    await app.close()
+    await new Promise<void>((resolve) => upstream.close(() => resolve()))
   })
 
   it('times out a hung upstream instead of hanging with it', async () => {

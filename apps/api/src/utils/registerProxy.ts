@@ -61,6 +61,13 @@ export type LogResponseBody = 'never' | 'errors' | 'always'
 /** reply-from reads `retriesCount` from the per-call options but never declares it in its types. */
 type ReplyOptions = NonNullable<FastifyHttpProxyOptions['replyOptions']> & { retriesCount?: number }
 
+/** Just enough of a Fastify request for failure logging, since the hooks disagree on its generics. */
+interface ProxiedRequest {
+  url: string
+  method: string
+  log: { error: (details: object, message: string) => void; warn: (message: string) => void }
+}
+
 export interface ProxyDefinition {
   /** Short name, used in log lines and as the failure-memory key. e.g. 'tokens' */
   name: string
@@ -95,6 +102,33 @@ export async function registerProxy(
 ): Promise<void> {
   const failureKey = getCacheKey('proxy-failure', name)
   const failureCountKey = getCacheKey('proxy-failure-count', name)
+
+  /**
+   * Records a transport-level failure: refused, reset, DNS, a timeout, or a body that died in
+   * transfer. An upstream that answered with a 4xx or 5xx is not one of these and must not count.
+   */
+  const recordFailure = (request: ProxiedRequest, error: Error): void => {
+    request.log.error(
+      { proxy: name, url: request.url, method: request.method, ms: elapsed(request), err: error.message },
+      `Proxy to ${name} failed`
+    )
+
+    // Tally rather than a flag. Reading then writing races across pods, which only means the odd
+    // lost increment and a block that trips a little later: fine for a heuristic, and far cheaper
+    // than adding an atomic counter to CacheRepository for this one caller.
+    cacheRepository
+      .get(failureCountKey)
+      .then((recorded) => {
+        const failures = Number(recorded ?? 0) + 1
+
+        return failures >= FAILURES_BEFORE_BLOCKING
+          ? cacheRepository.set(failureKey, '1', FAILURE_MEMORY_SECONDS)
+          : cacheRepository.set(failureCountKey, String(failures), FAILURE_WINDOW_SECONDS)
+      })
+      .catch((cacheError) => {
+        request.log.warn(`Could not remember ${name} failure: ${cacheError}`)
+      })
+  }
 
   await fastify.register(httpProxy, {
     ...options,
@@ -164,7 +198,16 @@ export async function registerProxy(
         // pipeline rather than body.pipe: pipe does not forward a source error to the destination, so
         // an upstream body that fails mid-transfer would leave the tap alive, never report, and the
         // call would go unlogged. Partial responses are exactly what the logging is for.
-        pipeline(body as unknown as Readable, tap, () => undefined)
+        //
+        // A body that dies here never reaches onError, because reply-from only calls it while the
+        // reply is unsent and the status has already gone out. Without this the truncated response
+        // would log as a clean 'Proxied to' line and never count toward the failure tally. No
+        // reply.send: the headers are already on the wire.
+        pipeline(body as unknown as Readable, tap, (error) => {
+          if (error) {
+            recordFailure(request, error)
+          }
+        })
 
         // reply-from types the third argument as an http response, but only ever passes a readable
         // body stream, so a tapped stream is the same shape it already had
@@ -178,30 +221,7 @@ export async function registerProxy(
         }
       },
       onError: (reply, { error }) => {
-        const { request } = reply
-
-        // Transport level: refused, reset, DNS, or one of the timeouts above. An upstream that
-        // answered with a 4xx or 5xx goes through onResponse instead and does not trip this.
-        request.log.error(
-          { proxy: name, url: request.url, method: request.method, ms: elapsed(request), err: error.message },
-          `Proxy to ${name} failed`
-        )
-
-        // Tally rather than a flag. Reading then writing races across pods, which only means the
-        // odd lost increment and a block that trips a little later: fine for a heuristic, and far
-        // cheaper than adding an atomic counter to CacheRepository for this one caller.
-        cacheRepository
-          .get(failureCountKey)
-          .then((recorded) => {
-            const failures = Number(recorded ?? 0) + 1
-
-            return failures >= FAILURES_BEFORE_BLOCKING
-              ? cacheRepository.set(failureKey, '1', FAILURE_MEMORY_SECONDS)
-              : cacheRepository.set(failureCountKey, String(failures), FAILURE_WINDOW_SECONDS)
-          })
-          .catch((cacheError) => {
-            request.log.warn(`Could not remember ${name} failure: ${cacheError}`)
-          })
+        recordFailure(reply.request, error)
 
         if (options.replyOptions?.onError) {
           options.replyOptions.onError(reply, { error })
