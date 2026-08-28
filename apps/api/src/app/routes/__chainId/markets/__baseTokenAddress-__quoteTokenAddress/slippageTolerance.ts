@@ -70,6 +70,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   }>(
     '/slippageTolerance',
     {
+      // The resolved bps is logged by the responseLogging plugin, from the response itself
+      config: { logResponseBody: 'always' },
       schema: {
         description: 'Retrieve a proposed slippage tolerance for a given market',
         tags: ['markets'],
@@ -82,12 +84,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params
 
-      const queryString = JSON.stringify(request.query)
-      // Debug: fires once per request and duplicates Fastify's own incoming request / request completed
-      // pair, which already carry the chain, market pair and status under a shared request id.
-      request.log.debug(
-        `Get default slippage for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`
-      )
       const slippageBps = await slippageService.getSlippageBps({
         chainId,
         baseTokenAddress,
