@@ -24,7 +24,7 @@ export const bffAuth: FastifyPluginCallback = (fastify, opts, next) => {
         // Make an exception for localhost
         !isLocalhost(origin))
     ) {
-      reply.status(403).send('Unauthorized')
+      reply.status(403).send(origin)
       return
     }
 
