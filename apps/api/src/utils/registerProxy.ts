@@ -3,6 +3,7 @@ import httpProxy, { FastifyHttpProxyOptions } from '@fastify/http-proxy'
 import { FastifyInstance } from 'fastify'
 import { pipeline, Readable } from 'stream'
 import { apiContainer } from '../app/inversify.config'
+import { LOGGABLE_CONTENT_TYPE, LogResponseBody, MAX_LOGGED_BODY_BYTES, shouldLogBody } from './logResponseBody'
 import { tapBody } from './tapBody'
 
 const cacheRepository: CacheRepository = apiContainer.get(cacheRepositorySymbol)
@@ -43,20 +44,6 @@ const FAILURE_WINDOW_SECONDS = 10
  * and the timing needs no cleanup of its own.
  */
 const startedAt = new WeakMap<object, number>()
-
-/**
- * How much of a response body is kept for logging.
- *
- * Bodies are the one field that can dwarf everything else: a token list response is orders of
- * magnitude larger than the line describing it. Only this prefix is retained, so the cost per call is
- * bounded regardless of response size.
- */
-const MAX_LOGGED_BODY_BYTES = 2048
-
-/** Bodies worth reading as text. Anything else is logged as a size only. */
-const LOGGABLE_CONTENT_TYPE = /^(application\/(json|.*\+json|xml)|text\/)/i
-
-export type LogResponseBody = 'never' | 'errors' | 'always'
 
 /** reply-from reads `retriesCount` from the per-call options but never declares it in its types. */
 type ReplyOptions = NonNullable<FastifyHttpProxyOptions['replyOptions']> & { retriesCount?: number }
@@ -173,7 +160,7 @@ export async function registerProxy(
       onResponse: (request, reply, body) => {
         const status = reply.statusCode
         const contentType = String(reply.getHeader('content-type') ?? '')
-        const wantsBody = logResponseBody === 'always' || (logResponseBody === 'errors' && status >= 400)
+        const wantsBody = shouldLogBody(logResponseBody, status)
         const isReadable = LOGGABLE_CONTENT_TYPE.test(contentType)
 
         // Logged once the body has flushed, so `bytes` and `ms` cover the whole upstream leg rather
