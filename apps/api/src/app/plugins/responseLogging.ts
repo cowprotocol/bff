@@ -21,10 +21,17 @@ declare module 'fastify' {
  * resolved value of a request was only visible where a route hand-rolled its own line. This replaces
  * those, uniformly and under one policy.
  *
- * Deliberately synchronous. Most handlers here are async and call `reply.send()` without returning
- * it, which Fastify tolerates only because the onSend chain finishes before the handler's promise
- * resolves. An async hook defers that chain by a microtask, so `reply.sent` is still false when the
- * handler resolves and Fastify sends a second time, crashing the process with ERR_HTTP_HEADERS_SENT.
+ * Deliberately synchronous, and it has to stay that way.
+ *
+ * Fastify sends twice when the onSend chain is still unfinished as the handler's promise resolves,
+ * which needs BOTH halves of a condition. One is two or more async onSend hooks: a single one is
+ * fine, and bffCache's has been async all along. The other is a handler calling `reply.send()`
+ * without returning it, as 45 of them under apps/api/src do; `return reply.send(...)` is immune.
+ * The second send crashes the process with ERR_HTTP_HEADERS_SENT.
+ *
+ * So being sync here is a budget, not a fix. With bffCache async and this hook sync we sit exactly
+ * one hook below the cliff: another async onSend hook, or a single `await` added here, takes all 45
+ * of those handlers down. Fixing it properly means returning the reply at those call sites.
  *
  * Streams are skipped: the proxies send one, and registerProxy already logs those through a tap that
  * does not consume the body.
