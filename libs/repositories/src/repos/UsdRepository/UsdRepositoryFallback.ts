@@ -1,4 +1,4 @@
-import { BTC_CURRENCY_ADDRESS, isSolanaChain, isSupportedChain } from '@cowprotocol/cow-sdk'
+import { BTC_CURRENCY_ADDRESS, isNonEvmChain, isSupportedChain } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
 import { base58 } from '@scure/base'
 import { injectable } from 'inversify'
@@ -99,7 +99,7 @@ export class UsdRepositoryFallback implements UsdRepository {
 
     // Erc20Repository only has RPC clients for EVM chains with CoW Protocol settlement, so there is
     // nothing to check against for Solana, Bitcoin or Optimism. Same guard as UsdRepositoryCow.
-    if (!chainId || !isSupportedChain(chainId) || isSolanaChain(chainId)) {
+    if (!chainId || !isSupportedChain(chainId) || isNonEvmChain(chainId)) {
       return true
     }
 
