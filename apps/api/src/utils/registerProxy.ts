@@ -85,7 +85,9 @@ export async function registerProxy(
     upstream,
     logResponseBody = 'errors',
     ...options
-  }: ProxyDefinition & Omit<FastifyHttpProxyOptions, 'upstream'>
+    // preHandler is omitted: this sets its own, and spreading options first would let a caller's be
+    // silently overwritten. Compose it here if one is ever actually needed.
+  }: ProxyDefinition & Omit<FastifyHttpProxyOptions, 'upstream' | 'preHandler'>
 ): Promise<void> {
   const failureKey = getCacheKey('proxy-failure', name)
   const failureCountKey = getCacheKey('proxy-failure-count', name)
