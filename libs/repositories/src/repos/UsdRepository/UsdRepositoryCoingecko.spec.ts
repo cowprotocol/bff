@@ -14,6 +14,17 @@ import { UsdRepositoryCoingecko } from './UsdRepositoryCoingecko'
 
 const okResponse = (data: unknown) => ({ data, response: { status: 200, ok: true } as Response })
 
+const errorResponse = (status: number, statusText = 'Error') => ({
+  data: undefined,
+  response: {
+    status,
+    ok: false,
+    statusText,
+    url: 'https://pro-api.coingecko.com/api/v3/simple/price',
+    text: async () => 'upstream error body',
+  } as unknown as Response,
+})
+
 describe('UsdRepositoryCoingecko', () => {
   let repository: UsdRepositoryCoingecko
 
@@ -105,6 +116,42 @@ describe('UsdRepositoryCoingecko', () => {
           query: { contract_addresses: WETH.toLowerCase(), vs_currencies: 'usd' },
         },
       })
+    })
+  })
+
+  describe('upstream failures vs answers', () => {
+    const chainId = SupportedChainId.MAINNET.toString()
+
+    /**
+     * These used to return null, which cached the failure as "no price" for 30 minutes and stopped
+     * UsdRepositoryFallback from trying Cow. Only a 404 is an answer.
+     */
+    it.each([429, 500, 502, 503])('throws on HTTP %s rather than reporting no price', async (status) => {
+      get.mockResolvedValue(errorResponse(status))
+
+      await expect(repository.getUsdPrice(chainId, WETH)).rejects.toThrow('Error getting USD price from Coingecko')
+      await expect(repository.getUsdPrices(chainId, WETH, '5m')).rejects.toThrow(
+        'Error getting USD prices from Coingecko'
+      )
+    })
+
+    it('returns null on 404, which is CoinGecko answering that it has no such token', async () => {
+      get.mockResolvedValue({ data: undefined, response: { status: 404, ok: false } as Response })
+
+      await expect(repository.getUsdPrice(chainId, WETH)).resolves.toBeNull()
+      await expect(repository.getUsdPrices(chainId, WETH, '5m')).resolves.toBeNull()
+    })
+
+    it('returns null on a 2xx that omits the token, which is also an answer', async () => {
+      get.mockResolvedValue(okResponse({}))
+
+      await expect(repository.getUsdPrice(chainId, WETH)).resolves.toBeNull()
+    })
+
+    it('treats a zero price as unknown rather than serving it', async () => {
+      get.mockResolvedValue(okResponse({ [WETH.toLowerCase()]: { usd: 0 } }))
+
+      await expect(repository.getUsdPrice(chainId, WETH)).resolves.toBeNull()
     })
   })
 })

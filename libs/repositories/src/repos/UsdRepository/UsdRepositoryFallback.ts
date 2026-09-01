@@ -38,21 +38,13 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
-    for (let i = 0; i < this.usdRepositories.length; i++) {
-      const usdRepository = this.usdRepositories[i]
-      const price = await usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress)
-      if (price !== null) {
-        return price
-      }
-
-      if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1]
-        logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
-        )
-      }
-    }
-    return null
+    return this.firstNonNull(
+      chainIdOrSlug,
+      tokenAddress,
+      (usdRepository) => usdRepository.getUsdPrice(chainIdOrSlug, tokenAddress),
+      // A null here becomes a 404, which the frontend takes as proof the token has no price
+      { rethrowOnFailure: true }
+    )
   }
 
   async getUsdPrices(
@@ -68,20 +60,73 @@ export class UsdRepositoryFallback implements UsdRepository {
       return null
     }
 
+    return this.firstNonNull(
+      chainIdOrSlug,
+      tokenAddress,
+      (usdRepository) => usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy),
+      // A null here becomes 0 bps with a 200, not a 404, so there is nothing to protect against
+      { rethrowOnFailure: false }
+    )
+  }
+
+  /**
+   * Queries the repositories in order and returns the first non-null result.
+   *
+   * A repository that throws is treated like one that returned null, so an upstream failure doesn't
+   * deny a price the next source can still serve. That is the point of this class, and previously a
+   * Coingecko or Redis error escaped as a 500 instead of falling back to Cow.
+   *
+   * `rethrowOnFailure` decides what happens when nothing produced a price and something failed. It
+   * exists to stop a null being mistaken for "this token has no price", which only matters where a
+   * null becomes a **404**:
+   *
+   * - getUsdPrice: a null is a 404, and cowswap records that token in `bffUnknownCurrencies` and stops
+   *   asking us for it for the rest of the session. An outage must never look like one, so it rethrows.
+   *   See getBffUsdPrice/fetchCurrencyUsdPrice in cowswap.
+   * - getUsdPrices: a null is 0 bps with a **200**, which every consumer already reads as "unknown"
+   *   and answers with its own default. There is no 404 to avoid, and UsdRepositoryCow does not
+   *   implement this method at all, so rethrowing would turn every Coingecko failure into a 500 for
+   *   the whole of /slippageTolerance rather than degrading to that default.
+   */
+  private async firstNonNull<T>(
+    chainIdOrSlug: string,
+    tokenAddress: string | undefined,
+    getResult: (usdRepository: UsdRepository) => Promise<T | null>,
+    { rethrowOnFailure }: { rethrowOnFailure: boolean }
+  ): Promise<T | null> {
+    let failure: unknown
+
     for (let i = 0; i < this.usdRepositories.length; i++) {
       const usdRepository = this.usdRepositories[i]
-      const prices = await usdRepository.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
-      if (prices !== null) {
-        return prices
-      }
+      const nextRepository = this.usdRepositories[i + 1]
+      const fallingBackTo = nextRepository ? `, falling back to ${nextRepository.name}` : ''
 
-      if (i < this.usdRepositories.length - 1) {
-        const nextRepository = this.usdRepositories[i + 1]
-        logger.info(
-          `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}, falling back to ${nextRepository.name}`
+      try {
+        const result = await getResult(usdRepository)
+
+        if (result !== null) {
+          return result
+        }
+
+        if (nextRepository) {
+          logger.info(
+            `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}`
+          )
+        }
+      } catch (error) {
+        failure = error
+        logger.warn(
+          `UsdRepositoryFallback: ${usdRepository.name} failed for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}: ${
+            error instanceof Error ? error.message : String(error)
+          }`
         )
       }
     }
+
+    if (failure !== undefined && rethrowOnFailure) {
+      throw failure
+    }
+
     return null
   }
 

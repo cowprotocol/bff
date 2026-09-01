@@ -86,10 +86,17 @@ export class UsdRepositoryCoingecko implements UsdRepository {
   ): Promise<PricePoint[] | null> {
     const { data, response } = await marketDataPromise
 
-    if (response.status === 404 || !data) {
+    // Same split as the spot path: a 404 is an answer, any other non-2xx is a failure that must not
+    // be cached as "no price" or stop the fallback from trying Cow.
+    if (response.status === 404) {
       return null
     }
+
     await throwIfUnsuccessful('Error getting USD prices from Coingecko', response)
+
+    if (!data) {
+      return null
+    }
 
     const volumesMap =
       data.total_volumes?.reduce((acc, [timestamp, volume]) => {
@@ -142,13 +149,18 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       response: Response
     }
 
-    if (response.status === 404 || !data?.[key]?.usd) {
+    // A 404 is an answer: Coingecko has no such coin or contract.
+    if (response.status === 404) {
       return null
     }
 
+    // Anything else non-2xx is a failure, not an answer. It has to throw: returning null here would
+    // cache it as "no price" for 30 minutes and stop the fallback from trying Cow.
     await throwIfUnsuccessful('Error getting USD price from Coingecko', response)
 
-    return data[key].usd
+    // A 2xx with the key absent is Coingecko saying it doesn't know the token. A zero price is
+    // treated as unknown too, rather than served as a real price.
+    return data?.[key]?.usd || null
   }
 
   private async getMarketDataByTokenAddress(
