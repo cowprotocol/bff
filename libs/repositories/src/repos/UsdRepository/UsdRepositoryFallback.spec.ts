@@ -1,9 +1,18 @@
 import { BTC_CURRENCY_ADDRESS, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { logger } from '@cowprotocol/shared'
 import { WETH } from '../../../test/mock'
+import { Erc20, Erc20Repository } from '../Erc20Repository/Erc20Repository'
 import { PricePoint, UsdRepository } from './UsdRepository'
 import { UsdRepositoryFallback } from './UsdRepositoryFallback'
 const mockDate = new Date('2024-01-01T00:00:00Z')
+
+const createErc20RepositoryMock = (
+  erc20: Erc20 | null = { address: WETH, decimals: 18 }
+): jest.Mocked<Erc20Repository> => ({
+  get: jest.fn().mockResolvedValue(erc20),
+})
+
+const erc20RepositoryMock = createErc20RepositoryMock()
 class UsdRepositoryMock_1_1 implements UsdRepository {
   name = 'Mock_1_1'
   async getUsdPrice() {
@@ -74,19 +83,28 @@ const usdRepositoryMock_null_null = new UsdRepositoryMock_null_null()
 describe('UsdRepositoryCoingecko', () => {
   describe('getUsdPrice', () => {
     it('Returns first repo price when is not null', async () => {
-      let usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_1_1, usdRepositoryMock_2_2])
+      let usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_1_1, usdRepositoryMock_2_2],
+        erc20RepositoryMock
+      )
 
       let price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
 
       expect(price).toEqual(1)
 
-      usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_2_2, usdRepositoryMock_1_1])
+      usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_2_2, usdRepositoryMock_1_1],
+        erc20RepositoryMock
+      )
 
       price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
 
       expect(price).toEqual(2)
 
-      usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_1_1, usdRepositoryMock_null_3])
+      usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_1_1, usdRepositoryMock_null_3],
+        erc20RepositoryMock
+      )
 
       price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
       expect(price).toEqual(1)
@@ -94,7 +112,10 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('Returns second repo price when null, and logs the name', async () => {
       const loggerSpy = jest.spyOn(logger, 'info')
-      const usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_null_3, usdRepositoryMock_1_1])
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_null_3, usdRepositoryMock_1_1],
+        erc20RepositoryMock
+      )
 
       const price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
       expect(price).toEqual(1)
@@ -104,13 +125,16 @@ describe('UsdRepositoryCoingecko', () => {
     })
 
     it('Returns null when configured with no repositories', async () => {
-      const usdRepositoryFallback = new UsdRepositoryFallback([])
+      const usdRepositoryFallback = new UsdRepositoryFallback([], erc20RepositoryMock)
       const price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
       expect(price).toEqual(null)
     })
 
     it('Returns null when no repo return a price', async () => {
-      const usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_null_3, usdRepositoryMock_null_null])
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_null_3, usdRepositoryMock_null_null],
+        erc20RepositoryMock
+      )
       const price = await usdRepositoryFallback.getUsdPrice(...PARAMS_PRICE)
       expect(price).toEqual(null)
     })
@@ -118,25 +142,37 @@ describe('UsdRepositoryCoingecko', () => {
 
   describe('getUsdPrices', () => {
     it('Returns first repo prices when is not null', async () => {
-      let usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_1_1, usdRepositoryMock_2_2])
+      let usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_1_1, usdRepositoryMock_2_2],
+        erc20RepositoryMock
+      )
 
       let price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual([{ date: mockDate, price: 1, volume: 1 }])
 
-      usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_2_2, usdRepositoryMock_1_1])
+      usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_2_2, usdRepositoryMock_1_1],
+        erc20RepositoryMock
+      )
 
       price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
 
       expect(price).toEqual([{ date: mockDate, price: 2, volume: 2 }])
 
-      usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_1_1, usdRepositoryMock_null_3])
+      usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_1_1, usdRepositoryMock_null_3],
+        erc20RepositoryMock
+      )
 
       price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual([{ date: mockDate, price: 1, volume: 1 }])
     })
 
     it('Returns second repo prices when null', async () => {
-      const usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_null_null, usdRepositoryMock_1_1])
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_null_null, usdRepositoryMock_1_1],
+        erc20RepositoryMock
+      )
 
       const price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual([{ date: mockDate, price: 1, volume: 1 }])
@@ -144,13 +180,16 @@ describe('UsdRepositoryCoingecko', () => {
 
     it('Returns null when configured with no repositories', async () => {
       // When no repo is provided, it returns null
-      const usdRepositoryFallback = new UsdRepositoryFallback([])
+      const usdRepositoryFallback = new UsdRepositoryFallback([], erc20RepositoryMock)
       const price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual(null)
     })
 
     it('Returns null when no repo return prices', async () => {
-      const usdRepositoryFallback = new UsdRepositoryFallback([usdRepositoryMock_3_null, usdRepositoryMock_null_null])
+      const usdRepositoryFallback = new UsdRepositoryFallback(
+        [usdRepositoryMock_3_null, usdRepositoryMock_null_null],
+        erc20RepositoryMock
+      )
       const price = await usdRepositoryFallback.getUsdPrices(...PARAMS_PRICES)
       expect(price).toEqual(null)
     })
@@ -168,7 +207,10 @@ describe('UsdRepositoryCoingecko', () => {
       async (tokenAddress) => {
         const firstRepository = createRepositoryMock('First')
         const secondRepository = createRepositoryMock('Second')
-        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository, secondRepository])
+        const usdRepositoryFallback = new UsdRepositoryFallback(
+          [firstRepository, secondRepository],
+          erc20RepositoryMock
+        )
 
         await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, tokenAddress)).resolves.toBeNull()
         await expect(usdRepositoryFallback.getUsdPrices(CHAIN_ID, tokenAddress, '5m')).resolves.toBeNull()
@@ -180,25 +222,104 @@ describe('UsdRepositoryCoingecko', () => {
       }
     )
 
-    it.each([WETH, SOLANA_USDC, BTC_CURRENCY_ADDRESS])(
-      'queries repositories for valid token address %s',
-      async (tokenAddress) => {
-        const firstRepository = createRepositoryMock('First')
-        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository])
+    it.each([
+      [WETH, CHAIN_ID],
+      [SOLANA_USDC, SupportedChainId.SOLANA.toString()],
+      [BTC_CURRENCY_ADDRESS, 'bitcoin'],
+    ])('queries repositories for valid token address %s on chain %s', async (tokenAddress, chainIdOrSlug) => {
+      const firstRepository = createRepositoryMock('First')
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20RepositoryMock)
 
-        await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, tokenAddress)).resolves.toBe(1)
+      await expect(usdRepositoryFallback.getUsdPrice(chainIdOrSlug, tokenAddress)).resolves.toBe(1)
 
-        expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, tokenAddress)
-      }
-    )
+      expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(chainIdOrSlug, tokenAddress)
+    })
 
     it('queries repositories when the token address is omitted', async () => {
       const firstRepository = createRepositoryMock('First')
-      const usdRepositoryFallback: UsdRepository = new UsdRepositoryFallback([firstRepository])
+      const usdRepositoryFallback: UsdRepository = new UsdRepositoryFallback([firstRepository], erc20RepositoryMock)
 
       await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID)).resolves.toBe(1)
 
       expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, undefined)
+    })
+  })
+
+  describe('token existence check', () => {
+    const createRepositoryMock = (name: string): jest.Mocked<UsdRepository> => ({
+      name,
+      getUsdPrice: jest.fn().mockResolvedValue(1),
+      getUsdPrices: jest.fn().mockResolvedValue([{ date: mockDate, price: 1, volume: 1 }]),
+    })
+
+    it('does not query repositories when the address is not an ERC20 on the requested chain', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository = createErc20RepositoryMock(null)
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, WETH)).resolves.toBeNull()
+      await expect(usdRepositoryFallback.getUsdPrices(CHAIN_ID, WETH, '5m')).resolves.toBeNull()
+
+      expect(erc20Repository.get).toHaveBeenCalledWith(SupportedChainId.MAINNET, WETH)
+      expect(firstRepository.getUsdPrice).not.toHaveBeenCalled()
+      expect(firstRepository.getUsdPrices).not.toHaveBeenCalled()
+    })
+
+    it('queries repositories when the address is an ERC20 on the requested chain', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository = createErc20RepositoryMock()
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, WETH)).resolves.toBe(1)
+
+      expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, WETH)
+    })
+
+    it('does not query repositories for non-EVM addresses on EVM chains', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository = createErc20RepositoryMock()
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, SOLANA_USDC)).resolves.toBeNull()
+
+      expect(erc20Repository.get).not.toHaveBeenCalled()
+      expect(firstRepository.getUsdPrice).not.toHaveBeenCalled()
+    })
+
+    it('fails open and queries repositories when the existence check throws', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository: jest.Mocked<Erc20Repository> = {
+        get: jest.fn().mockRejectedValue(new Error('RPC is down')),
+      }
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID, WETH)).resolves.toBe(1)
+
+      expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(CHAIN_ID, WETH)
+    })
+
+    it.each([SupportedChainId.SOLANA.toString(), '10', 'bitcoin'])(
+      'skips the existence check on chains without an RPC client (%s)',
+      async (chainIdOrSlug) => {
+        const firstRepository = createRepositoryMock('First')
+        const erc20Repository = createErc20RepositoryMock(null)
+        const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+        await expect(usdRepositoryFallback.getUsdPrice(chainIdOrSlug, WETH)).resolves.toBe(1)
+
+        expect(erc20Repository.get).not.toHaveBeenCalled()
+        expect(firstRepository.getUsdPrice).toHaveBeenCalledWith(chainIdOrSlug, WETH)
+      }
+    )
+
+    it('skips the existence check when the token address is omitted', async () => {
+      const firstRepository = createRepositoryMock('First')
+      const erc20Repository = createErc20RepositoryMock(null)
+      const usdRepositoryFallback = new UsdRepositoryFallback([firstRepository], erc20Repository)
+
+      await expect(usdRepositoryFallback.getUsdPrice(CHAIN_ID)).resolves.toBe(1)
+
+      expect(erc20Repository.get).not.toHaveBeenCalled()
     })
   })
 })

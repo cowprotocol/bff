@@ -97,10 +97,10 @@ export function getUsdRepositoryCoingecko(cacheRepository: CacheRepository): Usd
 }
 
 export function getUsdRepository(cacheRepository: CacheRepository, erc20Repository: Erc20Repository): UsdRepository {
-  return new UsdRepositoryFallback([
-    getUsdRepositoryCoingecko(cacheRepository),
-    getUsdRepositoryCow(cacheRepository, erc20Repository),
-  ])
+  return new UsdRepositoryFallback(
+    [getUsdRepositoryCoingecko(cacheRepository), getUsdRepositoryCow(cacheRepository, erc20Repository)],
+    erc20Repository
+  )
 }
 
 export function getTokenHolderRepositoryEthplorer(cacheRepository: CacheRepository): TokenHolderRepository {
