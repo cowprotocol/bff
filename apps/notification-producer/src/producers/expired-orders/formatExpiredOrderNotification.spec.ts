@@ -22,7 +22,7 @@ describe('formatExpiredOrderNotification', () => {
   ])('formats %s order expiry', (orderClass, title, message) => {
     expect(formatExpiredOrderNotification({ ...common, appData: appData(orderClass) })).toEqual({
       title,
-      message: message + '\n\nAccount: 0x1234...7890\nRecipient: 0x0000...0001\nChain: Arbitrum One',
+      message: message + '\n\nAccount: 0x1234…7890\nRecipient: 0x0000…0001\nChain: Arbitrum One',
     })
   })
 })

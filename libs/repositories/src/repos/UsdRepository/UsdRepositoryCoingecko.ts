@@ -1,7 +1,7 @@
 import { injectable } from 'inversify'
 import { getAddressKey } from '@cowprotocol/cow-sdk'
 import { getCoingeckoProClient, SimplePriceResponse } from '../../datasources/coingecko'
-import { getAddressOrPlatform, getCoingeckoPlatform } from '../../utils/coingeckoUtils'
+import { getAddressOrPlatform, getCoingeckoPlatform, getNativeCoinId } from '../../utils/coingeckoUtils'
 import { throwIfUnsuccessful } from '../../utils/throwIfUnsuccessful'
 import { PricePoint, PriceStrategy, UsdRepository } from './UsdRepository'
 
@@ -32,12 +32,21 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform)
 
-    const fetchPromise =
-      tokenAddress && addressOrPlatform !== platform
-        ? this.getSinglePriceByContractAddress(platform, addressOrPlatform)
-        : this.getSinglePriceByPlatformId(platform)
+    if (addressOrPlatform !== platform) {
+      return this.handleSinglePriceResponse(
+        this.getSinglePriceByContractAddress(platform, addressOrPlatform),
+        addressOrPlatform
+      )
+    }
 
-    return this.handleSinglePriceResponse(fetchPromise, addressOrPlatform)
+    // Native currency. It has no contract, and the platform id is not a coin id, so it has to be
+    // resolved to one. Without it we return null and let the Cow price source handle the chain.
+    const coinId = getNativeCoinId(platform)
+    if (!coinId) {
+      return null
+    }
+
+    return this.handleSinglePriceResponse(this.getSinglePriceByCoinId(coinId), coinId)
   }
 
   async getUsdPrices(
@@ -55,15 +64,39 @@ export class UsdRepositoryCoingecko implements UsdRepository {
 
     const addressOrPlatform = getAddressOrPlatform(tokenAddress, platform)
 
-    const { data, response } =
-      tokenAddress && addressOrPlatform !== platform
-        ? await this.getMarketDataByTokenAddress(platform, days, interval, addressOrPlatform)
-        : await this.getMarketDataByPlatformId(platform, days, interval)
+    if (addressOrPlatform !== platform) {
+      return this.handleMarketDataResponse(
+        this.getMarketDataByTokenAddress(platform, days, interval, addressOrPlatform)
+      )
+    }
 
-    if (response.status === 404 || !data) {
+    // Native currency: same coin id resolution as getUsdPrice
+    const coinId = getNativeCoinId(platform)
+    if (!coinId) {
       return null
     }
+
+    return this.handleMarketDataResponse(this.getMarketDataByCoinId(coinId, days, interval))
+  }
+
+  private async handleMarketDataResponse(
+    marketDataPromise:
+      | ReturnType<UsdRepositoryCoingecko['getMarketDataByTokenAddress']>
+      | ReturnType<UsdRepositoryCoingecko['getMarketDataByCoinId']>
+  ): Promise<PricePoint[] | null> {
+    const { data, response } = await marketDataPromise
+
+    // Same split as the spot path: a 404 is an answer, any other non-2xx is a failure that must not
+    // be cached as "no price" or stop the fallback from trying Cow.
+    if (response.status === 404) {
+      return null
+    }
+
     await throwIfUnsuccessful('Error getting USD prices from Coingecko', response)
+
+    if (!data) {
+      return null
+    }
 
     const volumesMap =
       data.total_volumes?.reduce((acc, [timestamp, volume]) => {
@@ -76,13 +109,11 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       return null
     }
 
-    const pricePoints = prices.map(([timestamp, price]) => ({
+    return prices.map(([timestamp, price]) => ({
       date: new Date(timestamp),
       price,
       volume: volumesMap?.get(timestamp) ?? 0,
     }))
-
-    return pricePoints
   }
 
   private async getSinglePriceByContractAddress(platform: string, tokenAddress: string) {
@@ -100,12 +131,12 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     })
   }
 
-  private async getSinglePriceByPlatformId(platform: string) {
+  private async getSinglePriceByCoinId(coinId: string) {
     // https://docs.coingecko.com/reference/simple-price
     return getCoingeckoProClient().GET(`/simple/price`, {
       params: {
         query: {
-          ids: platform,
+          ids: coinId,
           vs_currencies: 'usd',
         },
       },
@@ -118,13 +149,18 @@ export class UsdRepositoryCoingecko implements UsdRepository {
       response: Response
     }
 
-    if (response.status === 404 || !data?.[key]?.usd) {
+    // A 404 is an answer: Coingecko has no such coin or contract.
+    if (response.status === 404) {
       return null
     }
 
+    // Anything else non-2xx is a failure, not an answer. It has to throw: returning null here would
+    // cache it as "no price" for 30 minutes and stop the fallback from trying Cow.
     await throwIfUnsuccessful('Error getting USD price from Coingecko', response)
 
-    return data[key].usd
+    // A 2xx with the key absent is Coingecko saying it doesn't know the token. A zero price is
+    // treated as unknown too, rather than served as a real price.
+    return data?.[key]?.usd || null
   }
 
   private async getMarketDataByTokenAddress(
@@ -149,12 +185,12 @@ export class UsdRepositoryCoingecko implements UsdRepository {
     })
   }
 
-  private async getMarketDataByPlatformId(platform: string, days: string, interval: 'daily' | undefined) {
-    // Get prices: See https://docs.coingecko.com/reference/contract-address-market-chart
+  private async getMarketDataByCoinId(coinId: string, days: string, interval: 'daily' | undefined) {
+    // Get prices: See https://docs.coingecko.com/reference/coins-id-market-chart
     return getCoingeckoProClient().GET(`/coins/{id}/market_chart`, {
       params: {
         path: {
-          id: platform,
+          id: coinId,
         },
         query: {
           vs_currency: 'usd',
