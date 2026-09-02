@@ -187,8 +187,13 @@ async function sendMessageTelegram(chatId: string, notification: PushNotificatio
   }
 }
 
-function formatMessageMarkdown({ title, message, url }: PushNotification) {
-  const moreInfo = url ? `\n\nOrder details: [Explorer](${url})` : ''
+function formatMessageMarkdown({ title, message, url, context }: PushNotification) {
+  const isCowTradeNotification = context?.type === 'cow-trade-notification'
+  const moreInfo = url
+    ? isCowTradeNotification
+      ? `\n\nOrder details: [Explorer](${url})`
+      : `\n\n[Read more](${url})`
+    : ''
 
   return `\
 **${title}**.
