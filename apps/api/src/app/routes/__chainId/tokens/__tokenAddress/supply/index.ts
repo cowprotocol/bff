@@ -52,7 +52,7 @@ const supply: FastifyPluginAsync = async (fastify): Promise<void> => {
         const supplies = await getSupplies(request.params.chainId)
         const tokenSupply = supplies[request.params.tokenAddress.toLowerCase()]
 
-        if (!tokenSupply) {
+        if (tokenSupply === undefined) {
           return reply.code(404).send({ message: 'Token supply not found' })
         }
         if (!validateSupply(tokenSupply)) throw new Error()
