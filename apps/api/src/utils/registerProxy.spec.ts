@@ -223,6 +223,49 @@ describe('registerProxy', () => {
   })
 
   /**
+   * The threshold is documented as *consecutive* failures. A success proves the upstream is
+   * reachable, so it has to clear the tally: otherwise a proxy with an occasional reset accumulates
+   * toward the block over minutes of otherwise healthy traffic and 503s everyone.
+   */
+  it('forgets earlier failures once the upstream answers again', async () => {
+    let call = 0
+    const upstream: Server = createServer((_request, response) => {
+      // Alternate: a clean response, then a body that dies in transfer
+      if (call++ % 2 === 0) {
+        response.writeHead(200, { 'content-type': 'application/json' })
+        response.end('{"ok":true}')
+        return
+      }
+
+      response.writeHead(200, { 'content-type': 'application/json', 'content-length': '9999' })
+      response.write('{"partial":')
+      setTimeout(() => response.destroy(), 10)
+    })
+    await new Promise<void>((resolve) => upstream.listen(0, '127.0.0.1', resolve))
+
+    const app = Fastify()
+    const { port: upstreamPort } = upstream.address() as { port: number }
+    await registerProxy(app, { name: proxyName, upstream: `http://127.0.0.1:${upstreamPort}` })
+    await app.listen({ port: 0, host: '127.0.0.1' })
+
+    // Well past the threshold in total failures, but never two in a row
+    for (let pair = 0; pair < FAILURES_BEFORE_BLOCKING + 2; pair++) {
+      for (const _ of [0, 1]) {
+        await fetch(`${upstreamUrl(app)}/thing`)
+          .then((response) => response.text())
+          .catch(() => undefined)
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    const after = await fetch(`${upstreamUrl(app)}/thing`).then((response) => response.status)
+    expect(after).not.toBe(503)
+
+    await app.close()
+    await new Promise<void>((resolve) => upstream.close(() => resolve()))
+  })
+
+  /**
    * The distinction that makes the failure memory safe: an upstream that answers is reachable, so a
    * 500 on one URL must not stop every other URL being forwarded.
    */

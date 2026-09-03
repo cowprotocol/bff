@@ -175,6 +175,12 @@ export async function registerProxy(
             // produced a success-shaped 'Proxied to' line, status and all, beside the failure line.
             if (error) return
 
+            // A completed response proves the upstream is reachable, so the tally starts over. The
+            // threshold counts *consecutive* failures: without this it is cumulative, and a proxy
+            // with an occasional reset creeps to ten over minutes of otherwise healthy traffic and
+            // then blocks every caller. Fire and forget, after the body has already gone out.
+            cacheRepository.take(failureCountKey).catch(() => undefined)
+
             request.log.info(
               {
                 proxy: name,
