@@ -56,6 +56,8 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
   }>(
     '/usdPrice',
     {
+      // The resolved price is logged by the responseLogging plugin, from the response itself
+      config: { logResponseBody: 'always' },
       schema: {
         description: 'Get USD price for a given token',
         tags: ['tokens'],
@@ -75,7 +77,6 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
        */
       const tokenAddress = _tokenAddress === '-' ? undefined : _tokenAddress
       const price = await usdService.getUsdPrice(chainId, tokenAddress)
-      fastify.log.info(`Get USD value for ${tokenAddress} on chain ${chainId}: ${price}`)
       if (price === null) {
         reply.code(404).send({ message: 'Price not found' })
         return

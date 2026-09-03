@@ -8,6 +8,8 @@ import { UsdRepositoryCache } from './UsdRepositoryCache'
 
 const CACHE_VALUE_SECONDS = 10
 const CACHE_NULL_SECONDS = 20
+// Kept in step with CACHE_ERROR_SECONDS in UsdRepositoryCache
+const CACHE_ERROR_SECONDS = 20
 
 const wethLowercase = WETH.toLocaleLowerCase()
 const chainId = SupportedChainId.MAINNET.toString()
@@ -160,9 +162,28 @@ describe('UsdRepositoryCache', () => {
       // THEN: The call throws an awful error
       await expect(pricePromise).rejects.toThrow('💥 Booom!')
 
-      // THEN: The failure is NOT cached as "no price". Caching it would hide the outage behind a
-      // 404 for the whole NULL TTL, long after the upstream recovered.
-      expect(redisMock.set).not.toHaveBeenCalled()
+      // THEN: The failure is remembered briefly, so an outage does not turn every request into a
+      // fresh upstream call. Crucially it is NOT cached as "no price": that would hide the outage
+      // behind a 404 for the whole NULL TTL, long after the upstream recovered.
+      expect(redisMock.set).toHaveBeenCalledWith(expect.any(String), 'error', 'EX', CACHE_ERROR_SECONDS)
+      expect(redisMock.set).not.toHaveBeenCalledWith(expect.any(String), 'null', 'EX', expect.anything())
+    })
+
+    it('should not call the proxy while a recent failure is remembered', async () => {
+      // GIVEN: A failure was cached moments ago
+      redisMock.get.mockResolvedValue('error')
+
+      // GIVEN: The proxy would answer if asked
+      proxyMock.getUsdPrice.mockResolvedValue(200)
+
+      // WHEN: Get USD price
+      const pricePromise = usdRepositoryCache.getUsdPrice(chainId, WETH)
+
+      // THEN: It throws without hitting the upstream, which is the point: an outage must not turn
+      // every request into a fresh upstream call. It throws rather than returning null so the
+      // fallback still moves on to the next source instead of reporting "no price".
+      await expect(pricePromise).rejects.toThrow('failed within the last')
+      expect(proxyMock.getUsdPrice).not.toHaveBeenCalled()
     })
   })
 
@@ -283,8 +304,24 @@ describe('UsdRepositoryCache', () => {
       // THEN: The call throws an awful error
       await expect(pricesPromise).rejects.toThrow('💥 Booom!')
 
-      // THEN: The failure is NOT cached as "no price", same as the single price path
-      expect(redisMock.set).not.toHaveBeenCalled()
+      // THEN: Remembered briefly and not as "no price", same as the single price path
+      expect(redisMock.set).toHaveBeenCalledWith(expect.any(String), 'error', 'EX', CACHE_ERROR_SECONDS)
+      expect(redisMock.set).not.toHaveBeenCalledWith(expect.any(String), 'null', 'EX', expect.anything())
+    })
+
+    it('should not call the proxy while a recent failure is remembered', async () => {
+      // GIVEN: A failure was cached moments ago
+      redisMock.get.mockResolvedValue('error')
+
+      // GIVEN: The proxy would answer if asked
+      proxyMock.getUsdPrices.mockResolvedValue([pricePoint200])
+
+      // WHEN: Get USD prices
+      const pricesPromise = usdRepositoryCache.getUsdPrices(chainId, WETH, '5m')
+
+      // THEN: It throws without hitting the upstream, same as the single price path
+      await expect(pricesPromise).rejects.toThrow('failed within the last')
+      expect(proxyMock.getUsdPrices).not.toHaveBeenCalled()
     })
   })
 })

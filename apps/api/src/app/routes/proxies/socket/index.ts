@@ -1,5 +1,5 @@
-import httpProxy from '@fastify/http-proxy'
 import { FastifyPluginAsync } from 'fastify'
+import { registerProxy } from '../../../../utils/registerProxy'
 
 const DEFAULT_SOCKET_BASE_URL = 'https://dedicated-backend.bungee.exchange'
 
@@ -32,7 +32,8 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       .send()
   })
 
-  fastify.register(httpProxy, {
+  await registerProxy(fastify, {
+    name: 'socket',
     upstream,
     // The route file is mounted under '/proxies/socket', rewrite that prefix to '/'
     rewritePrefix: '/',
@@ -43,12 +44,6 @@ const proxy: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         origin: 'https://swap.cow.fi',
         Affiliate: affiliateCode,
       }),
-    },
-    preHandler: async (request) => {
-      fastify.log.info(
-        { url: request.url, method: request.method, headers: request.headers },
-        `Proxying request to socket ${upstream}`
-      )
     },
   })
 }

@@ -1,6 +1,8 @@
 import { AdditionalTargetChainId, SupportedChainId, TargetChainId } from '@cowprotocol/cow-sdk'
 
 import createClient from 'openapi-fetch'
+import { fetchWithTimeout } from '../utils/fetchWithTimeout'
+import { upstreamLogging } from '../utils/upstreamLogging'
 import type { components, paths } from '../gen/coingecko/coingecko-pro-types'
 import { COINGECKO_ASSET_PLATFORMS } from '../gen/coingecko/asset-platforms'
 
@@ -80,7 +82,10 @@ export function getCoingeckoProClient(apiKey = process.env.COINGECKO_API_KEY): C
     headers: {
       'x-cg-pro-api-key': apiKey,
     },
+    fetch: fetchWithTimeout(),
   })
+
+  coingeckoProClient.use(upstreamLogging('coingecko'))
 
   coingeckoProClientCache[apiKey] = coingeckoProClient
 

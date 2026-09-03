@@ -1,4 +1,4 @@
-import httpProxy from '@fastify/http-proxy'
+import { registerProxy } from '../../../../utils/registerProxy'
 import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../utils/cache'
 import { FastifyPluginAsync } from 'fastify'
 import { COINGECKO_PRO_BASE_URL } from '@cowprotocol/repositories'
@@ -17,7 +17,8 @@ const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
     return
   }
 
-  fastify.register(httpProxy, {
+  await registerProxy(fastify, {
+    name: 'coingecko',
     upstream: COINGECKO_PRO_BASE_URL,
     rewritePrefix: '/api/v3/',
     replyOptions: {
@@ -45,9 +46,6 @@ const coingeckoProxy: FastifyPluginAsync = async (fastify): Promise<void> => {
 
         return newHeaders
       },
-    },
-    preHandler: async (request) => {
-      fastify.log.debug({ url: request.url, method: request.method }, `Request coingecko proxy`)
     },
     undici: {
       strictContentLength: false, // Prevent errors when content-length header mismatches

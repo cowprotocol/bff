@@ -108,9 +108,11 @@ export class UsdRepositoryFallback implements UsdRepository {
           return result
         }
 
+        // "has no price" rather than "returned null": the source may have declined without calling
+        // its upstream at all, e.g. a chain Coingecko does not support. It says which, on its own line.
         if (nextRepository) {
           logger.info(
-            `UsdRepositoryFallback: ${usdRepository.name} returned null for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}`
+            `UsdRepositoryFallback: ${usdRepository.name} has no price for ${chainIdOrSlug}/${tokenAddress}${fallingBackTo}`
           )
         }
       } catch (error) {
