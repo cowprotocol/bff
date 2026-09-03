@@ -35,6 +35,16 @@ const schema = {
     COINGECKO_API_KEY: {
       type: 'string',
     },
+    CODEX_API_KEY: {
+      type: 'string',
+    },
+    PRICE_HISTORY_PROVIDER_ORDER: {
+      type: 'string',
+      default: '1,2',
+    },
+    PRICE_HISTORY_UPSTREAM: {
+      type: 'string',
+    },
     GOLD_RUSH_API_KEY: {
       type: 'string',
     },
