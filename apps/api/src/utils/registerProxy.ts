@@ -77,6 +77,9 @@ export interface ProxyDefinition {
  * - a log line per forwarded call, with status and duration, on both success and failure. Fastify
  *   already logs the inbound request, so this completes the picture with the upstream leg
  * - a short memory of transport failures, so an unreachable upstream is not hammered once per request
+ *
+ * `preHandler` is omitted from the options: this sets its own, and since caller options are spread
+ * first, one passed in here would be silently overwritten. Compose it if a proxy ever needs one.
  */
 export async function registerProxy(
   fastify: FastifyInstance,
@@ -85,8 +88,6 @@ export async function registerProxy(
     upstream,
     logResponseBody = 'errors',
     ...options
-    // preHandler is omitted: this sets its own, and spreading options first would let a caller's be
-    // silently overwritten. Compose it here if one is ever actually needed.
   }: ProxyDefinition & Omit<FastifyHttpProxyOptions, 'upstream' | 'preHandler'>
 ): Promise<void> {
   const failureKey = getCacheKey('proxy-failure', name)
@@ -167,31 +168,37 @@ export async function registerProxy(
 
         // Logged once the body has flushed, so `bytes` and `ms` cover the whole upstream leg rather
         // than just its headers.
-        const tap = tapBody(wantsBody && isReadable ? MAX_LOGGED_BODY_BYTES : 0, ({ bytes, snippet, truncated }) => {
-          request.log.info(
-            {
-              proxy: name,
-              url: request.url,
-              method: request.method,
-              status,
-              ms: elapsed(request),
-              contentType: contentType || undefined,
-              bytes,
-              body: snippet,
-              bodyTruncated: snippet !== undefined && truncated ? true : undefined,
-            },
-            `Proxied to ${name}`
-          )
-        })
+        const tap = tapBody(
+          wantsBody && isReadable ? MAX_LOGGED_BODY_BYTES : 0,
+          ({ bytes, snippet, truncated, error }) => {
+            // A body that died in transfer is reported by recordFailure below. Logging it here too
+            // produced a success-shaped 'Proxied to' line, status and all, beside the failure line.
+            if (error) return
+
+            request.log.info(
+              {
+                proxy: name,
+                url: request.url,
+                method: request.method,
+                status,
+                ms: elapsed(request),
+                contentType: contentType || undefined,
+                bytes,
+                body: snippet,
+                bodyTruncated: snippet !== undefined && truncated ? true : undefined,
+              },
+              `Proxied to ${name}`
+            )
+          }
+        )
 
         // pipeline rather than body.pipe: pipe does not forward a source error to the destination, so
         // an upstream body that fails mid-transfer would leave the tap alive, never report, and the
         // call would go unlogged. Partial responses are exactly what the logging is for.
         //
         // A body that dies here never reaches onError, because reply-from only calls it while the
-        // reply is unsent and the status has already gone out. Without this the truncated response
-        // would log as a clean 'Proxied to' line and never count toward the failure tally. No
-        // reply.send: the headers are already on the wire.
+        // reply is unsent and the status has already gone out. Without this the drop would never
+        // count toward the failure tally. No reply.send: the headers are already on the wire.
         pipeline(body as unknown as Readable, tap, (error) => {
           if (error) {
             recordFailure(request, error)

@@ -4,6 +4,8 @@ export interface BodySummary {
   bytes: number
   snippet?: string
   truncated: boolean
+  /** Set when the body died in transfer, so a partial response is not reported as a whole one */
+  error?: Error
 }
 
 /**
@@ -18,13 +20,14 @@ export function tapBody(maxBytes: number, onDone: (summary: BodySummary) => void
   let keptBytes = 0
   let reported = false
 
-  const report = () => {
+  const report = (error?: Error) => {
     if (reported) return
     reported = true
     onDone({
       bytes,
       snippet: keptBytes > 0 ? Buffer.concat(kept).toString('utf8') : undefined,
       truncated: bytes > keptBytes,
+      error,
     })
   }
 
@@ -47,9 +50,10 @@ export function tapBody(maxBytes: number, onDone: (summary: BodySummary) => void
     },
   })
 
-  // A client that disconnects mid-stream never reaches flush
-  tap.on('close', report)
+  // A client that disconnects mid-stream never reaches flush. destroy(err) emits 'error' before
+  // 'close', so a failed transfer reports its error rather than looking like a clean finish.
   tap.on('error', report)
+  tap.on('close', report)
 
   return tap
 }

@@ -298,6 +298,10 @@ describe('registerProxy', () => {
 
     expect(lines.find((line) => line.msg === `Proxy to ${proxyName} failed`)).toBeDefined()
 
+    // And NOT as a completed response: the partial body used to log a 'Proxied to' line with a 200
+    // beside the failure, so one dropped transfer read as both a success and a failure.
+    expect(lines.find((line) => line.msg === `Proxied to ${proxyName}`)).toBeUndefined()
+
     await app.close()
     await new Promise<void>((resolve) => upstream.close(() => resolve()))
   })
