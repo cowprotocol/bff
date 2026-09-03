@@ -40,15 +40,6 @@ const priceHistory: FastifyPluginAsync = async (fastify): Promise<void> => {
 
   const service = new PriceHistoryService(providers, fastify.config.PRICE_HISTORY_PROVIDER_ORDER, logger)
 
-  fastify.addHook('onSend', async (request, reply, payload) => {
-    if (request.headers.origin) {
-      reply.header('Access-Control-Allow-Origin', request.headers.origin)
-      reply.header('Vary', 'Origin')
-    }
-
-    return payload
-  })
-
   fastify.get<{
     Params: PriceHistoryParams
     Querystring: PriceHistoryQuery

@@ -61,7 +61,6 @@ describe('price history route', () => {
     const response = await app.inject({
       method: 'GET',
       url: PRICE_HISTORY_URL,
-      headers: { origin: 'https://swap.cow.fi' },
     })
 
     expect(response.statusCode).toBe(200)
@@ -73,7 +72,6 @@ describe('price history route', () => {
       ],
     })
     expect(response.headers['cache-control']).toContain('max-age=30')
-    expect(response.headers['access-control-allow-origin']).toBe('https://swap.cow.fi')
 
     const request = mockedFetch.mock.calls[0]
     expect(request?.[0]).toContain('GetTokenHistoryOHLC')
