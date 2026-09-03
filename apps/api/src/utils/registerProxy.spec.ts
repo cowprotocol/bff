@@ -306,6 +306,37 @@ describe('registerProxy', () => {
     await new Promise<void>((resolve) => upstream.close(() => resolve()))
   })
 
+  it('does not count a client walking away as an upstream failure', async () => {
+    // Upstream is healthy and still sending when the client gives up
+    const upstream: Server = createServer((_request, response) => {
+      response.writeHead(200, { 'content-type': 'application/json', 'content-length': '9999' })
+      response.write('{"partial":')
+      setTimeout(() => response.end('"rest"}'), 400)
+    })
+    await new Promise<void>((resolve) => upstream.listen(0, '127.0.0.1', resolve))
+
+    const { lines, logger } = captureLogs()
+    const app = Fastify({ logger })
+    const { port: upstreamPort } = upstream.address() as { port: number }
+    await registerProxy(app, { name: proxyName, upstream: `http://127.0.0.1:${upstreamPort}` })
+    await app.listen({ port: 0, host: '127.0.0.1' })
+
+    const controller = new AbortController()
+    await fetch(`${upstreamUrl(app)}/thing`, { signal: controller.signal })
+      .then(async (response) => {
+        await response.body!.getReader().read()
+        controller.abort()
+      })
+      .catch(() => undefined)
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    // A closed tab is not an upstream problem. Counting it would let ordinary navigation
+    // accumulate toward the block and 503 the proxy for every other caller.
+    expect(lines.find((line) => line.msg === `Proxy to ${proxyName} failed`)).toBeUndefined()
+
+    await app.close()
+    await new Promise<void>((resolve) => upstream.close(() => resolve()))
+  })
+
   it('times out a hung upstream instead of hanging with it', async () => {
     // Never replies
     const upstream = await startUpstream(() => new Promise(() => undefined) as never)
@@ -322,5 +353,59 @@ describe('registerProxy', () => {
 
     await app.close()
     await upstream.close()
+  })
+})
+
+describe('PROBES', () => {
+  const show = (label: string, lines: Record<string, unknown>[]) =>
+    console.log(
+      'PROBE ' + label + ': ' +
+        JSON.stringify(
+          lines
+            .filter((l) => String(l.msg).startsWith('Proxied to') || String(l.msg).startsWith('Proxy to'))
+            .map((l) => ({ msg: l.msg, status: l.status, bytes: l.bytes, body: l.body }))
+        )
+    )
+
+  async function run(label: string, handler: (res: import('http').ServerResponse) => void, method = 'GET') {
+    const upstream: Server = createServer((_req, res) => handler(res))
+    await new Promise<void>((resolve) => upstream.listen(0, '127.0.0.1', resolve))
+    const { lines, logger } = captureLogs()
+    const app = Fastify({ logger })
+    const { port } = upstream.address() as { port: number }
+    await registerProxy(app, {
+      name: proxyName,
+      upstream: `http://127.0.0.1:${port}`,
+      httpMethods: ['GET', 'HEAD'],
+      logResponseBody: 'always',
+    })
+    await app.listen({ port: 0, host: '127.0.0.1' })
+    await fetch(`${upstreamUrl(app)}/thing`, { method })
+      .then((r) => r.arrayBuffer())
+      .catch(() => undefined)
+    await new Promise((r) => setTimeout(r, 200))
+    show(label, lines)
+    await app.close()
+    await new Promise<void>((resolve) => upstream.close(() => resolve()))
+  }
+
+  it('probe: 204 no content', async () => {
+    await run('204', (res) => { res.writeHead(204); res.end() })
+  })
+
+  it('probe: 200 empty body', async () => {
+    await run('200-empty', (res) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end() })
+  })
+
+  it('probe: HEAD request', async () => {
+    await run('HEAD', (res) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end() }, 'HEAD')
+  })
+
+  it('probe: chunked, no content-length', async () => {
+    await run('chunked', (res) => {
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.write('{"a":1')
+      setTimeout(() => res.end('}'), 30)
+    })
   })
 })

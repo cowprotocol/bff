@@ -192,18 +192,27 @@ export async function registerProxy(
           }
         )
 
-        // pipeline rather than body.pipe: pipe does not forward a source error to the destination, so
-        // an upstream body that fails mid-transfer would leave the tap alive, never report, and the
-        // call would go unlogged. Partial responses are exactly what the logging is for.
-        //
+        const source = body as unknown as Readable
+
         // A body that dies here never reaches onError, because reply-from only calls it while the
-        // reply is unsent and the status has already gone out. Without this the drop would never
-        // count toward the failure tally. No reply.send: the headers are already on the wire.
-        pipeline(body as unknown as Readable, tap, (error) => {
-          if (error) {
-            recordFailure(request, error)
-          }
+        // reply is unsent and the status has already gone out, so without this the drop would never
+        // count toward the failure tally.
+        source.on('error', (error) => {
+          // Only an upstream failure counts. pipeline tears down both ends, so a client abandoning
+          // the response arrives here too, as a premature close on the source. The response socket
+          // tells them apart: it is already destroyed when the client left, and still open when the
+          // upstream is the one that died. Counting a closed tab or a cancelled fetch as an upstream
+          // failure would let ordinary browsing reach the threshold and 503 the proxy for everyone.
+          if (reply.raw.destroyed) return
+
+          recordFailure(request, error)
         })
+
+        // pipeline rather than source.pipe: pipe does not forward a source error to the destination,
+        // so an upstream body that fails mid-transfer would leave the tap alive, never report, and
+        // the call would go unlogged. Partial responses are exactly what the logging is for. No
+        // reply.send: the headers are already on the wire.
+        pipeline(source, tap, () => undefined)
 
         // reply-from types the third argument as an http response, but only ever passes a readable
         // body stream, so a tapped stream is the same shape it already had
