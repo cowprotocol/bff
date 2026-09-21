@@ -1,14 +1,20 @@
-import { Address, getAddress } from 'viem'
+import { getAddress } from 'viem'
 
 import { AllChainIds, NativeCurrencyAddress, WrappedNativeTokenAddress } from '../const'
-import { SupportedChainId } from '@cowprotocol/cow-sdk'
+import { isSolanaChain, SOL_NATIVE_CURRENCY_ADDRESS, SupportedChainId } from '@cowprotocol/cow-sdk'
 
 /**
- * Returns the token address. This function will throw if the address passed is not an Ethereum address.
- * It will also convert the address representing the native currency (0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE) into
- * its wrapped version.
+ * Returns the token address. On EVM chains, this function will throw if the address passed is not an
+ * Ethereum address, and will convert the address representing the native currency
+ * (0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE) into its wrapped version.
+ * On Solana, addresses are case-sensitive base58 and are returned as-is (only the native SOL placeholder
+ * is converted to its wrapped version), since they can't be checksummed/lowercased like EVM addresses.
  */
-export function toTokenAddress(address: string, chainId: SupportedChainId): Address {
+export function toTokenAddress(address: string, chainId: SupportedChainId): string {
+  if (isSolanaChain(chainId)) {
+    return address === SOL_NATIVE_CURRENCY_ADDRESS ? WrappedNativeTokenAddress[chainId] : address
+  }
+
   if (address.toLocaleLowerCase() === NativeCurrencyAddress) {
     return WrappedNativeTokenAddress[chainId]
   }

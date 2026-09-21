@@ -578,10 +578,14 @@ export interface components {
          */
         OrderKind: "buy" | "sell";
         /**
-         * @description Order class.
+         * @deprecated
+         * @description Deprecated. Order classes were removed: every order is a limit order whose
+         *     fee is taken from the surplus, and JIT orders are flagged by
+         *     `isLiquidityOrder`. The field is still returned for backwards
+         *     compatibility and always reads `limit`.
          * @enum {string}
          */
-        OrderClass: "market" | "limit" | "liquidity";
+        OrderClass: "limit";
         /**
          * @description Where should the `sellToken` be drawn from?
          *
@@ -606,9 +610,14 @@ export interface components {
          * @description How good should the price estimate be?
          *
          *     Fast: The price estimate is chosen among the fastest N price estimates.
-         *     Optimal: The price estimate is chosen among all price estimates.
-         *     Verified: The price estimate is chosen among all verified/simulated
-         *     price estimates.
+         *     Estimates do not get verified by simulation.
+         *     Optimal: The price estimate is chosen among all price estimates, ranked
+         *     purely by the promised price. Estimates do not get verified by simulation.
+         *     Verified: All price estimates get verified by simulation whenever
+         *     possible and verified estimates are preferred over unverified ones,
+         *     even when an unverified estimate promises a better price. The
+         *     response's `verified` flag indicates whether the returned estimate
+         *     was actually verified.
          *
          *     **NOTE**: Orders are supposed to be created from `verified` or `optimal`
          *     price estimates.
@@ -754,8 +763,11 @@ export interface components {
              * @example 2020-12-03T18:35:18.814523Z
              */
             creationDate: string;
-            /** @description The class of the order (market, limit, or liquidity). Determines how fees are handled.
-             *      */
+            /**
+             * @deprecated
+             * @description Deprecated, always `limit`. See `OrderClass`.
+             *
+             */
             class: components["schemas"]["OrderClass"];
             /** @description The address that signed the order and owns it. For regular orders, this is the trader. For EIP 1271 orders, it's the respective contract (see `onchainUser` for the actual trader).
              *      */
@@ -811,10 +823,13 @@ export interface components {
             executedFee?: components["schemas"]["BigUint"];
             /** @description Token the executed fee was captured in. */
             executedFeeToken?: components["schemas"]["Address"];
+            /** @description Estimated gas cost attributed to this order, in native token wei, summed across its fills. Omitted unless the cost of every fill is known, rather than reporting a partial total: absent for an unsettled order, until the latest fill's settlement has been attributed, and for orders with a fill predating this being recorded.
+             *      */
+            gasCost?: components["schemas"]["BigUint"];
             /** @description Full `appData`, which the contract-level `appData` is a hash of. See `OrderCreation` for more information.
              *      */
             fullAppData?: string | null;
-            /** @description Earliest time (unix seconds) at which the order may enter a batch auction, taken from the order's `appData`. Omitted when the order has no lower bound (eligible immediately).
+            /** @description Earliest time (unix seconds) at which the order may enter a batch auction, taken from the order's `appData`. Omitted when the order has no lower bound (eligible immediately). Mutually exclusive with `enableFastPath`: an order that sets both is rejected.
              *      */
             validFrom?: number | null;
             /** @description The address of the CoW Protocol settlement contract that this order is valid for. Orders are only valid on the settlement contract they were signed for.
@@ -885,6 +900,10 @@ export interface components {
              * @default erc20
              */
             buyTokenBalance: components["schemas"]["BuyTokenDestination"];
+            /**
+             * @deprecated
+             * @description Deprecated, always `limit`. See `OrderClass`.
+             */
             class: components["schemas"]["OrderClass"];
             appData: components["schemas"]["AppDataHash"];
             signature: components["schemas"]["Signature"];
@@ -894,6 +913,9 @@ export interface components {
             /** @description A winning quote.
              *      */
             quote?: components["schemas"]["Quote"];
+            /** @description Cap on the penalty a solver can incur for winning this order but failing to execute it, denominated in the native token.
+             *      */
+            penaltyCapNative?: components["schemas"]["TokenAmount"];
         };
         /** @description A batch auction for solving.
          *      */
@@ -986,6 +1008,11 @@ export interface components {
             /** @description Executed protocol fees for this trade, together with the fee policies used. Listed in the order they got applied.
              *      */
             executedProtocolFees?: components["schemas"]["ExecutedProtocolFee"][];
+            /** @description Estimated gas cost attributed to this trade, in native token wei: the settlement's gas cost split equally between the user trades it settled, not weighted by the gas each one consumed. Omitted until the settlement has been attributed, shortly after it is indexed, and permanently if it predates this being recorded. `0` for a JIT order that only provided liquidity.
+             *      */
+            gasCost?: components["schemas"]["BigUint"];
+            /** @description Cap on the penalty the winning solver could incur for not executing the order in the auction this trade settled, denominated in native token wei. Absent when the auction had a pre CIP-87 global penalty cap. */
+            penaltyCapNative?: components["schemas"]["BigUint"] | null;
         };
         /**
          * @description Unique identifier for the order: 56 bytes encoded as hex with `0x`
@@ -1031,7 +1058,7 @@ export interface components {
         /** @description Error quoting an order.
          *
          *     Possible `errorType` values per HTTP status:
-         *     * 400: `AppDataHashMismatch`, `CustomSolverError`, `ExcessiveValidTo`,
+         *     * 400: `AppDataHashMismatch`, `ExcessiveValidTo`,
          *       `InsufficientLiquidity`, `InsufficientValidTo`, `InvalidAppData`,
          *       `InvalidNativeSellToken`, `QuoteNotVerified`, `SameBuyAndSellToken`,
          *       `SellAmountDoesNotCoverFee`, `TokenTemporarilySuspended`,
@@ -1116,7 +1143,7 @@ export interface components {
             /** @default verified */
             priceQuality: components["schemas"]["PriceQuality"];
             /**
-             * @description Signals that this quote is intended for fast-path (out-of-competition) execution. Propagated to the solver.
+             * @description Signals that this quote is intended for fast-path (out-of-competition) execution. Propagated to the solver. Mutually exclusive with the `appData` `validFrom` field: an order that sets both is rejected.
              *
              * @default false
              */
