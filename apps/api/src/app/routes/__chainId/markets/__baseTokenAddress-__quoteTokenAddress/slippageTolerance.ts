@@ -1,11 +1,15 @@
 import { SlippageService, slippageServiceSymbol, VolatilityDetails } from '@cowprotocol/services'
+import { EVM_ADDRESS_PATTERN, SOL_ADDRESS_PATTERN } from '@cowprotocol/cow-sdk'
 import { FastifyPluginAsync } from 'fastify'
 import { FromSchema, JSONSchema } from 'json-schema-to-ts'
 import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../../utils/cache'
 import { apiContainer } from '../../../../inversify.config'
-import { ETHEREUM_ADDRESS_PATTERN, SupportedChainIdSchema } from '../../../../schemas'
+import { SupportedChainIdSchema } from '../../../../schemas'
 
 const CACHE_SECONDS = 120
+
+// Accepts either an EVM address (0x...) or a Solana address (base58), so the route also works for Solana markets.
+const TOKEN_ADDRESS_PATTERN = `(${EVM_ADDRESS_PATTERN.source})|(${SOL_ADDRESS_PATTERN.source})`
 
 const routeSchema = {
   type: 'object',
@@ -17,13 +21,13 @@ const routeSchema = {
       title: 'Base token address',
       description: 'Currency that is being bought or sold.',
       type: 'string',
-      pattern: ETHEREUM_ADDRESS_PATTERN,
+      pattern: TOKEN_ADDRESS_PATTERN,
     },
     quoteTokenAddress: {
       title: 'Quote token address',
       description: ' Currency in which the price of the base token is quoted.',
       type: 'string',
-      pattern: ETHEREUM_ADDRESS_PATTERN,
+      pattern: TOKEN_ADDRESS_PATTERN,
     },
   },
 } as const satisfies JSONSchema
