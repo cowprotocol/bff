@@ -1,5 +1,7 @@
 import { randomBytes } from 'crypto'
 
+import { Redis } from 'ioredis'
+
 import { CacheRepository } from '../repos/CacheRepository/CacheRepository'
 
 const TOKEN_PREFIX = 'telegram-connect:'
@@ -35,4 +37,46 @@ export async function releaseConnectToken(
   account: string
 ): Promise<void> {
   await cacheRepository.set(TOKEN_PREFIX + token, account, CONNECT_TOKEN_TTL_SECONDS)
+}
+
+const RATE_LIMIT_PREFIX = 'telegram-connect-rate:'
+export const CONNECT_TOKEN_RATE_LIMIT = 10
+export const CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS = 60
+
+/**
+ * Fixed-window counter guarding connect-token minting, which is unauthenticated: anyone may
+ * mint a token for any address (watching an arbitrary account is an intended feature), so
+ * without this the endpoint is a free write primitive.
+ *
+ * Keyed by account rather than by IP because apps/api runs behind an ingress and doesn't set
+ * Fastify's `trustProxy`, so `request.ip` is the proxy's address and a per-IP window would
+ * collapse into a single global one. The trade-off is that flooding someone's address delays
+ * their own connect by up to one window.
+ *
+ * Returns the seconds left in the current window when the account is over the limit - suitable
+ * for `Retry-After` - or null when the request is allowed.
+ */
+export async function getConnectTokenRetryAfter(
+  redis: Pick<Redis, 'incr' | 'expire' | 'ttl'>,
+  account: string
+): Promise<number | null> {
+  const key = RATE_LIMIT_PREFIX + account
+  const count = await redis.incr(key)
+
+  // NX: sets the expiry only while the key has none, so the window never slides. Applying it on
+  // every request (rather than only when the counter reads 1) means a TTL lost to a failed EXPIRE
+  // or to a process killed between the two commands is restored by the next request - otherwise
+  // the counter would climb forever and 429 that account until someone deleted the key by hand.
+  await redis.expire(key, CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS, 'NX')
+
+  if (count <= CONNECT_TOKEN_RATE_LIMIT) {
+    return null
+  }
+
+  // Only the rejected path pays for this round trip. TTL is negative when the key carries no
+  // expiry or expired in between; neither should happen after the EXPIRE above, so fall back to
+  // the full window rather than telling the caller to retry immediately.
+  const ttl = await redis.ttl(key)
+
+  return ttl > 0 ? ttl : CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS
 }

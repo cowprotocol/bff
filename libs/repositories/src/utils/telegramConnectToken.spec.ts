@@ -1,5 +1,14 @@
+import { Redis } from 'ioredis'
+
 import { CacheRepository } from '../repos/CacheRepository/CacheRepository'
-import { claimConnectToken, createConnectToken, releaseConnectToken } from './telegramConnectToken'
+import {
+  claimConnectToken,
+  CONNECT_TOKEN_RATE_LIMIT,
+  CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS,
+  createConnectToken,
+  getConnectTokenRetryAfter,
+  releaseConnectToken,
+} from './telegramConnectToken'
 
 // Simple in-memory cache implementation for testing
 class TestCacheRepository implements CacheRepository {
@@ -106,5 +115,89 @@ describe('telegramConnectToken', () => {
     const tokenB = await createConnectToken(cacheRepository, '0xabc')
 
     expect(tokenA).not.toBe(tokenB)
+  })
+})
+
+describe('getConnectTokenRetryAfter', () => {
+  const KEY = 'telegram-connect-rate:0xabc'
+
+  // Mimics INCR, EXPIRE ... NX (the expiry only lands while the key has none) and TTL.
+  function buildRedis() {
+    const counters = new Map<string, number>()
+    const ttls = new Map<string, number>()
+
+    const incr = jest.fn(async (key: string) => {
+      const count = (counters.get(key) ?? 0) + 1
+      counters.set(key, count)
+      return count
+    })
+
+    const expire = jest.fn(async (key: string, seconds: number, mode?: string) => {
+      if (mode === 'NX' && ttls.has(key)) return 0
+      ttls.set(key, seconds)
+      return 1
+    })
+
+    const ttl = jest.fn(async (key: string) => ttls.get(key) ?? -1)
+
+    return { redis: { incr, expire, ttl } as unknown as Pick<Redis, 'incr' | 'expire' | 'ttl'>, counters, ttls }
+  }
+
+  it('allows requests up to the limit and rejects the next one', async () => {
+    const { redis } = buildRedis()
+
+    for (let i = 0; i < CONNECT_TOKEN_RATE_LIMIT; i++) {
+      expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBeNull()
+    }
+
+    expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBe(CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
+  })
+
+  it('reports the seconds left in the window, not the full window', async () => {
+    const { redis, counters, ttls } = buildRedis()
+    counters.set(KEY, CONNECT_TOKEN_RATE_LIMIT) // next request goes over
+    ttls.set(KEY, 5)
+
+    expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBe(5)
+  })
+
+  it('does not read the TTL for an allowed request', async () => {
+    const { redis } = buildRedis()
+
+    await getConnectTokenRetryAfter(redis, '0xabc')
+
+    expect((redis.ttl as jest.Mock)).not.toHaveBeenCalled()
+  })
+
+  it('does not slide the window on later requests', async () => {
+    const { redis, ttls } = buildRedis()
+
+    await getConnectTokenRetryAfter(redis, '0xabc')
+    ttls.set(KEY, 5) // window about to close
+
+    await getConnectTokenRetryAfter(redis, '0xabc')
+
+    expect(ttls.get(KEY)).toBe(5)
+  })
+
+  it('restores a missing expiry so a lost EXPIRE cannot lock the account out for good', async () => {
+    const { redis, counters, ttls } = buildRedis()
+    // A previous request incremented the key but never set a TTL - EXPIRE threw, or the process
+    // died between the two commands.
+    counters.set(KEY, CONNECT_TOKEN_RATE_LIMIT)
+
+    await getConnectTokenRetryAfter(redis, '0xabc')
+
+    expect(ttls.get(KEY)).toBe(CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
+  })
+
+  it('counts each account separately', async () => {
+    const { redis } = buildRedis()
+
+    for (let i = 0; i <= CONNECT_TOKEN_RATE_LIMIT; i++) {
+      await getConnectTokenRetryAfter(redis, '0xabc')
+    }
+
+    expect(await getConnectTokenRetryAfter(redis, '0xdef')).toBeNull()
   })
 })
