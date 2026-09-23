@@ -31,7 +31,7 @@ async function unsubscribeAccount(params: {
 }): Promise<void> {
   const { bot, chatId, account, pushSubscriptionsRepository } = params
 
-  await pushSubscriptionsRepository.unlinkTelegramSubscription({ account })
+  await pushSubscriptionsRepository.unlinkTelegramSubscription({ account, chatId })
 
   await bot.sendMessage(chatId, `You've been unsubscribed from CoW Swap notifications for ${formatAccount(account)}.`)
 }
