@@ -1,5 +1,7 @@
 import { randomBytes } from 'crypto'
 
+import { Redis } from 'ioredis'
+
 import { CacheRepository } from '../repos/CacheRepository/CacheRepository'
 
 const TOKEN_PREFIX = 'telegram-connect:'
@@ -35,4 +37,33 @@ export async function releaseConnectToken(
   account: string
 ): Promise<void> {
   await cacheRepository.set(TOKEN_PREFIX + token, account, CONNECT_TOKEN_TTL_SECONDS)
+}
+
+const RATE_LIMIT_PREFIX = 'telegram-connect-rate:'
+export const CONNECT_TOKEN_RATE_LIMIT = 10
+export const CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS = 60
+
+/**
+ * Fixed-window counter guarding connect-token minting, which is unauthenticated: anyone may
+ * mint a token for any address (watching an arbitrary account is an intended feature), so
+ * without this the endpoint is a free write primitive.
+ *
+ * Keyed by account rather than by IP because apps/api runs behind an ingress and doesn't set
+ * Fastify's `trustProxy`, so `request.ip` is the proxy's address and a per-IP window would
+ * collapse into a single global one. The trade-off is that flooding someone's address delays
+ * their own connect by up to one window.
+ */
+export async function isConnectTokenRateLimited(
+  redis: Pick<Redis, 'incr' | 'expire'>,
+  account: string
+): Promise<boolean> {
+  const key = RATE_LIMIT_PREFIX + account
+  const count = await redis.incr(key)
+
+  // Only the request that opened the window sets its expiry, so the window doesn't slide.
+  if (count === 1) {
+    await redis.expire(key, CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
+  }
+
+  return count > CONNECT_TOKEN_RATE_LIMIT
 }

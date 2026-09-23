@@ -6,6 +6,7 @@ import {
   cacheRepositorySymbol,
   createConnectToken,
   isCmsEnabled,
+  isConnectTokenRateLimited,
   PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
   redisClient,
@@ -50,11 +51,12 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
     )
   } else {
     const cacheRepository: CacheRepository = apiContainer.get(cacheRepositorySymbol)
+    const redis = redisClient
 
     // POST /accounts/:account/telegram/connect-token
     fastify.post<{
       Params: ParamsSchema
-      Reply: { token: string; deepLink: string }
+      Reply: { token: string; deepLink: string } | { message: string }
     }>(
       '/connect-token',
       {
@@ -66,9 +68,16 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
       },
       async function (request, reply) {
         const account = request.params.account.toLowerCase()
+
+        // The endpoint is unauthenticated by design (anyone may watch any address), so the
+        // only thing standing between it and unbounded token minting is this window.
+        if (await isConnectTokenRateLimited(redis, account)) {
+          return reply.status(429).send({ message: 'Too many connect-token requests for this account' })
+        }
+
         const token = await createConnectToken(cacheRepository, account)
 
-        reply.send({ token, deepLink: buildTelegramDeepLink(telegramBotUsername, token) })
+        return reply.send({ token, deepLink: buildTelegramDeepLink(telegramBotUsername, token) })
       }
     )
   }
