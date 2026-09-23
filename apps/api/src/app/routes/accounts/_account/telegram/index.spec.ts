@@ -5,16 +5,15 @@ const ACCOUNT = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 const URL = `/accounts/${ACCOUNT}/telegram/connect-token`
 
 const mockCreateConnectToken = jest.fn()
-const mockIsConnectTokenRateLimited = jest.fn()
+const mockGetConnectTokenRetryAfter = jest.fn()
 
 jest.mock('@cowprotocol/repositories', () => ({
   isCmsEnabled: true,
-  redisClient: { incr: jest.fn(), expire: jest.fn() },
+  redisClient: { incr: jest.fn(), expire: jest.fn(), ttl: jest.fn() },
   cacheRepositorySymbol: Symbol.for('CacheRepository'),
   pushSubscriptionsRepositorySymbol: Symbol.for('PushSubscriptionsRepository'),
-  CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS: 60,
   createConnectToken: (...args: unknown[]) => mockCreateConnectToken(...args),
-  isConnectTokenRateLimited: (...args: unknown[]) => mockIsConnectTokenRateLimited(...args),
+  getConnectTokenRetryAfter: (...args: unknown[]) => mockGetConnectTokenRetryAfter(...args),
 }))
 
 jest.mock('../../../../inversify.config', () => ({
@@ -45,7 +44,7 @@ describe('telegram connect-token route', () => {
   }
 
   it('mints a token when the account is under the rate limit', async () => {
-    mockIsConnectTokenRateLimited.mockResolvedValue(false)
+    mockGetConnectTokenRetryAfter.mockResolvedValue(null)
     const app = await createApp()
 
     const response = await app.inject({ method: 'POST', url: URL })
@@ -53,18 +52,18 @@ describe('telegram connect-token route', () => {
     expect(response.statusCode).toBe(200)
     expect(response.json()).toEqual({ token: 'token-123', deepLink: 'https://t.me/cow_bot?start=token-123' })
     // The rate limiter is keyed on the normalised account, not the casing the caller sent.
-    expect(mockIsConnectTokenRateLimited).toHaveBeenCalledWith(expect.anything(), ACCOUNT.toLowerCase())
+    expect(mockGetConnectTokenRetryAfter).toHaveBeenCalledWith(expect.anything(), ACCOUNT.toLowerCase())
     await app.close()
   })
 
-  it('returns 429 with Retry-After and mints nothing once the limit is hit', async () => {
-    mockIsConnectTokenRateLimited.mockResolvedValue(true)
+  it('returns 429 with the remaining window as Retry-After and mints nothing', async () => {
+    mockGetConnectTokenRetryAfter.mockResolvedValue(17)
     const app = await createApp()
 
     const response = await app.inject({ method: 'POST', url: URL })
 
     expect(response.statusCode).toBe(429)
-    expect(response.headers['retry-after']).toBe('60')
+    expect(response.headers['retry-after']).toBe('17')
     expect(mockCreateConnectToken).not.toHaveBeenCalled()
     await app.close()
   })
