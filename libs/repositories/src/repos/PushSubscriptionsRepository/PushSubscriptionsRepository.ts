@@ -57,5 +57,6 @@ export interface PushSubscriptionsRepository {
     firstName?: string
     username?: string
   }): Promise<void>
-  unlinkTelegramSubscription(params: { account: string }): Promise<void>
+  // Scoped by chatId: a chat may only remove its own link, not every chat watching the account.
+  unlinkTelegramSubscription(params: { account: string; chatId: number }): Promise<void>
 }

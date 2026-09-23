@@ -50,7 +50,7 @@ describe('handleUnsubscribeCommand', () => {
 
     await handleUnsubscribeCommand({ bot, msg: buildMsg('/unsubscribe'), pushSubscriptionsRepository })
 
-    expect(unlinkTelegramSubscription).toHaveBeenCalledWith({ account: '0xabc' })
+    expect(unlinkTelegramSubscription).toHaveBeenCalledWith({ account: '0xabc', chatId: 555 })
     expect(sendMessage).toHaveBeenCalledWith(555, expect.stringMatching(/unsubscribed/i))
   })
 
@@ -155,7 +155,7 @@ describe('handleUnsubscribeCallback', () => {
       pushSubscriptionsRepository,
     })
 
-    expect(unlinkTelegramSubscription).toHaveBeenCalledWith({ account: '0xbbb' })
+    expect(unlinkTelegramSubscription).toHaveBeenCalledWith({ account: '0xbbb', chatId: 555 })
     expect(sendMessage).toHaveBeenCalledWith(555, expect.stringMatching(/unsubscribed/i))
     expect(answerCallbackQuery).toHaveBeenCalledWith('query-id')
   })
