@@ -1,5 +1,14 @@
+import { Redis } from 'ioredis'
+
 import { CacheRepository } from '../repos/CacheRepository/CacheRepository'
-import { claimConnectToken, createConnectToken, releaseConnectToken } from './telegramConnectToken'
+import {
+  claimConnectToken,
+  CONNECT_TOKEN_RATE_LIMIT,
+  CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS,
+  createConnectToken,
+  isConnectTokenRateLimited,
+  releaseConnectToken,
+} from './telegramConnectToken'
 
 // Simple in-memory cache implementation for testing
 class TestCacheRepository implements CacheRepository {
@@ -106,5 +115,52 @@ describe('telegramConnectToken', () => {
     const tokenB = await createConnectToken(cacheRepository, '0xabc')
 
     expect(tokenA).not.toBe(tokenB)
+  })
+})
+
+describe('isConnectTokenRateLimited', () => {
+  function buildRedis() {
+    const counters = new Map<string, number>()
+    const expire = jest.fn()
+    const incr = jest.fn(async (key: string) => {
+      const count = (counters.get(key) ?? 0) + 1
+      counters.set(key, count)
+      return count
+    })
+
+    return { incr, expire } as unknown as Pick<Redis, 'incr' | 'expire'> & {
+      incr: jest.Mock
+      expire: jest.Mock
+    }
+  }
+
+  it('allows requests up to the limit and rejects the next one', async () => {
+    const redis = buildRedis()
+
+    for (let i = 0; i < CONNECT_TOKEN_RATE_LIMIT; i++) {
+      expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(false)
+    }
+
+    expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(true)
+  })
+
+  it('sets the window expiry once, on the request that opens it', async () => {
+    const redis = buildRedis()
+
+    await isConnectTokenRateLimited(redis, '0xabc')
+    await isConnectTokenRateLimited(redis, '0xabc')
+
+    expect(redis.expire).toHaveBeenCalledTimes(1)
+    expect(redis.expire).toHaveBeenCalledWith('telegram-connect-rate:0xabc', CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
+  })
+
+  it('counts each account separately', async () => {
+    const redis = buildRedis()
+
+    for (let i = 0; i <= CONNECT_TOKEN_RATE_LIMIT; i++) {
+      await isConnectTokenRateLimited(redis, '0xabc')
+    }
+
+    expect(await isConnectTokenRateLimited(redis, '0xdef')).toBe(false)
   })
 })
