@@ -60,10 +60,11 @@ export async function isConnectTokenRateLimited(
   const key = RATE_LIMIT_PREFIX + account
   const count = await redis.incr(key)
 
-  // Only the request that opened the window sets its expiry, so the window doesn't slide.
-  if (count === 1) {
-    await redis.expire(key, CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
-  }
+  // NX: sets the expiry only while the key has none, so the window never slides. Applying it on
+  // every request (rather than only when the counter reads 1) means a TTL lost to a failed EXPIRE
+  // or to a process killed between the two commands is restored by the next request - otherwise
+  // the counter would climb forever and 429 that account until someone deleted the key by hand.
+  await redis.expire(key, CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS, 'NX')
 
   return count > CONNECT_TOKEN_RATE_LIMIT
 }

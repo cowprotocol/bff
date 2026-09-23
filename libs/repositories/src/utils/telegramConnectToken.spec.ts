@@ -119,23 +119,30 @@ describe('telegramConnectToken', () => {
 })
 
 describe('isConnectTokenRateLimited', () => {
+  const KEY = 'telegram-connect-rate:0xabc'
+
+  // Mimics INCR plus EXPIRE ... NX: the expiry only lands while the key has none.
   function buildRedis() {
     const counters = new Map<string, number>()
-    const expire = jest.fn()
+    const ttls = new Map<string, number>()
+
     const incr = jest.fn(async (key: string) => {
       const count = (counters.get(key) ?? 0) + 1
       counters.set(key, count)
       return count
     })
 
-    return { incr, expire } as unknown as Pick<Redis, 'incr' | 'expire'> & {
-      incr: jest.Mock
-      expire: jest.Mock
-    }
+    const expire = jest.fn(async (key: string, seconds: number, mode?: string) => {
+      if (mode === 'NX' && ttls.has(key)) return 0
+      ttls.set(key, seconds)
+      return 1
+    })
+
+    return { redis: { incr, expire } as unknown as Pick<Redis, 'incr' | 'expire'>, counters, ttls }
   }
 
   it('allows requests up to the limit and rejects the next one', async () => {
-    const redis = buildRedis()
+    const { redis } = buildRedis()
 
     for (let i = 0; i < CONNECT_TOKEN_RATE_LIMIT; i++) {
       expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(false)
@@ -144,18 +151,30 @@ describe('isConnectTokenRateLimited', () => {
     expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(true)
   })
 
-  it('sets the window expiry once, on the request that opens it', async () => {
-    const redis = buildRedis()
+  it('does not slide the window on later requests', async () => {
+    const { redis, ttls } = buildRedis()
 
     await isConnectTokenRateLimited(redis, '0xabc')
+    ttls.set(KEY, 5) // window about to close
+
     await isConnectTokenRateLimited(redis, '0xabc')
 
-    expect(redis.expire).toHaveBeenCalledTimes(1)
-    expect(redis.expire).toHaveBeenCalledWith('telegram-connect-rate:0xabc', CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
+    expect(ttls.get(KEY)).toBe(5)
+  })
+
+  it('restores a missing expiry so a lost EXPIRE cannot lock the account out for good', async () => {
+    const { redis, counters, ttls } = buildRedis()
+    // A previous request incremented the key but never set a TTL - EXPIRE threw, or the process
+    // died between the two commands.
+    counters.set(KEY, CONNECT_TOKEN_RATE_LIMIT)
+
+    await isConnectTokenRateLimited(redis, '0xabc')
+
+    expect(ttls.get(KEY)).toBe(CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
   })
 
   it('counts each account separately', async () => {
-    const redis = buildRedis()
+    const { redis } = buildRedis()
 
     for (let i = 0; i <= CONNECT_TOKEN_RATE_LIMIT; i++) {
       await isConnectTokenRateLimited(redis, '0xabc')
