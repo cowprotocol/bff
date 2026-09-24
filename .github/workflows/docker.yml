@@ -25,13 +25,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Setup dependencies
-        uses: ./.github/workflows/actions/setup-dependencies
-
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
-
-      - run: yarn build
 
       - name: Set up Docker Buildx
         id: setup-buildx
