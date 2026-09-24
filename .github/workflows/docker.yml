@@ -28,9 +28,12 @@ jobs:
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a # v4.3.0
+
       - name: Set up Docker Buildx
         id: setup-buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
@@ -57,9 +60,9 @@ jobs:
           tags: ${{ steps.image_meta.outputs.tags }}
           labels: ${{ steps.image_meta.outputs.labels }}
           builder: ${{ steps.setup-buildx.outputs.name }}
-          platforms: linux/amd64
-          cache-from: type=gha  
-          cache-to: type=gha,mode=max  
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           # TODO: Disabled as I couldn't get it to work with GH pkgs
           # secrets: |
           #   id=npmrc,src=${{ github.workspace }}/.npmrc
