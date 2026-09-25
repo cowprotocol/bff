@@ -5,6 +5,26 @@
 # Tip: Modify "docker-build" options in project.json to change docker build args.
 #
 # Run the container with `docker run -p 3000:3000 -t twap`.
+FROM docker.io/node:lts-alpine AS builder
+
+# Do not start the Nx daemon in the build container.
+ENV NX_DAEMON=false
+
+# Some native dependencies have no prebuilt binaries for all platforms (for
+# example, @parcel/watcher on linux/arm64). node-gyp uses these tools to
+# compile them.
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /workspace
+
+# Install the dependencies before you copy the source code. Docker can then
+# use the cached layer when only the source code changes.
+COPY package.json yarn.lock redocly.yaml ./
+RUN yarn install --frozen-lockfile
+
+COPY . .
+RUN yarn nx run twap:build
+
 FROM docker.io/node:lts-alpine
 
 ENV HOST=0.0.0.0
@@ -15,7 +35,7 @@ WORKDIR /app
 RUN addgroup --system twap && \
   adduser --system -G twap twap
 
-COPY dist/apps/twap twap
+COPY --from=builder /workspace/dist/apps/twap twap
 RUN chown -R twap:twap .
 
 # You can remove this install step if you build with `--bundle` option.
