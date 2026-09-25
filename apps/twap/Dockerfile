@@ -23,7 +23,7 @@ COPY package.json yarn.lock redocly.yaml ./
 RUN yarn install --frozen-lockfile
 
 COPY . .
-RUN yarn build
+RUN yarn nx run twap:build
 
 FROM docker.io/node:lts-alpine
 
