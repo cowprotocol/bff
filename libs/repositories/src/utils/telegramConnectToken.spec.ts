@@ -6,7 +6,7 @@ import {
   CONNECT_TOKEN_RATE_LIMIT,
   CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS,
   createConnectToken,
-  getConnectTokenRetryAfter,
+  isConnectTokenRateLimited,
   releaseConnectToken,
 } from './telegramConnectToken'
 
@@ -118,10 +118,10 @@ describe('telegramConnectToken', () => {
   })
 })
 
-describe('getConnectTokenRetryAfter', () => {
+describe('isConnectTokenRateLimited', () => {
   const KEY = 'telegram-connect-rate:0xabc'
 
-  // Mimics INCR, EXPIRE ... NX (the expiry only lands while the key has none) and TTL.
+  // Mimics INCR plus EXPIRE ... NX: the expiry only lands while the key has none.
   function buildRedis() {
     const counters = new Map<string, number>()
     const ttls = new Map<string, number>()
@@ -138,44 +138,26 @@ describe('getConnectTokenRetryAfter', () => {
       return 1
     })
 
-    const ttl = jest.fn(async (key: string) => ttls.get(key) ?? -1)
-
-    return { redis: { incr, expire, ttl } as unknown as Pick<Redis, 'incr' | 'expire' | 'ttl'>, counters, ttls }
+    return { redis: { incr, expire } as unknown as Pick<Redis, 'incr' | 'expire'>, counters, ttls }
   }
 
   it('allows requests up to the limit and rejects the next one', async () => {
     const { redis } = buildRedis()
 
     for (let i = 0; i < CONNECT_TOKEN_RATE_LIMIT; i++) {
-      expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBeNull()
+      expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(false)
     }
 
-    expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBe(CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
-  })
-
-  it('reports the seconds left in the window, not the full window', async () => {
-    const { redis, counters, ttls } = buildRedis()
-    counters.set(KEY, CONNECT_TOKEN_RATE_LIMIT) // next request goes over
-    ttls.set(KEY, 5)
-
-    expect(await getConnectTokenRetryAfter(redis, '0xabc')).toBe(5)
-  })
-
-  it('does not read the TTL for an allowed request', async () => {
-    const { redis } = buildRedis()
-
-    await getConnectTokenRetryAfter(redis, '0xabc')
-
-    expect((redis.ttl as jest.Mock)).not.toHaveBeenCalled()
+    expect(await isConnectTokenRateLimited(redis, '0xabc')).toBe(true)
   })
 
   it('does not slide the window on later requests', async () => {
     const { redis, ttls } = buildRedis()
 
-    await getConnectTokenRetryAfter(redis, '0xabc')
+    await isConnectTokenRateLimited(redis, '0xabc')
     ttls.set(KEY, 5) // window about to close
 
-    await getConnectTokenRetryAfter(redis, '0xabc')
+    await isConnectTokenRateLimited(redis, '0xabc')
 
     expect(ttls.get(KEY)).toBe(5)
   })
@@ -186,7 +168,7 @@ describe('getConnectTokenRetryAfter', () => {
     // died between the two commands.
     counters.set(KEY, CONNECT_TOKEN_RATE_LIMIT)
 
-    await getConnectTokenRetryAfter(redis, '0xabc')
+    await isConnectTokenRateLimited(redis, '0xabc')
 
     expect(ttls.get(KEY)).toBe(CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
   })
@@ -195,9 +177,9 @@ describe('getConnectTokenRetryAfter', () => {
     const { redis } = buildRedis()
 
     for (let i = 0; i <= CONNECT_TOKEN_RATE_LIMIT; i++) {
-      await getConnectTokenRetryAfter(redis, '0xabc')
+      await isConnectTokenRateLimited(redis, '0xabc')
     }
 
-    expect(await getConnectTokenRetryAfter(redis, '0xdef')).toBeNull()
+    expect(await isConnectTokenRateLimited(redis, '0xdef')).toBe(false)
   })
 })

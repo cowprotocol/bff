@@ -52,14 +52,11 @@ export const CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS = 60
  * Fastify's `trustProxy`, so `request.ip` is the proxy's address and a per-IP window would
  * collapse into a single global one. The trade-off is that flooding someone's address delays
  * their own connect by up to one window.
- *
- * Returns the seconds left in the current window when the account is over the limit - suitable
- * for `Retry-After` - or null when the request is allowed.
  */
-export async function getConnectTokenRetryAfter(
-  redis: Pick<Redis, 'incr' | 'expire' | 'ttl'>,
+export async function isConnectTokenRateLimited(
+  redis: Pick<Redis, 'incr' | 'expire'>,
   account: string
-): Promise<number | null> {
+): Promise<boolean> {
   const key = RATE_LIMIT_PREFIX + account
   const count = await redis.incr(key)
 
@@ -69,14 +66,5 @@ export async function getConnectTokenRetryAfter(
   // the counter would climb forever and 429 that account until someone deleted the key by hand.
   await redis.expire(key, CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS, 'NX')
 
-  if (count <= CONNECT_TOKEN_RATE_LIMIT) {
-    return null
-  }
-
-  // Only the rejected path pays for this round trip. TTL is negative when the key carries no
-  // expiry or expired in between; neither should happen after the EXPIRE above, so fall back to
-  // the full window rather than telling the caller to retry immediately.
-  const ttl = await redis.ttl(key)
-
-  return ttl > 0 ? ttl : CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS
+  return count > CONNECT_TOKEN_RATE_LIMIT
 }

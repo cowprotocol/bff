@@ -4,9 +4,10 @@ import TelegramBot from 'node-telegram-bot-api'
 import {
   CacheRepository,
   cacheRepositorySymbol,
+  CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS,
   createConnectToken,
-  getConnectTokenRetryAfter,
   isCmsEnabled,
+  isConnectTokenRateLimited,
   PushSubscriptionsRepository,
   pushSubscriptionsRepositorySymbol,
   redisClient,
@@ -71,12 +72,12 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
 
         // The endpoint is unauthenticated by design (anyone may watch any address), so the
         // only thing standing between it and unbounded token minting is this window.
-        const retryAfter = await getConnectTokenRetryAfter(redis, account)
-
-        if (retryAfter !== null) {
+        if (await isConnectTokenRateLimited(redis, account)) {
           return reply
             .status(429)
-            .header('Retry-After', retryAfter)
+            // Upper bound: the window may already be part-way through, but it's the only figure
+            // available without a second round trip for the key's TTL.
+            .header('Retry-After', CONNECT_TOKEN_RATE_LIMIT_WINDOW_SECONDS)
             .send({ message: 'Too many connect-token requests for this account' })
         }
 
