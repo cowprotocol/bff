@@ -68,11 +68,11 @@ describe('PushSubscriptionsRepositoryCms', () => {
       mockedFetch.mockResolvedValue(jsonResponse(200, { success: true }))
       const repository = new PushSubscriptionsRepositoryCms()
 
-      await repository.unlinkTelegramSubscription({ account: '0xabc' })
+      await repository.unlinkTelegramSubscription({ account: '0xabc', chatId: 42 })
 
       expect(mockedFetch).toHaveBeenCalledWith(
         'https://cms.mock/telegram-subscription/unlink-via-bot',
-        expect.objectContaining({ method: 'POST', body: JSON.stringify({ account: '0xabc' }) })
+        expect.objectContaining({ method: 'POST', body: JSON.stringify({ account: '0xabc', chatId: 42 }) })
       )
     })
   })

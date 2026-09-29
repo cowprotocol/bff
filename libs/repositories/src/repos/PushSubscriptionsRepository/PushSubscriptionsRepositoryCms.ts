@@ -86,7 +86,7 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
     await postToCmsInternalEndpoint('/telegram-subscription/link-via-bot', params)
   }
 
-  async unlinkTelegramSubscription(params: { account: string }): Promise<void> {
+  async unlinkTelegramSubscription(params: { account: string; chatId: number }): Promise<void> {
     await postToCmsInternalEndpoint('/telegram-subscription/unlink-via-bot', params)
   }
 }
