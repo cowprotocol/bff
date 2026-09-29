@@ -8,9 +8,16 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# A job with no permissions of its own uses these, not the repository default.
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  # Build one image for each application and architecture on a native runner.
+  # The `docker` job then combines them into one multi-platform manifest.
+  build:
+    name: build (${{ matrix.package }}, ${{ matrix.arch }})
     strategy:
       matrix:
         package:
@@ -18,6 +25,15 @@ jobs:
           - apps/twap
           - apps/notification-producer
           - apps/telegram
+        arch:
+          - amd64
+          - arm64
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -25,17 +41,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Setup dependencies
-        uses: ./.github/workflows/actions/setup-dependencies
-
       - name: Write commit hash in the assets directory
         run: echo -n "${{ github.sha }}" > assets/git-commit-hash.txt
 
-      - run: yarn build
-
+      # A push by digest needs buildx. The default docker driver cannot do it.
       - name: Set up Docker Buildx
-        id: setup-buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
@@ -45,29 +56,108 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract package name
-        run: echo "PACKAGE_NAME=$(basename ${{ matrix.package }})" >> $GITHUB_ENV
+        run: |
+          PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> "$GITHUB_ENV"
+          echo "IMAGE=ghcr.io/$GITHUB_REPOSITORY/$PACKAGE_NAME" >> "$GITHUB_ENV"
 
       - name: 'Image metadata for ${{ env.PACKAGE_NAME }}'
         id: image_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ghcr.io/${{ github.repository }}/${{ env.PACKAGE_NAME }}
+          images: ${{ env.IMAGE }}
 
-      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }}'
+      - name: 'BFF: Build and push ${{ env.PACKAGE_NAME }} (${{ matrix.arch }})'
+        id: build
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ${{ matrix.package }}/Dockerfile
-          push: true
-          tags: ${{ steps.image_meta.outputs.tags }}
+          platforms: linux/${{ matrix.arch }}
           labels: ${{ steps.image_meta.outputs.labels }}
-          builder: ${{ steps.setup-buildx.outputs.name }}
-          platforms: linux/amd64
-          cache-from: type=gha  
-          cache-to: type=gha,mode=max  
+          # push-by-digest makes an image with no tag. The `docker` job adds
+          # the tags to the multi-platform manifest.
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          # Cache each application and architecture separately.
+          cache-from: type=gha,scope=${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
           # TODO: Disabled as I couldn't get it to work with GH pkgs
           # secrets: |
           #   id=npmrc,src=${{ github.workspace }}/.npmrc
+
+      - name: Export image digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${DIGEST#sha256:}"
+
+      - name: Upload image digest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: digest-${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Combine the images of each application into one tagged manifest.
+  # Branch protection requires the `docker (apps/...)` check names.
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        package:
+          - apps/api
+          - apps/twap
+          - apps/notification-producer
+          - apps/telegram
+    steps:
+      - name: Extract package name
+        run: |
+          PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> "$GITHUB_ENV"
+          echo "IMAGE=ghcr.io/$GITHUB_REPOSITORY/$PACKAGE_NAME" >> "$GITHUB_ENV"
+
+      - name: Download image digests
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: /tmp/digests
+          pattern: digest-${{ env.PACKAGE_NAME }}-*
+          merge-multiple: true
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: 'Image metadata for ${{ env.PACKAGE_NAME }}'
+        id: image_meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
+        with:
+          images: ${{ env.IMAGE }}
+
+      # The digest file names give the images to combine.
+      - name: 'Create multi-platform manifest for ${{ env.PACKAGE_NAME }}'
+        working-directory: /tmp/digests
+        env:
+          METADATA: ${{ steps.image_meta.outputs.json }}
+          VERSION: ${{ steps.image_meta.outputs.version }}
+        run: |
+          readarray -t args < <(jq -r '(.tags[] | "--tag", .), (.annotations[] | "--annotation", .)' <<< "$METADATA")
+          for digest in *; do
+            args+=("${IMAGE}@sha256:${digest}")
+          done
+
+          docker buildx imagetools create "${args[@]}"
+          docker buildx imagetools inspect "${IMAGE}:${VERSION}"
 
       - uses: cowprotocol/autodeploy-action@73f1163f19a584cdc34e29aa84d630d7e6a45432 # v3
         if: ${{ github.ref == 'refs/heads/main' }}
