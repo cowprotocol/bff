@@ -6,8 +6,6 @@
   "scripts": {
     "start": "yarn start:api",
     "start:api": "nx run api:start",
-    "twap:run-migrations": "nx run twap:run-migrations",
-    "twap:generate-migrations": "nx run twap:generate-migrations",
     "typeorm": "nx run repositories:typeorm",
     "migration:run": "nx run repositories:migration:run",
     "migration:generate": "nx run repositories:migration:generate",
@@ -44,8 +42,6 @@
     "@fastify/sensible": "~5.2.0",
     "@fastify/swagger": "^8.6.0",
     "@fastify/swagger-ui": "^1.9.2",
-    "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
-    "@uniswap/sdk-core": "^4.0.1",
     "abstract-cache-redis": "^2.0.0",
     "ajv": "8.12.0",
     "amqplib": "^0.10.4",
