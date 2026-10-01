@@ -29,9 +29,6 @@ const schema = {
     SOCKET_BASE_URL: {
       type: 'string',
     },
-    TWAP_BASE_URL: {
-      type: 'string',
-    },
     COINGECKO_API_KEY: {
       type: 'string',
     },
