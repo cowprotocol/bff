@@ -57,6 +57,33 @@ describe('PriceHistoryService', () => {
     await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 2, bars: [BAR] })
   })
 
+  it('keeps valid candles when a provider returns malformed candles', async () => {
+    const invalidWeeklyBar = { timestamp: 1768435200, open: 3355.39, high: 2922.64, low: 1.62, close: 2959.62 }
+    const fallbackFetch = jest.fn().mockResolvedValue([BAR])
+    const service = new PriceHistoryService(
+      [
+        provider(
+          1,
+          jest
+            .fn()
+            .mockResolvedValue([
+              invalidWeeklyBar,
+              { ...BAR, timestamp: -1 },
+              { ...BAR, volume: -1 },
+              { ...BAR, close: NaN },
+              BAR,
+            ])
+        ),
+        provider(2, fallbackFetch),
+      ],
+      '1,2',
+      logger
+    )
+
+    await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: [BAR] })
+    expect(fallbackFetch).not.toHaveBeenCalled()
+  })
+
   it('falls back after a provider timeout', async () => {
     jest.useFakeTimers()
     const hanging = provider(

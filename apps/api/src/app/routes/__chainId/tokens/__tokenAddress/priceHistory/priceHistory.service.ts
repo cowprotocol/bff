@@ -60,7 +60,10 @@ export class PriceHistoryService {
       const timeout = setTimeout(() => controller.abort(), PRICE_HISTORY_PROVIDER_TIMEOUT_MS)
 
       try {
-        const bars = normalizePriceHistoryBars(await provider.fetchBars(request, controller.signal))
+        const bars = normalizePriceHistoryBars(
+          await provider.fetchBars(request, controller.signal),
+          this.logger.child({ provider: getProviderName(providerId) })
+        )
         const result = { providerId, bars }
 
         if (index > 0) {
