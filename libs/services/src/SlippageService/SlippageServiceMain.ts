@@ -14,6 +14,25 @@ import { SupportedChainId } from '@cowprotocol/cow-sdk'
 
 const FAIR_TIME_TO_SETTLEMENT = ms('5min')
 
+export const MIN_SLIPPAGE_BPS = 2
+
+/**
+ * What we multiply the standard deviation by.
+ *
+ * One standard deviation is about the size of an ordinary price change, and ordinary price changes
+ * are not what slippage is for. Multiplying by 3 leaves room for the busier five minutes.
+ */
+const STANDARD_DEVIATION_MULTIPLIER = 3
+
+/**
+ * Share of the largest price changes to skip over when picking the biggest one.
+ *
+ * We look at the biggest change the pair really made as well, because a token that sits still and
+ * then jumps has a small standard deviation and a large problem. Skipping the top 1% keeps one bad
+ * reading from Coingecko from setting the suggestion for the whole pair.
+ */
+const EXTREME_CHANGES_SKIPPED = 0.01
+
 @injectable()
 export class SlippageServiceMain implements SlippageService {
   constructor(
@@ -43,7 +62,7 @@ export class SlippageServiceMain implements SlippageService {
   }
 
   private getSlippageBpsFromVolatility(volatility: number): Bps {
-    return Math.ceil(volatility * 10_000)
+    return Math.max(MIN_SLIPPAGE_BPS, Math.ceil(volatility * 10_000))
   }
 
   /**
@@ -73,18 +92,20 @@ export class SlippageServiceMain implements SlippageService {
       return null
     }
 
-    // Predict variance between now and a fair settlement
-    const volatilityForFairSettlement = this.calculateVolatility(prices)
+    // Already relative to the price, so nothing to normalize
+    const volatility = this.calculateVolatility(prices)
 
-    // Return the normalized volatility (denominated in the token, not in USD)
-    const normalizedVolatility = volatilityForFairSettlement / usdPrice
+    // Too few usable points to measure: unknown, not calm
+    if (volatility === null) {
+      return null
+    }
 
     return {
       tokenAddress,
       prices,
       usdPrice,
-      volatilityInUsd: volatilityForFairSettlement,
-      volatilityInTokens: normalizedVolatility,
+      volatilityInUsd: volatility * usdPrice,
+      volatilityInTokens: volatility,
     }
   }
 
@@ -124,8 +145,6 @@ export class SlippageServiceMain implements SlippageService {
       return null
     }
 
-    const relativePrice = baseUsdPrice / quoteUsdPrice
-
     // Prices is an array. Build a map with timestamp as key using `basePrices` date, so we can match with the timestamp on `quotePrices`
     const basePricesMap = new Map(basePrices.map((price) => [roundDate(price.date).getTime(), price]))
 
@@ -151,17 +170,19 @@ export class SlippageServiceMain implements SlippageService {
       return null
     }
 
-    // Predict variance between now and a fair settlement
-    const volatilityForFairSettlement = this.calculateVolatility(prices)
+    // Already relative to the pair price, so nothing to normalize
+    const volatility = this.calculateVolatility(prices)
 
-    // Return the normalized volatility (denominated in the token, not in USD)
-    const normalizedVolatility = volatilityForFairSettlement / relativePrice
+    // Too few usable points to measure: unknown, not calm
+    if (volatility === null) {
+      return null
+    }
 
     return {
       baseTokenAddress,
       quoteTokenAddress,
       prices,
-      volatilityInTokens: normalizedVolatility,
+      volatilityInTokens: volatility,
     }
   }
 
@@ -199,45 +220,70 @@ export class SlippageServiceMain implements SlippageService {
     return volatility.volatilityInTokens
   }
 
-  private calculateVolatility(prices: PricePoint[]): number {
-    // Return 0 for empty arrays or arrays with insufficient data
-    if (prices.length === 0) {
-      return 0
+  /**
+   * Relative volatility (a fraction of price) expected over FAIR_TIME_TO_SETTLEMENT.
+   *
+   * Measured on how much the price changes from one reading to the next, not on how far the
+   * readings sit from their 24h average. The second one scores a slow all-day drift the same as a
+   * price that bounces every ten minutes — feed it the same prices in a different order and it does
+   * not notice — and only the bouncing one is a risk to a 5 minute settlement.
+   *
+   * Two answers are worked out and the larger wins: the size of an ordinary price change with room
+   * added on top, and the size of the biggest change that actually happened. Each covers for the
+   * other. The first alone under-prices a thin memecoin pair, which is quiet until it jumps. The
+   * second alone under-prices a pair whose 24 hours happened to be calm, leaving no large change
+   * in the window to find.
+   *
+   * Returns null when there are too few usable readings to measure anything. That is not the same
+   * as measuring no movement: the caller turns null into "no opinion" (0 bps) so consumers fall back
+   * to their own default, while a pair measured as genuinely calm gets MIN_SLIPPAGE_BPS.
+   */
+  private calculateVolatility(prices: PricePoint[]): number | null {
+    /**
+     * How much the price changed between each pair of consecutive readings, as a fraction of the
+     * price rather than an amount, so a token worth 0.0000009 and one worth 3000 are comparable.
+     *
+     * Held as the natural log of the ratio: that way a rise and the matching fall cancel out
+     * instead of leaving a drift, and the changes can be added across readings, which is what lets
+     * the square root below stretch one reading's worth of movement over the settlement window.
+     * For changes this small it is within a rounding error of the plain percentage.
+     */
+    const relativePriceChanges: number[] = []
+
+    for (let i = 1; i < prices.length; i++) {
+      const previous = prices[i - 1].price
+      const current = prices[i].price
+
+      // A zero or missing price is not a -100% change, it's an absent data point
+      if (previous > 0 && current > 0) {
+        relativePriceChanges.push(Math.log(current / previous))
+      }
     }
 
-    // Calculate the average of the prices (in USD)
-    const averagePrice = prices.reduce((acc, price) => acc + price.price, 0) / prices.length
+    if (relativePriceChanges.length < 2) {
+      return null
+    }
 
-    // Calculate the variance
+    // The size of an ordinary price change
+    const averageChange = relativePriceChanges.reduce((acc, change) => acc + change, 0) / relativePriceChanges.length
     const variance =
-      prices.reduce((acc, price) => {
-        // Calculate price differences between the price point and the average
-        const difference = price.price - averagePrice
-
-        // Square the difference
-        const squaredDifference = difference ** 2
-
-        // Sum squared differences
-        return acc + squaredDifference
-      }, 0) / prices.length
-
-    // Calculate the standard deviation
+      relativePriceChanges.reduce((acc, change) => acc + (change - averageChange) ** 2, 0) / relativePriceChanges.length
     const standardDeviation = Math.sqrt(variance)
 
-    // For single data point, we can't calculate time difference, return standard deviation
-    if (prices.length === 1) {
-      return standardDeviation
-    }
+    // The size of the biggest price change, skipping the most extreme few
+    const sortedChanges = relativePriceChanges.map(Math.abs).sort((a, b) => a - b)
+    const biggestChange = sortedChanges[Math.floor((1 - EXTREME_CHANGES_SKIPPED) * (sortedChanges.length - 1))]
 
-    // Average time between each data point
+    // One point to the settlement horizon. This is ~1 on the '5m' strategy today (Coingecko's
+    // points are 5min apart and so is the horizon), and stays correct if either ever changes.
     const averageTimeBetweenDataPoints =
       (prices[prices.length - 1].date.getTime() - prices[0].date.getTime()) / (prices.length - 1)
+    const pointsForFairSettlement =
+      averageTimeBetweenDataPoints > 0 ? FAIR_TIME_TO_SETTLEMENT / averageTimeBetweenDataPoints : 1
 
-    // Points in Time for Settlement
-    const pointsForFairSettlement = FAIR_TIME_TO_SETTLEMENT / averageTimeBetweenDataPoints
+    const expectedChange = Math.max(STANDARD_DEVIATION_MULTIPLIER * standardDeviation, biggestChange)
 
-    // Predict variance between now and a fair settlement
-    return standardDeviation * Math.sqrt(pointsForFairSettlement)
+    return expectedChange * Math.sqrt(pointsForFairSettlement)
   }
 }
 
