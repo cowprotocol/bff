@@ -1,3 +1,4 @@
+import { getAddressKey } from '@cowprotocol/cow-sdk'
 import Ajv from 'ajv'
 import { FromSchema } from 'json-schema-to-ts'
 import { upstreamPriceHistoryPayloadSchema } from './priceHistory.schemas'
@@ -50,7 +51,7 @@ export class UpstreamPriceHistoryProvider implements PriceHistoryProvider {
       body: JSON.stringify({
         singleChain: {
           chainId: request.chainId,
-          address: request.tokenAddress.toLowerCase(),
+          address: getAddressKey(request.tokenAddress),
         },
         startTime: new Date(getEffectiveFrom(request, interval) * 1000).toISOString(),
         endTime: new Date(request.to * 1000).toISOString(),

@@ -1,3 +1,4 @@
+import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import fastify, { FastifyInstance } from 'fastify'
 import priceHistory from './index'
 
@@ -126,6 +127,42 @@ describe('price history route', () => {
     expect(response.json()).toEqual({ providerId: 2, bars: [] })
     expect(mockedFetch).toHaveBeenCalledTimes(1)
     expect(mockedFetch.mock.calls[0]?.[0]).toBe('https://graph.codex.io/graphql')
+  })
+
+  it('accepts Solana mints and preserves their case through fallback to Codex', async () => {
+    app = await buildApp()
+    const mint = 'So11111111111111111111111111111111111111112'
+    mockedFetch
+      .mockResolvedValueOnce(createResponse({}, 500))
+      .mockResolvedValueOnce(
+        createResponse({ data: { getTokenBars: { o: [1], h: [3], l: [0.5], c: [2.5], t: [1710000000] } } })
+      )
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/${SupportedChainId.SOLANA}/tokens/${mint}/priceHistory?from=1710000000&to=1710007200&interval=1h`,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().bars).toHaveLength(1)
+    const upstreamBody = JSON.parse(String(mockedFetch.mock.calls[0]?.[1]?.body))
+    const codexBody = JSON.parse(String(mockedFetch.mock.calls[1]?.[1]?.body))
+    expect(upstreamBody.singleChain.address).toBe(mint)
+    expect(codexBody.variables.symbol).toBe(`${mint}:1399811149`)
+  })
+
+  it.each([
+    [SupportedChainId.SOLANA, TOKEN_ADDRESS],
+    [1, 'So11111111111111111111111111111111111111112'],
+    [SupportedChainId.SOLANA, 'invalid-mint'],
+  ])('rejects invalid addresses for chain %s', async (chainId, tokenAddress) => {
+    app = await buildApp()
+    const response = await app.inject({
+      method: 'GET',
+      url: `/${chainId}/tokens/${tokenAddress}/priceHistory?from=1710000000&to=1710007200&interval=1h`,
+    })
+    expect(response.statusCode).toBe(400)
+    expect(mockedFetch).not.toHaveBeenCalled()
   })
 
   it('rejects inverted time ranges before calling a provider', async () => {

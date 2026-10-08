@@ -1,3 +1,4 @@
+import { getAddressKey, isSolanaChain } from '@cowprotocol/cow-sdk'
 import Ajv from 'ajv'
 import { FromSchema } from 'json-schema-to-ts'
 import { codexPriceHistoryPayloadSchema } from './priceHistory.schemas'
@@ -75,7 +76,9 @@ export class CodexPriceHistoryProvider implements PriceHistoryProvider {
       body: JSON.stringify({
         query: TOKEN_BARS_QUERY,
         variables: {
-          symbol: `${request.tokenAddress.toLowerCase()}:${request.chainId}`,
+          symbol: `${getAddressKey(request.tokenAddress)}:${
+            isSolanaChain(request.chainId) ? 1399811149 : request.chainId
+          }`,
           from: request.from,
           to: request.to,
           resolution: CODEX_RESOLUTION_BY_INTERVAL[request.interval],
