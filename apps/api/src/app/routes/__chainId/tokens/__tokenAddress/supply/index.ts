@@ -1,3 +1,4 @@
+import { getAddressKey } from '@cowprotocol/cow-sdk'
 import Ajv from 'ajv'
 import { FastifyPluginAsync } from 'fastify'
 import { FromSchema } from 'json-schema-to-ts'
@@ -50,7 +51,7 @@ const supply: FastifyPluginAsync = async (fastify): Promise<void> => {
     async (request, reply) => {
       try {
         const supplies = await getSupplies(request.params.chainId)
-        const tokenSupply = supplies[request.params.tokenAddress.toLowerCase()]
+        const tokenSupply = supplies[getAddressKey(request.params.tokenAddress)]
 
         if (tokenSupply === undefined) {
           return reply.code(404).send({ message: 'Token supply not found' })

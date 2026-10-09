@@ -1,3 +1,4 @@
+import { SOL_ADDRESS_PATTERN, SupportedChainId } from '@cowprotocol/cow-sdk'
 import { JSONSchema } from 'json-schema-to-ts'
 import { AddressSchema, SupportedChainIdSchema } from '../../../../../schemas'
 import { PRICE_HISTORY_INTERVALS, PRICE_HISTORY_PROVIDER_IDS } from './priceHistory.types'
@@ -8,8 +9,11 @@ export const priceHistoryParamsSchema = {
   additionalProperties: false,
   properties: {
     chainId: SupportedChainIdSchema,
-    tokenAddress: AddressSchema,
+    tokenAddress: { type: 'string' },
   },
+  if: { properties: { chainId: { type: 'integer', const: SupportedChainId.SOLANA } } },
+  then: { properties: { tokenAddress: { type: 'string', pattern: SOL_ADDRESS_PATTERN.source } } },
+  else: { properties: { tokenAddress: AddressSchema } },
 } as const satisfies JSONSchema
 
 export const priceHistoryQuerySchema = {

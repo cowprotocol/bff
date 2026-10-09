@@ -1,4 +1,4 @@
-import { EVM_CHAIN_IDS, WrappedNativeTokenAddress } from '@cowprotocol/shared'
+import { AllChainIds, WrappedNativeTokenAddress } from '@cowprotocol/shared'
 import { config } from 'dotenv'
 import { resolve } from 'path'
 import { CodexPriceHistoryProvider } from './codex.provider'
@@ -20,7 +20,7 @@ describe('Codex price history provider (integration)', () => {
     }
   })
 
-  it.each(EVM_CHAIN_IDS)('fetches wrapped-native bars on chain %s', async (chainId) => {
+  it.each(AllChainIds)('fetches wrapped-native bars on chain %s', async (chainId) => {
     expect(await fetchBars(chainId, WrappedNativeTokenAddress[chainId])).not.toHaveLength(0)
   })
 
