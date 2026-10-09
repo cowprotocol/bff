@@ -1,3 +1,5 @@
+import type { Logger } from '@cowprotocol/shared'
+
 export const PRICE_HISTORY_PROVIDER_IDS = {
   UPSTREAM: 1,
   CODEX: 2,
@@ -48,15 +50,25 @@ export interface PriceHistoryProvider {
   fetchBars(request: PriceHistoryRequest, signal: AbortSignal): Promise<PriceHistoryBar[]>
 }
 
-export function normalizePriceHistoryBars(bars: PriceHistoryBar[]): PriceHistoryBar[] {
+export function normalizePriceHistoryBars(bars: PriceHistoryBar[], logger: Logger): PriceHistoryBar[] {
   const byTimestamp = new Map<number, PriceHistoryBar>()
+  let invalidBars = 0
 
   for (const bar of bars) {
     if (!isValidBar(bar)) {
-      throw new Error('Price history provider returned an invalid bar')
+      invalidBars++
+      continue
     }
 
     byTimestamp.set(bar.timestamp, bar)
+  }
+
+  if (invalidBars) {
+    logger.warn({ invalidBars }, 'Dropped invalid price history bars')
+  }
+
+  if (bars.length && !byTimestamp.size) {
+    throw new Error('Price history provider returned no valid bars')
   }
 
   return [...byTimestamp.values()].sort((a, b) => a.timestamp - b.timestamp)
