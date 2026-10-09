@@ -11,6 +11,7 @@ import {
 } from './priceHistory.types'
 
 const CODEX_API_URL = 'https://graph.codex.io/graphql'
+const SOLANA_CHAIN_ID_EXT = 1399811149
 
 const CODEX_RESOLUTION_BY_INTERVAL: Record<PriceHistoryInterval, string> = {
   '1m': '1',
@@ -77,7 +78,7 @@ export class CodexPriceHistoryProvider implements PriceHistoryProvider {
         query: TOKEN_BARS_QUERY,
         variables: {
           symbol: `${getAddressKey(request.tokenAddress)}:${
-            isSolanaChain(request.chainId) ? 1399811149 : request.chainId
+            isSolanaChain(request.chainId) ? SOLANA_CHAIN_ID_EXT : request.chainId
           }`,
           from: request.from,
           to: request.to,
