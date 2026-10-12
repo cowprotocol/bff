@@ -35,8 +35,8 @@ const TOKEN_BARS_QUERY = `
       countback: $countback
       currencyCode: USD
       from: $from
-      removeEmptyBars: true
-      removeLeadingNullValues: true
+      removeEmptyBars: false
+      removeLeadingNullValues: false
       resolution: $resolution
       symbol: $symbol
       to: $to
