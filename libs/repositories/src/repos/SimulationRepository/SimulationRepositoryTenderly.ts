@@ -94,6 +94,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       ...sim,
       network_id: chainId.toString(),
       gas_price: '0',
+      simulation_type: 'quick',
       save: true,
       save_if_fails: true,
     })) as TenderlySimulatePayload[]
