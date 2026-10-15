@@ -17,6 +17,9 @@ const schema = {
     PROXY_HOST: {
       type: 'string',
     },
+    TOKEN_SEARCH_URL: {
+      type: 'string',
+    },
     PROXY_UPSTREAM: {
       type: 'string',
     },

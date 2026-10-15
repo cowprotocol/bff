@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     env_file: .env.docker
     environment:
+      TOKEN_SEARCH_URL: ${TOKEN_SEARCH_URL}
       PROXY_UPSTREAM: ${PROXY_UPSTREAM}
       PROXY_ORIGIN: ${PROXY_ORIGIN}
       PROXY_HOST: ${PROXY_HOST}
