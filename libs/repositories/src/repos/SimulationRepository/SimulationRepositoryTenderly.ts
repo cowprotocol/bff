@@ -12,6 +12,7 @@ import { injectable } from 'inversify'
 import { SimulationData, SimulationInput, SimulationRepository } from './SimulationRepository'
 import { BigNumber } from 'ethers'
 import { buildStateDiff } from '../../utils/buildStateDiff'
+import { readJsonWithLimit } from '../../utils/readJsonWithLimit'
 
 interface TenderlyRequestLog {
   timestamp: string
@@ -93,6 +94,7 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
       ...sim,
       network_id: chainId.toString(),
       gas_price: '0',
+      simulation_type: 'quick',
       save: true,
       save_if_fails: true,
     })) as TenderlySimulatePayload[]
@@ -101,13 +103,14 @@ export class SimulationRepositoryTenderly implements SimulationRepository {
     this.logRequest(chainId, simulations)
 
     try {
-      const response = (await fetch(`${TENDERLY_API_BASE_ENDPOINT}/simulate-bundle`, {
+      const res = await fetch(`${TENDERLY_API_BASE_ENDPOINT}/simulate-bundle`, {
         method: 'POST',
         body: JSON.stringify({ simulations }),
         headers: {
           'X-Access-Key': TENDERLY_API_KEY,
         },
-      }).then((res) => res.json())) as TenderlyBundleSimulationResponse | SimulationError
+      })
+      const response = await readJsonWithLimit<TenderlyBundleSimulationResponse | SimulationError>(res)
 
       this.logResponse(startTime, response)
 
