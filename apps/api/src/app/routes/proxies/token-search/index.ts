@@ -48,7 +48,8 @@ const tokens: FastifyPluginAsync = async (fastify): Promise<void> => {
         if (deployment === undefined) return []
         if (!validateDeployment(deployment)) throw new Error('The token search response is invalid.')
 
-        const { address, decimals = 0 } = deployment
+        const { address, decimals } = deployment
+        if (decimals === undefined) return []
         return [{ chainId, address, decimals, name, symbol, logoURI: project?.logoUrl }]
       })
     } catch {
