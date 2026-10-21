@@ -1,6 +1,6 @@
+import { logger } from '@cowprotocol/shared'
 import { getCmsClient } from '../../datasources/cms'
 import {
-  CmsNotification,
   CmsPushNotification,
   CmsTelegramSubscription,
   CmsTelegramSubscriptions,
@@ -9,14 +9,10 @@ import {
 
 import { PushSubscriptionsRepository } from './PushSubscriptionsRepository'
 
-const PAGE_SIZE = 50
+export const PAGE_SIZE = 100
+const MAX_PAGES = 1000
 const CACHE_TIME = 30000
 const CMS_REQUEST_TIMEOUT_MS = 10_000
-
-type PaginationParam = {
-  page?: number
-  pageSize?: number
-}
 
 /**
  * Repository to keep track of subscribed accounts for push notifications.
@@ -30,7 +26,12 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
   async getAllSubscribedAccounts(): Promise<string[]> {
     const now = Date.now()
     if (!this.cachedAccounts || !this.lastCheck || now - this.lastCheck > CACHE_TIME) {
-      this.cachedAccounts = uniqueLowercase(await getAllSubscribedAccounts())
+      const accounts = uniqueLowercase(await getAllSubscribedAccounts())
+      // The cache refreshes every 30s, so only log when the watched set actually changes
+      if (accounts.length !== this.cachedAccounts?.length) {
+        logger.info(`[PushSubscriptionsRepositoryCms] Watching ${accounts.length} subscribed account(s)`)
+      }
+      this.cachedAccounts = accounts
       this.lastCheck = now
       return this.cachedAccounts
     }
@@ -38,14 +39,7 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
   }
 
   async getAllTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]> {
-    return getAllPages({
-      pageSize: PAGE_SIZE,
-      getPage: (params) =>
-        getTelegramSubscriptionsForAccounts({
-          ...params,
-          accounts,
-        }),
-    })
+    return getTelegramSubscriptionsForAccounts(accounts)
   }
 
   async getTelegramSubscriptionsForChatId(chatId: number): Promise<CmsTelegramSubscription[]> {
@@ -95,127 +89,36 @@ function uniqueLowercase(items: string[]): string[] {
   return Array.from(new Set(items.map((item) => item.toLowerCase())))
 }
 
-export async function getAllNotifications(): Promise<CmsNotification[]> {
-  const allNotifications = []
-  let page = 0
-
-  let notifications = await getNotificationsPage({
-    page,
-    pageSize: PAGE_SIZE + 1,
-  }) // Get one extra to check if there's more pages
-
-  allNotifications.push(notifications.length > PAGE_SIZE ? notifications.slice(0, -1) : notifications)
-
-  while (notifications.length > PAGE_SIZE) {
-    notifications = await getNotificationsPage({
-      page,
-      pageSize: PAGE_SIZE + 1,
-    }) // Get one extra to check if there's more pages
-    const hasMorePages = notifications.length > PAGE_SIZE
-    allNotifications.push(hasMorePages ? notifications.slice(0, -1) : notifications)
-
-    if (!hasMorePages) {
-      break
-    }
-
-    // Keep fetching while there's more pages
-    page++
-  }
-
-  return allNotifications.flat()
-}
-
-/**
- * Get a page of notifications from the CMS
- *
- * @param params - The pagination parameters
- * @returns The notifications
- */
-async function getNotificationsPage({ page = 0, pageSize = PAGE_SIZE }: PaginationParam = {}): Promise<
-  CmsNotification[]
-> {
-  const { data, error, response } = await getCmsClient().GET('/notifications', {
-    'populate[0]': 'notification_template',
-
-    // Pagination
-    'pagination[page]': page,
-    'pagination[pageSize]': pageSize,
-  })
-
-  if (error) {
-    console.error(`Error ${response.status} getting notifications: ${response.url}. Page${page}`, error)
-    throw error
-  }
-
-  return data.data
-}
-
 export async function getAllSubscribedAccounts(): Promise<string[]> {
-  return getAllPages({
-    pageSize: PAGE_SIZE,
-    getPage: (params) => getSubscribedAccounts(params),
-  })
-}
+  const accounts: string[] = []
 
-async function getAllPages<T>({
-  pageSize = PAGE_SIZE,
-  getPage,
-}: PaginationParam & {
-  getPage: (params: PaginationParam) => Promise<T[]>
-}): Promise<T[]> {
-  const allSubscriptions = []
-  let page = 0
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const subscriptions = await getSubscriptionsPage(page)
 
-  let subscriptions = await getPage({
-    page,
-    pageSize: pageSize + 1,
-  }) // Get one extra to check if there's more pages
-
-  allSubscriptions.push(subscriptions.length > pageSize ? subscriptions.slice(0, -1) : subscriptions)
-
-  while (subscriptions.length > pageSize) {
-    subscriptions = await getPage({
-      page,
-      pageSize: pageSize + 1,
-    }) // Get one extra to check if there's more pages
-    const hasMorePages = subscriptions.length > pageSize
-    allSubscriptions.push(hasMorePages ? subscriptions.slice(0, -1) : subscriptions)
-
-    if (!hasMorePages) {
-      break
+    for (const subscription of subscriptions) {
+      const account = subscription?.attributes?.account
+      if (account) {
+        accounts.push(account)
+      }
     }
 
-    // Keep fetching while there's more pages
-    page++
+    if (subscriptions.length < PAGE_SIZE) {
+      return accounts
+    }
   }
 
-  return allSubscriptions.flat()
+  throw new Error(`More than ${MAX_PAGES} pages of telegram subscriptions, giving up`)
 }
 
-async function getTelegramSubscriptionsForAccounts({
-  page = 0,
-  pageSize = PAGE_SIZE,
-  accounts,
-}: PaginationParam & { accounts: string[] }): Promise<CmsTelegramSubscription[]> {
-  const { data, error, response } = await getCmsClient().GET(`/accounts/${accounts.join(',')}/subscriptions/telegram`, {
-    // Pagination
-    'pagination[page]': page,
-    'pagination[pageSize]': pageSize,
-  })
-
-  if (error) {
-    console.error(`Error ${response.status} getting telegram subscriptions: ${response.url}. Page${page}`)
-    throw error
-  }
-
-  return data
-}
-
-async function getSubscribedAccounts({ page = 0, pageSize = PAGE_SIZE }: PaginationParam): Promise<string[]> {
-  const { data, error, response } = await getCmsClient().GET(`/telegram-subscriptions`, {
-    // Pagination
-    'pagination[page]': page,
-    'pagination[pageSize]': pageSize,
+async function getSubscriptionsPage(page: number): Promise<CmsTelegramSubscriptions[]> {
+  const { data, error, response } = await getCmsClient().GET('/telegram-subscriptions', {
+    params: {
+      query: {
+        'pagination[page]': page,
+        'pagination[pageSize]': PAGE_SIZE,
+        sort: 'id:asc',
+      },
+    },
   })
 
   if (error) {
@@ -223,15 +126,19 @@ async function getSubscribedAccounts({ page = 0, pageSize = PAGE_SIZE }: Paginat
     throw error
   }
 
-  const subscriptions = data.data as CmsTelegramSubscriptions[]
+  return data.data as CmsTelegramSubscriptions[]
+}
 
-  return subscriptions.reduce<string[]>((acc, subscription) => {
-    const account = subscription?.attributes?.account
-    if (account) {
-      acc.push(account)
-    }
-    return acc
-  }, [])
+// This CMS controller ignores pagination and returns every match, so one request is enough
+async function getTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]> {
+  const { data, error, response } = await getCmsClient().GET(`/accounts/${accounts.join(',')}/subscriptions/telegram`)
+
+  if (error) {
+    console.error(`Error ${response.status} getting telegram subscriptions: ${response.url}`)
+    throw error
+  }
+
+  return data
 }
 
 // TODO: switch to the typed `getCmsClient()` once @cowprotocol/cms is regenerated/published
