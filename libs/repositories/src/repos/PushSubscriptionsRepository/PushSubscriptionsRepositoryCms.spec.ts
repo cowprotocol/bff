@@ -1,4 +1,4 @@
-import { PAGE_SIZE, PushSubscriptionsRepositoryCms } from './PushSubscriptionsRepositoryCms'
+import { CMS_REQUEST_TIMEOUT_MS, PAGE_SIZE, PushSubscriptionsRepositoryCms } from './PushSubscriptionsRepositoryCms'
 
 // Keep the real openapi-fetch client (the bug was in how it serialises the query string),
 // but build it here so the tests don't depend on CMS_* being set before module load.
@@ -203,6 +203,25 @@ describe('PushSubscriptionsRepositoryCms', () => {
       expect(result).toEqual(['0xabc', '0xdef'])
     })
 
+    it('aborts a stalled page request instead of hanging', async () => {
+      // AbortSignal.timeout is stubbed so the test does not wait out the real timeout
+      const controller = new AbortController()
+      const timeout = jest.spyOn(AbortSignal, 'timeout').mockReturnValue(controller.signal)
+      mockedFetch.mockImplementation(
+        (input) =>
+          new Promise((_resolve, reject) => {
+            ;(input as Request).signal.addEventListener('abort', () => reject(new Error('aborted')))
+          })
+      )
+
+      const pending = new PushSubscriptionsRepositoryCms().getAllSubscribedAccounts()
+      controller.abort()
+
+      await expect(pending).rejects.toThrow(/aborted/)
+      expect(timeout).toHaveBeenCalledWith(CMS_REQUEST_TIMEOUT_MS)
+      timeout.mockRestore()
+    })
+
     it('throws instead of looping forever when the cms never returns a short page', async () => {
       mockedFetch.mockImplementation(async () => {
         const data = accounts(PAGE_SIZE).map((account, id) => ({ id, attributes: { account } }))
@@ -213,12 +232,12 @@ describe('PushSubscriptionsRepositoryCms', () => {
     })
   })
 
-  describe('getAllTelegramSubscriptionsForAccounts', () => {
+  describe('getTelegramSubscriptionsForAccount', () => {
     it('makes exactly one request, since the cms endpoint ignores pagination', async () => {
       const subscriptions = accounts(150).map((account) => ({ account, chatId: '42' }))
       mockedFetch.mockImplementation(async () => new Response(JSON.stringify(subscriptions), { status: 200 }))
 
-      const result = await new PushSubscriptionsRepositoryCms().getAllTelegramSubscriptionsForAccounts(['0xabc'])
+      const result = await new PushSubscriptionsRepositoryCms().getTelegramSubscriptionsForAccount('0xabc')
 
       expect(result).toHaveLength(150)
       expect(mockedFetch).toHaveBeenCalledTimes(1)

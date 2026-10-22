@@ -88,7 +88,7 @@ const telegram: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request, reply) {
       const account = request.params.account.toLowerCase()
-      const subscriptions = await pushSubscriptionsRepository.getAllTelegramSubscriptionsForAccounts([account])
+      const subscriptions = await pushSubscriptionsRepository.getTelegramSubscriptionsForAccount(account)
 
       reply.send({
         connected: subscriptions.length > 0,

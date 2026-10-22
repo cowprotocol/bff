@@ -81,7 +81,7 @@ async function getSubscriptions(
   const lastCheck = LAST_SUBSCRIPTION_CHECK.get(account)
   if (!lastCheck || lastCheck.getTime() + SUBSCRIPTION_CACHE_TIME < Date.now()) {
     // Get the subscriptions for this account (if we haven't checked in a while)
-    const subscriptionForAccount = await pushSubscriptionsRepository.getAllTelegramSubscriptionsForAccounts([account])
+    const subscriptionForAccount = await pushSubscriptionsRepository.getTelegramSubscriptionsForAccount(account)
     SUBSCRIPTION_CACHE.set(account, subscriptionForAccount)
   }
 

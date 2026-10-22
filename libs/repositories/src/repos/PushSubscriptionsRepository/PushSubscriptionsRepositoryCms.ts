@@ -12,7 +12,7 @@ import { PushSubscriptionsRepository } from './PushSubscriptionsRepository'
 export const PAGE_SIZE = 100
 const MAX_PAGES = 1000
 const CACHE_TIME = 30000
-const CMS_REQUEST_TIMEOUT_MS = 10_000
+export const CMS_REQUEST_TIMEOUT_MS = 10_000
 
 /**
  * Repository to keep track of subscribed accounts for push notifications.
@@ -38,8 +38,8 @@ export class PushSubscriptionsRepositoryCms implements PushSubscriptionsReposito
     return this.cachedAccounts || []
   }
 
-  async getAllTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]> {
-    return getTelegramSubscriptionsForAccounts(accounts)
+  async getTelegramSubscriptionsForAccount(account: string): Promise<CmsTelegramSubscription[]> {
+    return getTelegramSubscriptionsForAccount(account)
   }
 
   async getTelegramSubscriptionsForChatId(chatId: number): Promise<CmsTelegramSubscription[]> {
@@ -119,6 +119,7 @@ async function getSubscriptionsPage(page: number): Promise<CmsTelegramSubscripti
         sort: 'id:asc',
       },
     },
+    signal: AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS),
   })
 
   if (error) {
@@ -129,9 +130,11 @@ async function getSubscriptionsPage(page: number): Promise<CmsTelegramSubscripti
   return data.data as CmsTelegramSubscriptions[]
 }
 
-// This CMS controller ignores pagination and returns every match, so one request is enough
-async function getTelegramSubscriptionsForAccounts(accounts: string[]): Promise<CmsTelegramSubscription[]> {
-  const { data, error, response } = await getCmsClient().GET(`/accounts/${accounts.join(',')}/subscriptions/telegram`)
+// One account per request. It ignores pagination for a single account, so one request returns every chat.
+async function getTelegramSubscriptionsForAccount(account: string): Promise<CmsTelegramSubscription[]> {
+  const { data, error, response } = await getCmsClient().GET(`/accounts/${account}/subscriptions/telegram`, {
+    signal: AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS),
+  })
 
   if (error) {
     console.error(`Error ${response.status} getting telegram subscriptions: ${response.url}`)
