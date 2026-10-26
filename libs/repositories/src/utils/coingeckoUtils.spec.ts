@@ -44,6 +44,7 @@ describe('getNativeCoinId', () => {
     ['base', 'ethereum'],
     ['linea', 'ethereum'],
     ['ink', 'ethereum'],
+    ['robinhood', 'ethereum'],
     ['arbitrum-one', 'ethereum'],
     ['optimistic-ethereum', 'ethereum'],
   ])('resolves %s to the native coin id %s, not the platform id', (platform, coinId) => {
