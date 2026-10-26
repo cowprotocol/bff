@@ -19,4 +19,5 @@ export const GOLD_RUSH_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.LINEA]: 'linea-mainnet',
   [SupportedChainId.PLASMA]: 'plasma-mainnet',
   [SupportedChainId.INK]: 'ink-mainnet',
+  [SupportedChainId.ROBINHOOD]: 'robinhood-mainnet',
 } as const satisfies Record<EvmChainId, string>

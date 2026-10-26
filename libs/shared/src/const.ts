@@ -48,6 +48,7 @@ export const EXPLORER_NETWORK_NAMES = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
+  [SupportedChainId.ROBINHOOD]: 'robinhood',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 } as const satisfies Record<EvmChainId, string>
 
@@ -63,6 +64,7 @@ export const COW_API_NETWORK_NAMES = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
+  [SupportedChainId.ROBINHOOD]: 'robinhood',
   [SupportedChainId.SEPOLIA]: 'sepolia',
 } as const satisfies Record<EvmChainId, string>
 
