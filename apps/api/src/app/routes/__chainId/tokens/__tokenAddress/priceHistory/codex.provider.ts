@@ -103,6 +103,10 @@ export class CodexPriceHistoryProvider implements PriceHistoryProvider {
 }
 
 function mapCodexBars(bars: CodexTokenBars): PriceHistoryBar[] {
+  if (bars === null) {
+    return []
+  }
+
   const length = bars.t.length
   if (bars.o.length !== length || bars.h.length !== length || bars.l.length !== length || bars.c.length !== length) {
     throw new Error('Codex returned inconsistent arrays')

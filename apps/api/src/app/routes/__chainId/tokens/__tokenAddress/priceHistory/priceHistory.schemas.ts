@@ -81,6 +81,25 @@ const nullableStringArraySchema = {
   },
 } as const satisfies JSONSchema
 
+const codexTokenBarsSchema = {
+  type: 'object',
+  required: ['o', 'h', 'l', 'c', 't'],
+  additionalProperties: false,
+  properties: {
+    o: nullableNumberArraySchema,
+    h: nullableNumberArraySchema,
+    l: nullableNumberArraySchema,
+    c: nullableNumberArraySchema,
+    t: {
+      type: 'array',
+      items: { type: 'integer', minimum: 0 },
+    },
+    volume: {
+      anyOf: [nullableStringArraySchema, { type: 'null' }],
+    },
+  },
+} as const satisfies JSONSchema
+
 export const codexPriceHistoryPayloadSchema = {
   type: 'object',
   required: ['data'],
@@ -91,26 +110,15 @@ export const codexPriceHistoryPayloadSchema = {
       required: ['getTokenBars'],
       additionalProperties: false,
       properties: {
+        // Codex answers `null` plus a root `errors` entry (`NOT_FOUND`) for tokens it has no market for.
+        // Any field-level error collapses to zero bars here; gate on `extensions.code` if a transient
+        // Codex failure ever needs to stay a 502.
         getTokenBars: {
-          type: 'object',
-          required: ['o', 'h', 'l', 'c', 't'],
-          additionalProperties: false,
-          properties: {
-            o: nullableNumberArraySchema,
-            h: nullableNumberArraySchema,
-            l: nullableNumberArraySchema,
-            c: nullableNumberArraySchema,
-            t: {
-              type: 'array',
-              items: { type: 'integer', minimum: 0 },
-            },
-            volume: {
-              anyOf: [nullableStringArraySchema, { type: 'null' }],
-            },
-          },
+          anyOf: [codexTokenBarsSchema, { type: 'null' }],
         },
       },
     },
+    errors: { type: 'array' },
   },
 } as const satisfies JSONSchema
 
