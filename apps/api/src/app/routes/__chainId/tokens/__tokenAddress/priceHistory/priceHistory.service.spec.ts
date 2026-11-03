@@ -15,6 +15,10 @@ const REQUEST: PriceHistoryRequest = {
   interval: '1h',
 }
 const BAR: PriceHistoryBar = { timestamp: 1710000000, open: 1, high: 2, low: 0.5, close: 1.5 }
+const FLAT_BARS: PriceHistoryBar[] = [
+  { timestamp: 1710000000, open: 1, high: 1, low: 1, close: 1 },
+  { timestamp: 1710003600, open: 1, high: 1, low: 1, close: 1 },
+]
 const logger = pino({ enabled: false })
 
 function provider(
@@ -82,6 +86,24 @@ describe('PriceHistoryService', () => {
 
     await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: [BAR] })
     expect(fallbackFetch).not.toHaveBeenCalled()
+  })
+
+  // The upstream provider answers with a single price for the token it uses as its own USD reference, so the
+  // response is well-formed but carries nothing a chart can draw.
+  it('skips a flat series in favour of a provider that has one', async () => {
+    const upstream = provider(1, jest.fn().mockResolvedValue(FLAT_BARS))
+    const codex = provider(2, jest.fn().mockResolvedValue([BAR]))
+    const service = new PriceHistoryService([upstream, codex], '1,2', logger)
+
+    await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 2, bars: [BAR] })
+  })
+
+  it('keeps the flat series when no other provider has one', async () => {
+    const upstream = provider(1, jest.fn().mockResolvedValue(FLAT_BARS))
+    const codex = provider(2, jest.fn().mockRejectedValue(new Error('failed')))
+    const service = new PriceHistoryService([upstream, codex], '1,2', logger)
+
+    await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: FLAT_BARS })
   })
 
   it('falls back after a provider timeout', async () => {

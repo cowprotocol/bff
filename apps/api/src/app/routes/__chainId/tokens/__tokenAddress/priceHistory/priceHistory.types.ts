@@ -74,6 +74,21 @@ export function normalizePriceHistoryBars(bars: PriceHistoryBar[], logger: Logge
   return [...byTimestamp.values()].sort((a, b) => a.timestamp - b.timestamp)
 }
 
+/**
+ * A window whose every bar carries the same single price says nothing a chart can draw. A provider that
+ * treats the requested token as its own USD reference answers this way, so the series is well-formed but
+ * unusable, and callers should prefer any other provider's answer over it.
+ */
+export function isFlatPriceHistory(bars: PriceHistoryBar[]): boolean {
+  if (bars.length < 2) {
+    return false
+  }
+
+  const price = bars[0].open
+
+  return bars.every((bar) => bar.open === price && bar.high === price && bar.low === price && bar.close === price)
+}
+
 function isValidBar(bar: PriceHistoryBar): boolean {
   const prices = [bar.open, bar.high, bar.low, bar.close]
 

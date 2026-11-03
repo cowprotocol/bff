@@ -1,6 +1,7 @@
 import type { Logger } from '@cowprotocol/shared'
 import {
   getProviderName,
+  isFlatPriceHistory,
   normalizePriceHistoryBars,
   PRICE_HISTORY_PROVIDER_IDS,
   PriceHistoryProvider,
@@ -50,6 +51,8 @@ export class PriceHistoryService {
   }
 
   async getPriceHistory(request: PriceHistoryRequest): Promise<PriceHistoryResult> {
+    let flatResult: PriceHistoryResult | undefined
+
     for (const [index, providerId] of this.providerOrder.entries()) {
       const provider = this.providers.get(providerId)
       if (!provider || !provider.supportsInterval(request.interval)) {
@@ -66,6 +69,19 @@ export class PriceHistoryService {
         )
         const result = { providerId, bars }
 
+        if (isFlatPriceHistory(bars)) {
+          this.logger.info(
+            { provider: getProviderName(providerId), bars: bars.length },
+            'Price history provider returned a flat series'
+          )
+
+          if (!flatResult) {
+            flatResult = result
+          }
+
+          continue
+        }
+
         if (index > 0) {
           this.logger.info(
             { provider: getProviderName(providerId), bars: bars.length },
@@ -79,6 +95,10 @@ export class PriceHistoryService {
       } finally {
         clearTimeout(timeout)
       }
+    }
+
+    if (flatResult) {
+      return flatResult
     }
 
     throw new Error('Price history providers failed')
