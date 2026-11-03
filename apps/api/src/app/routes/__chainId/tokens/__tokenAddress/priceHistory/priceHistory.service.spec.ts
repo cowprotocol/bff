@@ -106,6 +106,14 @@ describe('PriceHistoryService', () => {
     await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: FLAT_BARS })
   })
 
+  it('keeps the flat series rather than an empty response from a later provider', async () => {
+    const upstream = provider(1, jest.fn().mockResolvedValue(FLAT_BARS))
+    const codex = provider(2, jest.fn().mockResolvedValue([]))
+    const service = new PriceHistoryService([upstream, codex], '1,2', logger)
+
+    await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: FLAT_BARS })
+  })
+
   it('falls back after a provider timeout', async () => {
     jest.useFakeTimers()
     const hanging = provider(

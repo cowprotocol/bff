@@ -82,6 +82,12 @@ export class PriceHistoryService {
           continue
         }
 
+        // A later provider with nothing at all is worse than the flat series already in hand. Without this,
+        // falling through from a flat result can downgrade a drawable-but-useless chart to an empty one.
+        if (!bars.length && flatResult) {
+          continue
+        }
+
         if (index > 0) {
           this.logger.info(
             { provider: getProviderName(providerId), bars: bars.length },
