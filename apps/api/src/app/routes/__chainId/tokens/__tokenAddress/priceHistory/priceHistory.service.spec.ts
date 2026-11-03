@@ -15,10 +15,14 @@ const REQUEST: PriceHistoryRequest = {
   interval: '1h',
 }
 const BAR: PriceHistoryBar = { timestamp: 1710000000, open: 1, high: 2, low: 0.5, close: 1.5 }
-const FLAT_BARS: PriceHistoryBar[] = [
-  { timestamp: 1710000000, open: 1, high: 1, low: 1, close: 1 },
-  { timestamp: 1710003600, open: 1, high: 1, low: 1, close: 1 },
-]
+const FLAT_BARS: PriceHistoryBar[] = Array.from({ length: 10 }, (_, i) => ({
+  timestamp: 1710000000 + i * 3600,
+  open: 1,
+  high: 1,
+  low: 1,
+  close: 1,
+}))
+const SHORT_FLAT_BARS: PriceHistoryBar[] = FLAT_BARS.slice(0, 2)
 const logger = pino({ enabled: false })
 
 function provider(
@@ -112,6 +116,17 @@ describe('PriceHistoryService', () => {
     const service = new PriceHistoryService([upstream, codex], '1,2', logger)
 
     await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: FLAT_BARS })
+  })
+
+  // A chart polling for new bars asks for the one or two since the last it holds, and any token can sit
+  // still that long. Treating that as a placeholder would split one chart across two price sources.
+  it('serves a window too short to judge without consulting the next provider', async () => {
+    const codexFetch = jest.fn().mockResolvedValue([BAR])
+    const upstream = provider(1, jest.fn().mockResolvedValue(SHORT_FLAT_BARS))
+    const service = new PriceHistoryService([upstream, provider(2, codexFetch)], '1,2', logger)
+
+    await expect(service.getPriceHistory(REQUEST)).resolves.toEqual({ providerId: 1, bars: SHORT_FLAT_BARS })
+    expect(codexFetch).not.toHaveBeenCalled()
   })
 
   it('falls back after a provider timeout', async () => {

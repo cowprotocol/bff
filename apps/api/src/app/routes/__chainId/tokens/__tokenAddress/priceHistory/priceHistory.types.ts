@@ -75,12 +75,19 @@ export function normalizePriceHistoryBars(bars: PriceHistoryBar[], logger: Logge
 }
 
 /**
+ * Below this, identical bars say nothing: a chart polling for new bars asks for the one or two since the
+ * last one it holds, and any token can sit still that long. A provider repeating one value across a window
+ * this wide is reporting a placeholder, not a quiet market.
+ */
+const MIN_FLAT_BARS = 10
+
+/**
  * A window whose every bar carries the same single price says nothing a chart can draw. A provider that
  * treats the requested token as its own USD reference answers this way, so the series is well-formed but
  * unusable, and callers should prefer any other provider's answer over it.
  */
 export function isFlatPriceHistory(bars: PriceHistoryBar[]): boolean {
-  if (bars.length < 2) {
+  if (bars.length < MIN_FLAT_BARS) {
     return false
   }
 
