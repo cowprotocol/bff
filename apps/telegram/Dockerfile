@@ -6,6 +6,7 @@
 #
 # Run the container with `docker run -p 3000:3000 -t telegram`.
 FROM docker.io/node:lts-alpine AS builder
+RUN command -v yarn >/dev/null || npm install -g yarn@1.22.22
 
 # Do not start the Nx daemon in the build container.
 ENV NX_DAEMON=false
@@ -26,6 +27,7 @@ COPY . .
 RUN yarn nx run telegram:build
 
 FROM docker.io/node:lts-alpine
+RUN command -v yarn >/dev/null || npm install -g yarn@1.22.22
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
