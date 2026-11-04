@@ -74,6 +74,28 @@ export function normalizePriceHistoryBars(bars: PriceHistoryBar[], logger: Logge
   return [...byTimestamp.values()].sort((a, b) => a.timestamp - b.timestamp)
 }
 
+/**
+ * Below this, identical bars say nothing: a chart polling for new bars asks for the one or two since the
+ * last one it holds, and any token can sit still that long. A provider repeating one value across a window
+ * this wide is reporting a placeholder, not a quiet market.
+ */
+const MIN_FLAT_BARS = 10
+
+/**
+ * A window whose every bar carries the same single price says nothing a chart can draw. `UPSTREAM`
+ * answers USDC with exactly `1` at every resolution it serves, so the series is well-formed but is a
+ * placeholder rather than a market, and callers should prefer any other provider's answer over it.
+ */
+export function isFlatPriceHistory(bars: PriceHistoryBar[]): boolean {
+  if (bars.length < MIN_FLAT_BARS) {
+    return false
+  }
+
+  const price = bars[0].open
+
+  return bars.every((bar) => bar.open === price && bar.high === price && bar.low === price && bar.close === price)
+}
+
 function isValidBar(bar: PriceHistoryBar): boolean {
   const prices = [bar.open, bar.high, bar.low, bar.close]
 
