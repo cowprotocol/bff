@@ -121,6 +121,33 @@ describe('CodexPriceHistoryProvider', () => {
     ])
   })
 
+  it('returns no bars when Codex has no market for the token', async () => {
+    mockedFetch.mockResolvedValue(
+      response({
+        errors: [
+          {
+            message: 'Could not find token for symbol: 0x61a075979fd5d9fc3b4f3db8ac77b710b03ecdc2:1',
+            extensions: { code: 'NOT_FOUND', serviceName: 'tokens' },
+            path: ['getTokenBars'],
+          },
+        ],
+        data: { getTokenBars: null },
+      })
+    )
+    const provider = new CodexPriceHistoryProvider('secret')
+
+    await expect(provider.fetchBars(REQUEST, new AbortController().signal)).resolves.toEqual([])
+  })
+
+  it('still rejects a payload without data', async () => {
+    mockedFetch.mockResolvedValue(response({ errors: [{ message: 'Rate limit exceeded' }] }))
+    const provider = new CodexPriceHistoryProvider('secret')
+
+    await expect(provider.fetchBars(REQUEST, new AbortController().signal)).rejects.toMatchObject({
+      message: 'Codex returned an invalid response',
+    })
+  })
+
   it('keeps upstream HTTP failures status-only', async () => {
     const readBody = jest.fn()
     mockedFetch.mockResolvedValue({
