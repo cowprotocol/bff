@@ -82,9 +82,9 @@ export function normalizePriceHistoryBars(bars: PriceHistoryBar[], logger: Logge
 const MIN_FLAT_BARS = 10
 
 /**
- * A window whose every bar carries the same single price says nothing a chart can draw. A provider that
- * treats the requested token as its own USD reference answers this way, so the series is well-formed but
- * unusable, and callers should prefer any other provider's answer over it.
+ * A window whose every bar carries the same single price says nothing a chart can draw. `UPSTREAM`
+ * answers USDC with exactly `1` at every resolution it serves, so the series is well-formed but is a
+ * placeholder rather than a market, and callers should prefer any other provider's answer over it.
  */
 export function isFlatPriceHistory(bars: PriceHistoryBar[]): boolean {
   if (bars.length < MIN_FLAT_BARS) {
