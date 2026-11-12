@@ -18,6 +18,7 @@ const BLOCKCHAIN_TO_CHAIN_ID: Record<string, SupportedChainId> = {
   mainnet: SupportedChainId.MAINNET,
   plasma: SupportedChainId.PLASMA,
   polygon: SupportedChainId.POLYGON,
+  robinhood: SupportedChainId.ROBINHOOD,
 }
 
 export function isTraderStatsRowRaw(data: unknown): data is TraderStatsRowRaw {
