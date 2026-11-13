@@ -176,6 +176,22 @@ describe('get-token-restrictions route', () => {
     await app.close()
   })
 
+  it('returns 503 when every token list fails on the first load, and retries on the next request', async () => {
+    globalThis.fetch = jest.fn(async (requestUrl: string) =>
+      requestUrl === RESTRICTED_TOKEN_LISTS_URL ? jsonResponse(CMS_RESPONSE) : jsonResponse({}, false)
+    ) as unknown as typeof fetch
+    const app = await createApp()
+
+    const failed = await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+    expect(failed.statusCode).toBe(503)
+    expect(failed.headers['cache-control']).toBeUndefined()
+
+    globalThis.fetch = mockFetch() as unknown as typeof fetch
+    const recovered = await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+    expect(recovered.json()).toEqual({ restricted: true, tokenList: 'xStocks Token List' })
+    await app.close()
+  })
+
   it('refetches the lists at most once per refresh interval, in the background', async () => {
     let now = 1_000_000
     jest.spyOn(Date, 'now').mockImplementation(() => now)

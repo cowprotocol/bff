@@ -59,6 +59,7 @@ export const REFRESH_INTERVAL_MS = 15 * 60 * 1000
  * - afterwards, a request triggers a background refresh at most once per REFRESH_INTERVAL_MS,
  *   and is answered with the current registry without waiting
  * - a failed refresh keeps the current registry; a token list that fails to load keeps its previous tokens
+ * - a load where no token list could be loaded (and none was loaded before) fails
  */
 export class TokenRestrictionsService {
   private rulesByToken: Map<string, TokenRule[]> | null = null
@@ -103,6 +104,11 @@ export class TokenRestrictionsService {
   private async fetchRules(): Promise<Map<string, TokenRule[]>> {
     const lists = await this.fetchRestrictedTokenLists()
     const tokenKeysPerList = await Promise.all(lists.map((list) => this.fetchTokenKeys(list)))
+
+    // Geoblocking must never silently turn itself off, so having no list data at all is treated as a failure
+    if (tokenKeysPerList.every((tokenKeys) => tokenKeys === undefined)) {
+      throw new Error('None of the restricted token lists could be loaded')
+    }
 
     const rulesByToken = new Map<string, TokenRule[]>()
     const tokenKeysByListUrl = new Map<string, string[]>()
