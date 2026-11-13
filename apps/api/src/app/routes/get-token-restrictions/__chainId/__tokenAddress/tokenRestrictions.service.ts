@@ -178,7 +178,7 @@ export class TokenRestrictionsService {
       throw new Error('Restricted token lists response had no data')
     }
 
-    return data.flatMap(({ attributes }) => {
+    const lists = data.flatMap(({ attributes }) => {
       if (
         !attributes ||
         typeof attributes.name !== 'string' ||
@@ -196,5 +196,11 @@ export class TokenRestrictionsService {
         },
       ]
     })
+
+    if (lists.length === 0) {
+      throw new Error('Restricted token lists response had no valid lists')
+    }
+
+    return lists
   }
 }

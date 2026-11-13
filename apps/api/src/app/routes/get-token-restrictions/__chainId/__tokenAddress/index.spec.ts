@@ -241,6 +241,36 @@ describe('get-token-restrictions route', () => {
     await app.close()
   })
 
+  it('returns 503 when the CMS has no valid lists', async () => {
+    globalThis.fetch = mockFetch({
+      data: [{}, { attributes: { name: 'No URL', restrictedCountries: ['US'] } }],
+    }) as unknown as typeof fetch
+    const app = await createApp()
+
+    const response = await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+
+    expect(response.statusCode).toBe(503)
+    expect(response.headers['cache-control']).toBeUndefined()
+    await app.close()
+  })
+
+  it('keeps the current registry when a refresh gets no valid lists from the CMS', async () => {
+    let now = 1_000_000
+    jest.spyOn(Date, 'now').mockImplementation(() => now)
+    globalThis.fetch = mockFetch() as unknown as typeof fetch
+    const app = await createApp()
+    await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+
+    globalThis.fetch = mockFetch({ data: [{}] }) as unknown as typeof fetch
+    now += REFRESH_INTERVAL_MS
+    await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+    await flushBackgroundRefresh()
+
+    const response = await app.inject({ method: 'GET', url: url(1, XSTOCK_TOKEN, 'US') })
+    expect(response.json()).toEqual({ restricted: true, tokenList: 'xStocks Token List' })
+    await app.close()
+  })
+
   it('keeps previously loaded tokens of a list that fails to refresh', async () => {
     let now = 1_000_000
     jest.spyOn(Date, 'now').mockImplementation(() => now)
