@@ -9,6 +9,8 @@ import {
 } from './tokenRestrictions.schemas'
 import { TokenRestrictionsService } from './tokenRestrictions.service'
 
+import type {} from '@fastify/caching'
+
 const CACHE_SECONDS = 5 * 60
 
 type TokenRestrictionsParams = FromSchema<typeof tokenRestrictionsParamsSchema>
