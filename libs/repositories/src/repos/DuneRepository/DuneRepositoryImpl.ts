@@ -12,6 +12,9 @@ export const duneRepositorySymbol = Symbol.for('DuneRepository')
 
 const DEFAULT_LIMIT = 1000
 
+/** Bounds what an error body contributes to the thrown message and the logs, not the read itself. */
+const MAX_ERROR_BODY_CHARS = 2000
+
 export class DuneRepositoryImpl implements DuneRepository {
   private readonly apiKey: string
   private readonly baseUrl: string
@@ -94,7 +97,7 @@ export class DuneRepositoryImpl implements DuneRepository {
       const responseText = (response as Partial<Response>).text
       if (typeof responseText === 'function') {
         try {
-          errorBody = await responseText.call(response)
+          errorBody = (await responseText.call(response)).slice(0, MAX_ERROR_BODY_CHARS)
         } catch {
           // keep default
         }
