@@ -1,10 +1,4 @@
-import type {
-  DuneExecutionResponse,
-  DuneRepository,
-  DuneResultResponse,
-  UploadCsvParams,
-  UploadCsvResponse,
-} from '@cowprotocol/repositories'
+import type { DuneRepository, DuneResultResponse, UploadCsvParams, UploadCsvResponse } from '@cowprotocol/repositories'
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import type { TraderActivityRowRaw } from './AffiliateStatsService.types'
 import { AffiliateStatsServiceImpl } from './AffiliateStatsServiceImpl'
@@ -13,24 +7,11 @@ const TRADER_ADDRESS = '0x0000000000000000000000000000000000000abc'
 const TRADER_ADDRESS_CHECKSUM = '0x0000000000000000000000000000000000000AbC'
 
 class MockDuneRepository implements DuneRepository {
-  public readonly executeQueryMock = jest.fn<
-    Promise<DuneExecutionResponse>,
-    Parameters<DuneRepository['executeQuery']>
-  >()
   public readonly getQueryResultsMock = jest.fn<Promise<DuneResultResponse<TraderActivityRowRaw>>, [unknown]>()
-  public readonly getExecutionResultsMock = jest.fn<Promise<DuneResultResponse<TraderActivityRowRaw>>, [unknown]>()
-  public readonly waitForExecutionMock = jest.fn<Promise<DuneResultResponse<TraderActivityRowRaw>>, [unknown]>()
   public readonly uploadCsvMock = jest.fn<Promise<UploadCsvResponse>, [UploadCsvParams]>()
 
   constructor() {
-    this.executeQueryMock.mockResolvedValue({
-      execution_id: 'execution-1',
-      state: 'QUERY_STATE_PENDING',
-    })
-
     this.getQueryResultsMock.mockResolvedValue(this.createResult([]))
-    this.getExecutionResultsMock.mockResolvedValue(this.createResult([]))
-    this.waitForExecutionMock.mockResolvedValue(this.createResult([]))
     this.uploadCsvMock.mockResolvedValue({ success: true })
   }
 
@@ -61,22 +42,8 @@ class MockDuneRepository implements DuneRepository {
     }
   }
 
-  executeQuery(...params: Parameters<DuneRepository['executeQuery']>): Promise<DuneExecutionResponse> {
-    return this.executeQueryMock(...params)
-  }
-
   async getQueryResults<T>(params: Parameters<DuneRepository['getQueryResults']>[0]): Promise<DuneResultResponse<T>> {
     return (await this.getQueryResultsMock(params)) as DuneResultResponse<T>
-  }
-
-  async getExecutionResults<T>(
-    params: Parameters<DuneRepository['getExecutionResults']>[0]
-  ): Promise<DuneResultResponse<T>> {
-    return (await this.getExecutionResultsMock(params)) as DuneResultResponse<T>
-  }
-
-  async waitForExecution<T>(params: Parameters<DuneRepository['waitForExecution']>[0]): Promise<DuneResultResponse<T>> {
-    return (await this.waitForExecutionMock(params)) as DuneResultResponse<T>
   }
 
   uploadCsv(params: UploadCsvParams): Promise<UploadCsvResponse> {
@@ -139,8 +106,6 @@ describe('AffiliateStatsServiceImpl', () => {
       offset: 0,
       typeAssertion: expect.any(Function),
     })
-    expect(duneRepository.executeQueryMock).not.toHaveBeenCalled()
-    expect(duneRepository.waitForExecutionMock).not.toHaveBeenCalled()
     expect(result.lastUpdatedAt).toBe('2026-03-18T10:00:01.000Z')
     expect(result.rows).toEqual([
       {
@@ -187,8 +152,6 @@ describe('AffiliateStatsServiceImpl', () => {
     await service.getTraderActivity(TRADER_ADDRESS_CHECKSUM)
 
     expect(duneRepository.getQueryResultsMock).toHaveBeenCalledTimes(1)
-    expect(duneRepository.executeQueryMock).not.toHaveBeenCalled()
-    expect(duneRepository.waitForExecutionMock).not.toHaveBeenCalled()
   })
 
   it('throws for unsupported blockchains in trader activity rows', async () => {
