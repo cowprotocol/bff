@@ -51,6 +51,12 @@ export const USDC = {
     address: '0x2D270e6886d130D724215A266106e6832161EAEd',
     decimals: 6,
   },
+  [SupportedChainId.ROBINHOOD]: {
+    // Robinhood has no USDC; USDG is the reference stablecoin there
+    // https://robin.etherscan.io/token/0x5fc5360d0400a0fd4f2af552add042d716f1d168
+    address: '0x5fc5360d0400a0fd4f2af552add042d716f1d168',
+    decimals: 6,
+  },
   [SupportedChainId.SEPOLIA]: {
     address: '0xbe72E441BF55620febc26715db68d3494213D8Cb',
     decimals: 18,

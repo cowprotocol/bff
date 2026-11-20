@@ -112,34 +112,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/trades": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get existing trades (unpaginated).
-         * @deprecated
-         * @description **Deprecated:** This endpoint is deprecated and will be removed in the future. Please use `/api/v2/trades` instead, which provides pagination support.
-         *
-         *     Exactly one of `owner` or `orderUid` must be set.
-         *
-         *     Results are sorted by block number and log index descending (newest trades first).
-         *
-         *     **Note:** This endpoint returns all matching trades without pagination. For paginated results, use `/api/v2/trades`.
-         *
-         */
-        get: operations["getTrades"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v2/trades": {
         parameters: {
             query?: never;
@@ -277,7 +249,7 @@ export interface paths {
         /**
          * Stream progressively improving quotes as solvers respond.
          * @description Accepts the same request body as `POST /api/v1/quote`. Instead of waiting for all solvers and returning the single best quote, this endpoint opens a Server-Sent Events stream and emits quotes as solvers respond. A quote is emitted only when it ranks better than the best one already sent; the first goes out as soon as the fastest solver answers. Solvers without a usable quote, and quotes that do not beat the best already sent, emit no event, so you may receive fewer events than there are solvers. The stream closes when the quote timeout elapses or all solvers have responded. Each emitted quote carries an `id` that can be referenced when placing an order.
-         *     The `priceQuality` field of the request body is ignored: this endpoint always queries all solvers and attempts verification, and each emitted quote carries its own `verified` flag. A verified quote ranks above an unverified one regardless of amount, so a later quote may report a lower `out_amount`. Individual solver errors are not streamed; if no solver returns a usable quote, a terminal event named `error` is sent with a `PriceEstimationError` body before the stream closes.
+         *     The `priceQuality` field uses the same estimator and ranking semantics as `POST /api/v1/quote`. `verified` attempts verification and prefers a verified quote over an unverified one regardless of amount, so a later quote may report a lower `out_amount`. `optimal` skips verification and ranks all responses by their promised price. `fast` is not supported because the streaming endpoint already returns the first usable quote as soon as it arrives. Individual solver errors are not streamed; if no solver returns a usable quote, a terminal event named `error` is sent with a `PriceEstimationError` body before the stream closes.
          *
          */
         post: operations["quoteStream"];
@@ -531,7 +503,7 @@ export interface components {
         AppDataHash: string;
         /** @description An `appData` document that is registered with the API. */
         AppDataObject: {
-            fullAppData?: components["schemas"]["AppData"];
+            fullAppData: components["schemas"]["AppData"];
         };
         /**
          * @description A big unsigned integer encoded in decimal.
@@ -835,7 +807,7 @@ export interface components {
             /** @description The address of the CoW Protocol settlement contract that this order is valid for. Orders are only valid on the settlement contract they were signed for.
              *      */
             settlementContract: components["schemas"]["Address"];
-            /** @description If the order was created with a quote, this field contains the original quote data for reference. Includes gas estimation and pricing information captured at the time of quoting, which can be used to analyze order execution and calculate fees.
+            /** @description If the order was created with a quote, this field contains the original quote data for reference. Includes gas estimation and pricing information captured at the time of quoting, which can be used to analyze order execution and calculate fees. Only populated once the order has been at least partially filled.
              *      */
             quote?: components["schemas"]["StoredOrderQuote"] | null;
         };
@@ -1063,7 +1035,8 @@ export interface components {
          *       `InvalidNativeSellToken`, `QuoteNotVerified`, `SameBuyAndSellToken`,
          *       `SellAmountDoesNotCoverFee`, `TokenTemporarilySuspended`,
          *       `TradingOutsideAllowedWindow`, `UnsupportedBuyTokenDestination`,
-         *       `UnsupportedOrderType`, `UnsupportedSellTokenSource`,
+         *       `UnsupportedOrderType`, `UnsupportedPriceQuality`,
+         *       `UnsupportedSellTokenSource`,
          *       `UnsupportedToken`
          *     * 403: `Forbidden`
          *     * 404: `NoLiquidity`
@@ -1071,7 +1044,7 @@ export interface components {
          *      */
         PriceEstimationError: {
             /** @enum {string} */
-            errorType: "AppDataHashMismatch" | "CustomSolverError" | "ExcessiveValidTo" | "Forbidden" | "InsufficientLiquidity" | "InsufficientValidTo" | "InternalServerError" | "InvalidAppData" | "InvalidNativeSellToken" | "NoLiquidity" | "QuoteNotVerified" | "SameBuyAndSellToken" | "SellAmountDoesNotCoverFee" | "TokenTemporarilySuspended" | "TradingOutsideAllowedWindow" | "UnsupportedBuyTokenDestination" | "UnsupportedOrderType" | "UnsupportedSellTokenSource" | "UnsupportedToken";
+            errorType: "AppDataHashMismatch" | "CustomSolverError" | "ExcessiveValidTo" | "Forbidden" | "InsufficientLiquidity" | "InsufficientValidTo" | "InternalServerError" | "InvalidAppData" | "InvalidNativeSellToken" | "NoLiquidity" | "QuoteNotVerified" | "SameBuyAndSellToken" | "SellAmountDoesNotCoverFee" | "TokenTemporarilySuspended" | "TradingOutsideAllowedWindow" | "UnsupportedBuyTokenDestination" | "UnsupportedOrderType" | "UnsupportedPriceQuality" | "UnsupportedSellTokenSource" | "UnsupportedToken";
             description: string;
             /** @description Optional error-specific payload: `SellAmountDoesNotCoverFee` returns an object with `fee_amount`. */
             data?: Record<string, never>;
@@ -1142,12 +1115,6 @@ export interface components {
             from: components["schemas"]["Address"];
             /** @default verified */
             priceQuality: components["schemas"]["PriceQuality"];
-            /**
-             * @description Signals that this quote is intended for fast-path (out-of-competition) execution. Propagated to the solver. Mutually exclusive with the `appData` `validFrom` field: an order that sets both is rejected.
-             *
-             * @default false
-             */
-            fastPath: boolean;
             /** @default eip712 */
             signingScheme: components["schemas"]["SigningScheme"];
             /**
@@ -1201,6 +1168,8 @@ export interface components {
             auctionStartBlock?: number;
             /** @description Block deadline by which the auction must be settled. */
             auctionDeadlineBlock?: number;
+            /** @description Whether this is a fast-path auction. */
+            fastPath?: boolean;
             /** @description The hashes of the transactions for the winning solutions of this competition.
              *      */
             transactionHashes?: components["schemas"]["TransactionHash"][];
@@ -1333,12 +1302,6 @@ export interface components {
              *     provides higher confidence that the trade will execute successfully.
              *      */
             verified: boolean;
-            /** @description Additional metadata about the quote execution plan (e.g., the route taken).
-             *     This field is only populated for orders that are no longer fillable
-             *     (filled, cancelled, or expired) to prevent solvers from copying
-             *     execution strategies for active orders.
-             *      */
-            metadata?: Record<string, never>;
         };
         /** @description A calculated order quote used in solver auctions.
          *      */
@@ -1914,37 +1877,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    getTrades: {
-        parameters: {
-            query?: {
-                owner?: components["schemas"]["Address"];
-                orderUid?: components["schemas"]["UID"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description ### If `owner` is specified:
-             *
-             *     Return all trades related to that `owner`.
-             *
-             *     ### If `orderUid` is specified:
-             *
-             *     Return all trades related to that `orderUid`. Given that an order
-             *     may be partially fillable, it is possible that an individual order
-             *     may have *multiple* trades. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Trade"][];
-                };
             };
         };
     };

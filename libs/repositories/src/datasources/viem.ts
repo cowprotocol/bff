@@ -1,7 +1,20 @@
 import { SupportedChainId } from '@cowprotocol/cow-sdk'
 import { EVM_CHAIN_IDS, EvmChainId, logger } from '@cowprotocol/shared'
 import { Chain, createPublicClient, http, PublicClient, webSocket } from 'viem'
-import { arbitrum, avalanche, base, bsc, gnosis, linea, mainnet, plasma, polygon, sepolia, ink } from 'viem/chains'
+import {
+  arbitrum,
+  avalanche,
+  base,
+  bsc,
+  gnosis,
+  ink,
+  linea,
+  mainnet,
+  plasma,
+  polygon,
+  robinhood,
+  sepolia,
+} from 'viem/chains'
 
 const NETWORKS = {
   [SupportedChainId.MAINNET]: mainnet,
@@ -15,6 +28,7 @@ const NETWORKS = {
   [SupportedChainId.LINEA]: linea,
   [SupportedChainId.PLASMA]: plasma,
   [SupportedChainId.INK]: ink,
+  [SupportedChainId.ROBINHOOD]: robinhood,
 } as const satisfies Record<EvmChainId, Chain>
 
 let viemClients: Record<EvmChainId, PublicClient> | undefined

@@ -19,4 +19,5 @@ export const MORALIS_CLIENT_NETWORK_MAPPING = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: null,
   [SupportedChainId.INK]: null,
+  [SupportedChainId.ROBINHOOD]: null,
 } as const satisfies Record<EvmChainId, string | null>

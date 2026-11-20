@@ -18,4 +18,5 @@ export const ETHPLORER_BASE_URL = {
   [SupportedChainId.LINEA]: 'https://api.lineaplorer.build',
   [SupportedChainId.PLASMA]: null,
   [SupportedChainId.INK]: null,
+  [SupportedChainId.ROBINHOOD]: null,
 } as const satisfies Record<EvmChainId, string | null>

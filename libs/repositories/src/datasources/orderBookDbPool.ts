@@ -21,6 +21,7 @@ const chainToDbNameMap = {
   [SupportedChainId.LINEA]: 'linea',
   [SupportedChainId.PLASMA]: 'plasma',
   [SupportedChainId.INK]: 'ink',
+  [SupportedChainId.ROBINHOOD]: 'robinhood',
 } as const satisfies Record<EvmChainId, string>
 
 function createNewOrderBookDbPool(env: 'prod' | 'barn', chainId: SupportedChainId): Pool {
