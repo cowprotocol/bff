@@ -37,12 +37,9 @@ import {
   TokenDetailService,
   TokenDetailServiceMain,
   tokenDetailServiceSymbol,
-  HooksService,
-  HooksServiceImpl,
   AffiliateStatsService,
   AffiliateStatsServiceImpl,
   affiliateStatsServiceSymbol,
-  hooksServiceSymbol,
   SimulationService,
   SlippageService,
   SlippageServiceMain,
@@ -119,8 +116,6 @@ export function getApiContainer(): Container {
     const affiliateStatsCacheTtlMs = getAffiliateStatsCacheTtlMs()
 
     apiContainer.bind<DuneRepository>(duneRepositorySymbol).toConstantValue(duneRepository)
-
-    apiContainer.bind<HooksService>(hooksServiceSymbol).toDynamicValue(() => new HooksServiceImpl(duneRepository))
 
     apiContainer
       .bind<AffiliateStatsService>(affiliateStatsServiceSymbol)
