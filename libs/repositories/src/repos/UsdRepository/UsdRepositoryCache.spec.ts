@@ -3,7 +3,7 @@ import IORedis from 'ioredis'
 import { WETH } from '../../../test/mock'
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis'
 import type { PricePoint } from './UsdRepository'
-import { UsdRepository } from './UsdRepository'
+import { PRICE_SERIES_CACHE_SECONDS, UsdRepository } from './UsdRepository'
 import { UsdRepositoryCache } from './UsdRepositoryCache'
 
 const CACHE_VALUE_SECONDS = 10
@@ -243,9 +243,37 @@ describe('UsdRepositoryCache', () => {
         `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:5m`,
         pricePoints200String,
         'EX',
-        CACHE_VALUE_SECONDS
+        PRICE_SERIES_CACHE_SECONDS['5m']
       )
     })
+
+    it.each(['5m', 'hourly', 'daily'] as const)(
+      'caches a %s series for its own granularity, not the generic value TTL',
+      async (priceStrategy) => {
+        // GIVEN: The value is not cached, and the proxy answers with a series
+        redisMock.get.mockResolvedValue(null)
+        proxyMock.getUsdPrices.mockResolvedValue([pricePoint200])
+
+        // WHEN: Get USD prices
+        await usdRepositoryCache.getUsdPrices(chainId, WETH, priceStrategy)
+
+        // THEN: The series is cached for that strategy's TTL
+        expect(redisMock.set).toHaveBeenCalledWith(
+          `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:${priceStrategy}`,
+          pricePoints200String,
+          'EX',
+          PRICE_SERIES_CACHE_SECONDS[priceStrategy]
+        )
+
+        // THEN: Never the generic value TTL
+        expect(redisMock.set).not.toHaveBeenCalledWith(
+          expect.any(String),
+          expect.any(String),
+          'EX',
+          CACHE_VALUE_SECONDS
+        )
+      }
+    )
 
     it('should call the proxy if no cache, then cache the NULL', async () => {
       // GIVEN: The value is not cached

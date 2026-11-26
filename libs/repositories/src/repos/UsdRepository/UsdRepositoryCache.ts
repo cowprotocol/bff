@@ -2,7 +2,14 @@ import { injectable } from 'inversify'
 import { logger } from '@cowprotocol/shared'
 import { getCacheKey, PartialCacheKey } from '../../utils/cache'
 import { CacheRepository } from '../CacheRepository/CacheRepository'
-import { deserializePricePoints, PricePoint, PriceStrategy, serializePricePoints, UsdRepository } from './UsdRepository'
+import {
+  deserializePricePoints,
+  PRICE_SERIES_CACHE_SECONDS,
+  PricePoint,
+  PriceStrategy,
+  serializePricePoints,
+  UsdRepository,
+} from './UsdRepository'
 
 const NULL_VALUE = 'null'
 const ERROR_VALUE = 'error'
@@ -86,6 +93,7 @@ export class UsdRepositoryCache implements UsdRepository {
     this.cacheValue({
       key,
       value: usdPrices ? serializePricePoints(usdPrices) : null,
+      cacheTimeSeconds: usdPrices ? PRICE_SERIES_CACHE_SECONDS[priceStrategy] : undefined,
     })
 
     return usdPrices

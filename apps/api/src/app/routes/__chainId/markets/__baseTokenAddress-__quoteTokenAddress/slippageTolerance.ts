@@ -1,12 +1,13 @@
 import { SlippageService, slippageServiceSymbol, VolatilityDetails } from '@cowprotocol/services'
 import { EVM_ADDRESS_PATTERN, SOL_ADDRESS_PATTERN } from '@cowprotocol/cow-sdk'
+import { PRICE_SERIES_CACHE_SECONDS } from '@cowprotocol/repositories'
 import { FastifyPluginAsync } from 'fastify'
 import { FromSchema, JSONSchema } from 'json-schema-to-ts'
 import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../../utils/cache'
 import { apiContainer } from '../../../../inversify.config'
 import { SupportedChainIdSchema } from '../../../../schemas'
 
-const CACHE_SECONDS = 120
+const CACHE_SECONDS = PRICE_SERIES_CACHE_SECONDS['5m']
 
 // Accepts either an EVM address (0x...) or a Solana address (base58), so the route also works for Solana markets.
 const TOKEN_ADDRESS_PATTERN = `(${EVM_ADDRESS_PATTERN.source})|(${SOL_ADDRESS_PATTERN.source})`
