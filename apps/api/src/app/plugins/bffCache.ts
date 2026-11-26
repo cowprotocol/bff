@@ -1,9 +1,14 @@
 import fp from 'fastify-plugin'
-import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue, parseCacheControlHeaderValue } from '../../utils/cache'
+import {
+  CACHE_CONTROL_HEADER,
+  getCacheControlHeaderValue,
+  getRequestCacheKey,
+  parseCacheControlHeaderValue,
+} from '../../utils/cache'
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify'
 
 const HEADER_NAME = 'x-bff-cache'
-import { CacheRepository, cacheRepositorySymbol, getCacheKey } from '@cowprotocol/repositories'
+import { CacheRepository, cacheRepositorySymbol } from '@cowprotocol/repositories'
 import { Readable } from 'stream'
 import { apiContainer } from '../inversify.config'
 
@@ -114,7 +119,7 @@ async function getContentFromPayload(payload: unknown): Promise<string | null> {
 }
 
 function getKey(req: FastifyRequest) {
-  return getCacheKey('requests', ...req.url.split('/'))
+  return getRequestCacheKey(req.url)
 }
 
 function getTtlFromResponse(reply: FastifyReply, defaultTtl: number | undefined): number | undefined {

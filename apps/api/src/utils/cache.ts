@@ -1,4 +1,7 @@
+import { getCacheKey } from '@cowprotocol/repositories'
 import { FastifyInstance } from 'fastify'
+
+import type {} from '@fastify/caching'
 
 export const CACHE_CONTROL_HEADER = 'cache-control'
 
@@ -74,4 +77,35 @@ export function parseCacheControlHeaderValue(headerValue?: string | number | str
   })
 
   return directivesResult
+}
+
+/** Clients poll with `to` set to `now` at second resolution, so an unrounded key never hits. */
+const TIMESTAMP_GRID_SECONDS = 30
+const TIMESTAMP_PARAMS = ['from', 'to']
+
+/** Cache key for a request URL, with timestamp params rounded so polling clients share an entry. */
+export function getRequestCacheKey(url: string): string {
+  return getCacheKey('requests', ...roundTimestampParams(url).split('/'))
+}
+
+function roundTimestampParams(url: string): string {
+  const queryStart = url.indexOf('?')
+  if (queryStart === -1) {
+    return url
+  }
+
+  const params = new URLSearchParams(url.slice(queryStart + 1))
+  let rounded = false
+
+  for (const name of TIMESTAMP_PARAMS) {
+    const value = params.get(name)
+    if (value === null || !/^\d+$/.test(value)) {
+      continue
+    }
+
+    params.set(name, String(Math.floor(Number(value) / TIMESTAMP_GRID_SECONDS) * TIMESTAMP_GRID_SECONDS))
+    rounded = true
+  }
+
+  return rounded ? `${url.slice(0, queryStart)}?${params}` : url
 }
