@@ -31,6 +31,17 @@ describe('getRequestCacheKey', () => {
     expect(getRequestCacheKey(paged(0, 100))).not.toEqual(getRequestCacheKey(paged(0, 119)))
   })
 
+  it('keeps a repeated timestamp param distinct from the valid request', () => {
+    // Validation runs after the key is built and rejects the duplicate, so collapsing it here would
+    // serve the cached 200 instead of the 400
+    const valid = `${CHART_URL}?from=1795535151&to=1795621551&interval=5m`
+    const duplicated = `${CHART_URL}?from=1795535151&from=bad&to=1795621551&interval=5m`
+
+    expect(getRequestCacheKey(valid, CHART_TIMESTAMP_PARAMS)).not.toEqual(
+      getRequestCacheKey(duplicated, CHART_TIMESTAMP_PARAMS)
+    )
+  })
+
   it('leaves non-numeric values alone', () => {
     const url =
       '/1/simulation?from=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&to=0xdac17f958d2ee523a2206206994597c13d831ec7'
