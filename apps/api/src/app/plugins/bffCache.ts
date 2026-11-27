@@ -7,6 +7,19 @@ import {
 } from '../../utils/cache'
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify'
 
+declare module 'fastify' {
+  interface FastifyContextConfig {
+    /**
+     * Query params on this route that hold a unix timestamp.
+     *
+     * They are rounded onto a shared grid before the cache key is built, so clients polling the same
+     * window share one entry instead of each minting a key of its own. `from`/`to` mean different
+     * things on different routes, so only the route that defines them can say this.
+     */
+    cacheKeyTimestampParams?: readonly string[]
+  }
+}
+
 const HEADER_NAME = 'x-bff-cache'
 import { CacheRepository, cacheRepositorySymbol } from '@cowprotocol/repositories'
 import { Readable } from 'stream'
@@ -119,7 +132,7 @@ async function getContentFromPayload(payload: unknown): Promise<string | null> {
 }
 
 function getKey(req: FastifyRequest) {
-  return getRequestCacheKey(req.url)
+  return getRequestCacheKey(req.url, req.routeConfig?.cacheKeyTimestampParams)
 }
 
 function getTtlFromResponse(reply: FastifyReply, defaultTtl: number | undefined): number | undefined {

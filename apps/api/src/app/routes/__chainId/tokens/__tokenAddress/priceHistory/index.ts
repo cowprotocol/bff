@@ -47,6 +47,7 @@ const priceHistory: FastifyPluginAsync = async (fastify): Promise<void> => {
   }>(
     '/',
     {
+      config: { cacheKeyTimestampParams: ['from', 'to'] },
       schema: {
         params: priceHistoryParamsSchema,
         querystring: priceHistoryQuerySchema,
