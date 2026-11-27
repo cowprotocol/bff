@@ -3,7 +3,7 @@ import IORedis from 'ioredis'
 import { WETH } from '../../../test/mock'
 import { CacheRepositoryRedis } from '../CacheRepository/CacheRepositoryRedis'
 import type { PricePoint } from './UsdRepository'
-import { UsdRepository } from './UsdRepository'
+import { PRICE_SERIES_CACHE_SECONDS, UsdRepository, withPriceSeriesCacheTtl } from './UsdRepository'
 import { UsdRepositoryCache } from './UsdRepositoryCache'
 
 const CACHE_VALUE_SECONDS = 10
@@ -17,6 +17,7 @@ const chainId = SupportedChainId.MAINNET.toString()
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
     get: jest.fn(),
+    ttl: jest.fn(),
     set: jest.fn(),
   }))
 })
@@ -222,6 +223,44 @@ describe('UsdRepositoryCache', () => {
       expect(proxyMock.getUsdPrices).not.toHaveBeenCalled()
     })
 
+    it('limits a response to the remaining lifetime of a cached series', async () => {
+      redisMock.get.mockResolvedValue(pricePoints100String)
+      redisMock.ttl.mockResolvedValue(1)
+
+      const { cacheTtlSeconds } = await withPriceSeriesCacheTtl(300, () =>
+        usdRepositoryCache.getUsdPrices(chainId, WETH, '5m')
+      )
+
+      expect(cacheTtlSeconds).toBeLessThanOrEqual(1)
+      expect(proxyMock.getUsdPrices).not.toHaveBeenCalled()
+    })
+
+    it('does not extend an old series when its key is replaced between cache reads', async () => {
+      redisMock.ttl.mockResolvedValue(1)
+      redisMock.get.mockImplementation(async () => {
+        redisMock.ttl.mockResolvedValue(300)
+        return pricePoints100String
+      })
+
+      const { cacheTtlSeconds } = await withPriceSeriesCacheTtl(300, () =>
+        usdRepositoryCache.getUsdPrices(chainId, WETH, '5m')
+      )
+
+      expect(cacheTtlSeconds).toBeLessThanOrEqual(1)
+    })
+
+    it('limits a fallback response to the upstream error cache lifetime', async () => {
+      redisMock.get.mockResolvedValue(null)
+      proxyMock.getUsdPrices.mockRejectedValue(new Error('Coingecko unavailable'))
+
+      const { cacheTtlSeconds } = await withPriceSeriesCacheTtl(300, async () => {
+        await expect(usdRepositoryCache.getUsdPrices(chainId, WETH, '5m')).rejects.toThrow('Coingecko unavailable')
+      })
+
+      expect(cacheTtlSeconds).toBeLessThanOrEqual(CACHE_ERROR_SECONDS)
+    })
+
+
     it('should call the proxy if no cache, then cache the value', async () => {
       // GIVEN: The value is not cached
       redisMock.get.mockResolvedValue(null)
@@ -243,9 +282,37 @@ describe('UsdRepositoryCache', () => {
         `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:5m`,
         pricePoints200String,
         'EX',
-        CACHE_VALUE_SECONDS
+        PRICE_SERIES_CACHE_SECONDS['5m']
       )
     })
+
+    it.each(['5m', 'hourly', 'daily'] as const)(
+      'caches a %s series for its own granularity, not the generic value TTL',
+      async (priceStrategy) => {
+        // GIVEN: The value is not cached, and the proxy answers with a series
+        redisMock.get.mockResolvedValue(null)
+        proxyMock.getUsdPrices.mockResolvedValue([pricePoint200])
+
+        // WHEN: Get USD prices
+        await usdRepositoryCache.getUsdPrices(chainId, WETH, priceStrategy)
+
+        // THEN: The series is cached for that strategy's TTL
+        expect(redisMock.set).toHaveBeenCalledWith(
+          `repos:test-cache:usd-prices:${chainId}:${wethLowercase}:${priceStrategy}`,
+          pricePoints200String,
+          'EX',
+          PRICE_SERIES_CACHE_SECONDS[priceStrategy]
+        )
+
+        // THEN: Never the generic value TTL
+        expect(redisMock.set).not.toHaveBeenCalledWith(
+          expect.any(String),
+          expect.any(String),
+          'EX',
+          CACHE_VALUE_SECONDS
+        )
+      }
+    )
 
     it('should call the proxy if no cache, then cache the NULL', async () => {
       // GIVEN: The value is not cached
