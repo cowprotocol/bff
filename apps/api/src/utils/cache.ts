@@ -57,14 +57,12 @@ function roundTimestampParams(url: string, timestampParams: readonly string[]): 
   let rounded = false
 
   for (const name of timestampParams) {
-    // A repeated param is rejected by validation, which runs after this key is built. Rounding it
-    // would drop the extra occurrence and hand the request the valid response cached under that key.
-    const values = params.getAll(name)
-    if (values.length !== 1 || !/^\d+$/.test(values[0])) {
+    const value = params.get(name)
+    if (value === null || !/^\d+$/.test(value)) {
       continue
     }
 
-    params.set(name, String(Math.floor(Number(values[0]) / TIMESTAMP_GRID_SECONDS) * TIMESTAMP_GRID_SECONDS))
+    params.set(name, String(Math.floor(Number(value) / TIMESTAMP_GRID_SECONDS) * TIMESTAMP_GRID_SECONDS))
     rounded = true
   }
 

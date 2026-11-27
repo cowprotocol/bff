@@ -33,7 +33,12 @@ interface BffCacheOptions {
 
 export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, next) => {
   const { ttl } = opts
-  fastify.addHook('onRequest', async (request, reply) => {
+  /**
+   * Deliberately preHandler, not onRequest: the key is built from raw query params, so a malformed
+   * request can normalise onto a valid one's key. Looking up after validation means anything the
+   * schema rejects gets its 400 instead of the cached 200 that key happens to hold.
+   */
+  fastify.addHook('preHandler', async (request, reply) => {
     // Cache only GET requests
     if (request.method !== 'GET') {
       return
