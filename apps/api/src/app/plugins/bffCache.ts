@@ -1,9 +1,27 @@
 import fp from 'fastify-plugin'
-import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue, parseCacheControlHeaderValue } from '../../utils/cache'
+import {
+  CACHE_CONTROL_HEADER,
+  getCacheControlHeaderValue,
+  getRequestCacheKey,
+  parseCacheControlHeaderValue,
+} from '../../utils/cache'
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify'
 
+declare module 'fastify' {
+  interface FastifyContextConfig {
+    /**
+     * Query params on this route that hold a unix timestamp.
+     *
+     * They are rounded onto a shared grid before the cache key is built, so clients polling the same
+     * window share one entry instead of each minting a key of its own. `from`/`to` mean different
+     * things on different routes, so only the route that defines them can say this.
+     */
+    cacheKeyTimestampParams?: readonly string[]
+  }
+}
+
 const HEADER_NAME = 'x-bff-cache'
-import { CacheRepository, cacheRepositorySymbol, getCacheKey } from '@cowprotocol/repositories'
+import { CacheRepository, cacheRepositorySymbol } from '@cowprotocol/repositories'
 import { Readable } from 'stream'
 import { apiContainer } from '../inversify.config'
 
@@ -15,7 +33,12 @@ interface BffCacheOptions {
 
 export const bffCache: FastifyPluginCallback<BffCacheOptions> = (fastify, opts, next) => {
   const { ttl } = opts
-  fastify.addHook('onRequest', async (request, reply) => {
+  /**
+   * Deliberately preHandler, not onRequest: the key is built from raw query params, so a malformed
+   * request can normalise onto a valid one's key. Looking up after validation means anything the
+   * schema rejects gets its 400 instead of the cached 200 that key happens to hold.
+   */
+  fastify.addHook('preHandler', async (request, reply) => {
     // Cache only GET requests
     if (request.method !== 'GET') {
       return
@@ -114,7 +137,7 @@ async function getContentFromPayload(payload: unknown): Promise<string | null> {
 }
 
 function getKey(req: FastifyRequest) {
-  return getCacheKey('requests', ...req.url.split('/'))
+  return getRequestCacheKey(req.url, req.routeConfig?.cacheKeyTimestampParams)
 }
 
 function getTtlFromResponse(reply: FastifyReply, defaultTtl: number | undefined): number | undefined {
