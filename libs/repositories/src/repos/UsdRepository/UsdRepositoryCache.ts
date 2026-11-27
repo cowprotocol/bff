@@ -7,6 +7,7 @@ import {
   PRICE_SERIES_CACHE_SECONDS,
   PricePoint,
   PriceStrategy,
+  recordPriceSeriesCacheTtl,
   serializePricePoints,
   UsdRepository,
 } from './UsdRepository'
@@ -74,12 +75,19 @@ export class UsdRepositoryCache implements UsdRepository {
     const key = getCacheKey(...this.baseCacheKey, 'usd-prices', chainIdOrSlug, tokenAddress || '', priceStrategy)
 
     // Get price from cache
-    const usdPriceCached = await this.getValueFromCache({
-      key,
-      convertFn: deserializePricePoints,
-    })
+    // Read the TTL first: a key replaced between these reads must not give an old value a new TTL.
+    const remainingTtl = await this.cache.getTtl(key).catch(() => null)
+    let usdPriceCached: PricePoint[] | null | undefined
+    try {
+      usdPriceCached = await this.getValueFromCache({ key, convertFn: deserializePricePoints })
+    } catch (error) {
+      recordPriceSeriesCacheTtl(remainingTtl)
+      throw error
+    }
 
     if (usdPriceCached !== undefined) {
+      // A response built from this series must not outlive the series entry.
+      recordPriceSeriesCacheTtl(remainingTtl)
       // Return cached prices (if available)
       return usdPriceCached
     }
@@ -87,14 +95,19 @@ export class UsdRepositoryCache implements UsdRepository {
     // Get the usd Prices (delegate call)
     const usdPrices = await this.getFromProxy(key, () =>
       this.proxy.getUsdPrices(chainIdOrSlug, tokenAddress, priceStrategy)
-    )
+    ).catch((error) => {
+      recordPriceSeriesCacheTtl(CACHE_ERROR_SECONDS)
+      throw error
+    })
 
     // Cache prices (or absence of it)
+    const cacheTimeSeconds = usdPrices ? PRICE_SERIES_CACHE_SECONDS[priceStrategy] : this.cacheTimeNullSeconds
     this.cacheValue({
       key,
       value: usdPrices ? serializePricePoints(usdPrices) : null,
-      cacheTimeSeconds: usdPrices ? PRICE_SERIES_CACHE_SECONDS[priceStrategy] : undefined,
+      cacheTimeSeconds,
     })
+    recordPriceSeriesCacheTtl(cacheTimeSeconds)
 
     return usdPrices
   }

@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'async_hooks'
+
 export const usdRepositorySymbol = Symbol.for('UsdRepository')
 
 export type PriceStrategy = '5m' | 'hourly' | 'daily'
@@ -11,6 +13,25 @@ export const PRICE_SERIES_CACHE_SECONDS: Record<PriceStrategy, number> = {
   '5m': 5 * 60,
   hourly: 60 * 60,
   daily: 60 * 60,
+}
+
+const priceSeriesExpiry = new AsyncLocalStorage<{ expiresAt: number }>()
+
+/** Cap an HTTP response by the earliest price-series cache expiry seen while computing it. */
+export async function withPriceSeriesCacheTtl<T>(
+  maxTtlSeconds: number,
+  getValue: () => Promise<T>
+): Promise<{ value: T; cacheTtlSeconds: number }> {
+  const context = { expiresAt: Date.now() + maxTtlSeconds * 1000 }
+  const value = await priceSeriesExpiry.run(context, getValue)
+  return { value, cacheTtlSeconds: Math.max(0, Math.floor((context.expiresAt - Date.now()) / 1000)) }
+}
+
+export function recordPriceSeriesCacheTtl(ttlSeconds: number | null | undefined): void {
+  const context = priceSeriesExpiry.getStore()
+  if (context) {
+    context.expiresAt = Math.min(context.expiresAt, Date.now() + Math.max(0, ttlSeconds ?? 0) * 1000)
+  }
 }
 
 export interface PricePoint {

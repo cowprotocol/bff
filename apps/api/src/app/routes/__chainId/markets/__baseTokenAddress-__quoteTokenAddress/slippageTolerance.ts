@@ -1,6 +1,6 @@
 import { SlippageService, slippageServiceSymbol, VolatilityDetails } from '@cowprotocol/services'
 import { EVM_ADDRESS_PATTERN, SOL_ADDRESS_PATTERN } from '@cowprotocol/cow-sdk'
-import { PRICE_SERIES_CACHE_SECONDS } from '@cowprotocol/repositories'
+import { PRICE_SERIES_CACHE_SECONDS, withPriceSeriesCacheTtl } from '@cowprotocol/repositories'
 import { FastifyPluginAsync } from 'fastify'
 import { FromSchema, JSONSchema } from 'json-schema-to-ts'
 import { CACHE_CONTROL_HEADER, getCacheControlHeaderValue } from '../../../../../utils/cache'
@@ -89,12 +89,10 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request, reply) {
       const { chainId, baseTokenAddress, quoteTokenAddress } = request.params
 
-      const slippageBps = await slippageService.getSlippageBps({
-        chainId,
-        baseTokenAddress,
-        quoteTokenAddress,
-      })
-      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
+      const { value: slippageBps, cacheTtlSeconds } = await withPriceSeriesCacheTtl(CACHE_SECONDS, () =>
+        slippageService.getSlippageBps({ chainId, baseTokenAddress, quoteTokenAddress })
+      )
+      reply.header(CACHE_CONTROL_HEADER, cacheTtlSeconds > 0 ? getCacheControlHeaderValue(cacheTtlSeconds) : 'no-store')
       reply.send({ slippageBps })
     }
   )
@@ -122,15 +120,13 @@ const root: FastifyPluginAsync = async (fastify): Promise<void> => {
         `Get volatility details for market ${baseTokenAddress}-${quoteTokenAddress} on chain ${chainId}. Query: ${queryString}`,
         JSON.stringify(request.query)
       )
-      const volatilityDetailsBase = await slippageService.getVolatilityDetails(chainId, baseTokenAddress)
-
-      const volatilityDetailsQuote = await slippageService.getVolatilityDetails(chainId, quoteTokenAddress)
-
-      reply.header(CACHE_CONTROL_HEADER, getCacheControlHeaderValue(CACHE_SECONDS))
-      reply.send({
-        baseToken: volatilityDetailsBase,
-        quoteToken: volatilityDetailsQuote,
+      const { value: details, cacheTtlSeconds } = await withPriceSeriesCacheTtl(CACHE_SECONDS, async () => {
+        const baseToken = await slippageService.getVolatilityDetails(chainId, baseTokenAddress)
+        const quoteToken = await slippageService.getVolatilityDetails(chainId, quoteTokenAddress)
+        return { baseToken, quoteToken }
       })
+      reply.header(CACHE_CONTROL_HEADER, cacheTtlSeconds > 0 ? getCacheControlHeaderValue(cacheTtlSeconds) : 'no-store')
+      reply.send(details)
     }
   )
 }
